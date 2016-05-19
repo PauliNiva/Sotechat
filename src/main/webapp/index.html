@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1, user-scalable=no">
+    <title>Chat</title>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/chat.css" rel="stylesheet">
+</head>
+<body ng-app="chatApp">
+<div class="container app-container" ng-controller="chat as chat">
+    <div class="container col-xs-12 col-sm-8  chat-container">
+        <div class="panel panel-default chat-panel">
+            <div class="panel-heading chat-heading">
+                <h4 class="panel-title">Esimerkki chat</h4>
+            </div>
+            <div class="panel-body chat-body">
+                <div ng-repeat="message in messages | orderBy:'time':false" class="message">
+                    <div ng-include="'views/message.html'"></div>
+                </div>
+            </div>
+            <div class="panel-footer chat-footer">
+                <form ng-submit="addMessage()" name="messageForm">
+                    <div class="input-group">
+                        <textarea ng-model="message" ng-enter="addMessage();" rows="1" class="form-control chat-text" placeholder=""> </textarea>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Lähetä</button>
+                </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container col-sm-4 hidden-xs info-container">
+        <div class="row logo-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Jarvenpaa.vaakuna.svg/207px-Jarvenpaa.vaakuna.svg.png" class="img-responsive center-block" >
+        </div>
+        <div class="panel panel-default info-panel">
+            <div class="panel-body">
+                <h4>Fusce dapibus</h4>
+                <ul>
+                    <li>sadf</li>
+                    <li>lassdf</li>
+                    <li>lassdf</li>
+                    <li>lassdf</li>
+                    <li>lassdf</li>
+                </ul>
+                <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="assets/lib/angular.min.js"></script>
+<script src="app.js"></script>
+<script src="assets/lib/bootstrap.min.js"></script>
+</body>
+</html>

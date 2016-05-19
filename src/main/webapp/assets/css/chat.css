@@ -1,0 +1,60 @@
+.chat-panel {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    height: 100%;
+}
+
+.chat-text {
+    resize: none;
+    height: 34px;
+
+}
+
+.chat-body {
+    overflow-y: auto;
+    height: calc(100% - 104px);
+    width: auto;
+}
+
+.app-container {
+    max-width: 1500px;
+    margin-top: 0px;
+    height: calc(100% - 10px);
+}
+
+.chat-container {
+    height: 100%;
+}
+
+.chat-footer {
+    height: 54px;
+}
+
+.chat-heading {
+    height: 50px;
+}
+
+
+.logo-container {
+    margin-top: 5px;
+    min-height: 244px;
+    height: 33%;
+}
+
+.info-panel {
+    margin-top: 5px;
+}
+textarea.form-control {
+    height: 34px;
+}
+
+.message-panel {
+    margin-bottom: 5px;
+    width: 95%;
+
+}
+
+html, body {
+    height: 100%;
+    padding: 0px;
+}
