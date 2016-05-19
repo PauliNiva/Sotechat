@@ -1,4 +1,4 @@
-package hello;
+package sotechat;
 
 /**
  * Created by leokallo on 18.5.2016.
