@@ -1,14 +1,27 @@
+
+
 var app = angular.module('chatApp', []);
 
-app.controller('chat', function($scope) {
+// $(document).ready(function($scope) {
+//     $.get("/join", function( data , ChatService) {
+//         console.log("ChatService: " + ChatService);
+//         ChatService.initialize(data);
+//     });
+// });
+
+
+
+app.controller('chat', function($scope, ChatService) {
     $scope.messages = [];
 
     $scope.addMessage = function() {
-        sendConversation($scope.message);
+        ChatService.send($scope.message);
         $scope.message = "";
     };
 
-
+    ChatService.receive().then(null, null, function(message) {
+        $scope.messages.push(message);
+    });
 
     var init =  function(){
         var message = [];
@@ -19,7 +32,66 @@ app.controller('chat', function($scope) {
         message.I = false;
         $scope.messages.push(message);
     };
+
     init();
+});
+
+app.service("ChatService", function($q, $timeout) {
+
+    var service = {}, listener = $q.defer(), socket = {
+        client: null,
+        stomp: null
+    }, messageIds = [];
+
+    service.RECONNECT_TIMEOUT = 30000;
+
+    service.receive = function() {
+        return listener.promise;
+    };
+
+    service.send = function(text) {
+        var id = Math.floor(Math.random() * 1000000);
+        socket.stomp.send("/toServer/"+service.channelId, {}, JSON.stringify({ 'userId': service.userId, 'channelId': service.channelId, 'content': text }));
+        messageIds.push(id);
+    };
+
+    var reconnect = function() {
+        $timeout(function() {
+            initialize();
+        }, this.RECONNECT_TIMEOUT);
+    };
+
+    var getMessage = function(data) {
+        var parsed = JSON.parse(data);
+        var message = [];
+        message.message = parsed.content;
+        message.time = parsed.timeStamp;
+        message.id = Math.floor(Math.random() * 1000000); // <-- mihin tämä on?
+        message.sender = parsed.userName;
+        //TODO: If author == self then Message.I = true
+        message.I = true;
+        return message;
+    };
+
+    var startListener = function($scope) {
+        socket.stomp.subscribe('/toClient/'+service.channelId, function(data){
+            console.log(JSON.parse(data.body));
+            listener.notify(getMessage(data.body));
+        });
+    };
+
+    var initialize = function() {
+        $.get("/join", function( data ) {
+            service.channelId = data.channelId;
+            service.userId = data.userId;
+            socket.client = new SockJS('/toServer');
+            socket.stomp = Stomp.over(socket.client);
+            socket.stomp.connect({}, startListener);
+            socket.stomp.onclose = reconnect;
+        });
+    };
+    initialize();
+    return service;
 });
 
 app.directive('ngEnter', function() {
