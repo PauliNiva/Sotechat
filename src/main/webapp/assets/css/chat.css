@@ -50,7 +50,11 @@ textarea.form-control {
 
 .message-panel {
     margin-bottom: 5px;
-    width: 95%;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: auto;
+    min-width: 150px;
+    max-width: 80%;
 
 }
 
