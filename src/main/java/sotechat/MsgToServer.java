@@ -1,7 +1,8 @@
 package sotechat;
 
 /**
- * Created by leokallo on 19.5.2016.
+ * Asiakasohjelman palvelimelle lähettämä viesti paketoidaan MsgToServer-olion sisälle, ennen kuin palvelimen
+ * ChatController-luokka voi käsitellä sitä.
  */
 public class MsgToServer {
 

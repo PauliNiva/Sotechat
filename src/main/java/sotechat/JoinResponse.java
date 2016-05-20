@@ -1,8 +1,5 @@
 package sotechat;
 
-/**
- * Created by leokallo on 19.5.2016.
- */
 public class JoinResponse {
 
     private String userName;

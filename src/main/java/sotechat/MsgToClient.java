@@ -1,7 +1,8 @@
 package sotechat;
 
 /**
- * Created by leokallo on 18.5.2016.
+ * Palvelimen asiakasohjelmalle lähettämä viesti on talletettu MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon
+ * Jackson-kirjaston avulla ennen kuin asiakasohjelma saa viestin.
  */
 public class MsgToClient {
 

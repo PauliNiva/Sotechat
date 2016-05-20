@@ -1,11 +1,11 @@
 package sotechat;
 
-/**
- * Created by leokallo on 19.5.2016.
- */
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Käynnistää Chat-webappin.
+ */
 @SpringBootApplication
 public class Application {
 

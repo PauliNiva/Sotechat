@@ -12,12 +12,23 @@ import java.util.Date;
 import java.util.Random;
 
 /**
- * Created by leokallo on 19.5.2016.
+ * Kontrolleriluokka, joka käsittelee asiakasohjelman ja palvelimen väliset chattiin liittyvät viestit.
+ *
+ * @since 19.5.2016
  */
 @RestController
 public class ChatController {
 
-        @MessageMapping("/toServer/{id}")
+    /**
+     * Metodi, joka käsittelee /toServer/{id}-polun kautta tulleet asiakasohjelman viestit, ja
+     * lähettää asiakasohjelmalle vastauksen.
+     *
+     * @param message Asiakasohjelman lähettämä viesti, jonka sisältö on paketoitu MsgToServer-olion sisälle
+     * @return Palauttaa MsgToClient-olion, joka on palvelimen lähettämä viesti asiakasohjelmalle. Olion sisältö
+     * muokataan JSON-muotoon Springin Jackson-kirjaston avulla ennen kuin asiakasohjelma vastaanottaa viestin.
+     * @throws Exception
+     */
+    @MessageMapping("/toServer/{id}")
         @SendTo("/toClient/{id}")
         public MsgToClient greeting(MsgToServer message) throws Exception {
             String username = "Anon";
@@ -25,7 +36,7 @@ public class ChatController {
             return new MsgToClient(username, message.getChannelId(), timeStamp, message.getContent());
         }
 
-        @RequestMapping("/join")
+    @RequestMapping("/join")
         public JoinResponse returnJoinResponse() throws Exception {
             Random rand = new Random();
             String username = "Anon" + rand.nextInt(500);
