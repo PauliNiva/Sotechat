@@ -1,5 +1,6 @@
 package sotechat.controller;
 
+import org.joda.time.DateTime;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ public class ChatController {
         @SendTo("/toClient/{id}")
         public MsgToClient greeting(MsgToServer message) throws Exception {
             String username = "Anon";
-            String timeStamp = new Date().toString();
+            String timeStamp = new DateTime().toString("HH:MM:SS");
             return new MsgToClient(username, message.getChannelId(), timeStamp, message.getContent());
         }
 
