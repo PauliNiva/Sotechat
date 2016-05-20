@@ -4,7 +4,7 @@
 
 <module name='Checker'>
 
-    <property name='basedir' value='${basedir}' />
+    <property name='basedir' value='/' />
     <property name='localeCountry' value='' />
     <property name='localeLanguage' value='' />
 
