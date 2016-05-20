@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/PauliNiva/Sotechat.svg?branch=dev)](https://travis-ci.org/PauliNiva/Sotechat)
-[![Coverage Status](https://coveralls.io/repos/github/PauliNiva/Sotechat/badge.svg?branch=dev)](https://coveralls.io/github/PauliNiva/Sotechat?branch=master)
+[![codecov.io](http://codecov.io/github/PauliNiva/Sotechat/coverage.svg?branch=dev)](http://codecov.io/github/PauliNiva/Sotechat?branch=dev)
 # Sotechat
 Sosiaali- ja terveyspalveluiden chat
 
