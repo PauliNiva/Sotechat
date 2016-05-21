@@ -33,7 +33,7 @@ public class ChatController {
         @SendTo("/toClient/{id}")
         public MsgToClient greeting(MsgToServer message) throws Exception {
             String username = "Anon";
-            String timeStamp = new DateTime().toString("HH:MM:SS");
+            String timeStamp = new DateTime().toString();
             return new MsgToClient(username, message.getChannelId(), timeStamp, message.getContent());
         }
 
