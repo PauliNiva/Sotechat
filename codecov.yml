@@ -1,12 +1,12 @@
 codecov:
   token: 105a25e3-d700-4523-a381-77d0684fca2c
-  branch: dev
+  branch: master
   bot: null
 
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: "0...100"
 
   notify:
     slack:
