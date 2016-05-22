@@ -9,7 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
 
-    public static void main(String[] args) {
+    /**
+     * Käynnistää sovelluksen.
+     * @param args Komentoriviargumentit taulukkona merkkijono-olioita.
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }

@@ -1,6 +1,6 @@
 codecov:
   token: 105a25e3-d700-4523-a381-77d0684fca2c
-  branch: master
+  branch: dev
   bot: null
 
 coverage:

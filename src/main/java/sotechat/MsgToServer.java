@@ -1,8 +1,8 @@
 package sotechat;
 
 /**
- * Asiakasohjelman palvelimelle lähettämä viesti paketoidaan MsgToServer-olion sisälle, ennen kuin palvelimen
- * ChatController-luokka voi käsitellä sitä.
+ * Asiakasohjelman palvelimelle lähettämä viesti paketoidaan MsgToServer-olion
+ * sisälle, ennen kuin palvelimen ChatController-luokka voi käsitellä sitä.
  */
 public class MsgToServer {
 
@@ -10,13 +10,15 @@ public class MsgToServer {
     private String channelId;
     private String content;
 
-    public String getUserId() {
-        return userId;
+    public final String getUserId() {
+        return this.userId;
     }
 
-    public String getChannelId() {
-        return channelId;
+    public final String getChannelId() {
+        return this.channelId;
     }
 
-    public String getContent() { return content; }
+    public final String getContent() {
+        return this.content;
+    }
 }
