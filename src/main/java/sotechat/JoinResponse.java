@@ -6,17 +6,22 @@ public class JoinResponse {
     private String userId;
     private String channelId;
 
-    public JoinResponse(String userName, String userId, String channelId) {
-        this.userName = userName;
-        this.userId = userId;
-        this.channelId = channelId;
+    public JoinResponse(final String pUserName, final String pUserId,
+                        final String pChannelId) {
+        this.userName = pUserName;
+        this.userId = pUserId;
+        this.channelId = pChannelId;
     }
 
-    public String getUserName() {
-        return userName;
+    public final String getUserName() {
+        return this.userName;
     }
 
-    public String getUserId() { return userId; }
+    public final String getUserId() {
+        return this.userId;
+    }
 
-    public String getChannelId() { return channelId; }
+    public final String getChannelId() {
+        return this.channelId;
+    }
 }

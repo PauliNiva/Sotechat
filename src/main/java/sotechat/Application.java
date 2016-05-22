@@ -7,9 +7,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Käynnistää Chat-webappin.
  */
 @SpringBootApplication
-public class Application {
+public final class Application {
 
-    public static void main(String[] args) {
+    /**
+     * Tyhjä konstruktori.
+     */
+    private Application() {
+        //not called
+    }
+
+    /**
+     * Käynnistää sovelluksen.
+     * @param args Komentoriviargumentit taulukkona merkkijono-olioita.
+     */
+    public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }

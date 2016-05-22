@@ -1,7 +1,8 @@
 package sotechat;
 
 /**
- * Palvelimen asiakasohjelmalle lähettämä viesti on talletettu MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon
+ * Palvelimen asiakasohjelmalle lähettämä viesti on talletettu
+ * MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon
  * Jackson-kirjaston avulla ennen kuin asiakasohjelma saa viestin.
  */
 public class MsgToClient {
@@ -11,22 +12,27 @@ public class MsgToClient {
     private String timeStamp;
     private String content;
 
-    public MsgToClient(String userName, String channelId, String timeStamp, String content) {
-        this.userName = userName;
-        this.channelId = channelId;
-        this.timeStamp = timeStamp;
-        this.content = content;
+    public MsgToClient(final String pUserName, final String pChannelId,
+                       final String pTimeStamp, final String pContent) {
+        this.userName = pUserName;
+        this.channelId = pChannelId;
+        this.timeStamp = pTimeStamp;
+        this.content = pContent;
     }
 
-    public String getUserName() {
+    public final String getUserName() {
         return userName;
     }
 
-    public String getChannelId() {
+    public final String getChannelId() {
         return channelId;
     }
 
-    public String getTimeStamp() { return timeStamp; }
+    public final String getTimeStamp() {
+        return timeStamp;
+    }
 
-    public String getContent() { return content; }
+    public final String getContent() {
+        return content;
+    }
 }
