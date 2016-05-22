@@ -21,18 +21,18 @@ public class MsgToClient {
     }
 
     public final String getUserName() {
-        return userName;
+        return this.userName;
     }
 
     public final String getChannelId() {
-        return channelId;
+        return this.channelId;
     }
 
     public final String getTimeStamp() {
-        return timeStamp;
+        return this.timeStamp;
     }
 
     public final String getContent() {
-        return content;
+        return this.content;
     }
 }
