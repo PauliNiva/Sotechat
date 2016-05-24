@@ -6,18 +6,26 @@ package sotechat;
  */
 public class MsgToServer {
 
+    /** Käyttäjän yksilöivä salainen ID. */
     private String userId;
+    /** Kanavan yksilöivä salainen ID. */
     private String channelId;
+    /** Viestin sisältö. */
     private String content;
 
+    /** Huom: konstruktorin lisääminen rikkoo Springin. */
+
+    /** Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille. */
     public final String getUserId() {
         return this.userId;
     }
 
+    /** Palauttaa salaisen kanavaID:n, joka kanavalla olijoiden pitää tietää. */
     public final String getChannelId() {
         return this.channelId;
     }
 
+    /** Palauttaa viestin sisällön. */
     public final String getContent() {
         return this.content;
     }

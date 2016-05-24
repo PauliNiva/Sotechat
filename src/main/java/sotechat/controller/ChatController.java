@@ -16,34 +16,54 @@ import java.util.Random;
 /**
  * Controlleri, joka käsittelee serverin puolella
  * chat-liikenteen clienttien kanssa.
+ * Kommenteissa "Mappays" viittaa siihen,
+ * mitä serveri tekee, kun johonkin
+ * tiettyyn polkuun tulee pyyntö.
  */
 @RestController
 public class ChatController {
 
-    /**
-     * Metodi, joka käsittelee /toServer/{id}-polun kautta tulleet
-     * asiakasohjelman viestit, ja lähettää asiakasohjelmalle vastauksen.
-     *
-     * @param msg Asiakasohjelman lähettämä viesti, jonka sisältö on
-     *                paketoitu MsgToServer-olion sisälle.
-     * @return Palauttaa MsgToClient-olion, joka on palvelimen lähettämä viesti
-     * asiakasohjelmalle. Olion sisältö muokataan JSON-muotoon Springin
-     * Jackson-kirjaston avulla ennen kuin asiakasohjelma vastaanottaa viestin.
-     * @throws Exception TODO: Selvitä mikä
-     */
-
-    /** Ohjataan kehitysvaiheessa kaikki samalle kanavalle. */
+    /** Ohjataan kehitysvaiheessa kaikki viestit samalle kanavalle. */
     public static final int DEV_CHANNEL = 666;
 
+    /**
+     * Alla metodi, joka käsittelee /toServer/{channelIid}
+     * -polun kautta tulleet clientin viestit,
+     * ja lähettää clientille vastauksen
+     * polussa /toClient/{channelId}
+     *
+     * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
+     *                    joka on paketoitu MsgToServer-olion sisälle.
+     * @return Palautusarvoa ei käytetä kuten yleensä, vaan
+     *         @SendTo -annotaatio saa Spring lähettämään
+     *         palautusarvona määritellyn olion lähetettäväksi
+     *         kaikille kanavalle subscribanneille henkilöille JSONina.
+     *         TODO: Parempi kuvaus viestin välittämisestä.
+     *
+     * @throws Exception TODO: Selvitä mikä poikkeus.
+     */
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
-    public final MsgToClient greeting(final MsgToServer msg) throws Exception {
+    public final MsgToClient routeMessage(final MsgToServer msgToServer) throws Exception {
         String username = "Anon";
+        // TODO: ID-to-name mappaykset Redisin kautta?
         String timeStamp = new DateTime().toString();
-        return new MsgToClient(username, msg.getChannelId(),
-                    timeStamp, msg.getContent());
+        // timeStamp täytyy antaa tässä muodossa AngularJS:n käsittelyyn.
+        return new MsgToClient(username, msgToServer.getChannelId(),
+                    timeStamp, msgToServer.getContent());
     }
 
+    /**
+     * Kun client menee sivulle index.html, tiedostoon upotettu
+     * JavaScript tekee erillisen GET-pyynnön polkuun /join.
+     * Tällä pyynnöllä client ilmaisee haluavansa chattiin.
+     * Alla oleva metodi mappaa pyynnöt polkuun /join antamalla
+     * käyttäjälle julkisen käyttäjänimen, salaisen käyttäjäID:n
+     * sekä salaisen kanavaID:n (kehitysvaiheessa lähetetään
+     * kaikki samalle kanavalle DEV_CHANNEL).
+     * @return Palautusarvo lähetetään JSONina clientille.
+     * @throws Exception TODO: Selvitä mikä poikkeus.
+     */
     @RequestMapping("/join")
     public final JoinResponse returnJoinResponse() throws Exception {
         Random rand = new Random();
@@ -53,6 +73,12 @@ public class ChatController {
         return new JoinResponse(username, userId, channel);
     }
 
+    /**
+     * Alla mäppäys hoitajan hallintasivulle /pro.
+     * TODO: Selvitä miten polkuja mapataan staattisiin resursseihin.
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/pro")
     public final String naytaHallintaSivu() throws Exception {
         return "Tänne tulisi hoitajan näkymä";

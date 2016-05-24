@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 /** Tämä luokka mappaa requestin /login oletuspolkuun resources/templates/login.html.
  *  (Mikään tapa määritellä login-resurssin löytymistä webapp -kansiosta ei toiminut.)
- *  (TODO: Selkeämpi mäppäys (myös index.html, joka vaan maagisesti löytyy nyt) */
+ *  (TODO: Selkeämpi mäppäys (myös index.html, joka löytyy nyt jotenkin maagisesti) */
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
