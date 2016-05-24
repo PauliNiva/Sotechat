@@ -14,15 +14,11 @@ import sotechat.MsgToServer;
 import java.util.Random;
 
 /**
- * Kontrolleriluokka, joka käsittelee asiakasohjelman ja palvelimen väliset
- * chattiin liittyvät viestit.
- *
- * @since 19.5.2016
+ * Controlleri, joka käsittelee serverin puolella
+ * chat-liikenteen clienttien kanssa.
  */
 @RestController
 public class ChatController {
-
-    private static final int UPPER_BOUND = 500;
 
     /**
      * Metodi, joka käsittelee /toServer/{id}-polun kautta tulleet
@@ -35,6 +31,10 @@ public class ChatController {
      * Jackson-kirjaston avulla ennen kuin asiakasohjelma vastaanottaa viestin.
      * @throws Exception TODO: Selvitä mikä
      */
+
+    /** Ohjataan kehitysvaiheessa kaikki samalle kanavalle. */
+    public static final int DEV_CHANNEL = 666;
+
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
     public final MsgToClient greeting(final MsgToServer msg) throws Exception {
@@ -47,9 +47,9 @@ public class ChatController {
     @RequestMapping("/join")
     public final JoinResponse returnJoinResponse() throws Exception {
         Random rand = new Random();
-        String username = "Anon" + rand.nextInt(UPPER_BOUND);
-        String userId = "" + rand.nextInt(UPPER_BOUND * 2);
-        String channel = Integer.toString(0); //  rand.nextInt(2);
+        String username = "Anon";
+        String userId = "" + rand.nextInt(Integer.MAX_VALUE);
+        String channel = Integer.toString(DEV_CHANNEL);
         return new JoinResponse(username, userId, channel);
     }
 
