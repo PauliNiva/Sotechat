@@ -33,7 +33,7 @@ public class ChatController {
      * @return Palauttaa MsgToClient-olion, joka on palvelimen lähettämä viesti
      * asiakasohjelmalle. Olion sisältö muokataan JSON-muotoon Springin
      * Jackson-kirjaston avulla ennen kuin asiakasohjelma vastaanottaa viestin.
-     * @throws Exception MIKÄ EXCEPTION!!!!!!!!!!!! TODO
+     * @throws Exception TODO: Selvitä mikä
      */
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
@@ -53,13 +53,10 @@ public class ChatController {
         return new JoinResponse(username, userId, channel);
     }
 
-    @RequestMapping("/secret")
-    public final JoinResponse testi() throws Exception {
-        Random rand = new Random();
-        String username = "Anon" + rand.nextInt(UPPER_BOUND);
-        String userId = "" + rand.nextInt(UPPER_BOUND * 2);
-        String channel = "" + rand.nextInt(2);
-        return new JoinResponse(username, userId, channel);
+    @RequestMapping("/pro")
+    public final String naytaHallintaSivu() throws Exception {
+        return "Tänne tulisi hoitajan näkymä";
     }
+
 }
 
