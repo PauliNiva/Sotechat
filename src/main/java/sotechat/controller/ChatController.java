@@ -52,5 +52,14 @@ public class ChatController {
         String channel = "" + rand.nextInt(2);
         return new JoinResponse(username, userId, channel);
     }
+
+    @RequestMapping("/secret")
+    public final JoinResponse testi() throws Exception {
+        Random rand = new Random();
+        String username = "Anon" + rand.nextInt(UPPER_BOUND);
+        String userId = "" + rand.nextInt(UPPER_BOUND * 2);
+        String channel = "" + rand.nextInt(2);
+        return new JoinResponse(username, userId, channel);
+    }
 }
 
