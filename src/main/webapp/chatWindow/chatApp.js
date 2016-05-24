@@ -1,17 +1,10 @@
 var chatApp = angular.module('chatApp', ['luegg.directives']);
 
-// $(document).ready(function($scope) {
-//     $.get("/join", function( data , ChatService) {
-//         console.log("ChatService: " + ChatService);
-//         ChatService.initialize(data);
-//     });
-// });
-
-
 chatApp.controller('chatController', function ($scope, ChatService) {
     $scope.messages = [];
+    this.chatName = "Esimerkki chat"
 
-    $scope.addMessage = function () {
+    $scope.sendMessage = function () {
         if ($scope.messageForm.$valid) {
             ChatService.send($scope.message);
             $scope.message = "";
@@ -26,7 +19,6 @@ chatApp.controller('chatController', function ($scope, ChatService) {
         var message = [];
         message.message = "Hei, tervetuloa .. Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh";
         message.time = Date.now();
-        message.id = Math.floor(Math.random() * 1000000);
         message.sender = "Ammattilainen";
         message.I = false;
         $scope.messages.push(message);

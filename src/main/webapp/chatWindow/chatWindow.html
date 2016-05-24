@@ -1,0 +1,50 @@
+<div class="panel panel-default chat-panel" ng-controller="chatController as chat">
+    <div class="panel-heading chat-heading">
+
+        <div class="col-lg-4 col-md-4 col-sm-10 col-xs-8" style="padding-right: 0px">
+            <h4 class="panel-title">{{chat.chatName}}</h4>
+        </div>
+        <div class="col-lg-6 col-md-6 hidden-sm hidden-xs" style="padding-right: 0px">
+            <div class="input-group">
+                <input type="text" class="form-control" value="AvainChatinPalauttamistaVarten" readonly>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><span
+                                class="glyphicon glyphicon-copy"></span></button>
+                        <button class="btn btn-default" type="button"><span
+                                class="glyphicon glyphicon-info-sign"></span></button>
+                    </span>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4">
+            <button class="btn btn-danger center-block" type="button">Poistu</button>
+        </div>
+    </div>
+    <div class="panel-heading hidden-md hidden-lg">
+        <div class="input-group">
+            <input type="text" class="form-control" value="apinasöibanaaninbussissa" readonly>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-copy"></span> </button>
+                        <button class="btn btn-default" type="button"><span
+                                class="glyphicon glyphicon-info-sign"></span></button>
+                    </span>
+        </div>
+    </div>
+    <div class="panel-body chat-body" scroll-glue>
+        <div ng-repeat="message in messages | orderBy:'time':false" class="message">
+            <div ng-include="'chatWindow/message.html'"></div>
+        </div>
+    </div>
+    <div class="panel-footer chat-footer">
+        <form ng-submit="sendMessage()" name="messageForm">
+            <div class="input-group">
+                <textarea ng-model="message" ng-enter="sendMessage();" rows="1" class="form-control chat-text"
+                          required autofocus name="messageArea"></textarea>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button"><span
+                            class="glyphicon glyphicon-file"></span></button>
+                    <button class="btn btn-default" type="submit" name="send">Lähetä</button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
