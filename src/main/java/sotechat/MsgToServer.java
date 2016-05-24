@@ -13,7 +13,7 @@ public class MsgToServer {
     /** Viestin sisältö. */
     private String content;
 
-    /** Huom: konstruktorin lisääminen rikkoo Springin. */
+    /** Huom: Älä lisää konstruktoria, se rikkoo Springin. */
 
     /** Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille. */
     public final String getUserId() {

@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  *  (Mikään tapa määritellä login-resurssin löytymistä webapp -kansiosta ei toiminut.)
  *  (TODO: Selkeämpi mäppäys (myös index.html, joka löytyy nyt jotenkin maagisesti) */
 @Configuration
-public class MvcConfig extends WebMvcConfigurerAdapter {
+public class LoginRouteConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {

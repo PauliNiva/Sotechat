@@ -23,9 +23,6 @@ import java.util.Random;
 @RestController
 public class ChatController {
 
-    /** Ohjataan kehitysvaiheessa kaikki viestit samalle kanavalle. */
-    public static final int DEV_CHANNEL = 666;
-
     /**
      * Alla metodi, joka käsittelee /toServer/{channelIid}
      * -polun kautta tulleet clientin viestit,
@@ -69,7 +66,7 @@ public class ChatController {
         Random rand = new Random();
         String username = "Anon";
         String userId = "" + rand.nextInt(Integer.MAX_VALUE);
-        String channel = Integer.toString(DEV_CHANNEL);
+        String channel = "DEV_CHANNEL";
         return new JoinResponse(username, userId, channel);
     }
 
