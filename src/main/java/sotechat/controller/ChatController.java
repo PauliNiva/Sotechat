@@ -23,8 +23,7 @@ import java.util.Random;
 @RestController
 public class ChatController {
 
-    /**
-     * Alla metodi, joka käsittelee /toServer/{channelIid}
+    /** Alla metodi, joka käsittelee /toServer/{channelIid}
      * -polun kautta tulleet clientin viestit,
      * ja lähettää clientille vastauksen
      * polussa /toClient/{channelId}
@@ -41,7 +40,8 @@ public class ChatController {
      */
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
-    public final MsgToClient routeMessage(final MsgToServer msgToServer) throws Exception {
+    public final MsgToClient routeMessage(
+            final MsgToServer msgToServer) throws Exception {
         String username = "Anon";
         // TODO: ID-to-name mappaykset Redisin kautta?
         String timeStamp = new DateTime().toString();
@@ -50,8 +50,7 @@ public class ChatController {
                     timeStamp, msgToServer.getContent());
     }
 
-    /**
-     * Kun client menee sivulle index.html, tiedostoon upotettu
+    /** Kun client menee sivulle index.html, tiedostoon upotettu
      * JavaScript tekee erillisen GET-pyynnön polkuun /join.
      * Tällä pyynnöllä client ilmaisee haluavansa chattiin.
      * Alla oleva metodi mappaa pyynnöt polkuun /join antamalla
@@ -73,7 +72,7 @@ public class ChatController {
     /**
      * Alla mäppäys hoitajan hallintasivulle /pro.
      * TODO: Selvitä miten polkuja mapataan staattisiin resursseihin.
-     * @return
+     * @return Palautetaan pyytajalle hallintasivu.
      * @throws Exception
      */
     @RequestMapping("/pro")

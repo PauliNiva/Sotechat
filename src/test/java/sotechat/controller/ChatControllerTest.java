@@ -14,21 +14,37 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * ChatControllerTest.
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = MockServletContext.class)
 @WebAppConfiguration
 public class ChatControllerTest {
 
+    /**
+     * MockMvc.
+     */
     private MockMvc mvc;
 
+    /**
+     * Before.
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
-        mvc = MockMvcBuilders.standaloneSetup(new ChatController()).build();
+        mvc = MockMvcBuilders
+                .standaloneSetup(new ChatController()).build();
     }
 
+    /**
+     * contextLoads.
+     * @throws Exception
+     */
     @Test
     public void contextLoads() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/join").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders
+                .get("/join").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 }
