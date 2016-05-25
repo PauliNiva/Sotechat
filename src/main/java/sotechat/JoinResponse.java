@@ -13,7 +13,12 @@ public class JoinResponse {
     /** Salainen kanavaID. */
     private String channelId;
 
-    /** Konstruktori alustaa olion parametreinä annetuilla arvoilla. */
+    /**
+     * Konstruktori alustaa olion parametreinä annetuilla arvoilla.
+     * @param pUserName userName
+     * @param pUserId userId
+     * @param pChannelId channelId
+     */
     public JoinResponse(final String pUserName, final String pUserId,
                         final String pChannelId) {
         this.userName = pUserName;

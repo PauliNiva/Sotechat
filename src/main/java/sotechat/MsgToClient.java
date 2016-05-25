@@ -21,7 +21,13 @@ public class MsgToClient {
     /** Viestin sisältö. */
     private String content;
 
-    /** Konstruktori alustaa olion annetuilla parametreillä. */
+    /**
+     * Konstruktori alustaa olion annetuilla parametreillä.
+     * @param pUserName userName
+     * @param pChannelId channelId
+     * @param pTimeStamp timeStamp
+     * @param pContent content
+     */
     public MsgToClient(final String pUserName, final String pChannelId,
                        final String pTimeStamp, final String pContent) {
         this.userName = pUserName;
@@ -38,7 +44,8 @@ public class MsgToClient {
     }
 
     /**
-     * @return Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää.
+     * @return Palauttaa salaisen avaimen,
+     * jolla kanavaa voi kuunnella + viestittää.
      */
     public final String getChannelId() {
         return this.channelId;

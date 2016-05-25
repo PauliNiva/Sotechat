@@ -23,7 +23,7 @@ public class MsgToServer {
     }
 
     /**
-     * @return Palauttaa salaisen kanavaID:n, joka kanavalla olijoiden pitää tietää.
+     * @return Palauttaa salaisen kanavaID:n.
      */
     public final String getChannelId() {
         return this.channelId;

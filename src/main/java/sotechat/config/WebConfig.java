@@ -6,8 +6,7 @@ import org.springframework.web.servlet.config.annotation.
 import org.springframework.web.servlet.config.annotation.
         WebMvcConfigurerAdapter;
 
-/**
- * Määrittelee Springille fronttipuolen tiedostopolun.
+/** Määrittelee Springille fronttipuolen tiedostopolun.
  */
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
