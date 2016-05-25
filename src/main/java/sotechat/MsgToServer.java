@@ -15,17 +15,23 @@ public class MsgToServer {
 
     /** Huom: Älä lisää konstruktoria, se rikkoo Springin. */
 
-    /** Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille. */
+    /**
+     * @return Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille.
+     */
     public final String getUserId() {
         return this.userId;
     }
 
-    /** Palauttaa salaisen kanavaID:n, joka kanavalla olijoiden pitää tietää. */
+    /**
+     * @return Palauttaa salaisen kanavaID:n, joka kanavalla olijoiden pitää tietää.
+     */
     public final String getChannelId() {
         return this.channelId;
     }
 
-    /** Palauttaa viestin sisällön. */
+    /**
+     * @return Palauttaa viestin sisällön.
+     */
     public final String getContent() {
         return this.content;
     }

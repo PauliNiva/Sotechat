@@ -30,23 +30,30 @@ public class MsgToClient {
         this.content = pContent;
     }
 
-    /** Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne". */
+    /**
+     * @return Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
+     */
     public final String getUserName() {
         return this.userName;
     }
 
-    /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää. */
+    /**
+     * @return Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää.
+     */
     public final String getChannelId() {
         return this.channelId;
     }
 
-    /** Palauttaa ajan viestin saapumiselle (serverin ajassa).
-     *  Formaatti erityisesti AngularJS:n käsittelyä varten. */
+    /**
+     * @return Palauttaa ajan viestin saapumiselle (serverin ajassa).
+     */
     public final String getTimeStamp() {
         return this.timeStamp;
     }
 
-    /** Palauttaa viestin sisällön. */
+    /**
+     * @return Palauttaa viestin sisällön.
+     */
     public final String getContent() {
         return this.content;
     }

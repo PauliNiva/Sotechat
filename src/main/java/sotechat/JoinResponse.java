@@ -21,17 +21,23 @@ public class JoinResponse {
         this.channelId = pChannelId;
     }
 
-    /** Palauttaa julkisen käyttäjänimen. */
+    /**
+     * @return Palauttaa julkisen käyttäjänimen.
+     */
     public final String getUserName() {
         return this.userName;
     }
 
-    /** Palauttaa salaisen käyttäjäID:n. */
+    /**
+     * @return Palauttaa salaisen käyttäjäID:n.
+     */
     public final String getUserId() {
         return this.userId;
     }
 
-    /** Palauttaa salaisen kanavaID:n. */
+    /**
+     * @return Palauttaa salaisen kanavaID:n.
+     */
     public final String getChannelId() {
         return this.channelId;
     }
