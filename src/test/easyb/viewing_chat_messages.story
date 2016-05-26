@@ -1,9 +1,7 @@
 
 import org.openqa.selenium.*
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.remote.RemoteWebDriver
-import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.joda.time.DateTime;
 import static java.util.Calendar.*
 

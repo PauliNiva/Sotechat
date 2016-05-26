@@ -1,6 +1,5 @@
 
 import org.openqa.selenium.*
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 
 description 'As a user I want to send a message'

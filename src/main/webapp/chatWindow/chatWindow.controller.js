@@ -47,6 +47,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             $http.get("/join").then(function(response) {
                 channelId = response.data.channelId;
                 userId = response.data.userId;
+                initStompClient();
             })
         };
 
@@ -63,5 +64,5 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             });
         };
         joinToChat();
-        initStompClient();
+
     }]);
