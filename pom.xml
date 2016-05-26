@@ -29,12 +29,6 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!--
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
--->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,31 +62,23 @@
             <scope>test</scope>
         </dependency>
 
-        <!--
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-            <version>4.1.0.RELEASE</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>springloaded</artifactId>
+            <version>1.2.5.RELEASE</version>
         </dependency>
--->
-        <dependency>
-            <groupId>com.github.detro</groupId>
-            <artifactId>phantomjsdriver</artifactId>
-            <version>1.2.0</version>
-        </dependency>
+
+        <!--- <dependency>
+             <groupId>com.github.detro</groupId>
+             <artifactId>phantomjsdriver</artifactId>
+             <version>1.2.0</version>
+         </dependency> -->
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
         </dependency>
 
-        <!--
-                <dependency>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-jasper</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-        -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -100,12 +86,12 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jasmine</artifactId>
-            <version>2.0.0</version>
-            <scope>test</scope>
-        </dependency>
+        <!--- <dependency>
+             <groupId>org.webjars</groupId>
+             <artifactId>jasmine</artifactId>
+             <version>2.0.0</version>
+             <scope>test</scope>
+         </dependency> -->
 
         <!-- H2 -->
         <dependency>
@@ -128,12 +114,12 @@
             <artifactId>commons-dbcp</artifactId>
             <type>jar</type>
         </dependency>
-        
-         <dependency>
-             <groupId>joda-time</groupId>
-             <artifactId>joda-time</artifactId>
-             <version>2.9.3</version>
-         </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.3</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -141,10 +127,59 @@
             <version>2.5</version>
             <type>maven-plugin</type>
         </dependency>
-        
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.53.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>2.53.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-htmlunit-driver</artifactId>
+            <version>2.52.0</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.3.6</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easyb</groupId>
+            <artifactId>easyb-core</artifactId>
+            <version>1.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>2.53.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.detro</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
     </dependencies>
@@ -154,6 +189,25 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -260,41 +314,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>com.github.klieber</groupId>
-                <artifactId>phantomjs-maven-plugin</artifactId>
-                <version>0.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>install</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <version>1.9.2</version>
-                </configuration>
-            </plugin>
-
-            <plugin> <groupId>com.github.timurstrekalov</groupId>
-                <artifactId>saga-maven-plugin</artifactId>
-                <version>1.5.5</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>coverage</goal>
-                        </goals> </execution>
-                </executions>
-                <configuration>
-                    <baseDir>http://localhost:${jasmine.serverPort}</baseDir>
-                    <includes>
-                        **/set1/*-TestRunner.html,
-                        **/set2/*-TestRunner.html
-                    </includes>
-                    <outputDir>${project.basedir}/target/JasmineCoverage</outputDir>
-                </configuration>
-            </plugin>
 
         </plugins>
     </build>

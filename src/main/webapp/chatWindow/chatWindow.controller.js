@@ -55,7 +55,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             stompSocket.init('/toServer');
             stompSocket.connect(function (frame) {
                 stompSocket.subscribe("/toClient/" + channelId, function (message) {
-                    $scope.messages.push(getMessage(message.body));
+                    $scope.messages.push($scope.getMessage(message.body));
                 });
 
             }, function (error) {

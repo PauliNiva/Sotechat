@@ -38,11 +38,11 @@
         <form ng-submit="sendMessage()" name="messageForm">
             <div class="input-group">
                 <textarea ng-model="message" ng-enter="sendMessage();" rows="1" class="form-control chat-text"
-                          required autofocus></textarea>
+                          required autofocus name="messageArea"></textarea>
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="button"><span
                             class="glyphicon glyphicon-file"></span></button>
-                    <button class="btn btn-default" type="submit">Lähetä</button>
+                    <button class="btn btn-default" type="submit" name="send">Lähetä</button>
                 </span>
             </div>
         </form>
