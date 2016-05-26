@@ -288,6 +288,7 @@
                     <preloadSources>
                         <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
                         <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${project.basedir}</jsSrcDir>
                     <sourceIncludes>
@@ -297,7 +298,7 @@
                         <include>src/main/webapp/chatWindow/*.js</include>
                     </sourceIncludes>
                     <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
-                    <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+                    <!--<webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>-->
                 </configuration>
             </plugin>
 
