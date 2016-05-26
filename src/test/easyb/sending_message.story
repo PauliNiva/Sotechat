@@ -1,12 +1,13 @@
 
 import org.openqa.selenium.*
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.firefox.FirefoxDriver
 
 description 'As a user I want to send a message'
 /*
 scenario "user cand write a message on a text input", {
     given 'user has chosen the right link', {
-        driver = new HtmlUnitDriver()
+        driver = new FirefoxDriver()
     }
     when 'a chat window is accessed', {
         driver.get("http://localhost:8080")
@@ -19,7 +20,7 @@ scenario "user cand write a message on a text input", {
 
 scenario "user can send the message he or she has written to the server by pressing submit", {
     given 'text is written to the right text field in a chat window', {
-        driver = new HtmlUnitDriver()
+        driver = new FirefoxDriver()
         driver.get("http://localhost:8080")
         element = driver.findElement(By.name("messageArea"))
         element.sendKeys("my first testmessage")
