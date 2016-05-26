@@ -161,14 +161,6 @@
             <version>1.4.01</version>
             <scope>test</scope>
         </dependency>
-
-
-        <dependency>
-            <groupId>com.github.detro</groupId>
-            <artifactId>phantomjsdriver</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -288,6 +280,7 @@
                     <preloadSources>
                         <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
                         <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${project.basedir}</jsSrcDir>
                     <sourceIncludes>
@@ -297,7 +290,7 @@
                         <include>src/main/webapp/chatWindow/*.js</include>
                     </sourceIncludes>
                     <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
-                    <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+                    <!--<webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>-->
                 </configuration>
             </plugin>
         </plugins>
