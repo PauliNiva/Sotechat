@@ -28,7 +28,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
         };
         
         /** Funktio parsee viestin haluttuun muotoon. */
-        var getMessage = function (data) {
+        $scope.getMessage = function (data) {
             var parsed = JSON.parse(data);
             var message = [];
             message.message = parsed.content;

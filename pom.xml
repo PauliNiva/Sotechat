@@ -75,6 +75,11 @@
             <version>4.1.0.RELEASE</version>
         </dependency>
 -->
+        <dependency>
+            <groupId>com.github.detro</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>1.2.0</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -92,6 +97,13 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jasmine</artifactId>
+            <version>2.0.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -129,6 +141,7 @@
             <version>2.5</version>
             <type>maven-plugin</type>
         </dependency>
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -212,6 +225,77 @@
                     </storyReport>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalContexts>
+                        <context>
+                            <contextRoot>/lib</contextRoot>
+                            <directory>${project.build.directory}/src/main/webapp/assets</directory>
+                        </context>
+                    </additionalContexts>
+                    <preloadSources>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                    </preloadSources>
+                    <jsSrcDir>${project.basedir}</jsSrcDir>
+                    <sourceIncludes>
+                        <include>src/main/webapp/services/*.js</include>
+                        <include>src/main/webapp/assets/lib/*.js</include>
+                        <include>src/main/webapp/*.js</include>
+                        <include>src/main/webapp/chatWindow/*.js</include>
+                    </sourceIncludes>
+                    <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
+                    <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.klieber</groupId>
+                <artifactId>phantomjs-maven-plugin</artifactId>
+                <version>0.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <version>1.9.2</version>
+                </configuration>
+            </plugin>
+
+            <plugin> <groupId>com.github.timurstrekalov</groupId>
+                <artifactId>saga-maven-plugin</artifactId>
+                <version>1.5.5</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>coverage</goal>
+                        </goals> </execution>
+                </executions>
+                <configuration>
+                    <baseDir>http://localhost:${jasmine.serverPort}</baseDir>
+                    <includes>
+                        **/set1/*-TestRunner.html,
+                        **/set2/*-TestRunner.html
+                    </includes>
+                    <outputDir>${project.basedir}/target/JasmineCoverage</outputDir>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
