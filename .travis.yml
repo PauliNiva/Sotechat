@@ -16,7 +16,7 @@ notifications:
     - '#%{build_number} %{message} (%{branch} : %{author}): %{commit_message}'
 
 addons:
-    firefox: "39.0"
+    firefox: "latest"
     code_climate:
         repo_token: b3947eb04b867918f437bf3b54e5a96614e3651282214fb15a81fc62c74ce47a
 
