@@ -8,13 +8,13 @@ public class MsgToServer {
 
     /** Käyttäjän yksilöivä salainen ID. */
     private String userId;
+
     /** Kanavan yksilöivä salainen ID. */
     private String channelId;
     /** Viestin sisältö. */
     private String content;
 
     /** Huom: Älä lisää konstruktoria, se rikkoo Springin. */
-
     /**
      * @return Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille.
      */

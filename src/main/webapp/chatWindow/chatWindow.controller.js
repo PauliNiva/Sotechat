@@ -19,7 +19,6 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 var destination = "/toServer/" + channelId;
                 stompSocket.send(destination, {}, JSON.stringify(
                     {
-                        'userId': userId,
                         'channelId': channelId,
                         'content': $scope.message
                     }));
@@ -30,6 +29,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
         /** Funktio parsee viestin haluttuun muotoon. */
         var getMessage = function (data) {
             var parsed = JSON.parse(data);
+            console.log(parsed);
             var message = [];
             message.message = parsed.content;
             message.time = parsed.timeStamp;
@@ -45,6 +45,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
          *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
         var joinToChat = function () {
             $http.get("/join").then(function(response) {
+                username = response.data.userName;
                 channelId = response.data.channelId;
                 userId = response.data.userId;
             })
@@ -57,7 +58,9 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 stompSocket.subscribe("/toClient/" + channelId, function (message) {
                     $scope.messages.push(getMessage(message.body));
                 });
-
+            /*    stompSocket.subscribe("/topic/", function(message) {
+                    console.log(JSON.parse(message.body));
+                });*/
             }, function (error) {
                 initStompClient();
             });

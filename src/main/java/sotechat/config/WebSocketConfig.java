@@ -2,11 +2,16 @@ package sotechat.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.ExpiringSession;
+import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.
         AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.
         EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 /**
  * Konfiguraatioluokka, joka määrittelee, että asiakasohjelmalta(clientiltä)
@@ -16,8 +21,9 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  * @since 19.5.2016
  */
 @Configuration
+@EnableScheduling
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
     /**
      * Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
@@ -29,7 +35,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
      */
     @Override
     public final void configureMessageBroker(final MessageBrokerRegistry conf) {
-        conf.enableSimpleBroker("/toClient");
+        conf.enableSimpleBroker("/toClient", "/topic/");
     }
 
     /**
@@ -42,7 +48,12 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
      *                 asiakasohjelmien viesteille pääteosoitteen.
      */
     @Override
-    public final void registerStompEndpoints(final StompEndpointRegistry reg) {
+    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
+    }
+
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new MyHandler(), "/myHandler")
+                .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
 }
