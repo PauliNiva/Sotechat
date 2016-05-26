@@ -25,7 +25,11 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
 
-script: phantomjs testrunner.js
+before_script:
+  - npm install karma
+
+script:
+  - karma start --single-run --browsers PhantomJS test/karma/config/unit.js
  
 after_success:
   - bash <(curl -s https://codecov.io/bash)
