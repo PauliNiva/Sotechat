@@ -161,14 +161,6 @@
             <version>1.4.01</version>
             <scope>test</scope>
         </dependency>
-
-
-        <dependency>
-            <groupId>com.github.detro</groupId>
-            <artifactId>phantomjsdriver</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -301,8 +293,6 @@
                     <!--<webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>-->
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 
