@@ -29,7 +29,7 @@ before_script:
   - npm install karma
 
 script:
-  - karma start --single-run --browsers PhantomJS test/karma/config/unit.js
+  - karma start --single-run --browsers PhantomJS karma.conf.js
  
 after_success:
   - bash <(curl -s https://codecov.io/bash)
