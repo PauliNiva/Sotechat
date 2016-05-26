@@ -2,6 +2,10 @@
 import org.openqa.selenium.*
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.remote.RemoteWebDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.joda.time.DateTime;
+import static java.util.Calendar.*
 
 description 'As a user I want to view the messages I have sent in the chat window'
 
@@ -21,27 +25,6 @@ scenario "user can see a message that has been sent to the server", {
         }
 }
 
-/*
-scenario "user can see the time when a message has been sent", {
-        given 'a message has been written', {
-                driver = new FirefoxDriver()
-                driver.get("http://localhost:8080")
-                element = driver.findElement(By.name("messageArea"))
-                element.sendKeys("message with time")
-        }
-        when 'the message is submitted', {
-                element = driver.findElement(By.name("send"))
-                time = DateTime("HH:MM")
-                element.submit()
-                time.plus(Period.seconds(30))
-
-        }
-        then 'the sending time of the message can be seen', {
-                driver.getPageSource().contains(time)
-        }
-
-}
-*/
 
 scenario "user can view multiple messages he or she has sent in a time order", {
         given 'the chat window is accessed', {
