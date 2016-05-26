@@ -21,10 +21,11 @@ scenario "user can see a message that has been sent to the server", {
                 element.submit()
         }
         then 'the message appears in the chat window', {
-                driver.getPageSource().contains("I want to send this message")
+                element = driver.findElement(By.name("messageArea"))
+//                element.getText().shouldBe null
+                driver.getPageSource().contains("I want to send this message").shouldBe true
         }
 }
-
 
 scenario "user can view multiple messages he or she has sent in a time order", {
         given 'the chat window is accessed', {
