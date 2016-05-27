@@ -293,6 +293,16 @@
                     <!--<webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>-->
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            
         </plugins>
     </build>
 
