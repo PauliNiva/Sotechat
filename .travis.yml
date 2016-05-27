@@ -29,12 +29,10 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
 
-install:
-  -
+install: true
 
 script :
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-  - mvn integration-test
+  - mvn install
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
