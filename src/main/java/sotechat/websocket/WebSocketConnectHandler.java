@@ -25,24 +25,8 @@ public class WebSocketConnectHandler<S>
     }
 
    public void onApplicationEvent(SessionConnectEvent event) {
-       Random rand = new Random();
-       String username = "Anon";
-       String userId = "" + rand.nextInt(Integer.MAX_VALUE);
-       String name = username + userId;
-       String user = "{\"username\":\"" + username + "\"}";
-       this.messagingTemplate.convertAndSend("/topic/join", user);
-      /*  MessageHeaders headers = event.getMessage().getHeaders();
-       // Map<String, Object> sessionAttributes = SimpMessageHeaderAccessor.getFirstNativeHeader(headers);
-
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        accessor.addNativeHeader("user-name", "pena");
-        accessor.setNativeHeader("accept-version", "2");
-        for (int i = 0; i < 100; i++) {
-            System.out.println("perkele");
-        //    System.out.println(sessionAttributes.get("headers").toString());
-        }
-        System.out.println(accessor.getNativeHeader("user-name"));
-        Principal user = SimpMessageHeaderAccessor.getUser(headers);
+    //   System.out.println(session);
+      /*  Principal user = SimpMessageHeaderAccessor.getUser(headers);
         if (user == null) {
             return;
         }

@@ -8,19 +8,19 @@ public class JoinResponse {
 
     /** Julkinen käyttäjänimi. */
     private String userName;
-    /** Salainen käyttäjäID. TODO: korvautuu sessionID:llä */
 
-    /** Salainen kanavaID. */
+    /** Salainen käyttäjäID. */
+    private String userId;
+
+    /** Kanava. */
     private String channelId;
 
-    /**
-     * Konstruktori alustaa olion parametreinä annetuilla arvoilla.
-     * @param pUserName userName
-     * @param pChannelId channelId
-     */
+
     public JoinResponse(final String pUserName,
+                        final String pUserId,
                         final String pChannelId) {
         this.userName = pUserName;
+        this.userId = pUserId;
         this.channelId = pChannelId;
     }
 
@@ -32,11 +32,14 @@ public class JoinResponse {
     }
 
     /**
-     * @return Palauttaa salaisen käyttäjäID:n. TODO: korvautuu sessionID:llä
+     * @return Palauttaa salaisen käyttäjäID:n.
      */
+    public final String getUserId() {
+        return this.userId;
+    }
 
     /**
-     * @return Palauttaa salaisen kanavaID:n.
+     * @return Palauttaa listan kanavista.
      */
     public final String getChannelId() {
         return this.channelId;

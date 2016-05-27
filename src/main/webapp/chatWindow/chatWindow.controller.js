@@ -19,6 +19,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 var destination = "/toServer/" + channelId;
                 stompSocket.send(destination, {}, JSON.stringify(
                     {
+                        'userId': userId,
                         'channelId': channelId,
                         'content': $scope.message
                     }));
@@ -48,6 +49,8 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 username = response.data.userName;
                 channelId = response.data.channelId;
                 userId = response.data.userId;
+                console.log(username + " " + channelId + " " + userId);
+                initStompClient();
             })
         };
 
@@ -66,5 +69,4 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             });
         };
         joinToChat();
-        initStompClient();
     }]);

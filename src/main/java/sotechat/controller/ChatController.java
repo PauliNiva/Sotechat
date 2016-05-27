@@ -3,21 +3,27 @@ package sotechat.controller;
 import org.joda.time.DateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.socket.WebSocketSession;
 import sotechat.JoinResponse;
 import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
-import java.util.Random;
+import java.security.Principal;
+import java.util.*;
 
 /**
  * Controlleri, joka käsittelee serverin puolella
@@ -47,26 +53,16 @@ public class ChatController {
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
     public final MsgToClient routeMessage(
-            final MsgToServer msgToServer, SimpMessageHeaderAccessor headerAccessor) throws Exception {
-  //      String username = "Anon";
-        Map<String, Object> attrs = headerAccessor.getSessionAttributes();
-        HttpSession session = 
-        for (int i = 0; i < 50; i++) {
-            System.out.println("===============");
-        }
-        for (String s : attrs.keySet()) {
-            System.out.println(s);
-        }
-    /*    HttpSession session = req.getSession();
-        String username = session.getAttribute("username").toString();*/
+            final MsgToServer msgToServer) throws Exception {git
         // TODO: ID-to-name mappaykset Redisin kautta?
         String timeStamp = new DateTime().toString();
         // timeStamp täytyy antaa tässä muodossa AngularJS:n käsittelyyn.
-        return new MsgToClient("pekka", msgToServer.getChannelId(),
+        return new MsgToClient("" + msgToServer.getUserId(), msgToServer.getChannelId(),
                     timeStamp, msgToServer.getContent());
     }
 
-    /** Kun client menee sivulle index.html, tiedostoon upotettu
+    /** TODO: Kirjoita javadoc uusiks. Vanhaa tietoa.
+     * Kun client menee sivulle index.html, tiedostoon upotettu
      * JavaScript tekee erillisen GET-pyynnön polkuun /join.
      * Tällä pyynnöllä client ilmaisee haluavansa chattiin.
      * Alla oleva metodi mappaa pyynnöt polkuun /join antamalla
@@ -77,17 +73,28 @@ public class ChatController {
      * @throws Exception TODO: Selvitä mikä poikkeus.
      */
     @RequestMapping("/join")
-    public final JoinResponse returnJoinResponse(HttpServletRequest req) throws Exception {
-        // TODO: session kommentointi
+    public final JoinResponse returnJoinResponse(HttpServletRequest req, Principal professional) throws Exception {
         HttpSession session = req.getSession();
-        if (session.getAttribute("username") == null) {
-            Random rand = new Random();
-            String username = "Anon";
-            String channel = "DEV_CHANNEL";
-            session.setAttribute("username", username);
-            session.setAttribute("channelId", channel);
+
+        /* If client is authenticated as a professional,
+         * always write over session attributes. */
+        if (professional != null) {
+            session.setAttribute("username", professional.getName());
+            session.setAttribute("userId", "Hoitajan_ID");
+            // TODO: hae hoitajan ID nimen perusteella (redis?)
         }
-        return new JoinResponse(session.getAttribute("username").toString(), session.getAttribute("channelId").toString());
+
+        /* If session attributes still not known,
+         * we have a new anonymous user. */
+        if (session.getAttribute("username") == null) {
+            String newUserId = ""+new Random().nextInt(Integer.MAX_VALUE);
+            // TODO: ID-to-name mappings (redis?), no duplicate IDs.
+            session.setAttribute("username", "Anon");
+            session.setAttribute("userId", newUserId);
+        }
+        String username = session.getAttribute("username").toString();
+        String userId = session.getAttribute("userId").toString();
+        return new JoinResponse(username, userId, "DEV_CHANNEL");
     }
 
     /**
