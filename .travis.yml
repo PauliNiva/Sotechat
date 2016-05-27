@@ -32,7 +32,7 @@ before_install:
 install: true
 
 script :
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -DskipITs=true -B -V
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - mvn integration-test
 
 after_success:
