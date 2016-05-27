@@ -1,6 +1,7 @@
 
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.Keys
 
 description 'As a user I want to send a message'
 
@@ -24,8 +25,6 @@ scenario "user cand write a message on a text input", {
 
 scenario "user can send the message he or she has written to the server by pressing submit", {
     given 'text is written to the right text field in a chat window', {
-        driver = new FirefoxDriver()
-        driver.get("http://localhost:8080")
         element = driver.findElement(By.name("messageArea"))
         element.sendKeys("my first testmessage")
     }
@@ -35,28 +34,42 @@ scenario "user can send the message he or she has written to the server by press
     }
     then 'the text can be sent to the chat server', {
         element = driver.findElement(By.name("messageArea"))
-//        element.getText().shouldEqual ""
+        element.getText().equals("").shouldBe true
         page = driver.getPageSource()
         page.contains("my first testmessage").shouldBe true
     }
 }
 
 scenario "user can send the message he or she has written to the server by pressing enter", {
-    given 'text is written to the right text field in a chat window'
-    when 'enter is pressed'
-    then 'the text can be sent to the chat server'
+    given 'text is written to the right text field in a chat window', {
+        element = driver.findElement(By.name("messageArea"))
+        element.sendKeys("my second testmessage")
+    }
+    when 'enter is pressed', {
+        driver.getKeyboard().pressKey(Keys.ENTER)
+    }
+    then 'the text can be sent to the chat server', {
+        element = driver.findElement(By.name("messageArea"))
+        element.getText().equals("").shouldBe true
+        page = driver.getPageSource()
+        page.contains("my second testmessage").shouldBe true
+        driver.quit()
+    }
 }
 
-scenario "user can't send an invalid message", {
+scenario "user can't send an empty message", {
     given 'nothing is written to the text field', {
             driver = new FirefoxDriver()
             driver.get("http://localhost:8080")
     }
     when 'submit is clicked', {
+            element = driver.findElement(By.name("messageArea"))
+            element.sendKeys("")
             element = driver.findElement(By.name("send"))
             element.submit();
     }
     then 'no message is sent', {
             driver.getPageSource().contains("panel panel-default message-panel").shouldBe false
+            driver.quit()
     }
 }

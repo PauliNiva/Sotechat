@@ -15,6 +15,7 @@ scenario "User can open a chat window", {
             page.contains("panel panel-default chat-panel").shouldBe true
             page.contains("chatController as chat").shouldBe true
             page.contains("panel-body chat-body").shouldBe true
+            driver.quit()
         }
 }
 
