@@ -69,7 +69,9 @@ scenario "user can't send an empty message", {
             element.submit();
     }
     then 'no message is sent', {
-            driver.getPageSource().contains("panel panel-default message-panel").shouldBe false
+            page = driver.getPageSource()
+            page.contains("panel panel-default message-panel").shouldBe false
+            page.contains("messageText").shouldBe false
             driver.quit()
     }
 }
