@@ -33,8 +33,7 @@ public class ChatControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        mvc = MockMvcBuilders
-                .standaloneSetup(new ChatController()).build();
+
     }
 
     /**

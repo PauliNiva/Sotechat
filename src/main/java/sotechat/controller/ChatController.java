@@ -7,15 +7,10 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import org.springframework.session.Session;
-import org.springframework.session.SessionRepository;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.socket.WebSocketSession;
 import sotechat.JoinResponse;
 import sotechat.MsgToClient;
 import sotechat.MsgToServer;
@@ -24,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.*;
+
+import sotechat.data.Mapper;
 
 /**
  * Controlleri, joka käsittelee serverin puolella
@@ -35,6 +32,12 @@ import java.util.*;
 @RestController
 public class ChatController {
 
+    private Mapper mapper;
+
+    @Autowired
+    public ChatController(Mapper mapper) {
+        this.mapper = mapper;
+    }
     /** Alla metodi, joka käsittelee /toServer/{channelIid}
      * -polun kautta tulleet clientin viestit,
      * ja lähettää clientille vastauksen
@@ -53,12 +56,14 @@ public class ChatController {
     @MessageMapping("/toServer/{id}")
     @SendTo("/toClient/{id}")
     public final MsgToClient routeMessage(
-            final MsgToServer msgToServer) throws Exception {git
+            final MsgToServer msgToServer) throws Exception {
         // TODO: ID-to-name mappaykset Redisin kautta?
+
         String timeStamp = new DateTime().toString();
         // timeStamp täytyy antaa tässä muodossa AngularJS:n käsittelyyn.
-        return new MsgToClient("" + msgToServer.getUserId(), msgToServer.getChannelId(),
-                    timeStamp, msgToServer.getContent());
+        String username = mapper.getUsernameFromId(msgToServer.getUserId());
+        return new MsgToClient(username, msgToServer.getChannelId(),
+                    timeStamp, msgToServer.getContent() +  " " + msgToServer.getUserId());
     }
 
     /** TODO: Kirjoita javadoc uusiks. Vanhaa tietoa.
@@ -79,21 +84,22 @@ public class ChatController {
         /* If client is authenticated as a professional,
          * always write over session attributes. */
         if (professional != null) {
-            session.setAttribute("username", professional.getName());
-            session.setAttribute("userId", "Hoitajan_ID");
-            // TODO: hae hoitajan ID nimen perusteella (redis?)
+            String username = professional.getName();
+            String userId = mapper.getIdFromRegisteredName(username);
+            session.setAttribute("username", username);
+            session.setAttribute("userId", userId);
         }
 
         /* If session attributes still not known,
          * we have a new anonymous user. */
         if (session.getAttribute("username") == null) {
-            String newUserId = ""+new Random().nextInt(Integer.MAX_VALUE);
-            // TODO: ID-to-name mappings (redis?), no duplicate IDs.
+            String newUserId = mapper.generateNewId();
             session.setAttribute("username", "Anon");
             session.setAttribute("userId", newUserId);
         }
         String username = session.getAttribute("username").toString();
         String userId = session.getAttribute("userId").toString();
+        this.mapper.mapUsernameToId(userId, username);
         return new JoinResponse(username, userId, "DEV_CHANNEL");
     }
 
