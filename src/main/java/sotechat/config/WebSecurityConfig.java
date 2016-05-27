@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -17,7 +16,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    final protected void configure(final HttpSecurity http) throws Exception {
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
@@ -47,16 +46,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
          * kirjautumista vaativat pyynnöt login.html -sivulle */
     }
 
-    /** Kovakoodataan hoitajan tunnukset siihen
-     * saakka, että tietokanta on käytössä. */
+    /**
+     * Kovakoodataan hoitajan tunnukset siihen saakka,
+     * että tietokanta on käytössä.
+     * @param auth
+     * @throws Exception
+     */
     @Autowired
-    public void configureGlobal(
-            AuthenticationManagerBuilder auth) throws Exception {
+    final public void configureGlobal(
+            final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
                 .withUser("hoitaja")
                 .password("salasana")
                 .roles("USER");
-                //TODO: selvitä roolin merkitys
+                // TODO: selvitä roolin merkitys.
     }
 }

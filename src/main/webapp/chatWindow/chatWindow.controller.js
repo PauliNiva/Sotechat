@@ -28,7 +28,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
         };
         
         /** Funktio parsee viestin haluttuun muotoon. */
-        var getMessage = function (data) {
+        $scope.getMessage = function (data) {
             var parsed = JSON.parse(data);
             var message = [];
             message.message = parsed.content;
@@ -47,6 +47,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             $http.get("/join").then(function(response) {
                 channelId = response.data.channelId;
                 userId = response.data.userId;
+                initStompClient();
             })
         };
 
@@ -55,7 +56,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             stompSocket.init('/toServer');
             stompSocket.connect(function (frame) {
                 stompSocket.subscribe("/toClient/" + channelId, function (message) {
-                    $scope.messages.push(getMessage(message.body));
+                    $scope.messages.push($scope.getMessage(message.body));
                 });
 
             }, function (error) {
@@ -63,5 +64,5 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             });
         };
         joinToChat();
-        initStompClient();
+
     }]);

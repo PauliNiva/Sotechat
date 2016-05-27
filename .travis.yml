@@ -21,10 +21,10 @@ addons:
         repo_token: b3947eb04b867918f437bf3b54e5a96614e3651282214fb15a81fc62c74ce47a
 
 before_install:
- - "export DISPLAY=:99.0"
- - "sh -e /etc/init.d/xvfb start"
- - sleep 3 # give xvfb some time to start	
- 
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 

@@ -4,6 +4,7 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import java.util.List
 import java.lang.Integer
 
+
 description 'As a user I want to view the messages I have sent in the chat window'
 
 scenario "user can see a message that has been sent to the server", {
