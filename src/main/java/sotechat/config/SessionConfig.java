@@ -1,6 +1,6 @@
 package sotechat.config;
 
-import org.springframework.context.annotation.Bean;
+/*import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -17,6 +17,4 @@ public class SessionConfig {
         return new JedisConnectionFactory();
     }
 
-    @Bean
-    public RedisOperationsSessionRepository redisSessionRepository() { return new RedisOperationsSessionRepository(connectionFactory()); }
-}
+}*/

@@ -27,9 +27,8 @@ import java.util.Map;
  * @since 19.5.2016
  */
 @Configuration
-@EnableScheduling
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     /**
      * Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
@@ -54,7 +53,7 @@ public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfig
      *                 asiakasohjelmien viesteille pääteosoitteen.
      */
     @Override
-    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
+    public final void registerStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 }
