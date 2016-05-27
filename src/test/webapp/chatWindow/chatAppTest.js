@@ -1,5 +1,5 @@
 "use strict";
-describe('ChatController', function() {
+describe("ChatController", function() {
     var $scope, ctrl;
     var mockService;
     var data = '\{"userName":"Anon","channelId":"0","timeStamp":"2016-05-24T06:58:54.794Z","content":"Kirjoitan jotain"\}';
