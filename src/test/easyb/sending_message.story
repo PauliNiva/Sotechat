@@ -19,7 +19,6 @@ scenario "user cand write a message on a text input", {
         page.contains("sendMessage();").shouldBe true
         page.contains("button").shouldBe true
         page.contains("submit").shouldBe true
-        page.contains("Lähetä").shouldBe true
     }
 }
 
@@ -33,6 +32,7 @@ scenario "user can send the message he or she has written to the server by press
         element.submit();
     }
     then 'the text can be sent to the chat server', {
+        Thread.sleep(1000)
         element = driver.findElement(By.name("messageArea"))
         element.getText().equals("").shouldBe true
         page = driver.getPageSource()
@@ -49,6 +49,7 @@ scenario "user can send the message he or she has written to the server by press
         driver.getKeyboard().pressKey(Keys.ENTER)
     }
     then 'the text can be sent to the chat server', {
+        Thread.sleep(1000)
         element = driver.findElement(By.name("messageArea"))
         element.getText().equals("").shouldBe true
         page = driver.getPageSource()
@@ -69,6 +70,7 @@ scenario "user can't send an empty message", {
             element.submit();
     }
     then 'no message is sent', {
+            Thread.sleep(1000)
             page = driver.getPageSource()
             page.contains("panel panel-default message-panel").shouldBe false
             page.contains("messageText").shouldBe false
