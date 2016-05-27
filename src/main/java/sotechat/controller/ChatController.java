@@ -41,7 +41,7 @@ public class ChatController {
     /** Alla metodi, joka käsittelee /toServer/{channelIid}
      * -polun kautta tulleet clientin viestit,
      * ja lähettää clientille vastauksen
-     * polussa /toClient/{channelId}
+     * polussa /toClient/{channelId}.
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
      *                    joka on paketoitu MsgToServer-olion sisälle.
@@ -63,7 +63,7 @@ public class ChatController {
         // timeStamp täytyy antaa tässä muodossa AngularJS:n käsittelyyn.
         String username = mapper.getUsernameFromId(msgToServer.getUserId());
         return new MsgToClient(username, msgToServer.getChannelId(),
-                    timeStamp, msgToServer.getContent() +  " " + msgToServer.getUserId());
+                    timeStamp, msgToServer.getContent());
     }
 
     /** TODO: Kirjoita javadoc uusiks. Vanhaa tietoa.
@@ -107,7 +107,7 @@ public class ChatController {
      * Alla mäppäys hoitajan hallintasivulle /pro.
      * TODO: Selvitä miten polkuja mapataan staattisiin resursseihin.
      * @return Palautetaan pyytajalle hallintasivu.
-     * @throws Exception
+     * @throws Exception TODO: Selvitä mikä poikkeus.
      */
     @RequestMapping("/pro")
     public final String naytaHallintaSivu() throws Exception {

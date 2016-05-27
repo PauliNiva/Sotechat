@@ -28,7 +28,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
         };
         
         /** Funktio parsee viestin haluttuun muotoon. */
-        var getMessage = function (data) {
+        $scope.getMessage = function (data) {
             var parsed = JSON.parse(data);
             console.log(parsed);
             var message = [];
@@ -49,7 +49,6 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 username = response.data.userName;
                 channelId = response.data.channelId;
                 userId = response.data.userId;
-                console.log(username + " " + channelId + " " + userId);
                 initStompClient();
             })
         };
@@ -59,7 +58,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             stompSocket.init('/toServer');
             stompSocket.connect(function (frame) {
                 stompSocket.subscribe("/toClient/" + channelId, function (message) {
-                    $scope.messages.push(getMessage(message.body));
+                    $scope.messages.push($scope.getMessage(message.body));
                 });
             /*    stompSocket.subscribe("/topic/", function(message) {
                     console.log(JSON.parse(message.body));

@@ -29,12 +29,6 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!--
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
--->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,10 +46,6 @@
             <version>4.2.6.RELEASE</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,26 +58,17 @@
             <scope>test</scope>
         </dependency>
 
-        <!--
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-taglibs</artifactId>
-            <version>4.1.0.RELEASE</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>springloaded</artifactId>
+            <version>1.2.5.RELEASE</version>
         </dependency>
--->
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
         </dependency>
 
-        <!--
-                <dependency>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-jasper</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-        -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -116,12 +97,12 @@
             <artifactId>commons-dbcp</artifactId>
             <type>jar</type>
         </dependency>
-        
-         <dependency>
-             <groupId>joda-time</groupId>
-             <artifactId>joda-time</artifactId>
-             <version>2.9.3</version>
-         </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.3</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -129,9 +110,32 @@
             <version>2.5</version>
             <type>maven-plugin</type>
         </dependency>
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>2.53.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>2.53.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.3.6</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.easyb</groupId>
+            <artifactId>easyb-core</artifactId>
+            <version>1.5</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -151,6 +155,25 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -222,7 +245,49 @@
                     </storyReport>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <additionalContexts>
+                        <context>
+                            <contextRoot>/lib</contextRoot>
+                            <directory>${project.build.directory}/src/main/webapp/assets</directory>
+                        </context>
+                    </additionalContexts>
+                    <preloadSources>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular-mocks.js</source>
+                    </preloadSources>
+                    <jsSrcDir>${project.basedir}</jsSrcDir>
+                    <sourceIncludes>
+                        <include>src/main/webapp/services/*.js</include>
+                        <include>src/main/webapp/assets/lib/*.js</include>
+                        <include>src/main/webapp/*.js</include>
+                        <include>src/main/webapp/chatWindow/*.js</include>
+                    </sourceIncludes>
+                    <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
+                    <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+                    <phantomjs>
+                        <version>2.1.1</version>
+                        <checkSystemPath>true</checkSystemPath>
+                        <enforceVersion>true</enforceVersion>
+                        <source>REPOSITORY</source>
+                        <baseUrl></baseUrl>
+                        <outputDirectory>target/phantomjs</outputDirectory>
+                    </phantomjs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>
