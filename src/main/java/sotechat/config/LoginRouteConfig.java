@@ -13,6 +13,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class LoginRouteConfig extends WebMvcConfigurerAdapter {
 
+    /** Thymeleaf on jotenkin osallisena tässä login-mäppäyksessä.
+     * @param registry täytä kuvaus
+     */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login");
