@@ -43,7 +43,7 @@ describe("ChatController", function() {
     });
 
     it("Can sent message", function() {
-        angular.element(element).val('Testi').trigger('input');
+        scope.message = "testi";
         scope.$apply();
         scope.sendMessage();
         expect(stompSocket.send).toHaveBeenCalled();
