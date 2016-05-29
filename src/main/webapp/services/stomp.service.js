@@ -1,6 +1,6 @@
 /** Service hoitaa tietoliikenteen
  *   (over STOMP over Websockets over TCP/IP) */
-angular.module('chatApp.services', [])
+angular.module('chatApp')
     .factory('stompSocket', ['$rootScope', function ($rootScope) {
         var stompClient;
         var socket = {
