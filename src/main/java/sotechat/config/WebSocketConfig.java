@@ -1,23 +1,13 @@
 package sotechat.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.session.ExpiringSession;
-import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.*;
-import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-import sotechat.JoinResponse;
+import org.springframework.web
+        .socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web
+        .socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.Map;
 
 /** Palvelin käsittelee kahta erityyppistä liikennettä: HTML ja WebSockets.
  * Tämä konfiguraatioluokka koskee WebSocket-liikenteen käsittelyä.
