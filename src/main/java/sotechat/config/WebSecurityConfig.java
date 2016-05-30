@@ -16,14 +16,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
     @Override
-    final protected void configure(final HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
                 .authorizeRequests()
                 // pyynnöt polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/pro").authenticated()
+                .antMatchers("/proCP.html").authenticated()
                 // muut pyynnöt
                 // sallitaan kaikille
                 .anyRequest().permitAll()
@@ -42,19 +42,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // logout sallitaan kaikille
                 .permitAll();
 
-        /* Ilmeisesti tämä myös ohjaa jollain magialla
-         * kirjautumista vaativat pyynnöt login.html -sivulle */
+        /* Thymeleafilla on jokin rooli kirjautumista vaativien
+         * pyyntöjen uudelleenohjaamisessa login.html -sivulle.
+          * Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
-    /**
-     * Kovakoodataan hoitajan tunnukset siihen saakka,
+    /** Kovakoodataan hoitajan tunnukset siihen saakka,
      * että tietokanta on käytössä.
-     * @param auth
-     * @throws Exception
+     * @param auth mikä tämä on?
+     * @throws Exception mikä poikkeus?
      */
     @Autowired
-    final public void configureGlobal(
-            final AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
                 .withUser("hoitaja")
