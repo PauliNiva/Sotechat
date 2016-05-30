@@ -2,10 +2,13 @@ package sotechat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication
+        .builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration
+        .WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration
+        .EnableWebSecurity;
 
 /** Tämä konfiguraatiotiedosto ottaa Spring Securityn käyttöön
  *  yhdessä joidenkin pom.xml -määrityksien kanssa. */
@@ -16,7 +19,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected final void configure(final HttpSecurity http) throws Exception {
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
@@ -53,7 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @throws Exception mikä poikkeus?
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+     public final void configureGlobal(
+            final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
                 .withUser("hoitaja")
