@@ -2,7 +2,8 @@ package sotechat.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation
+        .WebMvcConfigurerAdapter;
 
 /** Tämä luokka mappaa requestin /login oletuspolkuun
  *  resources/templates/login.html. (Mikään tapa
@@ -14,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 public class LoginRouteConfig extends WebMvcConfigurerAdapter {
 
     @Override
-    final public void addViewControllers(
+    public final void addViewControllers(
             final ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login");
     }
