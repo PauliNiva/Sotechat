@@ -275,9 +275,9 @@
                     </preloadSources>
                     <jsSrcDir>${project.basedir}</jsSrcDir>
                     <sourceIncludes>
+                        <include>src/main/webapp/*.js</include>
                         <include>src/main/webapp/services/*.js</include>
                         <include>src/main/webapp/assets/lib/*.js</include>
-                        <include>src/main/webapp/*.js</include>
                         <include>src/main/webapp/chatWindow/*.js</include>
                     </sourceIncludes>
                     <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
