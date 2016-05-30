@@ -14,9 +14,17 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 import sotechat.websocket.WebSocketConnectHandler;
 
+/**
+ * Keskeneräinen.
+ * @param <S>
+ */
 @Configuration
 public class WebSocketHandlersConfig<S extends ExpiringSession> {
 
+    /** Täytetään myöhemmin.
+     * @param messagingTemplate täytetään myöhemmin
+     * @return täytetään myöhemmin
+     */
     @Bean
     public WebSocketConnectHandler<S> webSocketConnectHandler(SimpMessageSendingOperations messagingTemplate) {
         return new WebSocketConnectHandler<S>(messagingTemplate);

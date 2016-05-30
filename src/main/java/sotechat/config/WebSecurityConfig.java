@@ -42,15 +42,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // logout sallitaan kaikille
                 .permitAll();
 
-        /* Ilmeisesti tämä myös ohjaa jollain magialla
-         * kirjautumista vaativat pyynnöt login.html -sivulle */
+        /* Thymeleafilla on jokin rooli kirjautumista vaativien
+         * pyyntöjen uudelleenohjaamisessa login.html -sivulle.
+          * Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
-    /**
-     * Kovakoodataan hoitajan tunnukset siihen saakka,
+    /** Kovakoodataan hoitajan tunnukset siihen saakka,
      * että tietokanta on käytössä.
-     * @param auth
-     * @throws Exception
+     * @param auth mikä tämä on?
+     * @throws Exception mikä poikkeus?
      */
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

@@ -19,19 +19,15 @@ import java.security.Principal;
 import java.util.Arrays;
 import java.util.Map;
 
-/**
- * Konfiguraatioluokka, joka määrittelee, että asiakasohjelmalta(clientiltä)
- * tulleet viestit kulkevat WebSocketin kautta palvelimelle
- * ChatController-luokan käsiteltäväksi. Lisäksi luokka välittää
- * ChatControllerin generoiman vastauksen asiakasohjelmalle.
- * @since 19.5.2016
- */
+/** Palvelin käsittelee kahta erityyppistä liikennettä: HTML ja WebSockets.
+ * Tämä konfiguraatioluokka koskee WebSocket-liikenteen käsittelyä.
+ * Ilmeisesti tässä määritellään polut, joihin tulevat/menevät viestit
+ * käsitellään - ja muihin polkuihin menevät viestit unohdetaan. */
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
-    /**
-     * Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
+    /** Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
      * välittääkseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
      * Palvelimen viestit tulevat ChatController-luokalta.
      *
@@ -40,11 +36,10 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
      */
     @Override
     public final void configureMessageBroker(final MessageBrokerRegistry conf) {
-        conf.enableSimpleBroker("/toClient", "/topic/");
+        conf.enableSimpleBroker("/toClient");
     }
 
-    /**
-     * Metodi käyttää StompEndpointRegistry-luokan metodia addEndpoint
+    /** Metodi käyttää StompEndpointRegistry-luokan metodia addEndpoint
      * määrittääkseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
      * pääteosoitteen. Tässä ohjelmassa viestit ohjautuvat
      * ChatController-luokalle.

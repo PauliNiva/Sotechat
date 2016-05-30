@@ -1,7 +1,6 @@
 package sotechat;
 
-/**
- * Palvelimen asiakasohjelmalle lähettämä viesti on talletettu
+/** Palvelimen asiakasohjelmalle lähettämä viesti on talletettu
  * MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon
  * Jackson-kirjaston avulla ennen kuin asiakasohjelma saa viestin.
  *
@@ -21,8 +20,7 @@ public class MsgToClient {
     /** Viestin sisältö. */
     private String content;
 
-    /**
-     * Konstruktori alustaa olion annetuilla parametreillä.
+    /** Konstruktori alustaa olion annetuilla parametreillä.
      * @param pUserName userName
      * @param pChannelId channelId
      * @param pTimeStamp timeStamp
@@ -36,29 +34,28 @@ public class MsgToClient {
         this.content = pContent;
     }
 
-    /**
+    /** Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
      * @return Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
      */
     public final String getUserName() {
         return this.userName;
     }
 
-    /**
-     * @return Palauttaa salaisen avaimen,
-     * jolla kanavaa voi kuunnella + viestittää.
+    /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää.
+     * @return Palauttaa salaisen avaimen.
      */
     public final String getChannelId() {
         return this.channelId;
     }
 
-    /**
+    /** Palauttaa ajan viestin saapumiselle (serverin ajassa).
      * @return Palauttaa ajan viestin saapumiselle (serverin ajassa).
      */
     public final String getTimeStamp() {
         return this.timeStamp;
     }
 
-    /**
+    /** Palauttaa viestin sisällön.
      * @return Palauttaa viestin sisällön.
      */
     public final String getContent() {
