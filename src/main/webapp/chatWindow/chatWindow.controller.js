@@ -2,7 +2,7 @@
 // - Kun Serviceltä tulee viesti, kontrolleri päivittää selaimessa olevan näkymän.
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 // TODO: Kuvaile $scope
-angular.module('chatApp.controllers', ['luegg.directives'])
+angular.module('chatApp')
     .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http', function ($scope, $location, $interval, stompSocket, $http) {
         // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
         $scope.messages = [];
@@ -28,7 +28,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
         };
         
         /** Funktio parsee viestin haluttuun muotoon. */
-        $scope.getMessage = function (data) {
+        var getMessage = function (data) {
             var parsed = JSON.parse(data);
             console.log(parsed);
             var message = [];
@@ -58,7 +58,7 @@ angular.module('chatApp.controllers', ['luegg.directives'])
             stompSocket.init('/toServer');
             stompSocket.connect(function (frame) {
                 stompSocket.subscribe("/toClient/" + channelId, function (message) {
-                    $scope.messages.push($scope.getMessage(message.body));
+                    $scope.messages.push(getMessage(message.body));
                 });
             /*    stompSocket.subscribe("/topic/", function(message) {
                     console.log(JSON.parse(message.body));
@@ -67,5 +67,6 @@ angular.module('chatApp.controllers', ['luegg.directives'])
                 initStompClient();
             });
         };
+        
         joinToChat();
     }]);
