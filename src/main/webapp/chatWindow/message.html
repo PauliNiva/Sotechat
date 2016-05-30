@@ -1,18 +1,21 @@
 <div class="row">
-    <div ng-class="{'pull-right': message.I}" class="panel panel-default message-panel">
-        <span></span>
-
+    <div ng-class="{'pull-right': message.I, 'pull-left': !message.I}" class="panel panel-default message-panel">
         <div ng-if="message.I" class="header">
-            <small class="text-muted"><span class="glyphicon glyphicon-time"></span><time> {{message.time | date:'HH:mm'}}</time></small>
+            <small class="text-muted">
+                <span class="glyphicon glyphicon-time"></span>
+                <time> {{message.time | date:'HH:mm'}}</time>
+            </small>
             <strong class="pull-right">{{message.sender}} </strong>
         </div>
         <div ng-if="!message.I" class="header">
-            <strong>{{message.sender}}</strong><small class="pull-right text-muted">
-            <span class="glyphicon glyphicon-time"></span><time> {{message.time | date:'HH:mm'}}</time></small>
+            <strong>{{message.sender}}</strong>
+            <small class="pull-right text-muted">
+                <span class="glyphicon glyphicon-time"></span>
+                <time> {{message.time | date:'HH:mm'}}</time>
+            </small>
         </div>
         <p name="messageText">
-            {{message.message}}
+            {{message.content}}
         </p>
-
     </div>
 </div>
