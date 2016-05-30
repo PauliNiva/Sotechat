@@ -1,4 +1,4 @@
-package sotechat.websocket;
+/*package sotechat.websocket;
 
 /**
  * Luokka ei vielä käytössä.
@@ -25,4 +25,4 @@ public class WebSocketConnectHandler<S>
         }
         String id = SimpMessageHeaderAccessor.getSessionId(headers);
     }
-}/*
+}*/
