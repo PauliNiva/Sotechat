@@ -11,7 +11,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sotechat.data.Mapper;
 import sotechat.data.MapperImpl;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +27,7 @@ public class ChatControllerTest {
      * MockMvc.
      */
     private MockMvc mvc;
+
     /**
      * Before.
      * @throws Exception
@@ -39,13 +39,23 @@ public class ChatControllerTest {
     }
 
     /**
-     * contextLoads.
+     * Get pyyntö polkuun "/join" palauttaa statukseksen OK.
      * @throws Exception
      */
     @Test
-    public void contextLoads() throws Exception {
+    public void getToJoinReturnOK() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .get("/join").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    /**
+     * Get pyyntö polkuun "/pro" palauttaa merkkijonon.
+     * @throws Exception
+     */
+    @Test
+    public void getToProIsValid() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .get("/pro").content("Tänne tulisi hoitajan näkymä"));
     }
 }
