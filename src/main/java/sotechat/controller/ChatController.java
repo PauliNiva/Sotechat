@@ -5,6 +5,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +48,7 @@ public class ChatController {
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
      *                    joka on paketoitu MsgToServer-olion sisälle.
-     * @param professional Principal-sessio kirjautuneelle käyttäjälle.
+     * @param accessor Haetaan session-tiedot täältä.
      * @return Palautusarvoa ei käytetä kuten yleensä, vaan
      *         @SendTo -annotaatio saa Spring lähettämään
      *         palautusarvona määritellyn olion lähetettäväksi
@@ -58,7 +59,8 @@ public class ChatController {
     @SendTo("/toClient/{channelId}")
     public final MsgToClient routeMessage(
             final MsgToServer msgToServer,
-            final Principal professional) throws Exception {
+            final SimpMessageHeaderAccessor accessor
+    ) throws Exception {
 
         /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
         String timeStamp = new DateTime().toString();
@@ -72,13 +74,16 @@ public class ChatController {
         if (mapper.isUserProfessional(userId)) {
             /** ID kuuluu ammattilaiselle, varmistetaan että on kirjautunut. */
 
-            if (professional == null) {
+            if (accessor.getUser() == null) {
                 /** Ei kirjautunut, hylätään viesti. */
                 return null;
             }
-
-            String username = professional.getName();
-            String userId = mapper.getIdFromRegisteredName(username);
+            String username = accessor.getUser().getName();
+            String authId = mapper.getIdFromRegisteredName(username);
+            if (!userId.equals(authId)) {
+                /** Kirjautunut ID eri kuin viestiin merkitty lähettäjän ID. */
+                return null;
+            }
 
         }
         String username = mapper.getUsernameFromId(userId);

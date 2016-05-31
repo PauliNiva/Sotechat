@@ -40,5 +40,11 @@ public interface Mapper {
      * @return Palauttaa true, jos käyttäjä ID löytyy, ja false, jos ei löydy.
      */
     boolean isUserIdMapped(String id);
+
+    /** Metodi tarkistaa, kuuluuko jokin käyttäjäID
+     * rekisteröityneelle käyttäjälle.
+     * @param id id
+     * @return true, jos kuuluu.
+     */
     boolean isUserProfessional(String id);
 }

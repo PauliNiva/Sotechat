@@ -3,6 +3,7 @@ package sotechat.data;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.security.SecureRandom;
 import java.math.BigInteger;
@@ -19,6 +20,10 @@ public class MapperImpl implements Mapper {
     /** revMap key=username, value=id,
      * esim. revMap.get("hoitaja anne") => "annenId". */
     private HashMap<String, String> revMap;
+    /** professionalIDs:ltä voi kysyä, mitkä ID:t ovat rekisteröity. */
+    private HashSet<String> professionalIDs;
+
+
     /** Raskas satunnaislukugeneraattori. */
     private SecureRandom random;
     /** Nopea satunnaismerkkijonogeneraattori (joka käyttää normi Randomia). */
@@ -29,10 +34,12 @@ public class MapperImpl implements Mapper {
         this.map = new HashMap<String, String>();
         this.revMap = new HashMap<String, String>();
         this.random = new SecureRandom();
-        this.fastGen = new FastGeneratorForRandomStrings(16);
+        this.fastGen = new FastGeneratorForRandomStrings();
+        this.professionalIDs = new HashSet<>();
 
         /** Kovakoodataan yksi hoitaja devausvaiheessa. */
         mapUsernameToId("666", "hoitaja");
+        professionalIDs.add("666");
     }
 
     /** Tallentaa molempiin suuntiin tiedon id<->username
@@ -67,6 +74,11 @@ public class MapperImpl implements Mapper {
         return (map.containsKey(id));
     }
 
+    @Override
+    public final boolean isUserProfessional(final String id) {
+        return professionalIDs.contains(id);
+    }
+
     /** Getteri salaiselle käyttäjäID:lle,
      * parametrina julkinen käyttäjänimi.
      * Huom: mielekästä käyttää vain rekisteröityjen
@@ -79,8 +91,9 @@ public class MapperImpl implements Mapper {
     @Override
     public final String getIdFromRegisteredName(final String registeredName) {
         /* Varmistetaan ensin, että username tunnetaan. */
-        if (!revMap.containsKey(registeredName)) {
-            /* Ei pitäisi laueta tuotannossa koskaan. */
+        if (registeredName == null
+                || registeredName.isEmpty()
+                || !revMap.containsKey(registeredName)) {
             return "UNKNOWN_ID";
         }
         return this.revMap.get(registeredName);
@@ -103,6 +116,59 @@ public class MapperImpl implements Mapper {
             }
         }
     }
+
+    /** Nopea satunnaismerkkijonotuottaja (käytössä).
+     *  @return satunnaismerkkijono
+     */
+    public final String getFastRandomString() {
+        return fastGen.nextString();
+    }
+
+    /** Nopea pseudosatunnaismerkkijonotuottaja.
+     * Attribution: http://stackoverflow.com/questions/
+     * 41107/how-to-generate-a-random-alpha-numeric-string
+     */
+    private class FastGeneratorForRandomStrings {
+
+        /** Käytetään nopeaa randomia. */
+        private final Random random = new Random();
+        /** Haluttu pituus satunnaismerkkijonoille. */
+        private static final int LENGTH = 16;
+
+        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voi sisältää. */
+        private final char[] symbols;
+        /** Tilapäistaulukko uuden merkkijonon muodostukseen. */
+        private final char[] buf;
+
+        /** Konstruktori alustaa olion (yksi olio riittää). */
+        FastGeneratorForRandomStrings() {
+            if (LENGTH < 1) {
+                throw new IllegalArgumentException("length < 1: " + LENGTH);
+            }
+            buf = new char[LENGTH];
+            StringBuilder tmp = new StringBuilder();
+            for (char ch = '0'; ch <= '9'; ++ch) {
+                tmp.append(ch);
+            }
+            for (char ch = 'a'; ch <= 'z'; ++ch) {
+                tmp.append(ch);
+            }
+            symbols = tmp.toString().toCharArray();
+        }
+
+        /** Palauttaa satunnaismerkkijonon.
+         * @return satunnaismerkkijono
+         */
+        public String nextString() {
+            for (int idx = 0; idx < buf.length; ++idx) {
+                buf[idx] = symbols[random.nextInt(symbols.length)];
+            }
+            return new String(buf);
+        }
+    }
+
+
+
 
     /** Ei käytössä. Jos halutaan siirtyä "satunnaisempaan",
      * mutta hitaampaan generaattoriin. Tässä tapauksessa
@@ -128,53 +194,4 @@ public class MapperImpl implements Mapper {
      * merkkijonoesitys on kuitenkin ilmaistu kantaluvussa 32.
      */
     private final int numeralSystem = 32;
-    /** Nopea satunnaismerkkijonotuottaja (käytössä).
-     * * @return satunnaismerkkijono
-     */
-    public final String getFastRandomString() {
-        return fastGen.nextString();
-    }
-
-    /** Nopea pseudosatunnaismerkkijonotuottaja.
-     * Attribution: http://stackoverflow.com/questions/
-     * 41107/how-to-generate-a-random-alpha-numeric-string
-     */
-    private class FastGeneratorForRandomStrings {
-
-        /** Käytetään nopeaa randomia. */
-        private final Random random = new Random();
-        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voivat
-         *  sisältää. */
-        private final char[] symbols;
-        /** Tilapäistaulukko uuden merkkijonon muodostukseen. */
-        private final char[] buf;
-
-        /** Konstruktori alustaa olion (yksi olio riittää).
-         * @param length pituus halutuille merkkijonoille
-         */
-        FastGeneratorForRandomStrings(final int length) {
-            if (length < 1) {
-                throw new IllegalArgumentException("length < 1: " + length);
-            }
-            buf = new char[length];
-            StringBuilder tmp = new StringBuilder();
-            for (char ch = '0'; ch <= '9'; ++ch) {
-                tmp.append(ch);
-            }
-            for (char ch = 'a'; ch <= 'z'; ++ch) {
-                tmp.append(ch);
-            }
-            symbols = tmp.toString().toCharArray();
-        }
-
-        /** Palauttaa satunnaismerkkijonon.
-         * @return satunnaismerkkijono
-         */
-        public String nextString() {
-            for (int idx = 0; idx < buf.length; ++idx) {
-                buf[idx] = symbols[random.nextInt(symbols.length)];
-            }
-            return new String(buf);
-        }
-    }
 }
