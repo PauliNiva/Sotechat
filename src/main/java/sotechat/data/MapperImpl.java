@@ -16,7 +16,8 @@ public class MapperImpl implements Mapper {
 
     /** map key=id, value=username, esim. map.get("491829813") => "Anon". */
     private HashMap<String, String> map;
-    /** revMap key=username, value=id, esim. revMap.get("hoitaja anne") => "annenId". */
+    /** revMap key=username, value=id,
+     * esim. revMap.get("hoitaja anne") => "annenId". */
     private HashMap<String, String> revMap;
     /** Raskas satunnaislukugeneraattori. */
     private SecureRandom random;
@@ -39,7 +40,7 @@ public class MapperImpl implements Mapper {
      * @param username julkinen username
      */
     @Override
-    public void mapUsernameToId(String id, String username) {
+    public final void mapUsernameToId(final String id, final String username) {
         this.map.put(id, username);
         this.revMap.put(username, id);
     }
@@ -50,7 +51,7 @@ public class MapperImpl implements Mapper {
      * @return username
      */
     @Override
-    public String getUsernameFromId(String id) {
+    public final String getUsernameFromId(final String id) {
         if (!map.containsKey(id)) {
             return "UNKNOWN_USERNAME";
         }
@@ -90,7 +91,7 @@ public class MapperImpl implements Mapper {
      * @return userId
      */
     @Override
-    public String generateNewId() {
+    public final String generateNewId() {
         while (true) {
             /** Tuotetaan satunnaismerkkijonoja niin kauan,
              * että vapaa merkkijono löytyy. On erittäin
@@ -110,14 +111,27 @@ public class MapperImpl implements Mapper {
      * kutsumista.
      * @return satunnaismerkkijono
      */
-    public String getSecureRandomString() {
-        return "" + new BigInteger(130, random).toString(32);
+    public final String getSecureRandomString() {
+        return "" + new BigInteger(maxBitLength, random)
+                .toString(numeralSystem);
     }
 
-    /** Nopea satunnaismerkkijonotuottaja (käytössä).
-     * @return satunnaismerkkijono
+    /** Suurin mahdollinen määrä bittejä mitä salaisessa merkkijonossa voi
+     * olla. Random arpoo, kuinka monta bittiä salaiseen merkkijonoon lopulta
+     * tulee.
      */
-    public String getFastRandomString() {
+    private final int maxBitLength = 130;
+    /** Muuttujan arvo kertoo mihin lukujärjestelmään luotu BigInteger
+     * muunnetaan, kun siitä luodaan merkkijonoesitys. Oletuksena toString
+     * luo merkkijonoesityksen 10-järjestelmään, esim. "10".toString()
+     * palauttaisi arvon 10. Tässä tapauksessa luodun BigIntegerin
+     * merkkijonoesitys on kuitenkin ilmaistu kantaluvussa 32.
+     */
+    private final int numeralSystem = 32;
+    /** Nopea satunnaismerkkijonotuottaja (käytössä).
+     * * @return satunnaismerkkijono
+     */
+    public final String getFastRandomString() {
         return fastGen.nextString();
     }
 
@@ -129,7 +143,8 @@ public class MapperImpl implements Mapper {
 
         /** Käytetään nopeaa randomia. */
         private final Random random = new Random();
-        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voivat sisältää. */
+        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voivat
+         *  sisältää. */
         private final char[] symbols;
         /** Tilapäistaulukko uuden merkkijonon muodostukseen. */
         private final char[] buf;
@@ -137,15 +152,18 @@ public class MapperImpl implements Mapper {
         /** Konstruktori alustaa olion (yksi olio riittää).
          * @param length pituus halutuille merkkijonoille
          */
-        public FastGeneratorForRandomStrings(int length) {
-            if (length < 1)
+        FastGeneratorForRandomStrings(final int length) {
+            if (length < 1) {
                 throw new IllegalArgumentException("length < 1: " + length);
+            }
             buf = new char[length];
             StringBuilder tmp = new StringBuilder();
-            for (char ch = '0'; ch <= '9'; ++ch)
+            for (char ch = '0'; ch <= '9'; ++ch) {
                 tmp.append(ch);
-            for (char ch = 'a'; ch <= 'z'; ++ch)
+            }
+            for (char ch = 'a'; ch <= 'z'; ++ch) {
                 tmp.append(ch);
+            }
             symbols = tmp.toString().toCharArray();
         }
 
@@ -153,8 +171,9 @@ public class MapperImpl implements Mapper {
          * @return satunnaismerkkijono
          */
         public String nextString() {
-            for (int idx = 0; idx < buf.length; ++idx)
+            for (int idx = 0; idx < buf.length; ++idx) {
                 buf[idx] = symbols[random.nextInt(symbols.length)];
+            }
             return new String(buf);
         }
     }

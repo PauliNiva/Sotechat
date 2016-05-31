@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             final AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
-                .withUser("hoitaja")
+                .withUser("Hoitaja")
                 .password("salasana")
                 .roles("USER");
                 // TODO: selvitä roolin merkitys.

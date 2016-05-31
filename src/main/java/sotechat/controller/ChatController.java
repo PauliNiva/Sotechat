@@ -3,11 +3,8 @@ package sotechat.controller;
 import org.joda.time.DateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +15,6 @@ import sotechat.MsgToServer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.*;
 
 import sotechat.data.Mapper;
 
@@ -32,12 +28,17 @@ import sotechat.data.Mapper;
 public class ChatController {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
-    private Mapper mapper;
+    private final Mapper mapper;
 
-    /** Spring taikoo tässä Singleton-instanssin mapperista. */
+    /** Spring taikoo tässä Singleton-instanssin mapperista.
+     *
+     * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
+     * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
+     * käyttäjä-id:n perusteella.
+     */
     @Autowired
-    public ChatController(Mapper mapper) {
-        this.mapper = mapper;
+    public ChatController(final Mapper pMapper) {
+        this.mapper = pMapper;
     }
 
     /** Alla metodi, joka käsittelee /toServer/{channelIid}
@@ -95,9 +96,14 @@ public class ChatController {
      * ja kanavaId:n (kaikki samalle kanavalle DEV_CHANNEL).
      * @return Palautusarvo lähetetään JSONina clientille.
      * @throws Exception mikä poikkeus?
+     * @param req Http GET-pyyntö osoitteesee /join.
+     * @param professional Kirjautuneelle käyttäjälle(hoitaja) luotu
+     *                     istunto(session) kirjautumisen yhteydessä
      */
     @RequestMapping("/join")
-    public final JoinResponse returnJoinResponse(HttpServletRequest req, Principal professional) throws Exception {
+    public final JoinResponse returnJoinResponse(
+            final HttpServletRequest req, final Principal professional)
+            throws Exception {
 
         HttpSession session = req.getSession();
         /** Kyseessä nimenomaan HTTP-session, ei WebSocket-session.
