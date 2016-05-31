@@ -9,4 +9,5 @@ public interface Mapper {
     String getIdFromRegisteredName(String registeredName);
     String generateNewId();
     boolean isUserIdMapped(String id);
+    boolean isUserProfessional(String id);
 }

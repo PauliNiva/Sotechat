@@ -46,6 +46,7 @@ public class ChatController {
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
      *                    joka on paketoitu MsgToServer-olion sisälle.
+     * @param professional Principal-sessio kirjautuneelle käyttäjälle.
      * @return Palautusarvoa ei käytetä kuten yleensä, vaan
      *         @SendTo -annotaatio saa Spring lähettämään
      *         palautusarvona määritellyn olion lähetettäväksi
@@ -55,9 +56,10 @@ public class ChatController {
     @MessageMapping("/toServer/{channelId}")
     @SendTo("/toClient/{channelId}")
     public final MsgToClient routeMessage(
-            final MsgToServer msgToServer) throws Exception {
+            final MsgToServer msgToServer,
+            final Principal professional) throws Exception {
 
-        /** Annetaan timeStamp juuri tässä muodossa AngularJS varten. */
+        /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
         String timeStamp = new DateTime().toString();
 
         /** Selvitetään käyttäjänimi annetun userId:n perusteella. */
@@ -65,6 +67,18 @@ public class ChatController {
         if (!mapper.isUserIdMapped(userId)) {
             /** Kelvoton ID, hylätään viesti. */
             return null;
+        }
+        if (mapper.isUserProfessional(userId)) {
+            /** ID kuuluu ammattilaiselle, varmistetaan että on kirjautunut. */
+
+            if (professional == null) {
+                /** Ei kirjautunut, hylätään viesti. */
+                return null;
+            }
+
+            String username = professional.getName();
+            String userId = mapper.getIdFromRegisteredName(username);
+
         }
         String username = mapper.getUsernameFromId(userId);
 

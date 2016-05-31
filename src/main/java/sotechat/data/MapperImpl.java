@@ -62,7 +62,7 @@ public class MapperImpl implements Mapper {
      * @return true/false
      */
     @Override
-    public boolean isUserIdMapped(String id) {
+    public final boolean isUserIdMapped(final String id) {
         return (map.containsKey(id));
     }
 
@@ -76,7 +76,7 @@ public class MapperImpl implements Mapper {
      * @return id salainen id
      */
     @Override
-    public String getIdFromRegisteredName(String registeredName) {
+    public final String getIdFromRegisteredName(final String registeredName) {
         /* Varmistetaan ensin, että username tunnetaan. */
         if (!revMap.containsKey(registeredName)) {
             /* Ei pitäisi laueta tuotannossa koskaan. */
