@@ -14,6 +14,7 @@ import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
@@ -154,8 +155,9 @@ public class ChatController {
      * @throws Exception mikä poikkeus.
      */
     @RequestMapping("/pro")
-    public final String naytaHallintaSivu() throws Exception {
-        return "Tänne tulisi hoitajan näkymä";
+    public final void naytaHallintaSivu(
+            final HttpServletResponse resp) throws Exception {
+        resp.sendRedirect("/proCP.html");
     }
 
 }
