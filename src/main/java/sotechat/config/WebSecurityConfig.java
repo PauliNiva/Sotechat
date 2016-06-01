@@ -22,8 +22,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Määrittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
-        // HTTP pyynnöt pakotetaan HTTPS
-        //http.requiresChannel().anyRequest().requiresSecure();
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
@@ -47,10 +45,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 // logout sallitaan kaikille
-                .permitAll()
-                .and()
-                .requiresChannel()
-                .anyRequest().requiresSecure();
+                .permitAll();
+
+                // allaoleva HTTPS pakotus ei toimi
+                //.and()
+                //.requiresChannel()
+                //.anyRequest().requiresSecure();
 
 
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
