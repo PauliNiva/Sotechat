@@ -10,15 +10,15 @@ public class Queue {
         this.queue = new LinkedList<QueueItem>();
     }
 
-    public final void addToQueue(final String channelId, String category) {
+    public final synchronized void addToQueue(final String channelId, String category) {
         this.queue.add(new QueueItem(channelId, category));
     }
 
-    public final QueueItem getFirst() {
+    public final synchronized QueueItem getFirst() {
         return this.queue.pollFirst();
     }
 
-    public final QueueItem getFirstFrom(final String category) {
+    public final synchronized QueueItem getFirstFrom(final String category) {
         ListIterator<QueueItem> iterator = queue.listIterator(0);
         while (iterator.hasNext()) {
             QueueItem next = iterator.next();
@@ -30,7 +30,7 @@ public class Queue {
         return null;
     }
 
-    public final QueueItem remove(final String channelId){
+    public final synchronized QueueItem remove(final String channelId){
         ListIterator<QueueItem> iterator = queue.listIterator(0);
         while(iterator.hasNext()){
             QueueItem next = iterator.next();
@@ -42,11 +42,11 @@ public class Queue {
         return null;
     }
 
-    public final int length(){
+    public final synchronized int length(){
         return queue.size();
     }
 
-    public final int itemsBefore(final String channelId){
+    public final synchronized int itemsBefore(final String channelId){
         ListIterator<QueueItem> iterator = queue.listIterator(0);
         int count = 0;
         while(iterator.hasNext()){
