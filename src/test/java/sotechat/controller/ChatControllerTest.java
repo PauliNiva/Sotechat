@@ -40,6 +40,7 @@ public class ChatControllerTest {
 
     /**
      * Get pyyntö polkuun "/join" palauttaa statukseksen OK.
+     * TODO: Kunnolla.
      * @throws Exception
      */
     @Test
@@ -51,6 +52,7 @@ public class ChatControllerTest {
 
     /**
      * Get pyyntö polkuun "/pro" palauttaa merkkijonon.
+     * TODO: Kunnolla.
      * @throws Exception
      */
     @Test

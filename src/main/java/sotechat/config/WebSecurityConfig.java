@@ -12,14 +12,18 @@ import org.springframework.security.config.annotation.web.configuration
 
 /** Tämä konfiguraatiotiedosto ottaa Spring Securityn käyttöön
  *  yhdessä joidenkin pom.xml -määrityksien kanssa. */
+
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
+    /** Määrittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        // HTTP pyynnöt pakotetaan HTTPS
+        //http.requiresChannel().anyRequest().requiresSecure();
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
@@ -43,7 +47,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 // logout sallitaan kaikille
-                .permitAll();
+                .permitAll()
+                .and()
+                .requiresChannel()
+                .anyRequest().requiresSecure();
+
 
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
          * pyyntöjen uudelleenohjaamisessa login.html -sivulle.

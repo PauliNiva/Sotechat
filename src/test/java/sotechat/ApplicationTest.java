@@ -11,8 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @WebAppConfiguration
 public class ApplicationTest {
 
-    /**
-     * Tyhja testi.
+    /** TODO: Kunnolla.
      */
     @Test
     public void contextLoads() {
