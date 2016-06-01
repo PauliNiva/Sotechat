@@ -19,6 +19,7 @@ angular.module('chatApp')
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
                     var destination = "/toServer/" + channelID;
+
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
                             'userId': userID,
@@ -44,7 +45,7 @@ angular.module('chatApp')
                 stompSocket.init('/toServer');
                 stompSocket.connect(function (frame) {
                     console.log(channelID);
-                    stompSocket.subscribe("/toClient/" + channelID, function (response) {
+                    stompSocket.subscribe("/toClient/" + "dev", function (response) {
                         $scope.messages.push(getMessage(response.body));
                     });
                 }, function (error) {
