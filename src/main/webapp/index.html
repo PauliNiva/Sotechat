@@ -14,18 +14,19 @@
     <script src="chatWindow/chatWindow.directives.js"></script>
     <script src="pool/userToPool.ctrl.js"></script>
     <script src="services/stomp.service.js"></script>
+    <script src="services/queue.service.js"></script>
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <script src="assets/lib/bootstrap.min.js"></script>
     <script src="assets/lib/scrollglue.js"></script>
     <link href="assets/css/chat.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp">
-<div class="container chat-container" ng-view>
+<div class="container chat-container" ng-view="">
     <base href="/">
 
-    <!--   <div class="" ng-include="'pool/userToPool.tpl.html'"></div>
-       <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>
-       <div class="container col-sm-4 hidden-xs info-container" ng-include="'chatWindow/chatInfo.html'"></div>-->
+    <!--  <div class="" ng-include="'pool/userToPool.tpl.html'"></div>
+      <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>
+      <div class="container col-sm-4 hidden-xs info-container" ng-include="'chatWindow/chatInfo.html'"></div>-->
    </div>
    </body>
    </html>

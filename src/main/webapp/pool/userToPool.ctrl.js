@@ -1,11 +1,12 @@
 angular.module('chatApp')
-    .controller('userToPoolCtrl', ['$http', '$scope', '$location', function($http, $scope, $location) {
+    .controller('userToPoolCtrl', ['$http', '$scope', '$location','queueService', function($http, $scope, $location, queueService) {
         var QUEUEJOINURL = '/queueJoin';
         $scope.joinQueue = function() {
             var successJoinQueue = function(response) {
-                $scope.userName = response.data.userName;
-                $scope.channelId = response.data.channelId;
-                $scope.userId = response.data.userId;
+                console.log(response);
+                queueService.setUserName(response.data.userName);
+                queueService.setChannelID(response.data.channelId);
+                queueService.setUserID(response.data.userId);
                 $location.path('/inQueue');
             };
 
@@ -15,6 +16,7 @@ angular.module('chatApp')
              
             // $http.post(QUEUEJOINURL, {'userName' : $scope.userName, 'startMessage' : $scope.startMessage})
             //   .then(successJoinQueue, errorJoinQueue);
+
             $http.get("/join").then(successJoinQueue);
            
         };

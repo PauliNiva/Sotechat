@@ -1,5 +1,5 @@
-angular.module('chatApp', [])
-    .service('queueService', function () {
+angular.module('chatApp')
+    .factory('queueService', function () {
         var channelID;
         var userName;
         var userID;

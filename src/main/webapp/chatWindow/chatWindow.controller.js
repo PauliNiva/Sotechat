@@ -3,14 +3,14 @@
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 //
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http',
-        function ($scope, $location, $interval, stompSocket, $http) {
+    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http', 'queueService',
+        function ($scope, $location, $interval, stompSocket, $http, queueService) {
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             // Muuttujat joihin tallennetaan channelId ja user id
-           // var channelId;
-           // var userId;
-           // var userName;
+            var channelID;
+            var userID;
+            var userName;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             this.chatName = 'Esimerkki';
 
@@ -18,11 +18,11 @@ angular.module('chatApp')
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/" + $scope.channelId;
+                    var destination = "/toServer/" + channelID;
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
-                            'userId': $scope.userId,
-                            'channelId': $scope.channelId,
+                            'userId': userID,
+                            'channelId': channelID,
                             'content': $scope.message
                         }));
                     $scope.message = '';
@@ -43,7 +43,8 @@ angular.module('chatApp')
             var initStompClient = function () {
                 stompSocket.init('/toServer');
                 stompSocket.connect(function (frame) {
-                    stompSocket.subscribe("/toClient/" + $scope.channelId, function (response) {
+                    console.log(channelID);
+                    stompSocket.subscribe("/toClient/" + channelID, function (response) {
                         $scope.messages.push(getMessage(response.body));
                     });
                 }, function (error) {
@@ -62,5 +63,12 @@ angular.module('chatApp')
                 })
             };
 
-            initStompClient();
+            var getVariables = function() {
+                userName = queueService.getUserName();
+                channelID = queueService.getChannelID();
+                userID = queueService.getUserID();
+                initStompClient();
+            };
+
+            getVariables();
         }]);
