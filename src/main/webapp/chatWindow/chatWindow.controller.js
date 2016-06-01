@@ -8,9 +8,9 @@ angular.module('chatApp')
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             // Muuttujat joihin tallennetaan channelId ja user id
-            var channelId;
-            var userId;
-            var userName;
+           // var channelId;
+           // var userId;
+           // var userName;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             this.chatName = 'Esimerkki';
 
@@ -18,11 +18,11 @@ angular.module('chatApp')
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/" + channelId;
+                    var destination = "/toServer/" + $scope.channelId;
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
-                            'userId': userId,
-                            'channelId': channelId,
+                            'userId': $scope.userId,
+                            'channelId': $scope.channelId,
                             'content': $scope.message
                         }));
                     $scope.message = '';
@@ -43,7 +43,7 @@ angular.module('chatApp')
             var initStompClient = function () {
                 stompSocket.init('/toServer');
                 stompSocket.connect(function (frame) {
-                    stompSocket.subscribe("/toClient/" + channelId, function (response) {
+                    stompSocket.subscribe("/toClient/" + $scope.channelId, function (response) {
                         $scope.messages.push(getMessage(response.body));
                     });
                 }, function (error) {
@@ -62,5 +62,5 @@ angular.module('chatApp')
                 })
             };
 
-            joinToChat();
+            initStompClient();
         }]);

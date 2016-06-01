@@ -3,7 +3,10 @@ angular.module('chatApp')
         var QUEUEJOINURL = '/queueJoin';
         $scope.joinQueue = function() {
             var successJoinQueue = function(response) {
-                
+                $scope.userName = response.data.userName;
+                $scope.channelId = response.data.channelId;
+                $scope.userId = response.data.userId;
+                $location.path('/inQueue');
             };
 
             var errorJoinQueue = function(response) {
@@ -12,7 +15,8 @@ angular.module('chatApp')
              
             // $http.post(QUEUEJOINURL, {'userName' : $scope.userName, 'startMessage' : $scope.startMessage})
             //   .then(successJoinQueue, errorJoinQueue);
-            $location.path('/inQueue');
+            $http.get("/join").then(successJoinQueue);
+           
         };
 
     }]);
