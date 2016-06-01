@@ -44,24 +44,12 @@ angular.module('chatApp')
             var initStompClient = function () {
                 stompSocket.init('/toServer');
                 stompSocket.connect(function (frame) {
-                    console.log(channelID);
                     stompSocket.subscribe("/toClient/" + "dev", function (response) {
                         $scope.messages.push(getMessage(response.body));
                     });
                 }, function (error) {
                     initStompClient();
                 });
-            };
-
-            /** Kun tämä JS ladataan, tehdään GET-pyyntö polkuun /join.
-             *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
-            var joinToChat = function () {
-                $http.get("/join").then(function (response) {
-                    userName = response.data.userName;
-                    channelId = response.data.channelId;
-                    userId = response.data.userId;
-                    initStompClient();
-                })
             };
 
             var getVariables = function() {
