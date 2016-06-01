@@ -14,7 +14,9 @@ import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.security.Principal;
 
 import sotechat.data.Mapper;
@@ -157,6 +159,7 @@ public class ChatController {
     public final String naytaHallintaSivu() throws Exception {
         return "Tänne tulisi hoitajan näkymä";
     }
+
 
 }
 

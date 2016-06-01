@@ -38,20 +38,7 @@ angular.module('chatApp')
                 message.sender = parsed.userName;
                 message.I = message.sender === userName;
                 return message;
-            }
-
-
-            /** Kun tämä JS ladataan, tehdään GET-pyyntö polkuun /join.
-             *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
-            var joinToChat = function () {
-                $http.get("/join").then(function (response) {
-                    userName = response.data.userName;
-                    channelId = response.data.channelId;
-                    userId = response.data.userId;
-                    initStompClient();
-                })
             };
-
 
             var initStompClient = function () {
                 stompSocket.init('/toServer');
@@ -62,6 +49,17 @@ angular.module('chatApp')
                 }, function (error) {
                     initStompClient();
                 });
+            };
+
+            /** Kun tämä JS ladataan, tehdään GET-pyyntö polkuun /join.
+             *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
+            var joinToChat = function () {
+                $http.get("/join").then(function (response) {
+                    userName = response.data.userName;
+                    channelId = response.data.channelId;
+                    userId = response.data.userId;
+                    initStompClient();
+                })
             };
 
             joinToChat();

@@ -8,9 +8,11 @@
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
     <script src="assets/lib/angular.js"></script>
+    <script src="assets/lib/angular-route.js"></script>
     <script src="app.module.js"></script>
     <script src="chatWindow/chatWindow.controller.js"></script>
     <script src="chatWindow/chatWindow.directives.js"></script>
+    <script src="pool/userToPool.ctrl.js"></script>
     <script src="services/stomp.service.js"></script>
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <script src="assets/lib/bootstrap.min.js"></script>
@@ -18,9 +20,12 @@
     <link href="assets/css/chat.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp">
-<div class="container app-container">
-    <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>
-    <div class="container col-sm-4 hidden-xs info-container" ng-include="'chatWindow/chatInfo.html'"></div>
-</div>
-</body>
-</html>
+<div class="container chat-container" ng-view>
+    <base href="/">
+
+    <!--   <div class="" ng-include="'pool/userToPool.tpl.html'"></div>
+       <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>
+       <div class="container col-sm-4 hidden-xs info-container" ng-include="'chatWindow/chatInfo.html'"></div>-->
+   </div>
+   </body>
+   </html>
