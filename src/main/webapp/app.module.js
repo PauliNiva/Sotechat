@@ -5,7 +5,9 @@ angular.module('chatApp').config(['$routeProvider', '$locationProvider', functio
     $routeProvider.when('/', {
         templateUrl: 'pool/userToPool.tpl.html', controller: 'userToPoolCtrl'
     }).when('/inQueue', {
-        templateUrl: 'chatWindow/userInChat.tpl.html', controller: 'chatController'
+        templateUrl: 'pool/userInPool.tpl.html', controller: 'userInPoolCtrl'
+    }).when('/chat', {
+        templateUrl: 'chatWindow/userInChat.tpl.html'
     }).otherwise({
         redirectTo: '/'
     });

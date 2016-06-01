@@ -1,9 +1,12 @@
 angular.module('chatApp')
-    .factory('queueService', function () {
+    .factory('queueService', ['$http', '$q', function ($http, $q) {
         var channelID;
         var userName;
         var userID;
+        var defer = $q.defer();
         var queue = {
+            getVariablesFormServer: getVariablesFormServer,
+            setAllVariables: setAllVariables,
             setChannelID : setChannelID,
             setUserName : setUserName,
             setUserID : setUserID,
@@ -36,5 +39,15 @@ angular.module('chatApp')
             return userID;
         };
 
+        function getVariablesFormServer() {
+          return $http.get("/join");
+        };
+
+        function setAllVariables(response) {
+            setUserName(response.data.userName);
+            setChannelID(response.data.channelId);
+            setUserID(response.data.userId);
+        };
+        
         return queue;
-    });
+    }]);
