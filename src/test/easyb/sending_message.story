@@ -10,7 +10,7 @@ scenario "user cand write a message on a text input", {
         driver = new FirefoxDriver()
     }
     when 'a chat window is accessed', {
-        driver.get("https://localhost:8080")
+        driver.get("https://localhost:8443")
     }
     then 'text can be applied to a text field', {
         page = driver.getPageSource()
@@ -61,7 +61,7 @@ scenario "user can send the message he or she has written to the server by press
 scenario "user can't send an empty message", {
     given 'nothing is written to the text field', {
             driver = new FirefoxDriver()
-            driver.get("https://localhost:8080")
+            driver.get("https://localhost:8443")
     }
     when 'submit is clicked', {
             element = driver.findElement(By.name("messageArea"))

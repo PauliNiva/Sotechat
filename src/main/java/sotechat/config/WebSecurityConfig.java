@@ -47,10 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // logout sallitaan kaikille
                 .permitAll();
 
-                // TODO: allaoleva HTTP->HTTPS pakotus ei toimi
-                //.and()
-                //.requiresChannel()
-                //.anyRequest().requiresSecure();
+        // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
+        http.requiresChannel().anyRequest().requiresSecure();
 
         // TODO: alla oleva csrf tokenin configurointi ei toimi
         // http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(),
