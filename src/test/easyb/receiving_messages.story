@@ -8,9 +8,9 @@ description 'As a user I want to see the messages other people have sent to disc
 scenario "user can view a message the other party has sent to the discussion", {
     given 'two persons have accessed the chat window', {
         firstdr = new FirefoxDriver()
-        firstdr.get("http://localhost:8080")
+        firstdr.get("https://localhost:8080")
         seconddr = new FirefoxDriver()
-        seconddr.get("http://localhost:8080")
+        seconddr.get("https://localhost:8080")
         }
     when 'the other person sends a message', {
         element = firstdr.findElement(By.name("messageArea"))
@@ -30,9 +30,9 @@ scenario "user can view a message the other party has sent to the discussion", {
 scenario "user can view messages sent by both parties in time order", {
     given 'two persons have accessed the chat window', {
         firstdr = new FirefoxDriver()
-        firstdr.get("http://localhost:8080")
+        firstdr.get("https://localhost:8080")
         seconddr = new FirefoxDriver()
-        seconddr.get("http://localhost:8080")
+        seconddr.get("https://localhost:8080")
     }
     when 'the other person sends multiple messages', {
         firste = firstdr.findElement(By.name("messageArea"))

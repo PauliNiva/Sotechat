@@ -47,15 +47,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // logout sallitaan kaikille
                 .permitAll();
 
-                // allaoleva HTTPS pakotus ei toimi
+                // TODO: allaoleva HTTP->HTTPS pakotus ei toimi
                 //.and()
                 //.requiresChannel()
                 //.anyRequest().requiresSecure();
 
+        // TODO: alla oleva csrf tokenin configurointi ei toimi
+        // http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(),
+        // CsrfFilter.class);
 
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
          * pyyntöjen uudelleenohjaamisessa login.html -sivulle.
-          * Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
+          * TODO: Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
     /** Kovakoodataan hoitajan tunnukset siihen saakka,
