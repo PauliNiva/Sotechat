@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 import sotechat.data.Mapper;
+import sotechat.service.QueueService;
 
 /** Controlleri, joka käsittelee serverin puolella
  * chat-liikenteen clienttien kanssa.
@@ -31,16 +32,20 @@ public class ChatController {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
+    @Autowired
+    private final QueueService queueService;
 
     /** Spring taikoo tässä Singleton-instanssin mapperista.
      *
      * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
+     * @param queueService
      */
     @Autowired
-    public ChatController(final Mapper pMapper) {
+    public ChatController(final Mapper pMapper, QueueService queueService) {
         this.mapper = pMapper;
+        this.queueService = queueService;
     }
 
     /** Alla metodi, joka käsittelee /toServer/{channelIid}

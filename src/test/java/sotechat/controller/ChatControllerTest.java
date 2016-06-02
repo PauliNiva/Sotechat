@@ -35,7 +35,7 @@ public class ChatControllerTest {
     @Before
     public void setUp() throws Exception {
         mvc = MockMvcBuilders
-                .standaloneSetup(new ChatController(new MapperImpl())).build();
+                .standaloneSetup(new ChatController(new MapperImpl(), queueService)).build();
     }
 
     /**
