@@ -7,13 +7,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class AngularTestController {
 
-    @RequestMapping(value = "/{[path:[^\\.]*}")
-    public String redirect() {
-        return "forward:/";
-    }
-
     @RequestMapping(value = "/pro")
     public String pro() {
         return "forward:/proCP.html";
     }
+
+    @RequestMapping(value ={"/chat", "/inQueue"})
+    public String redirect() {
+        return "forward:/";
+    }
+
+
+
+
 }

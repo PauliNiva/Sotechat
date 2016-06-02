@@ -26,7 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // pyynnöt polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/proCP.html").authenticated()
+                .antMatchers("/pro").authenticated()
                 // muut pyynnöt
                 // sallitaan kaikille
                 .anyRequest().permitAll()
