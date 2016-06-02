@@ -3,13 +3,13 @@
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 //
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http',
-        function ($scope, $location, $interval, stompSocket, $http) {
+    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http', 'queueService', 
+        function ($scope, $location, $interval, stompSocket, $http, queueService) {
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             // Muuttujat joihin tallennetaan channelId ja user id
-            var channelId;
-            var userId;
+            var channelID;
+            var userID;
             var userName;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             this.chatName = 'Esimerkki';
@@ -18,11 +18,11 @@ angular.module('chatApp')
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/" + channelId;
+                    var destination = "/toServer/" + queueService.getChannelID();
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
-                            'userId': userId,
-                            'channelId': channelId,
+                            'userId': queueService.getUserID(),
+                            'channelId': queueService.getChannelID(),
                             'content': $scope.message
                         }));
                     $scope.message = '';
@@ -36,33 +36,31 @@ angular.module('chatApp')
                 message.content = parsed.content;
                 message.time = parsed.timeStamp;
                 message.sender = parsed.userName;
-                message.I = message.sender === userName;
+                message.I = message.sender === queueService.getUserName();
                 return message;
-            }
-
-
-            /** Kun tämä JS ladataan, tehdään GET-pyyntö polkuun /join.
-             *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
-            var joinToChat = function () {
-                $http.get("/join").then(function (response) {
-                    userName = response.data.userName;
-                    channelId = response.data.channelId;
-                    userId = response.data.userId;
-                    initStompClient();
-                })
             };
-
 
             var initStompClient = function () {
                 stompSocket.init('/toServer');
                 stompSocket.connect(function (frame) {
-                    stompSocket.subscribe("/toClient/" + channelId, function (response) {
+                    stompSocket.subscribe("/toClient/" + queueService.getChannelID(), function (response) {
+                        console.log(response.body);
                         $scope.messages.push(getMessage(response.body));
                     });
                 }, function (error) {
-                    initStompClient();
+                  //  initStompClient();
                 });
             };
 
-            joinToChat();
+            var getVariables = function() {
+                userName = queueService.getUserName();
+                channelID = queueService.getChannelID();
+                userID = queueService.getUserID();
+
+            };
+
+            queueService.getVariablesFormServer().then(function(response) {
+                queueService.setAllVariables(response);
+                initStompClient();
+            });
         }]);
