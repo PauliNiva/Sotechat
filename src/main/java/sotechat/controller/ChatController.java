@@ -114,11 +114,11 @@ public class ChatController {
         String username = session.getAttribute("username").toString();
         String userId = session.getAttribute("userId").toString();
         String category = session.getAttribute("category").toString();
-        String channelId = session.getAttribute("channelId").toString();
+        String channel = session.getAttribute("channelId").toString();
         // TODO: Jos hoitaja -> lista channelId:tä ?
 
         /** Paketoidaan muuttujat StateResponseen, joka käännetään JSONiksi. */
-        return new StateResponse(state, username, userId, category, channelId);
+        return new StateResponse(state, username, userId, category, channel);
     }
 
     /** Kun client lähettää avausviestin ja haluaa liittyä pooliin.
@@ -128,13 +128,28 @@ public class ChatController {
      * @return mitä vastataan clientille
      * @throws Exception mikä poikkeus
      */
-    @RequestMapping(value = "/sendNameAndMessage", method = RequestMethod.POST)
-    public final StateResponse returnStateResponse(
+    @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
+    public  final String returnStateResponse(
             final HttpServletRequest request,
-            final HttpServletResponse response, final Principal professional)
+            final HttpServletResponse response,
+            final Principal professional)
             throws Exception {
         HttpSession session = request.getSession();
 
+        if (!session.getAttribute("state").toString().equals("start")) {
+            return "Denied, join pool request must come from start state.";
+        }
+
+        // validoi nimi
+        // String userId = session.getAttribute("userId");
+        // session.setAttribute("username", username);
+        // mapper.mapUsernameToId(userId, username);
+
+
+        session.setAttribute("state", "pool");
+
+        /** */
+        return "OK, please request new state now.";
 
     }
 
