@@ -15,7 +15,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
-import org.springframework.messaging.simp.annotation.support.SimpAnnotationMethodMessageHandler;
+import org.springframework.messaging.simp.annotation.support
+        .SimpAnnotationMethodMessageHandler;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -24,8 +25,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation
+        .AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation
+        .EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.util.Morko;
@@ -39,6 +42,9 @@ import java.util.Map;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Testit WebSocket-viestien lähetykselle
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
         MessageTest.TestWebSocketConfig.class,
@@ -59,6 +65,7 @@ public class MessageTest {
 
     private TestChannelInterceptor brokerChannelInterceptor;
 
+
     @Before
     public void setUp() throws Exception {
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
@@ -67,53 +74,96 @@ public class MessageTest {
     }
 
     @Test
-    public void clientReceivesCorrectResponseAfterSendingMessage() throws Exception {
-        /*Mapataan käyttäjä johonkin id:seen, jotta ChatControllerin routeMessage-metodi
-        löytää*/
-        mapper.mapUsernameToId("666", "Morko");
+    public void clientReceivesCorrectResponseAfterSendingMessage()
+            throws Exception {
+        /**
+         * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
+         * ChatController-luokan routeMessage-metodissa löydetään oikea
+         * käyttäjäid:n perusteella, ja metodi kyetään suorittamaan
+         * loppuun saakka.
+         */
+        mapper.mapUsernameToId("676", "Morko");
 
-        StompHeaderAccessor headers = StompHeaderAccessor.create(StompCommand.SEND);
+        /**
+         * Simuloidaan normaalisti JavaScriptin avulla tapahtuvaa viestien
+         * lähetystä clientiltä palvelimelle. Asetetaan siis arvot mille
+         * kanavalle viesti lähetetään, mikä on SessionId, ja mitä StompJS:n
+         * komentoa käytetään, jotta viesti voidaan lähettää(SEND).
+         */
+        StompHeaderAccessor headers = StompHeaderAccessor
+                .create(StompCommand.SEND);
         headers.setDestination("/toServer/DEV_CHANNEL");
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
         headers.setSessionAttributes(new HashMap<String, Object>());
 
+        /**
+         * Luodaan lähetettävä viesti, vastaa siis normaalisti JavaScriptillä
+         * Json-muodossa generoitavaa luokkaa, josta
+         */
         Morko morko = new Morko();
-        morko.add("userId", "666", false);
+        morko.add("userId", "676", false);
         morko.add("channelId", "DEV_CHANNEL", true);
         morko.add("content", "Hei!", true);
         morko.add("userName", "Morko", true);
         morko.add("timeStamp", "Sunnuntai", true);
-
+        /**
+         * Rakennetaan vielä edellä muodostetusta viestistä Message-olio,
+         * joka voidaankin sitten lähettää palvelimelle.
+         */
         String jsonString = morko.mapToString();
-        Message<String> message = MessageBuilder.createMessage(jsonString, headers.getMessageHeaders());
-
+        Message<String> message = MessageBuilder.createMessage(jsonString,
+                headers.getMessageHeaders());
+        /**
+         * Lähetetään viesti palvelimelle.
+         */
         this.clientInboundChannel.send(message);
-
+        /**
+         * Talletetaan palvelimelta tullut vastaus Message-olioon. Eli siis
+         * mitä ChatControllerin routeMessage-metodi palauttaa.
+         */
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
+        /**
+         * Testi, joka tarkistaa, että palvelimelta tulleen viestin
+         * headereissa oikea sisältö. Nyt testataan vain sessionId, myös
+         * muita arvoja voitaisiin testata.
+         */
         StompHeaderAccessor replyHeaders = StompHeaderAccessor.wrap(reply);
         assertEquals("0", replyHeaders.getSessionId());
 
-        String json = new String((byte[]) reply.getPayload(), Charset.forName("UTF-8"));
-
+        /**
+         * Parsetaan vastauksena saatu string JsonObjectiksi.
+         */
+        String json = new String((byte[]) reply.getPayload(),
+                Charset.forName("UTF-8"));
         JsonParser parser = new JsonParser();
         JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
-        
+
+        /**
+         * Tarkistetaan, että vastauksena tullut JsonObject sisältää
+         * oikeat kentät, eli userName, timeStamp, content ja channelId,
+         * mutta ei userId:ta!
+         */
         for (Map.Entry entry : jsonMessage.entrySet()) {
             String key = entry.getKey().toString();
             assertTrue(morko.getMorkoSet().contains(key));
         }
     }
 
+    /**
+     * Konfiguroidaan WebSocket testiympäristöön.
+     */
     @Configuration
     @EnableScheduling
     @ComponentScan(
             basePackages="sotechat",
-            excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION, value = Configuration.class)
+            excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
+                    value = Configuration.class)
     )
     @EnableWebSocketMessageBroker
-    static class TestWebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+    static class TestWebSocketConfig
+            extends AbstractWebSocketMessageBrokerConfigurer {
 
         @Autowired
         Environment env;
@@ -129,16 +179,10 @@ public class MessageTest {
         }
     }
 
-    /**
-     * Configuration class that un-registers MessageHandler's it finds in the
-     * ApplicationContext from the message channels they are subscribed to...
-     * except the message handler used to invoke annotated message handling methods.
-     * The intent is to reduce additional processing and additional messages not
-     * related to the test.
-     */
     @Configuration
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    static class TestConfig implements ApplicationListener<ContextRefreshedEvent> {
+    static class TestConfig implements
+            ApplicationListener<ContextRefreshedEvent> {
 
         @Autowired
         private List<SubscribableChannel> channels;

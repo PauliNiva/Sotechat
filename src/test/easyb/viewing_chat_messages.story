@@ -45,7 +45,7 @@ scenario "user can view multiple messages he or she has sent in a time order", {
         }
         then 'they can be viewed in a time order', {
                 Thread.sleep(1000)
-                driver.get("http://localhost:8080")
+                driver.get("https://localhost:8443")
                 elements = driver.findElements(By.name("messageText"))
                 first = elements.first().getText()
                 last = first.toInteger()

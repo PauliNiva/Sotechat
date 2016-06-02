@@ -5,7 +5,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.JoinResponse;
@@ -13,6 +15,7 @@ import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
@@ -47,6 +50,7 @@ public class ChatController {
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
      *                    joka on paketoitu MsgToServer-olion sisälle.
+     * @param accessor Haetaan session-tiedot täältä.
      * @return Palautusarvoa ei käytetä kuten yleensä, vaan
      *         @SendTo -annotaatio saa Spring lähettämään
      *         palautusarvona määritellyn olion lähetettäväksi
@@ -56,9 +60,10 @@ public class ChatController {
     @MessageMapping("/toServer/{channelId}")
     @SendTo("/toClient/{channelId}")
     public final MsgToClient routeMessage(
-            final MsgToServer msgToServer) throws Exception {
-
-        /** Annetaan timeStamp juuri tässä muodossa AngularJS varten. */
+            final MsgToServer msgToServer,
+            final SimpMessageHeaderAccessor accessor
+    ) throws Exception {
+        /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
         String timeStamp = new DateTime().toString();
 
         /** Selvitetään käyttäjänimi annetun userId:n perusteella. */
@@ -67,8 +72,22 @@ public class ChatController {
             /** Kelvoton ID, hylätään viesti. */
             return null;
         }
-        String username = mapper.getUsernameFromId(userId);
+        if (mapper.isUserProfessional(userId)) {
+            /** ID kuuluu ammattilaiselle, varmistetaan että on kirjautunut. */
 
+            if (accessor.getUser() == null) {
+                /** Ei kirjautunut, hylätään viesti. */
+                return null;
+            }
+            String username = accessor.getUser().getName();
+            String authId = mapper.getIdFromRegisteredName(username);
+            if (!userId.equals(authId)) {
+                /** Kirjautunut ID eri kuin viestiin merkitty lähettäjän ID. */
+                return null;
+            }
+
+        }
+        String username = mapper.getUsernameFromId(userId);
         /** MsgToClient paketoidaan JSONiksi ja lähetetään WebSocketilla. */
         return new MsgToClient(username, msgToServer.getChannelId(),
                     timeStamp, msgToServer.getContent());
@@ -86,7 +105,7 @@ public class ChatController {
      * @param professional Kirjautuneelle käyttäjälle(hoitaja) luotu
      *                     istunto(session) kirjautumisen yhteydessä
      */
-    @RequestMapping("/join")
+    @RequestMapping(value = "/join")//, method = RequestMethod.POST)
     public final JoinResponse returnJoinResponse(
             final HttpServletRequest req, final Principal professional)
             throws Exception {
@@ -135,8 +154,9 @@ public class ChatController {
      * @throws Exception mikä poikkeus.
      */
     @RequestMapping("/pro")
-    public final String naytaHallintaSivu() throws Exception {
-        return "Tänne tulisi hoitajan näkymä";
+    public final void naytaHallintaSivu(
+            final HttpServletResponse resp) throws Exception {
+        resp.sendRedirect("/proCP.html");
     }
 
 }
