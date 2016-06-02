@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.JoinResponse;
@@ -106,7 +107,7 @@ public class ChatController {
      * @param professional Kirjautuneelle käyttäjälle(hoitaja) luotu
      *                     istunto(session) kirjautumisen yhteydessä
      */
-    @RequestMapping("/join")
+    @RequestMapping(value = "/join")//, method = RequestMethod.POST)
     public final JoinResponse returnJoinResponse(
             final HttpServletRequest req, final Principal professional)
             throws Exception {

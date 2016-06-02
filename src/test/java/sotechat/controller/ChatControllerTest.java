@@ -58,6 +58,6 @@ public class ChatControllerTest {
     @Test
     public void getToProIsValid() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .get("/pro").content("Tänne tulisi hoitajan näkymä"));
+                .get("/pro").content(""));
     }
 }
