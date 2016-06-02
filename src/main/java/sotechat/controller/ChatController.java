@@ -7,11 +7,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import sotechat.JoinResponse;
-import sotechat.MsgToClient;
-import sotechat.MsgToServer;
+import sotechat.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -95,6 +94,65 @@ public class ChatController {
                     timeStamp, msgToServer.getContent());
     }
 
+    /** Kun client lataa sivun ja haluaa pyytää tilan.
+     * @param req req
+     * @param professional pro
+     * @return mitä vastataan clientille
+     * @throws Exception mikä poikkeus
+     */
+    @RequestMapping(value = "/state", method = RequestMethod.GET)
+    public final StateResponse returnStateResponse(
+            final HttpServletRequest req, final Principal professional)
+            throws Exception {
+        HttpSession session = req.getSession();
+
+        /** Varmistetaan, että sessionissa on asianmukainen userId,username. */
+        updateSessionAttributes(session, professional);
+
+        /** Kaivetaan sessionista tiedot muuttujiin. */
+        String state = session.getAttribute("state").toString();
+        String username = session.getAttribute("username").toString();
+        String userId = session.getAttribute("userId").toString();
+        String category = session.getAttribute("category").toString();
+        String channel = session.getAttribute("channelId").toString();
+        // TODO: Jos hoitaja -> lista channelId:tä ?
+
+        /** Paketoidaan muuttujat StateResponseen, joka käännetään JSONiksi. */
+        return new StateResponse(state, username, userId, category, channel);
+    }
+
+    /** Kun client lähettää avausviestin ja haluaa liittyä pooliin.
+     * @param request request
+     * @param response response
+     * @param professional professional
+     * @return mitä vastataan clientille
+     * @throws Exception mikä poikkeus
+     */
+    @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
+    public  final String returnStateResponse(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final Principal professional)
+            throws Exception {
+        HttpSession session = request.getSession();
+
+        if (!session.getAttribute("state").toString().equals("start")) {
+            return "Denied, join pool request must come from start state.";
+        }
+
+        // validoi nimi
+        // String userId = session.getAttribute("userId");
+        // session.setAttribute("username", username);
+        // mapper.mapUsernameToId(userId, username);
+
+
+        session.setAttribute("state", "pool");
+
+        /** */
+        return "OK, please request new state now.";
+
+    }
+
     /** Kun client menee sivulle index.html, tiedostoon upotettu
      * JavaScript tekee erillisen GET-pyynnön polkuun /join.
      * Tällä pyynnöllä client ilmaisee haluavansa chattiin.
@@ -107,46 +165,59 @@ public class ChatController {
      * @param professional Kirjautuneelle käyttäjälle(hoitaja) luotu
      *                     istunto(session) kirjautumisen yhteydessä
      */
-    @RequestMapping("/join")
+    @RequestMapping(value = "/join", method = RequestMethod.GET)
     public final JoinResponse returnJoinResponse(
             final HttpServletRequest req, final Principal professional)
             throws Exception {
-
         HttpSession session = req.getSession();
-        /** Kyseessä nimenomaan HTTP-session, ei WebSocket-session.
-         * WebSocket-viestien mukana ei kulje HTTP-headereitä,
-         * jonka vuoksi HTTP-sessionia ei voida käyttää userien
-         * identifioimiseen, vaan käytetään userId:tä. */
 
-        if (professional != null) {
-            /* Jos client on autentikoitunut ammattilaiseksi,
-             * kirjoitetaan sessio-attribuutit aina
-             * (mahdollisten aiempien attribuuttien päälle). */
-            String username = professional.getName();
-            String userId = mapper.getIdFromRegisteredName(username);
-            session.setAttribute("username", username);
-            session.setAttribute("userId", userId);
-        }
+        updateSessionAttributes(session, professional);
+        String username = session.getAttribute("username").toString();
+        String userId = session.getAttribute("userId").toString();
 
-        if (session.getAttribute("username") == null) {
-            /* Jos sessio-attribuutit ovat vieläkin tuntemattomat,
-             * käyttäjä ei voi olla ammattilainen, joten
-             * luodaan uusi userID anonymous-käyttäjälle ja
-             * tallennetaan sessio-attribuutteihin. */
-            String newUserId = mapper.generateNewId();
-            session.setAttribute("username", "Anon");
-            session.setAttribute("userId", newUserId);
-        }
+        /** Palautetaan JoinResponse, jonka Spring paketoi JSONiksi. */
+        return new JoinResponse(username, userId, "DEV_CHANNEL");
+    }
+
+    /** Metodi päivittää tarvittaessa session-attribuuttien state,
+     * userId ja username vastaamaan ajanmukaisia arvoja.
+     * @param session session
+     * @param professional professional
+     */
+    public final void updateSessionAttributes(
+            final HttpSession session,
+            final Principal professional) {
 
         /** Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.getAttribute("username").toString();
         String userId = session.getAttribute("userId").toString();
 
-        /** Kirjataan ne mapperiin (vaikka ne monesti jo olivat siellä). */
-        this.mapper.mapUsernameToId(userId, username);
+        /** Päivitetään muuttujat, jos tarpeellista. */
+        if (professional != null) {
+            /* Jos client on autentikoitunut ammattilaiseksi */
+            username = professional.getName();
+            userId = mapper.getIdFromRegisteredName(username);
+        } else if (session.getAttribute("username") == null) {
+            /* Uusi käyttäjä */
+            username = "Anon";
+            userId = mapper.generateNewId();
+            session.setAttribute("state", "start");
+            session.setAttribute("category", "DRUGS"); //TODO
 
-        /** Palautetaan JoinResponse, jonka Spring paketoi JSONiksi. */
-        return new JoinResponse(username, userId, "DEV_CHANNEL");
+            /** Oikea kanavaID annetaan vasta nimen/aloitusviestin jälkeen. */
+            String channelNotRelevantYet = mapper.generateNewId();
+            session.setAttribute("channelId", channelNotRelevantYet);
+            /** Random kanava failsafena, jos jonkin virheen vuoksi
+             * käyttäjät päätyisivätkin sinne keskustelemaan,
+             * tyhjä kanava on parempi kuin kasa trolleja. */
+        }
+
+        /** Liitetään muuttujien tieto sessioon (monesti aiemman päälle). */
+        session.setAttribute("username", username);
+        session.setAttribute("userId", userId);
+
+        /** Kirjataan tiedot mapperiin (monesti aiemman päälle). */
+        this.mapper.mapUsernameToId(userId, username);
     }
 
     /**
