@@ -15,8 +15,7 @@ angular.module('chatApp')
              
             // $http.post(QUEUEJOINURL, {'userName' : $scope.userName, 'startMessage' : $scope.startMessage})
             //   .then(successJoinQueue, errorJoinQueue);
-
-           // $http.get("/join").then(successJoinQueue);
+            
             queueService.getVariablesFormServer().then(function(response) {
                 queueService.setAllVariables(response);
                 $location.path('/inQueue')

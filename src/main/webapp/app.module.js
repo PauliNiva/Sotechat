@@ -13,3 +13,14 @@ angular.module('chatApp').config(['$routeProvider', '$locationProvider', functio
     });
 }]);
 
+angular.module('chatApp').run(['$location', 'queueService', function ($location, queueService) {
+    var state = queueService.getUserState();
+    if (state === 'queue') {
+        $location.path('/inQueue');
+    } else if (state === 'chat') {
+        $location.path('/chat');
+    } else {
+        $location.path('/');
+    }
+}]);
+

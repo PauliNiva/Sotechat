@@ -11,4 +11,9 @@ public class AngularTestController {
     public String redirect() {
         return "forward:/";
     }
+
+    @RequestMapping(value = "/pro")
+    public String pro() {
+        return "forward:/proCP.html";
+    }
 }

@@ -155,10 +155,10 @@ public class ChatController {
      * @return Palautetaan autentikoituneelle clientille hallintasivu.
      * @throws Exception mikä poikkeus.
      */
-    @RequestMapping("/pro")
+  /**  @RequestMapping("/pro")
     public final String naytaHallintaSivu() throws Exception {
         return "Tänne tulisi hoitajan näkymä";
-    }
+    }*/
 
 
 }

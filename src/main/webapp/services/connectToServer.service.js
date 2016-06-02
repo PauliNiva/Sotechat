@@ -1,21 +1,30 @@
 angular.module('chatApp')
     .service('connectToServer', ['stompSocket', function (stompSocket) {
-        var stompClient;
+        var status = false;
         var socket = {
-            connect: connect
+            connect: connect,
+            subscribe: subscribe,
         };
 
         function connect(channelID, answer) {
+            if (!status) {
             stompSocket.init('/toServer');
             stompSocket.connect(function (frame) {
-                stompSocket.subscribe("/toClient/" + channelID, function (response) {
-                    answer(response);
-                });
+                status = true;
+                answer();
             }, function (error) {
-
+                
+                status = false;
             });
-        };
-
+        } else  {
+                answer();
+            }};
+        
+        function subscribe(destination, answerFunction) {
+            return stompSocket.subscribe(destination, function (response) {
+                answerFunction(response);
+            });
+        }
         
         return socket;
     }]);

@@ -3,14 +3,11 @@
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 //
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http', 'queueService', 
-        function ($scope, $location, $interval, stompSocket, $http, queueService) {
+    .controller('chatController', ['$scope', '$location', 'stompSocket', '$http', 'connectToServer', 'queueService',
+        function ($scope, $location, stompSocket, $http, connectToServer, queueService) {
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
-            // Muuttujat joihin tallennetaan channelId ja user id
-            var channelID;
-            var userID;
-            var userName;
+            var sub;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             this.chatName = 'Esimerkki';
 
@@ -40,27 +37,19 @@ angular.module('chatApp')
                 return message;
             };
 
-            var initStompClient = function () {
-                stompSocket.init('/toServer');
-                stompSocket.connect(function (frame) {
-                    stompSocket.subscribe("/toClient/" + queueService.getChannelID(), function (response) {
-                        console.log(response.body);
-                        $scope.messages.push(getMessage(response.body));
-                    });
-                }, function (error) {
-                  //  initStompClient();
+            var subscribe = function () {
+                sub = connectToServer.subscribe('/toClient/' + queueService.getChannelID(), function (response) {
+                    $scope.messages.push(getMessage(response.body));
                 });
-            };
-
-            var getVariables = function() {
-                userName = queueService.getUserName();
-                channelID = queueService.getChannelID();
-                userID = queueService.getUserID();
 
             };
 
-            queueService.getVariablesFormServer().then(function(response) {
+            var init = function () {
+                connectToServer.connect(queueService.getChannelID(), subscribe);
+            };
+
+            queueService.getVariablesFormServer().then(function (response) {
                 queueService.setAllVariables(response);
-                initStompClient();
+                init();
             });
         }]);
