@@ -16,8 +16,4 @@ public class AngularTestController {
     public String redirect() {
         return "forward:/";
     }
-
-
-
-
 }
