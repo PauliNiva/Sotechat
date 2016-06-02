@@ -1,23 +1,26 @@
 package sotechat.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.joda.time.DateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import sotechat.*;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.security.Principal;
+import java.util.Map;
 
+import sotechat.JoinResponse;
+import sotechat.MsgToClient;
+import sotechat.MsgToServer;
+import sotechat.StateResponse;
 import sotechat.data.Mapper;
 
 /** Controlleri, joka käsittelee serverin puolella
@@ -94,7 +97,7 @@ public class ChatController {
                     timeStamp, msgToServer.getContent());
     }
 
-    /** Kun client lataa sivun ja haluaa pyytää tilan.
+    /** Kun client haluaa pyytää tilan (mm. sivun latauksen yhteydessä).
      * @param req req
      * @param professional pro
      * @return mitä vastataan clientille
@@ -105,6 +108,8 @@ public class ChatController {
             final HttpServletRequest req, final Principal professional)
             throws Exception {
         HttpSession session = req.getSession();
+
+        System.out.println("     id(state) = " + session.getId());
 
         /** Varmistetaan, että sessionissa on asianmukainen userId,username. */
         updateSessionAttributes(session, professional);
@@ -123,34 +128,53 @@ public class ChatController {
 
     /** Kun client lähettää avausviestin ja haluaa liittyä pooliin.
      * @param request request
-     * @param response response
      * @param professional professional
      * @return mitä vastataan clientille
      * @throws Exception mikä poikkeus
      */
     @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
-    public  final String returnStateResponse(
+    public final String respondToJoinPoolRequest(
             final HttpServletRequest request,
-            final HttpServletResponse response,
-            final Principal professional)
-            throws Exception {
+            final Principal professional
+    )throws Exception {
         HttpSession session = request.getSession();
 
-        if (!session.getAttribute("state").toString().equals("start")) {
-            return "Denied, join pool request must come from start state.";
+        /** Tehdään JSON-objekti clientin lähettämästä JSONista. */
+        String jsonString = request.getReader().readLine();
+        JsonParser parser = new JsonParser();
+        JsonObject json = parser.parse(jsonString).getAsJsonObject();
+
+        String username = json.get("username").toString();
+
+
+        System.out.println("     id(joinPool) = " + session.getId() + " , username = " + username);
+
+
+
+        if (!stateToString(session).equals("start")) {
+            /** Ei JSON-muodossa, jotta AngularJS osaa ohjata fail-metodille. */
+            System.out.println(stateToString(session));
+            return "Denied join pool request due to bad state.";
+        }
+        if (false) {
+            // TODO: validoi username.
+            return "Denied join pool request due to reserved username.";
         }
 
-        // validoi nimi
-        // String userId = session.getAttribute("userId");
-        // session.setAttribute("username", username);
-        // mapper.mapUsernameToId(userId, username);
 
+        String userId = session.getAttribute("userId").toString();
+        session.setAttribute("username", username);
+        mapper.mapUsernameToId(userId, username);
 
         session.setAttribute("state", "pool");
+        /** JSON-muodossa, jotta AngularJS osaa ohjata success-metodille. */
+        return "{\"content\":\"OK, please request new state now.\"}";
 
-        /** */
-        return "OK, please request new state now.";
+    }
 
+    public static String stateToString(HttpSession session) {
+        if (session == null) return "";
+        return session.getAttribute("state").toString();
     }
 
     /** Kun client menee sivulle index.html, tiedostoon upotettu
@@ -171,6 +195,8 @@ public class ChatController {
             throws Exception {
         HttpSession session = req.getSession();
 
+        System.out.println("     id(join) = " + session.getId());
+
         updateSessionAttributes(session, professional);
         String username = session.getAttribute("username").toString();
         String userId = session.getAttribute("userId").toString();
@@ -189,14 +215,17 @@ public class ChatController {
             final Principal professional) {
 
         /** Kaivetaan username ja id sessio-attribuuteista. */
-        String username = session.getAttribute("username").toString();
-        String userId = session.getAttribute("userId").toString();
+        Object username = session.getAttribute("username");
+        Object userId = session.getAttribute("userId");
 
         /** Päivitetään muuttujat, jos tarpeellista. */
         if (professional != null) {
             /* Jos client on autentikoitunut ammattilaiseksi */
             username = professional.getName();
-            userId = mapper.getIdFromRegisteredName(username);
+            userId = mapper.getIdFromRegisteredName(username.toString());
+            session.setAttribute("state", "notRelevantForProfessional");
+            session.setAttribute("category", "notRelevantForProfessional");
+            session.setAttribute("channelId", "DEV_CHANNEL"); // TODO
         } else if (session.getAttribute("username") == null) {
             /* Uusi käyttäjä */
             username = "Anon";
@@ -217,20 +246,8 @@ public class ChatController {
         session.setAttribute("userId", userId);
 
         /** Kirjataan tiedot mapperiin (monesti aiemman päälle). */
-        this.mapper.mapUsernameToId(userId, username);
+        this.mapper.mapUsernameToId(userId.toString(), username.toString());
     }
-
-    /**
-     * Alla mäppäys hoitajan hallintasivulle /pro.
-     * TODO: Selvitä miten polkuja mapataan staattisiin resursseihin.
-     * @return Palautetaan autentikoituneelle clientille hallintasivu.
-     * @throws Exception mikä poikkeus.
-     */
-  /**  @RequestMapping("/pro")
-    public final String naytaHallintaSivu() throws Exception {
-        return "Tänne tulisi hoitajan näkymä";
-    }*/
-
 
 }
 

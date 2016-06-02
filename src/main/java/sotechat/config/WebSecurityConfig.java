@@ -20,6 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.csrf().disable();
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"

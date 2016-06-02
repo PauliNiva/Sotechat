@@ -1,28 +1,21 @@
 angular.module('chatApp')
     .controller('userToPoolCtrl', ['$http', '$scope', '$location','queueService', function($http, $scope, $location, queueService) {
-        var QUEUEJOINURL = '/queueJoin';
+
+        queueService.refreshState();
+
+        var JOINPOOLURL = '/joinPool';
         $scope.joinQueue = function() {
             var successJoinQueue = function(response) {
-                queueService.setUserName(response.data.userName);
-                queueService.setChannelID(response.data.channelId);
-                queueService.setUserID(response.data.userId);
-                $location.path('/inQueue');
+                queueService.refreshState();
             };
 
             var errorJoinQueue = function(response) {
-
+                console.log("Error joining pool. Duplicate username?");
             };
-             
-            // $http.post(QUEUEJOINURL, {'userName' : $scope.userName, 'startMessage' : $scope.startMessage})
-            //   .then(successJoinQueue, errorJoinQueue);
-            
-            queueService.getVariablesFormServer().then(function(response) {
-                queueService.setAllVariables(response);
-                $location.path('/inQueue')
-            });
-            
 
-           
+            $http.post(JOINPOOLURL, {'username' : $scope.userName, 'startMessage' : $scope.startMessage})
+               .then(successJoinQueue, errorJoinQueue);
+
         };
 
     }]);
