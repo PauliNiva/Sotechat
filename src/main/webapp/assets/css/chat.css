@@ -4,9 +4,10 @@
     height: 100%;
 }
 
-textarea.chat-text {
+.chat-text {
     resize: none;
     height: 34px;
+
 }
 
 .chat-body {
@@ -53,7 +54,7 @@ textarea.chat-text {
     margin-top: 5px;
 }
 textarea.form-control {
-  resize: none;
+    height: 34px;
 }
 
 .message-panel {
@@ -93,12 +94,6 @@ textarea.form-control {
 
 .poolPro{
     overflow-y: auto;
-}
-
-.userToPool-panel {
-    max-width: 350px;
-    margin: auto;
-    margin-top: 10px;
 }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
