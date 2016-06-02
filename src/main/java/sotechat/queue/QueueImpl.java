@@ -27,17 +27,18 @@ public class QueueImpl implements Queue {
     /**
      * addTo -metodi lisää jonoon uuden QueueItemin, johon on talletettu
      * jonottavan käyttäjän kanavan id, keskustelun aihealue sekä jonottavan
-     * käyttäjän nimi
+     * käyttäjän nimi. Palauttaa true, jos lisäys onnistui.
      * @param channelId jonottajan kanavan id
      * @param category keskustelun aihealue
      * @param username jonottajan käyttäjänimi
+     * @return true jos lisäys onnistui
      */
     @Override
-    public final synchronized void addTo(final String channelId,
+    public final synchronized boolean addTo(final String channelId,
                                          final String category,
                                          final String username) {
 
-        queue.addLast(new QueueItem(channelId, category, username));
+        return queue.offerLast(new QueueItem(channelId, category, username));
     }
 
     /**

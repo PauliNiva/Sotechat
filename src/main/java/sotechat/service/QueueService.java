@@ -32,14 +32,16 @@ public class QueueService {
 
     /**
      * addToQueue -metodi lisää jonon perälle alkion, jossa tiedot jonottajan
-     * kanavaid:stä keskustelun aihealueesta ja jonottajan käyttäjänimestä
+     * kanavaid:stä keskustelun aihealueesta ja jonottajan käyttäjänimestä.
+     * Palauttaa true jos lisäys onnistui.
      * @param channelId jonottajan kanavaid
      * @param category keskustelun aihealue
      * @param username jonottajan käyttäjänimi
+     * @return true jos lisäys onnitui
      */
-    public final void addToQueue(String channelId, String category,
+    public final boolean addToQueue(String channelId, String category,
                                  String username){
-        queue.addTo(channelId, category, username);
+        return queue.addTo(channelId, category, username);
     }
 
     /**
