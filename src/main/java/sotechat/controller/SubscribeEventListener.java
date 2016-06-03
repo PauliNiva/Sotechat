@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static sotechat.service.StateService.get;
+
 /** Used to keep track who is subscribed to which channel.
  *
  */
@@ -64,8 +66,11 @@ public class SubscribeEventListener
                 .get("SPRING.SESSION.ID").toString();
 
         HttpSession session = sessionRepo.getHttpSession(sessionId);
-        String channelId = session.getAttribute("channelId").toString();
-        System.out.println(channelId);
+        String channelId = get(session, "channelId");
+        System.out.println("Subscribing someone to " + channelId);
+        if (channelId.isEmpty()) {
+            return;
+        }
 
         if (!map.get(channelId).isEmpty() || map.get(channelId) != null) {
             map.get(channelId).add(session);

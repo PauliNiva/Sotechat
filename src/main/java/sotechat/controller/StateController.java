@@ -18,51 +18,25 @@ import java.security.Principal;
 import sotechat.JoinResponse;
 import sotechat.ProStateResponse;
 import sotechat.UserStateResponse;
-import sotechat.data.Mapper;
-import sotechat.service.QueueService;
 import sotechat.service.StateService;
-
-import static sotechat.service.StateService.get;
 
 /** Reititys tilaan liittyville HTML GET- ja POST-pyynnoille.
  */
+@RestController
 public class StateController {
-
-    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
-    private final Mapper mapper;
-
-    /** QueueService. */
-    private final QueueService queueService;
 
     /** State Service. */
     private final StateService stateService;
 
-    /** Channel where queue status is broadcasted. */
-    private static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
-
-    /** SubScribeEventHandler. */
-    private final ApplicationListener subscribeEventListener;
-
     /** Spring taikoo tässä Singleton-instanssit palveluista.
      *
-     * @param pMapper Olio, johon talletetaan tiedot käyttäjien id:istä
-     * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
-     * käyttäjä-id:n perusteella.
-     * @param queueService queueService
-     * @param subscribeEventListener dfojfdoidfjo
-     * @param stateService ssdofofsd
+     * @param pStateService ssdofofsd
      */
     @Autowired
     public StateController(
-            final Mapper pMapper,
-            final ApplicationListener subscribeEventListener,
-            final QueueService queueService,
-            final StateService stateService
+            final StateService pStateService
     ) {
-        this.mapper = pMapper;
-        this.subscribeEventListener = subscribeEventListener;
-        this.queueService = queueService;
-        this.stateService = stateService;
+        this.stateService = pStateService;
     }
 
     /** Kun customerClient haluaa pyytää tilan (mm. sivun latauksen yhteydessä).
@@ -73,8 +47,8 @@ public class StateController {
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
             final HttpServletRequest req
-            ) throws Exception
-    {
+            ) throws Exception {
+
         HttpSession session = req.getSession();
         System.out.println("     State request from customerClient " + session.getId());
         return stateService.respondToUserStateRequest(session);
@@ -90,8 +64,8 @@ public class StateController {
     public final ProStateResponse returnProStateResponse(
             final HttpServletRequest req,
             final Principal professional
-            ) throws Exception
-    {
+            ) throws Exception {
+
         HttpSession session = req.getSession();
         System.out.println("     State request from proClient " + session.getId());
         return stateService.respondToProStateRequest(session, professional);
@@ -106,8 +80,8 @@ public class StateController {
     @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
     public final String respondToJoinPoolRequest(
             final HttpServletRequest request
-            ) throws Exception
-    {
+            ) throws Exception {
+
         HttpSession session = request.getSession();
         return stateService.respondToJoinPoolRequest(request);
     }
@@ -125,7 +99,8 @@ public class StateController {
     public final String popClientFromQueue(
             final SimpMessageHeaderAccessor accessor,
             final @DestinationVariable String channelId
-    ) throws Exception {
+            ) throws Exception {
+
         //upgradeSubscribersToChat(channelId);
         // TODO: Poista jonosta kaikki jotka on subscribennu kanavaan channelId
         System.out.println("Opening channel Id: " + channelId);

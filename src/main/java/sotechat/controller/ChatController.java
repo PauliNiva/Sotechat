@@ -37,19 +37,19 @@ public class ChatController {
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
      * @param pQueueService queueService
-     * @param pSubscribeEventListener dfojfdoidfjo
+     * @param subscribeEventListener dfojfdoidfjo
      * @param pRepository Session Repo.
      */
     @Autowired
     public ChatController(
             final Mapper pMapper,
-            final ApplicationListener pSubscribeEventListener,
+            final ApplicationListener subscribeEventListener,
             final QueueService pQueueService,
             final SessionRepo pRepository
     ) {
         this.repository = pRepository;
         this.mapper = pMapper;
-        this.subscribeEventListener = pSubscribeEventListener;
+        this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
     }
 

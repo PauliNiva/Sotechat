@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Service;
 import sotechat.ProStateResponse;
 import sotechat.UserStateResponse;
 import sotechat.data.Mapper;
@@ -17,7 +18,7 @@ import java.security.Principal;
 /**
  * Käyttäjän tilan käsittelyyn liittyvä logiikka.
  */
-
+@Service
 public class StateService {
 
 
@@ -38,16 +39,17 @@ public class StateService {
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
      * @param pQueueService queueService
-     * @param pSubscribeEventListener dfojfdoidfjo
+     * @param subscribeEventListener dfojfdoidfjo
      */
     @Autowired
     public StateService(
             final Mapper pMapper,
-            final ApplicationListener pSubscribeEventListener,
+            final ApplicationListener subscribeEventListener,
             final QueueService pQueueService
+            /* HUOM: Spring ei salli "pSubsc..." tyyppista nimentaa tuolle. */
     ) {
         this.mapperService = pMapper;
-        this.subscribeEventListener = pSubscribeEventListener;
+        this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
     }
 
@@ -97,8 +99,8 @@ public class StateService {
         /** Note: ammattilaisella kaikki attribuutit relevantteja aina. */
 
         /** Paketoidaan muuttujat StateResponseen, joka käännetään JSONiksi. */
-        //return new ProStateResponse(
-        //        state, username, userId, qbcc, online, channelIds);
+        return new ProStateResponse(
+                state, username, userId, qbcc, online, channelIds);
     }
 
 
@@ -109,8 +111,8 @@ public class StateService {
      */
     public final String respondToJoinPoolRequest(
             final HttpServletRequest request
-            ) throws IOException
-    {
+            ) throws IOException {
+
         HttpSession session = request.getSession();
         /** Tehdään JSON-objekti clientin lähettämästä JSONista. */
         String jsonString = request.getReader().readLine();
