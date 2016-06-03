@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1, user-scalable=no">
     <title>Sosiaali ja terveys chat</title>
-    <script src="assets/lib/jquery-1.12.3.min.js"></script>
+
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
     <script src="assets/lib/angular.js"></script>
@@ -26,14 +26,14 @@
     <script src="services/connectToServer.service.js"></script>
 
 
-    <script src="assets/lib/bootstrap.min.js"></script>
+
     <script src="assets/lib/scrollglue.js"></script>
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/chat.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp">
-<div class="container chat-container" ng-controller="userCtrl" ng-include="state">
+<div class="container app-container" ng-controller="userCtrl" ng-include="state">
 
 
     <!--  <div class="" ng-include="'pool/userToPool.tpl.html'"></div>

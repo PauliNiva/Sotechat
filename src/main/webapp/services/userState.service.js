@@ -4,18 +4,6 @@ angular.module('chatApp')
         var userName;
         var userID;
         var userState;
-        var queue = {
-            getVariablesFormServer: getVariablesFormServer,
-            setAllVariables: setAllVariables,
-            setChannelID : setChannelID,
-            setUserName : setUserName,
-            setUserID : setUserID,
-            setUserState : setUserState,
-            getUserState: getUserState,
-            getChannelID : getChannelID,
-            getUserName : getUserName,
-            getUserID : getUserID
-        };
 
         function setChannelID(value) {
             channelID = value;
@@ -64,6 +52,19 @@ angular.module('chatApp')
             setChannelID(response.data.channelId);
             setUserID(response.data.userId);
             setUserState(response.data.state);
+        };
+
+        var queue = {
+            getVariablesFormServer: getVariablesFormServer,
+            setAllVariables: setAllVariables,
+            setChannelID : setChannelID,
+            setUserName : setUserName,
+            setUserID : setUserID,
+            setUserState : setUserState,
+            getUserState: getUserState,
+            getChannelID : getChannelID,
+            getUserName : getUserName,
+            getUserID : getUserID
         };
         
         return queue;

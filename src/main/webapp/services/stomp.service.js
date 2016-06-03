@@ -3,12 +3,6 @@
 angular.module('chatApp')
     .factory('stompSocket', ['$rootScope', function ($rootScope) {
         var stompClient;
-        var socket = {
-            init: init,
-            connect: connect,
-            subscribe: subscribe,
-            send: send
-        };
 
         function init(url) {
             stompClient = Stomp.over(new SockJS(url));
@@ -37,6 +31,13 @@ angular.module('chatApp')
 
         function send(destination, headers, object) {
             stompClient.send(destination, headers, object);
+        };
+
+        var socket = {
+            init: init,
+            connect: connect,
+            subscribe: subscribe,
+            send: send
         };
 
         return socket;

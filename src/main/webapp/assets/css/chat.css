@@ -11,18 +11,11 @@ textarea.chat-text {
 
 .chat-body {
     overflow-y: auto;
-    height: calc(100% - 154px);
+    height: calc(100% - 104px);
     width: auto;
 }
 
-@media (min-width: 970px) {
-    .chat-body {
-        overflow-y: auto;
-        height: calc(100% - 104px);
-        width: auto;
-    }
 
-}
 
 .app-container {
     max-width: 1500px;
