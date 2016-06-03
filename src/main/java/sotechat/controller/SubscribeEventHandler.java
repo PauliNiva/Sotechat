@@ -13,6 +13,7 @@ import sotechat.data.SessionRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class SubscribeEventHandler
     private HashMap<String, List<HttpSession>> map;
 
     @Autowired
-    private SessionRepo sessions;
+    private SessionRepo sessionRepo;
     /** Constructor initiates singleton instance. */
     public SubscribeEventHandler() {
         map = new HashMap<String, List<HttpSession>>();
@@ -57,11 +58,18 @@ public class SubscribeEventHandler
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
                 .get("SPRING.SESSION.ID").toString();
-        SessionRepo sessions = getSessionRepo();
 
-        System.out.println(sessions.getHttpSession(sessionId).getAttribute("username"));
-        System.out.println(sessions.getHttpSession(sessionId).getAttribute("state"));
-        System.out.println(sessions.getHttpSession(sessionId).getAttribute("channelId"));
+        HttpSession session = sessionRepo.getHttpSession(sessionId);
+        String channelId = session.getAttribute("channelId").toString();
+        System.out.println(channelId);
+
+        if (!map.get(channelId).isEmpty() || map.get(channelId) != null) {
+            map.get(channelId).add(session);
+        } else {
+            List<HttpSession> sessions = new ArrayList();
+            sessions.add(session);
+            map.put(session.getAttribute("channelId").toString(), sessions);
+        }
     }
 
     /** Handles unsubscribe events.
@@ -71,11 +79,11 @@ public class SubscribeEventHandler
         System.out.println("UNSUB = " + event.toString());
     }
 
-    private void setSessionRepo(SessionRepo repo) {
-        this.sessions = repo;
+    private void setSessionRepo(final SessionRepo repo) {
+        this.sessionRepo = repo;
     }
 
     private SessionRepo getSessionRepo() {
-        return this.sessions;
+        return this.sessionRepo;
     }
 }
