@@ -1,33 +1,15 @@
-<div class="panel panel-default chat-panel" ng-controller="chatController as chat">
+<div class="panel panel-default chat-panel">
     <div class="panel-heading chat-heading">
         <div class="col-lg-4 col-md-4 col-sm-10 col-xs-8" style="padding-right: 0px">
-            <h4 class="panel-title">{{chat.chatName}}</h4>
+            <h4 class="panel-title">{{chatName}}</h4>
         </div>
         <div class="col-lg-6 col-md-6 hidden-sm hidden-xs" style="padding-right: 0px" ng-hide="pro">
-            <div class="input-group">
-                <input type="text" class="form-control" value="AvainChatinPalauttamistaVarten" readonly>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button"><span
-                                class="glyphicon glyphicon-copy"></span></button>
-                        <button class="btn btn-default" type="button"><span
-                                class="glyphicon glyphicon-info-sign"></span></button>
-                    </span>
-            </div>
         </div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4" ng-hide="pro">
             <button class="btn btn-danger center-block" type="button">Poistu</button>
         </div>
     </div>
-    <div class="panel-heading hidden-md hidden-lg" ng-hide="pro">
-        <div class="input-group">
-            <input type="text" class="form-control" value="apinasöibanaanin" readonly>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-copy"></span> </button>
-                        <button class="btn btn-default" type="button"><span
-                                class="glyphicon glyphicon-info-sign"></span></button>
-                    </span>
-        </div>
-    </div>
+
     <div class="panel-body chat-body" scroll-glue>
         <div ng-repeat="message in messages | orderBy:'time':false" class="message">
             <div ng-include="'chatWindow/message.html'"></div>

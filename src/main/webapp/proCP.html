@@ -8,22 +8,20 @@
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
     <script src="assets/lib/angular.js"></script>
-    <script src="assets/lib/angular-route.js"></script>
+    <script src="assets/lib/ui-bootstrap.js"></script>
 
     <script src="app.module.js"></script>
 
     <script src="chatWindow/chatWindow.controller.js"></script>
     <script src="chatWindow/chatWindow.directives.js"></script>
+    <script src="chatWindow/chatWindow.component.js"></script>
 
     <script src="proControlPanel/proCP.controller.js"></script>
 
     <script src="services/stomp.service.js"></script>
     <script src="services/userState.service.js"></script>
     <script src="services/connectToServer.service.js"></script>
-    <script src="services/userRouteService.js"></script>
 
-
-    <script src="assets/lib/bootstrap.min.js"></script>
     <script src="assets/lib/scrollglue.js"></script>
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
@@ -31,7 +29,6 @@
     <link href="assets/css/bootstrap-switch.min.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp" >
-<base href="/pro">
 <div class="ng-cloak container-fluid proContainer" ng-controller="proCPController">
     <div class="chat-container" ng-include="'proControlPanel/controlPanel.tpl.html'"></div>
 </div>

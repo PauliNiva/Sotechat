@@ -1,2 +1,2 @@
-angular.module('chatApp', ['luegg.directives']);
+angular.module('chatApp', ['luegg.directives', 'ui.bootstrap']);
 

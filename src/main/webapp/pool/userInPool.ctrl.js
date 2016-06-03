@@ -6,7 +6,7 @@ angular.module('chatApp')
                 queueService.setUserState('chat');
                 subscribeToQueue.unsubscribe();
                 $scope.updateState();
-            }, 10000);  // test only
+            }, 3000);  // test only
 
             
             var QUEUEADDRESS = '/toClient/';

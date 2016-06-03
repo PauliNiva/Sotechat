@@ -5,12 +5,12 @@
 angular.module('chatApp')
     .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'queueService',
         function ($scope, stompSocket, connectToServer, queueService) {
-
+            $scope.pro = $scope.$parent.pro;
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             var sub;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
-            this.chatName = 'Esimerkki';
+            $scope.chatName = 'Esimerkki';
 
             /** Funktio lähettää servicen avulla tekstikentän
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
@@ -49,5 +49,10 @@ angular.module('chatApp')
                 connectToServer.connect(queueService.getChannelID(), subscribe);
             };
             
-            init();
+            if ($scope.$parent.pro) {
+                subscribe();
+            } else {
+                init();
+            }
+
         }]);
