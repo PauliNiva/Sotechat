@@ -27,12 +27,13 @@ angular.module('chatApp')
         };
 
         function subscribe(destination, callback) {
-            stompClient.subscribe(destination, function (message) {
+           return stompClient.subscribe(destination, function (message) {
                 $rootScope.$apply(function () {
                     callback(message);
                 });
             });
         };
+        
 
         function send(destination, headers, object) {
             stompClient.send(destination, headers, object);

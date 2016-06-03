@@ -22,13 +22,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Määrittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.csrf().disable();
         http
                 // "määritellään seuraavaksi, mitkä
                 // pyynnöt vaativat kirjautumisen"
                 .authorizeRequests()
                 // pyynnöt polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/proCP.html").authenticated()
+                .antMatchers("/pro").authenticated()
                 // muut pyynnöt
                 // sallitaan kaikille
                 .anyRequest().permitAll()
@@ -48,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
-        http.requiresChannel().anyRequest().requiresSecure();
+        // http.requiresChannel().anyRequest().requiresSecure();
 
         // TODO: alla oleva csrf tokenin configurointi ei toimi
         // http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(),

@@ -24,6 +24,6 @@ public class QueueServiceTest {
 
     @Test
     public void addToQueueTest(){
-        service.addToQueue("333", "")
+        service.addToQueue("333", "", "");
     }
 }

@@ -38,7 +38,9 @@ public class ChatControllerTest {
     @Before
     public void setUp() throws Exception {
         mvc = MockMvcBuilders
-                .standaloneSetup(new ChatController(new MapperImpl(), new QueueService(new QueueImpl()))).build();
+                .standaloneSetup(new ChatController(new MapperImpl(),
+                        new SubscribeEventHandler(),
+                        new QueueService(new QueueImpl()))).build();
     }
 
     /**
@@ -64,3 +66,4 @@ public class ChatControllerTest {
                 .get("/pro").content("Tänne tulisi hoitajan näkymä"));
     }
 }
+
