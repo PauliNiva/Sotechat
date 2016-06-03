@@ -3,7 +3,7 @@ package sotechat;
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
  * kun "tavalliselle käyttäjälle" kerrotaan state.
  */
-public class StateResponse {
+public class UserStateResponse {
 
     /** Tila ("start", "inpool", "chat"). */
     private String state;
@@ -23,11 +23,11 @@ public class StateResponse {
      * @param pCategory category
      * @param pChannelId channelId
      */
-    public StateResponse(final String pState,
-                        final String pUsername,
-                         final String pUserId,
-                         final String pCategory,
-                        final String pChannelId) {
+    public UserStateResponse(final String pState,
+                             final String pUsername,
+                             final String pUserId,
+                             final String pCategory,
+                             final String pChannelId) {
         this.state = pState;
         this.userName = pUsername;
         this.userId = pUserId;

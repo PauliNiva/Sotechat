@@ -16,7 +16,7 @@ angular.module('chatApp')
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/" + queueService.getChannelID();
+                    var destination = "/toServer/chat/" + queueService.getChannelID();
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
                             'userId': queueService.getUserID(),
@@ -39,7 +39,7 @@ angular.module('chatApp')
             };
 
             var subscribe = function () {
-                sub = connectToServer.subscribe('/toClient/' + queueService.getChannelID(), function (response) {
+                sub = connectToServer.subscribe('/toClient/chat/' + queueService.getChannelID(), function (response) {
                     $scope.messages.push(getMessage(response.body));
                 });
 

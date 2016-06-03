@@ -44,7 +44,7 @@ angular.module('chatApp')
         };
 
         function getVariablesFormServer() {
-          return $http.get("/state");
+          return $http.get("/userState");
         };
 
         function setAllVariables(response) {

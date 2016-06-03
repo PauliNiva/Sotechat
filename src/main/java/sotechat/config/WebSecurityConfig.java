@@ -12,12 +12,14 @@ import org.springframework.security.config.annotation.web.configuration
 
 /** Tämä konfiguraatiotiedosto ottaa Spring Securityn käyttöön
  *  yhdessä joidenkin pom.xml -määrityksien kanssa. */
+
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    /** Määrittelee kirjautumisvaatimuksen sivulle /pro. */
+    /** Määrittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -27,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // pyynnöt polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/pro").authenticated()
+                .antMatchers("/pro", "/proCP.html").authenticated()
                 // muut pyynnöt
                 // sallitaan kaikille
                 .anyRequest().permitAll()
@@ -46,9 +48,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // logout sallitaan kaikille
                 .permitAll();
 
+        // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
+        // http.requiresChannel().anyRequest().requiresSecure();
+
+        // TODO: alla oleva csrf tokenin configurointi ei toimi
+        // http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(),
+        // CsrfFilter.class);
+
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
          * pyyntöjen uudelleenohjaamisessa login.html -sivulle.
-          * Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
+          * TODO: Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
     /** Kovakoodataan hoitajan tunnukset siihen saakka,

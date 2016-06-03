@@ -9,7 +9,7 @@ angular.module('chatApp')
             }, 3000);  // test only
 
             
-            var QUEUEADDRESS = '/toClient/';
+            var QUEUEADDRESS = '/toClient/queue/';
 
             var onMessage = function (response) {
                 var parsed = JSON.parse(response.body);
