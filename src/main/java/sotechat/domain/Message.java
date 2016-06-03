@@ -21,6 +21,9 @@ public class Message extends AbstractPersistable<Long> {
     @ManyToOne
     private Conversation conversation;
 
+    public Message() {
+    }
+
     public final Date getDate() {
         return this.date;
     }

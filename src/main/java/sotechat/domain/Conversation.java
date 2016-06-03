@@ -1,5 +1,6 @@
 package sotechat.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,10 @@ public class Conversation extends AbstractPersistable<Long> {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "author")
     private List<Message> messagesOfConversation;
 
+    public Conversation() {
+        messagesOfConversation = new ArrayList<>();
+    }
+
     public final Date getDate() {
         return this.date;
     }
@@ -52,5 +57,9 @@ public class Conversation extends AbstractPersistable<Long> {
     public final void setMessagesOfConversation(
             final List<Message> pMessagesOfConversation) {
         this.messagesOfConversation = pMessagesOfConversation;
+    }
+
+    public final void addMessageToConversation(Message pmessage) {
+        messagesOfConversation.add(pmessage);
     }
 }

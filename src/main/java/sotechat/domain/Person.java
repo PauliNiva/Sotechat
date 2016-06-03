@@ -25,7 +25,7 @@ public class Person extends AbstractPersistable<Long> {
     }
 
     public final void setName(final String pname) {
-        this.name = name;
+        this.name = pname;
     }
 
     public final String getUsername() {
