@@ -24,6 +24,7 @@ import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 import sotechat.StateResponse;
 import sotechat.data.Mapper;
+import sotechat.service.QueueService;
 
 /** Controlleri, joka käsittelee serverin puolella
  * chat-liikenteen clienttien kanssa.
@@ -36,6 +37,8 @@ public class ChatController {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
+    /** QueueService. */
+    private final QueueService queueService;
 
     /** SubScribeEventHandler. */
     private final ApplicationListener subscribeEventHandler;
@@ -45,13 +48,16 @@ public class ChatController {
      * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
+     * @param queueService
      */
     @Autowired
     public ChatController(
             final Mapper pMapper,
-            final ApplicationListener subscribeEventHandler) {
+            final ApplicationListener subscribeEventHandler,
+            final QueueService queueService) {
         this.mapper = pMapper;
         this.subscribeEventHandler = subscribeEventHandler;
+        this.queueService = queueService;
     }
 
     /** Alla metodi, joka käsittelee /toServer/{channelIid}
