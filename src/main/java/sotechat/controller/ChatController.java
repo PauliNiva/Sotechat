@@ -19,38 +19,17 @@ import sotechat.data.SessionRepo;
 @RestController
 public class ChatController {
 
-    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
-    private final Mapper mapper;
+    /** Tarjoaa logiikan. */
+    private final ChatMessageService chatMessageService;
 
-    /** QueueService. */
-    private final QueueService queueService;
-
-    /** Session Repository. */
-    private final SessionRepo repository;
-
-    /** SubScribeEventHandler. */
-    private final ApplicationListener subscribeEventListener;
-
-    /** Spring taikoo tässä Singleton-instanssit palveluista.
-     *
-     * @param pMapper Olio, johon talletetaan tiedot käyttäjien id:istä
-     * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
-     * käyttäjä-id:n perusteella.
-     * @param pQueueService queueService
-     * @param subscribeEventListener dfojfdoidfjo
-     * @param pRepository Session Repo.
+    /** Konstruktori, jolla Spring taikoo singleton-instanssin servicesta.
+     * @param pChatService Chat Message Service.
      */
     @Autowired
     public ChatController(
-            final Mapper pMapper,
-            final ApplicationListener subscribeEventListener,
-            final QueueService pQueueService,
-            final SessionRepo pRepository
+            final ChatMessageService pChatService
     ) {
-        this.repository = pRepository;
-        this.mapper = pMapper;
-        this.subscribeEventListener = subscribeEventListener;
-        this.queueService = pQueueService;
+        this.chatMessageService = pChatService;
     }
 
     /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,
@@ -72,11 +51,11 @@ public class ChatController {
     public final MsgToClient routeMessage(
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
-    ) throws Exception {
-        return ChatMessageService.processMessage(
+            ) throws Exception {
+
+        return chatMessageService.processMessage(
                 msgToServer,
-                accessor,
-                mapper
+                accessor
         );
     }
 

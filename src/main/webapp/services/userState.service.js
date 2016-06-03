@@ -1,5 +1,5 @@
 angular.module('chatApp')
-    .factory('queueService', ['$http', '$location', function ($http, $location) {
+    .factory('queueService', ['$http', function ($http) {
         var channelID;
         var userName;
         var userID;
@@ -14,8 +14,7 @@ angular.module('chatApp')
             getUserState: getUserState,
             getChannelID : getChannelID,
             getUserName : getUserName,
-            getUserID : getUserID,
-            refreshState : refreshState
+            getUserID : getUserID
         };
 
         function setChannelID(value) {
@@ -57,7 +56,7 @@ angular.module('chatApp')
         };
 
         function getVariablesFormServer() {
-          return $http.get("/state");
+          return $http.get("/userState");
         };
 
         function setAllVariables(response) {
@@ -66,15 +65,6 @@ angular.module('chatApp')
             setUserID(response.data.userId);
             setUserState(response.data.state);
         };
-
-        function refreshState() {
-            getVariablesFormServer().then(function(response) {
-                setAllVariables(response);
-                if (getUserState() == "chat") $location.path('/chat');
-                if (getUserState() == "pool") $location.path('/inQueue');
-                else $location.path('/');
-            });
-        }
         
         return queue;
     }]);

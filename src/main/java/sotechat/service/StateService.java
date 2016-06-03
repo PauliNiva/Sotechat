@@ -9,11 +9,13 @@ import org.springframework.stereotype.Service;
 import sotechat.ProStateResponse;
 import sotechat.UserStateResponse;
 import sotechat.data.Mapper;
+import sotechat.data.SessionRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
+import static sotechat.util.Utils.get;
 
 /**
  * Käyttäjän tilan käsittelyyn liittyvä logiikka.
@@ -24,13 +26,19 @@ public class StateService {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapperService;
+
     /** QueueService. */
     private final QueueService queueService;
+
     /** SubScribeEventHandler. */
     private final ApplicationListener subscribeEventListener;
+
+    /** Session Repository. */
+    private final SessionRepo sessionRepo;
+
     /** Channel where queue status is broadcasted. */
     private static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
-    // TODO: refaktoroi yhteen paikkaan QBCC määritykset
+
 
 
     /** Spring taikoo tässä konstruktorissa Singleton-instanssit palveluista.
@@ -44,25 +52,32 @@ public class StateService {
     @Autowired
     public StateService(
             final Mapper pMapper,
-            final ApplicationListener subscribeEventListener,
-            final QueueService pQueueService
             /* HUOM: Spring ei salli "pSubsc..." tyyppista nimentaa tuolle. */
+            final ApplicationListener subscribeEventListener,
+            final QueueService pQueueService,
+            final SessionRepo pSessionRepo
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
+        this.sessionRepo = pSessionRepo;
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
-     * @param session session
+     * @param req request
+     * @param professional kirjautumistiedot - kirjautumaton on null
      * @return UserStateResponse
      */
     public final UserStateResponse respondToUserStateRequest(
-            final HttpSession session
+            final HttpServletRequest req,
+            final Principal professional
     ) {
+        HttpSession session = req.getSession();
+        System.out.println("     State request from customerClient " + session.getId());
+        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
+
         /** Varmistetaan, että sessionissa on asianmukaiset attribuutit. */
-        Principal professional = null;
-        updateSessionAttributes(session, professional);
+        sessionRepo.updateSessionAttributes(session, professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -79,15 +94,18 @@ public class StateService {
 
 
     /** Logiikka miten vastataan proClientin state requestiin.
-     * @param session session
      * @return UserStateResponse
      */
     public final ProStateResponse respondToProStateRequest(
-            final HttpSession session,
+            final HttpServletRequest req,
             final Principal professional
     ) {
+
+        HttpSession session = req.getSession();
+        System.out.println("     State request from proClient " + session.getId());
+
         /** Varmistetaan, että sessionissa on asianmukaiset attribuutit. */
-        updateSessionAttributes(session, professional);
+        sessionRepo.updateSessionAttributes(session, professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -145,71 +163,21 @@ public class StateService {
         return "{\"content\":\"OK, please request new state now.\"}";
     }
 
+    public String popQueue(String channelId) {
+        System.out.println("Opening channel Id: " + channelId);
+        queueService.removeFromQueue(channelId);
 
-    /** Metodi päivittää tarvittaessa session-attribuuttien state,
-     * userId ja username vastaamaan ajanmukaisia arvoja.
-     * @param session session
-     * @param professional professional
-     */
-    public final void updateSessionAttributes(
-            final HttpSession session,
-            final Principal professional) {
-
-        /** Kaivetaan username ja id sessio-attribuuteista. */
-        Object username = session.getAttribute("username");
-        Object userId = session.getAttribute("userId");
-
-        /** Päivitetään muuttujat, jos tarpeellista. */
-        if (professional != null) {
-            /* Jos client on autentikoitunut ammattilaiseksi */
-            username = professional.getName();
-            userId = mapperService.getIdFromRegisteredName(username.toString());
-            session.setAttribute("state", "notRelevantForProfessional");
-            session.setAttribute("category", "notRelevantForProfessional");
-            session.setAttribute("channelId", "DEV_CHANNEL"); // TODO
-        } else if (get(session, "username").isEmpty()) {
-            /* Uusi käyttäjä */
-            username = "Anon";
-            userId = mapperService.generateNewId();
-            session.setAttribute("state", "start");
-            session.setAttribute("category", "DRUGS"); //TODO
-
-            /** Oikea kanavaID annetaan vasta nimen/aloitusviestin jälkeen. */
-            String channelNotRelevantYet = mapperService.generateNewId();
-            session.setAttribute("channelId", channelNotRelevantYet);
-            /** Random kanava failsafena, jos jonkin virheen vuoksi
-             * käyttäjät päätyisivätkin sinne keskustelemaan,
-             * tyhjä kanava on parempi kuin kasa trolleja. */
-        }
-
-        /** Liitetään muuttujien tieto sessioon (monesti aiemman päälle). */
-        session.setAttribute("username", username);
-        session.setAttribute("userId", userId);
-
-        /** Kirjataan tiedot mapperiin (monesti aiemman päälle). */
-        mapperService.mapUsernameToId(userId.toString(), username.toString());
+        return "{\"content\":\"channel activated. request new state now.\"}";
     }
 
-
-    /** Esim: get(session, "username") -> "Matti".
-     * Toistoa oli niin paljon, että eriytettiin omaksi metodiksi.
-     * Palauttaa nullin sijaan tyhjän Stringin, jotta käsittely helpottuisi.
-     * @param session HttpSession-objekti
-     * @param attributeName Avain haettavalle attribuutille
-     * @return Haettavan attribuutin arvo Stringinä
+    /** Getter.
+     * @return QBCC.
      */
-    public static String get(
-            final HttpSession session,
-            final String attributeName)
-    {
-        if (session == null) {
-            return "";
-        }
-        Object value = session.getAttribute(attributeName);
-        if (value == null) {
-            return "";
-        }
-        return value.toString();
+    public String getQueueBroadcastChannel() {
+        return QUEUE_BROADCAST_CHANNEL;
     }
 
+    public String getQueueAsJson() {
+        return queueService.toString();
+    }
 }

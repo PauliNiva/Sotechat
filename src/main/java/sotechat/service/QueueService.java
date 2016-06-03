@@ -45,11 +45,12 @@ public class QueueService {
     }
 
     /**
-     * queueToString -metodi palauttaa JSON -muotoisen taulukko esityksen
+     * toString -metodi palauttaa JSON -muotoisen taulukko esityksen
      * jonon alkioista
      * @return JSON -muotoinen taulukko jonon alkioista
      */
-    public final String queueToString() {
+    @Override
+    public final String toString() {
         List<QueueItem> list = queue.returnQueue();
         String json = "{\"jono\": [";
         for(QueueItem item : list){

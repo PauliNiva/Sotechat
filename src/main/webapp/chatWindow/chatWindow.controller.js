@@ -3,20 +3,20 @@
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 //
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', 'stompSocket', '$http', 'connectToServer', 'queueService',
-        function ($scope, $location, stompSocket, $http, connectToServer, queueService) {
-
+    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'queueService',
+        function ($scope, stompSocket, connectToServer, queueService) {
+            $scope.pro = $scope.$parent.pro;
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             var sub;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
-            this.chatName = 'Esimerkki';
+            $scope.chatName = 'Esimerkki';
 
             /** Funktio lähettää servicen avulla tekstikentän
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/" + queueService.getChannelID();
+                    var destination = "/toServer/chat/" + queueService.getChannelID();
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
                             'userId': queueService.getUserID(),
@@ -39,7 +39,7 @@ angular.module('chatApp')
             };
 
             var subscribe = function () {
-                sub = connectToServer.subscribe('/toClient/' + queueService.getChannelID(), function (response) {
+                sub = connectToServer.subscribe('/toClient/chat/' + queueService.getChannelID(), function (response) {
                     $scope.messages.push(getMessage(response.body));
                 });
 
@@ -49,5 +49,10 @@ angular.module('chatApp')
                 connectToServer.connect(queueService.getChannelID(), subscribe);
             };
             
-            init();
+            if ($scope.$parent.pro) {
+                subscribe();
+            } else {
+                init();
+            }
+
         }]);

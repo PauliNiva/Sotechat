@@ -1,14 +1,15 @@
 angular.module('chatApp')
     .controller('userInPoolCtrl', ['$http', '$scope', '$location', 'queueService', 'connectToServer', '$timeout',
         function ($http, $scope, $location, queueService, connectToServer, $timeout) {
-
+            var subscribeToQueue;
             $timeout(function () {
                 queueService.setUserState('chat');
+                subscribeToQueue.unsubscribe();
                 $scope.updateState();
-            }, 10000);  // test only
+            }, 3000);  // test only
 
-            var subscribeToQueue;
-            var QUEUEADDRESS = '/toClient/';
+            
+            var QUEUEADDRESS = '/toClient/queue/';
 
             var onMessage = function (response) {
                 var parsed = JSON.parse(response.body);

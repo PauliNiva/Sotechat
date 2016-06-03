@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static sotechat.service.StateService.get;
+import static sotechat.util.Utils.get;
 
 /** Used to keep track who is subscribed to which channel.
  *
@@ -59,26 +58,31 @@ public class SubscribeEventListener
      * @param event event
      */
     private void handleSubscribe(final SessionSubscribeEvent event) {
-      //  System.out.println("SUB = " + event.toString());
+        System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
                 .get("SPRING.SESSION.ID").toString();
 
         HttpSession session = sessionRepo.getHttpSession(sessionId);
+        if (session == null) {
+            System.out.println("!!! ERROR !!! Failed to retrieve session for ID " + sessionId);
+            return;
+        }
+
         String channelId = get(session, "channelId");
         System.out.println("Subscribing someone to " + channelId);
         if (channelId.isEmpty()) {
             return;
         }
 
-        if (!map.get(channelId).isEmpty() || map.get(channelId) != null) {
-            map.get(channelId).add(session);
-        } else {
-            List<HttpSession> sessions = new ArrayList();
-            sessions.add(session);
-            map.put(session.getAttribute("channelId").toString(), sessions);
+        /** Add session to list of subscribers to channelId. */
+        List<HttpSession> list = map.get(channelId);
+        if (list == null) {
+            list = new ArrayList<>();
+            map.put(channelId, list);
         }
+        list.add(session);
     }
 
     /** Handles unsubscribe events.

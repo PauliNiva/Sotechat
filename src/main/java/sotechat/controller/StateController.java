@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.security.Principal;
 import sotechat.JoinResponse;
 import sotechat.ProStateResponse;
 import sotechat.UserStateResponse;
+import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
 /** Reititys tilaan liittyville HTML GET- ja POST-pyynnoille.
@@ -27,6 +29,10 @@ public class StateController {
 
     /** State Service. */
     private final StateService stateService;
+
+    @Autowired
+    private SimpMessagingTemplate brokerMessagingTemplate;
+
 
     /** Spring taikoo tässä Singleton-instanssit palveluista.
      *
@@ -40,18 +46,18 @@ public class StateController {
     }
 
     /** Kun customerClient haluaa pyytää tilan (mm. sivun latauksen yhteydessä).
+     * TODO: Selvitä, miksi myös hoitajalta tulee /userState pyyntöjä välillä.
      * @param req täältä päästään session-olioon käsiksi.
      * @return mitä vastataan customerClientin tilanpäivityspyyntöön.
      * @throws Exception mikä poikkeus
      */
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
-            final HttpServletRequest req
+            final HttpServletRequest req,
+            final Principal professional
             ) throws Exception {
 
-        HttpSession session = req.getSession();
-        System.out.println("     State request from customerClient " + session.getId());
-        return stateService.respondToUserStateRequest(session);
+        return stateService.respondToUserStateRequest(req, professional);
     }
 
     /** Kun proClient haluaa pyytää tilan (mm. sivun lataus).
@@ -66,9 +72,7 @@ public class StateController {
             final Principal professional
             ) throws Exception {
 
-        HttpSession session = req.getSession();
-        System.out.println("     State request from proClient " + session.getId());
-        return stateService.respondToProStateRequest(session, professional);
+        return stateService.respondToProStateRequest(req, professional);
     }
 
 
@@ -82,14 +86,12 @@ public class StateController {
             final HttpServletRequest request
             ) throws Exception {
 
-        HttpSession session = request.getSession();
         return stateService.respondToJoinPoolRequest(request);
     }
 
 
 
-    /** Kun hoitaja ottaa jonosta chatin, tänne pitäisi tulla signaali.
-     * @param accessor accessor
+    /** Toimenpiteet, kun hoitaja avaa jonosta chatin.
      * @param channelId channelId
      * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
      * @throws Exception mikä poikkeus
@@ -97,48 +99,14 @@ public class StateController {
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
     public final String popClientFromQueue(
-            final SimpMessageHeaderAccessor accessor,
             final @DestinationVariable String channelId
             ) throws Exception {
 
-        //upgradeSubscribersToChat(channelId);
-        // TODO: Poista jonosta kaikki jotka on subscribennu kanavaan channelId
-        System.out.println("Opening channel Id: " + channelId);
-        return "{\"content\":\"channel activated. request new state now.\"}";
+        String wakeUp = stateService.popQueue(channelId);
+        String qbcc = "/" + stateService.getQueueBroadcastChannel();
+        String qAsJson = stateService.getQueueAsJson();
+        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson); //TODO:TEST THIS
+        return wakeUp;
     }
 
-
-
-
-
-
-    /** EI KÄYTÖSSÄ ENÄÄ ?
-     *
-     * Kun client menee sivulle index.html, tiedostoon upotettu
-     * JavaScript tekee erillisen GET-pyynnön polkuun /join.
-     * Tällä pyynnöllä client ilmaisee haluavansa chattiin.
-     * Alla oleva metodi mappaa pyynnöt polkuun /join
-     * ja palauttaa käyttäjälle JSONina usernamen, userId:n
-     * ja kanavaId:n (kaikki samalle kanavalle DEV_CHANNEL).
-     * @return Palautusarvo lähetetään JSONina clientille.
-     * @throws Exception mikä poikkeus?
-     * @param req Http GET-pyyntö osoitteesee /join.
-     * @param professional Kirjautuneelle käyttäjälle(hoitaja) luotu
-     *                     istunto(session) kirjautumisen yhteydessä
-     */
-    @RequestMapping(value = "/join", method = RequestMethod.GET)
-    public final JoinResponse returnJoinResponse(
-            final HttpServletRequest req, final Principal professional)
-            throws Exception {
-        HttpSession session = req.getSession();
-
-        System.out.println("     id(join) = " + session.getId());
-
-        stateService.updateSessionAttributes(session, professional);
-        String username = session.getAttribute("username").toString();
-        String userId = session.getAttribute("userId").toString();
-
-        /** Palautetaan JoinResponse, jonka Spring paketoi JSONiksi. */
-        return new JoinResponse(username, userId, "DEV_CHANNEL");
-    }
 }

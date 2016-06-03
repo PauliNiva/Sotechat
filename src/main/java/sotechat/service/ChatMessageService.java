@@ -1,8 +1,9 @@
 package sotechat.service;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 import sotechat.data.Mapper;
@@ -10,19 +11,33 @@ import sotechat.data.Mapper;
 /**
  * Logiikka chat-viestien käsittelyyn.
  */
-public final class ChatMessageService {
+@Service
+public class ChatMessageService {
+
+    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
+    private final Mapper mapper;
+
+    /**
+     * Constructor autowires mapper.
+     * @param pMapper mapper.
+     */
+    @Autowired
+    public ChatMessageService(
+            final Mapper pMapper
+    ) {
+        this.mapper = pMapper;
+    }
+
 
     /** Logiikka saapuvien chat-viestien käsittelyyn.
      * Palauttaa viestin muodossa, joka voidaan lähettää kanavalla olijoille.
      * @param msgToServer saapuva viesti
      * @param accessor accessor
-     * @param mapper mapper
      * @return msgToClient eli lähtevä viesti
      */
-    public static MsgToClient processMessage(
+    public MsgToClient processMessage(
             final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor accessor,
-            final Mapper mapper
+            final SimpMessageHeaderAccessor accessor
     ) {
         /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
         String timeStamp = new DateTime().toString();
@@ -55,11 +70,4 @@ public final class ChatMessageService {
                 timeStamp, msgToServer.getContent());
     }
 
-
-    /**
-     * This exists to solve a CheckStyle warning.
-     */
-    private ChatMessageService() {
-        /** Not called. */
-    }
 }
