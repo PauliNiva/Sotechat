@@ -1,3 +1,7 @@
 sotechat
 sotechat.config
 sotechat.controller
+sotechat.data
+sotechat.domain
+sotechat.util
+sotechat.websocket
