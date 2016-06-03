@@ -32,6 +32,7 @@ public class ChatController {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
+    /** Hoitaa jonon palvelut */
     @Autowired
     private final QueueService queueService;
 
@@ -40,10 +41,10 @@ public class ChatController {
      * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
-     * @param queueService
+     * @param queueService hoitaa jonon palvelut
      */
     @Autowired
-    public ChatController(final Mapper pMapper, QueueService queueService) {
+    public ChatController(final Mapper pMapper, final QueueService queueService) {
         this.mapper = pMapper;
         this.queueService = queueService;
     }

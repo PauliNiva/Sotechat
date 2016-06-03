@@ -25,6 +25,18 @@ public class QueueImpl implements Queue {
     }
 
     /**
+     * konstruktori alustaa jonon uudeksi listaksi, johon lisätään parametrina
+     * annetut QueueItemit
+     * @param items jonoon lisättävät QueueItemit
+     */
+    public QueueImpl(QueueItem... items){
+        this.queue = new LinkedList<QueueItem>();
+        for(QueueItem item: items){
+            this.queue.addLast(item);
+        }
+    }
+
+    /**
      * addTo -metodi lisää jonoon uuden QueueItemin, johon on talletettu
      * jonottavan käyttäjän kanavan id, keskustelun aihealue sekä jonottavan
      * käyttäjän nimi. Palauttaa true, jos lisäys onnistui.
@@ -115,6 +127,31 @@ public class QueueImpl implements Queue {
                 return count;
             }
             count++;
+        }
+        return count;
+    }
+
+    /**
+     * itemsBeforeIn -metodi palauttaa parametrina annetun kanavaid:n omaavaa
+     * QueueItemia edeltävän jonon pituuden parametrina annetuissa aihealue
+     * kategoriassa
+     * @param channelId Haetun QueueItemin kanavaid
+     * @param category keskustelun aihealue jossa olevia QueueItemejä
+     *                 tarkastellaan
+     * @return kuinka monta QueueItemia on jonossa ennen haettua QueueItemia
+     * annetussa kategoriassa
+     */
+    public final synchronized int itemsBeforeIn(final String channelId, final String category){
+        ListIterator<QueueItem> iterator = queue.listIterator(0);
+        int count = 0;
+        while(iterator.hasNext()){
+            QueueItem next = iterator.next();
+            if(next.getChannelId().equals(channelId)){
+                return count;
+            }
+            if(next.getCategory().equals(category)){
+                count++;
+            }
         }
         return count;
     }

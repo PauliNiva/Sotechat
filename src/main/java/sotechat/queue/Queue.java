@@ -53,6 +53,15 @@ public interface Queue {
     int itemsBefore(String channelId);
 
     /**
+     * metodi palauttaa haettua alkiota edeltävän jonon pituuden
+     * parametrina annetussa kategoriassa
+     * @param channelId haetun alkion kanavaid
+     * @param category tarkasteltava kategoria
+     * @return edeltävän jonon pituus annetussa kategoriassa
+     */
+    int itemsBeforeIn(String channelId, String category);
+
+    /**
      * metodi palauttaa viitteen jonoon
      * @return jono
      */
