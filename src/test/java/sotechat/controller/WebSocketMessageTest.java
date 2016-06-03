@@ -205,6 +205,33 @@ public class WebSocketMessageTest {
         assertNull(reply);
     }
 
+    @Test
+    public void serverDoesntAcceptMessageFromUserIfUserIdDoesntExist()
+        throws Exception {
+        StompHeaderAccessor headers =
+                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+
+        MsgUtil msgUtil = new MsgUtil();
+        msgUtil.add("userId", "243", false);
+        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("content", "Hei!", true);
+        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("timeStamp", "Sunnuntai", true);
+
+        String messageToBeSendedAsJsonString = msgUtil.mapToString();
+        Message<String> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString,
+                        headers.getMessageHeaders());
+
+        this.clientInboundChannel.send(message);
+
+        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+        /**
+         * Ei pitäisi tulla vastausta, koska userId:tä ei löydy.
+         */
+        assertNull(reply);
+    }
+
     /**
      * Asetetaan palvelimelle WebSocketin kautta lähetettävän viestin
      * headereille oletusarvot. Apumetodi joka vähentää copy-pastea.
