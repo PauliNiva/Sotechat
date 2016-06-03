@@ -16,14 +16,14 @@ import java.util.List;
  *
  */
 @Component
-public class SubscribeEventHandler
+public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
     /** Key = channelID, value = list of subscribed sessions. */
     private HashMap<String, List<HttpSession>> map;
 
     /** Constructor initiates singleton instance. */
-    public SubscribeEventHandler() {
+    public SubscribeEventListener() {
         map = new HashMap<String, List<HttpSession>>();
     }
 
@@ -32,7 +32,7 @@ public class SubscribeEventHandler
      * @param applicationEvent all application events routed through here.
      */
     @Override
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+    public void onApplicationEvent(final ApplicationEvent applicationEvent) {
         if (applicationEvent.getClass() == SessionSubscribeEvent.class) {
             handleSubscribe((SessionSubscribeEvent) applicationEvent);
         } else if
