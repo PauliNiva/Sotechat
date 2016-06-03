@@ -31,10 +31,10 @@ import org.springframework.web.socket.config.annotation
         .EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
-import sotechat.util.Morko;
+import sotechat.util.MsgUtil;
+import sotechat.util.TestChannelInterceptor;
 
 import java.nio.charset.Charset;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +47,10 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-        MessageTest.TestWebSocketConfig.class,
-        MessageTest.TestConfig.class
+        WebSocketMessageTest.TestWebSocketConfig.class,
+        WebSocketMessageTest.TestConfig.class
 })
-public class MessageTest {
+public class WebSocketMessageTest {
 
     private MapperImpl mapper;
 
@@ -77,12 +77,12 @@ public class MessageTest {
     public void clientReceivesCorrectResponseAfterSendingMessage()
             throws Exception {
         /**
-         * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
+         * Luodaan mapperiin avain-arvo -pari (id:676, username:MsgUtil), jotta
          * ChatController-luokan routeMessage-metodissa löydetään oikea
-         * käyttäjäid:n perusteella, ja metodi kyetään suorittamaan
+         * käyttäjä id:n perusteella, ja metodi kyetään suorittamaan
          * loppuun saakka.
          */
-        mapper.mapUsernameToId("676", "Morko");
+        mapper.mapUsernameToId("676", "MsgUtil");
 
         /**
          * Simuloidaan normaalisti JavaScriptin avulla tapahtuvaa viestien
@@ -99,19 +99,20 @@ public class MessageTest {
 
         /**
          * Luodaan lähetettävä viesti, vastaa siis normaalisti JavaScriptillä
-         * Json-muodossa generoitavaa luokkaa, josta
+         * Json-muodossa olevaa viestiä, joka palvelimella paketoidaan
+         * MsgToServer-luokan sisälle.
          */
-        Morko morko = new Morko();
-        morko.add("userId", "676", false);
-        morko.add("channelId", "DEV_CHANNEL", true);
-        morko.add("content", "Hei!", true);
-        morko.add("userName", "Morko", true);
-        morko.add("timeStamp", "Sunnuntai", true);
+        MsgUtil msgUtil = new MsgUtil();
+        msgUtil.add("userId", "676", false);
+        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("content", "Hei!", true);
+        msgUtil.add("userName", "MsgUtil", true);
+        msgUtil.add("timeStamp", "Sunnuntai", true);
         /**
          * Rakennetaan vielä edellä muodostetusta viestistä Message-olio,
          * joka voidaankin sitten lähettää palvelimelle.
          */
-        String jsonString = morko.mapToString();
+        String jsonString = msgUtil.mapToString();
         Message<String> message = MessageBuilder.createMessage(jsonString,
                 headers.getMessageHeaders());
         /**
@@ -120,7 +121,7 @@ public class MessageTest {
         this.clientInboundChannel.send(message);
         /**
          * Talletetaan palvelimelta tullut vastaus Message-olioon. Eli siis
-         * mitä ChatControllerin routeMessage-metodi palauttaa.
+         * mitä ChatControllerin routeMessage-metodi palauttaa(MsgToClient).
          */
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
@@ -147,7 +148,7 @@ public class MessageTest {
          */
         for (Map.Entry entry : jsonMessage.entrySet()) {
             String key = entry.getKey().toString();
-            assertTrue(morko.getMorkoSet().contains(key));
+            assertTrue(msgUtil.getMorkoSet().contains(key));
         }
     }
 

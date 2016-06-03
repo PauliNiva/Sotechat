@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class Morko {
+public class MsgUtil {
 
     private HashSet<String> halutaanLahettaa;
     private HashMap<String, String> map;
 
-    public Morko() {
+    public MsgUtil() {
         this.halutaanLahettaa = new HashSet<>();
         this.map = new HashMap<>();
     }
