@@ -74,7 +74,6 @@ public class ChatController {
         }
         if (mapper.isUserProfessional(userId)) {
             /** ID kuuluu ammattilaiselle, varmistetaan että on kirjautunut. */
-
             if (accessor.getUser() == null) {
                 /** Ei kirjautunut, hylätään viesti. */
                 return null;

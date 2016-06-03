@@ -15,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A ChannelInterceptor that caches messages.
+ * Luokka, joka avustaa viestien käsittelyssä WebSocket-testeissä.
  */
 public class TestChannelInterceptor extends ChannelInterceptorAdapter {
 
@@ -30,9 +30,6 @@ public class TestChannelInterceptor extends ChannelInterceptorAdapter {
         this.destinationPatterns.addAll(Arrays.asList(patterns));
     }
 
-    /**
-     * @return the next received message or {@code null} if the specified time elapses
-     */
     public Message<?> awaitMessage(long timeoutInSeconds) throws InterruptedException {
         return this.messages.poll(timeoutInSeconds, TimeUnit.SECONDS);
     }

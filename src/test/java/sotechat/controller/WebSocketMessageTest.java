@@ -33,12 +33,14 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.util.MsgUtil;
 import sotechat.util.TestChannelInterceptor;
+import sotechat.util.TestPrincipal;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -74,15 +76,16 @@ public class WebSocketMessageTest {
     }
 
     @Test
-    public void clientReceivesCorrectResponseAfterSendingMessage()
+    public void
+    unAuthenticatedUserReceivesCorrectResponseAfterSendingMessage()
             throws Exception {
         /**
-         * Luodaan mapperiin avain-arvo -pari (id:676, username:MsgUtil), jotta
+         * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
          * ChatController-luokan routeMessage-metodissa löydetään oikea
-         * käyttäjä id:n perusteella, ja metodi kyetään suorittamaan
-         * loppuun saakka.
+         * käyttäjä id:n perusteella, eikä metodin suoritus siis keskeydy
+         * siihen, että mappperista ei löydy oikeaa käyttäjää.
          */
-        mapper.mapUsernameToId("676", "MsgUtil");
+        mapper.mapUsernameToId("676", "Morko");
 
         /**
          * Simuloidaan normaalisti JavaScriptin avulla tapahtuvaa viestien
@@ -90,12 +93,9 @@ public class WebSocketMessageTest {
          * kanavalle viesti lähetetään, mikä on SessionId, ja mitä StompJS:n
          * komentoa käytetään, jotta viesti voidaan lähettää(SEND).
          */
-        StompHeaderAccessor headers = StompHeaderAccessor
-                .create(StompCommand.SEND);
-        headers.setDestination("/toServer/DEV_CHANNEL");
-        headers.setSessionId("0");
-        headers.setNativeHeader("channelId", "DEV_CHANNEL");
-        headers.setSessionAttributes(new HashMap<String, Object>());
+        StompHeaderAccessor headers =
+                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+
 
         /**
          * Luodaan lähetettävä viesti, vastaa siis normaalisti JavaScriptillä
@@ -106,14 +106,15 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "676", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "MsgUtil", true);
+        msgUtil.add("userName", "Morko", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
         /**
          * Rakennetaan vielä edellä muodostetusta viestistä Message-olio,
          * joka voidaankin sitten lähettää palvelimelle.
          */
-        String jsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder.createMessage(jsonString,
+        String messageToBeSendedAsJsonString = msgUtil.mapToString();
+        Message<String> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString,
                 headers.getMessageHeaders());
         /**
          * Lähetetään viesti palvelimelle.
@@ -126,30 +127,115 @@ public class WebSocketMessageTest {
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
         /**
-         * Testi, joka tarkistaa, että palvelimelta tulleen viestin
-         * headereissa oikea sisältö. Nyt testataan vain sessionId, myös
-         * muita arvoja voitaisiin testata.
-         */
-        StompHeaderAccessor replyHeaders = StompHeaderAccessor.wrap(reply);
-        assertEquals("0", replyHeaders.getSessionId());
-
-        /**
          * Parsetaan vastauksena saatu string JsonObjectiksi.
          */
-        String json = new String((byte[]) reply.getPayload(),
-                Charset.forName("UTF-8"));
-        JsonParser parser = new JsonParser();
-        JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
+        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
 
         /**
          * Tarkistetaan, että vastauksena tullut JsonObject sisältää
          * oikeat kentät, eli userName, timeStamp, content ja channelId,
-         * mutta ei userId:ta!
+         * mutta ei userId:ta! Niiden kenttien, jotka MsgUtil-olion avulla
+         * on aiemmin asetettu falseksi ei pitäisi löytyä jsonMessagesta.
          */
         for (Map.Entry entry : jsonMessage.entrySet()) {
             String key = entry.getKey().toString();
-            assertTrue(msgUtil.getMorkoSet().contains(key));
+            assertTrue(msgUtil.getMsgUtilSet().contains(key));
         }
+    }
+
+    @Test
+    public void authenticatedRegistereUserReceivesCorrectResponse()
+            throws Exception {
+        StompHeaderAccessor headers =
+                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+        /**
+         * Simuloidaan hoitajan kirjautumista.
+         */
+        headers.setUser(new TestPrincipal("hoitaja"));
+
+        MsgUtil msgUtil = new MsgUtil();
+        msgUtil.add("userId", "666", false);
+        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("content", "Hei!", true);
+        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("timeStamp", "Sunnuntai", true);
+
+        String messageToBeSendedAsJsonString = msgUtil.mapToString();
+        Message<String> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString,
+                headers.getMessageHeaders());
+
+        this.clientInboundChannel.send(message);
+
+        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+
+        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
+
+        for (Map.Entry entry : jsonMessage.entrySet()) {
+            String key = entry.getKey().toString();
+            assertTrue(msgUtil.getMsgUtilSet().contains(key));
+        }
+    }
+
+    @Test
+    public void unAuthenticatedRegisteredUserDoesNotReceiveResponse()
+        throws Exception {
+        StompHeaderAccessor headers =
+                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+
+        MsgUtil msgUtil = new MsgUtil();
+        msgUtil.add("userId", "666", false);
+        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("content", "Hei!", true);
+        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("timeStamp", "Sunnuntai", true);
+
+        String messageToBeSendedAsJsonString = msgUtil.mapToString();
+        Message<String> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString,
+                        headers.getMessageHeaders());
+
+        this.clientInboundChannel.send(message);
+
+        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+        /**
+         * Ei pitäisi tulla vastausta, koska rekisteröityneellä käyttäjällä
+         * eli hoitajalla ei ole Principal-statusta eli hän ei ole kirjautunut.
+         */
+        assertNull(reply);
+    }
+
+    /**
+     * Asetetaan palvelimelle WebSocketin kautta lähetettävän viestin
+     * headereille oletusarvot. Apumetodi joka vähentää copy-pastea.
+     *
+     * @param channel Tähän tulee se kanava, joka kontrolleri-metodissa
+     *                on merkitty MessageMapping-annotaatiolla, esim.
+     *                /toServer/{channelId}
+     * @return
+     */
+    public StompHeaderAccessor setDefaultHeadersForChannel(String channel) {
+        StompHeaderAccessor headers = StompHeaderAccessor
+                .create(StompCommand.SEND);
+        headers.setDestination("/toServer/DEV_CHANNEL");
+        headers.setSessionId("0");
+        headers.setNativeHeader("channelId", "DEV_CHANNEL");
+        headers.setSessionAttributes(new HashMap<String, Object>());
+        return headers;
+    }
+
+    /**
+     * Apumetodi viestien muuntamiseski helpommin käsiteltävään Json-muotoon.
+     *
+     * @param message Palvelimelta saatu vastausviesti
+     * @return
+     */
+    public JsonObject parseMessageIntoJsonObject(Message<?> message) {
+        String json = new String((byte[]) message.getPayload(),
+                Charset.forName("UTF-8"));
+        JsonParser parser = new JsonParser();
+        JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
+        return jsonMessage;
     }
 
     /**
