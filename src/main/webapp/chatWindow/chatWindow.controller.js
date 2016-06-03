@@ -1,72 +1,53 @@
 // Kontrolleri päivittää tietoja molempiin suuntiin:
 // - Kun Serviceltä tulee viesti, kontrolleri päivittää selaimessa olevan näkymän.
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
-// TODO: Kuvaile $scope
+//
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', '$interval', 'stompSocket', '$http', function ($scope, $location, $interval, stompSocket, $http) {
-        // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
-        $scope.messages = [];
-        // Muuttujat joihin tallennetaan channelId ja user id
-        var channelId;
-        var userId;
-        // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
-        this.chatName = 'Esimerkki';
+    .controller('chatController', ['$scope', '$location', 'stompSocket', '$http', 'connectToServer', 'queueService',
+        function ($scope, $location, stompSocket, $http, connectToServer, queueService) {
 
-        /** Funktio lähettää servicen avulla tekstikentän
-         *  sisällön ja lopuksi tyhjentää tekstikentän. */
-        $scope.sendMessage = function () {
-            if ($scope.messageForm.$valid) {
-                var destination = "/toServer/" + channelId;
-                stompSocket.send(destination, {}, JSON.stringify(
-                    {
-                        'userId': userId,
-                        'channelId': channelId,
-                        'content': $scope.message
-                    }));
-                $scope.message = '';
-            }
-        };
-        
-        /** Funktio parsee viestin haluttuun muotoon. */
-        var getMessage = function (data) {
-            var parsed = JSON.parse(data);
-            console.log(parsed);
-            var message = [];
-            message.message = parsed.content;
-            message.time = parsed.timeStamp;
-            message.sender = parsed.userName;
-            /** TODO: If author == self then Message.I = true
-             *       Vaikuttaa viestien asemointiin vasen/oikea. */
-            message.I = true;
-            return message;
-        }
-        
+            // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
+            $scope.messages = [];
+            var sub;
+            // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
+            this.chatName = 'Esimerkki';
 
-        /** Kun tämä JS ladataan, tehdään GET-pyyntö polkuun /join.
-         *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
-        var joinToChat = function () {
-            $http.get("/join").then(function(response) {
-                username = response.data.userName;
-                channelId = response.data.channelId;
-                userId = response.data.userId;
-                initStompClient();
-            })
-        };
+            /** Funktio lähettää servicen avulla tekstikentän
+             *  sisällön ja lopuksi tyhjentää tekstikentän. */
+            $scope.sendMessage = function () {
+                if ($scope.messageForm.$valid) {
+                    var destination = "/toServer/" + queueService.getChannelID();
+                    stompSocket.send(destination, {}, JSON.stringify(
+                        {
+                            'userId': queueService.getUserID(),
+                            'channelId': queueService.getChannelID(),
+                            'content': $scope.message
+                        }));
+                    $scope.message = '';
+                }
+            };
 
+            /** Funktio parsee viestin haluttuun muotoon. */
+            var getMessage = function (data) {
+                var parsed = JSON.parse(data);
+                var message = [];
+                message.content = parsed.content;
+                message.time = parsed.timeStamp;
+                message.sender = parsed.userName;
+                message.I = message.sender === queueService.getUserName();
+                return message;
+            };
 
-        var initStompClient = function () {
-            stompSocket.init('/toServer');
-            stompSocket.connect(function (frame) {
-                stompSocket.subscribe("/toClient/" + channelId, function (message) {
-                    $scope.messages.push(getMessage(message.body));
+            var subscribe = function () {
+                sub = connectToServer.subscribe('/toClient/' + queueService.getChannelID(), function (response) {
+                    $scope.messages.push(getMessage(response.body));
                 });
-            /*    stompSocket.subscribe("/topic/", function(message) {
-                    console.log(JSON.parse(message.body));
-                });*/
-            }, function (error) {
-                initStompClient();
-            });
-        };
-        
-        joinToChat();
-    }]);
+
+            };
+
+            var init = function () {
+                connectToServer.connect(queueService.getChannelID(), subscribe);
+            };
+            
+            init();
+        }]);

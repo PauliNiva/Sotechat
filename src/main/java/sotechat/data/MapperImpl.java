@@ -3,6 +3,7 @@ package sotechat.data;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 import java.security.SecureRandom;
 import java.math.BigInteger;
@@ -16,8 +17,13 @@ public class MapperImpl implements Mapper {
 
     /** map key=id, value=username, esim. map.get("491829813") => "Anon". */
     private HashMap<String, String> map;
-    /** revMap key=username, value=id, esim. revMap.get("hoitaja anne") => "annenId". */
+    /** revMap key=username, value=id,
+     * esim. revMap.get("hoitaja anne") => "annenId". */
     private HashMap<String, String> revMap;
+    /** professionalIDs:ltä voi kysyä, mitkä ID:t ovat rekisteröity. */
+    private HashSet<String> professionalIDs;
+
+
     /** Raskas satunnaislukugeneraattori. */
     private SecureRandom random;
     /** Nopea satunnaismerkkijonogeneraattori (joka käyttää normi Randomia). */
@@ -28,10 +34,12 @@ public class MapperImpl implements Mapper {
         this.map = new HashMap<String, String>();
         this.revMap = new HashMap<String, String>();
         this.random = new SecureRandom();
-        this.fastGen = new FastGeneratorForRandomStrings(16);
+        this.fastGen = new FastGeneratorForRandomStrings();
+        this.professionalIDs = new HashSet<>();
 
         /** Kovakoodataan yksi hoitaja devausvaiheessa. */
         mapUsernameToId("666", "hoitaja");
+        professionalIDs.add("666");
     }
 
     /** Tallentaa molempiin suuntiin tiedon id<->username
@@ -39,7 +47,7 @@ public class MapperImpl implements Mapper {
      * @param username julkinen username
      */
     @Override
-    public void mapUsernameToId(String id, String username) {
+    public final void mapUsernameToId(final String id, final String username) {
         this.map.put(id, username);
         this.revMap.put(username, id);
     }
@@ -50,7 +58,7 @@ public class MapperImpl implements Mapper {
      * @return username
      */
     @Override
-    public String getUsernameFromId(String id) {
+    public final String getUsernameFromId(final String id) {
         if (!map.containsKey(id)) {
             return "UNKNOWN_USERNAME";
         }
@@ -62,8 +70,13 @@ public class MapperImpl implements Mapper {
      * @return true/false
      */
     @Override
-    public boolean isUserIdMapped(String id) {
+    public final boolean isUserIdMapped(final String id) {
         return (map.containsKey(id));
+    }
+
+    @Override
+    public final boolean isUserProfessional(final String id) {
+        return professionalIDs.contains(id);
     }
 
     /** Getteri salaiselle käyttäjäID:lle,
@@ -76,10 +89,11 @@ public class MapperImpl implements Mapper {
      * @return id salainen id
      */
     @Override
-    public String getIdFromRegisteredName(String registeredName) {
+    public final String getIdFromRegisteredName(final String registeredName) {
         /* Varmistetaan ensin, että username tunnetaan. */
-        if (!revMap.containsKey(registeredName)) {
-            /* Ei pitäisi laueta tuotannossa koskaan. */
+        if (registeredName == null
+                || registeredName.isEmpty()
+                || !revMap.containsKey(registeredName)) {
             return "UNKNOWN_ID";
         }
         return this.revMap.get(registeredName);
@@ -90,7 +104,7 @@ public class MapperImpl implements Mapper {
      * @return userId
      */
     @Override
-    public String generateNewId() {
+    public final String generateNewId() {
         while (true) {
             /** Tuotetaan satunnaismerkkijonoja niin kauan,
              * että vapaa merkkijono löytyy. On erittäin
@@ -103,21 +117,10 @@ public class MapperImpl implements Mapper {
         }
     }
 
-    /** Ei käytössä. Jos halutaan siirtyä "satunnaisempaan",
-     * mutta hitaampaan generaattoriin. Tässä tapauksessa
-     * olisi hyvä varmistaa, ettei palvelinta voi kyykyttää
-     * pyynnöillä, jotka aiheuttavat tämän metodin jatkuvaa
-     * kutsumista.
-     * @return satunnaismerkkijono
-     */
-    public String getSecureRandomString() {
-        return "" + new BigInteger(130, random).toString(32);
-    }
-
     /** Nopea satunnaismerkkijonotuottaja (käytössä).
-     * @return satunnaismerkkijono
+     *  @return satunnaismerkkijono
      */
-    public String getFastRandomString() {
+    public final String getFastRandomString() {
         return fastGen.nextString();
     }
 
@@ -129,23 +132,27 @@ public class MapperImpl implements Mapper {
 
         /** Käytetään nopeaa randomia. */
         private final Random random = new Random();
-        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voivat sisältää. */
+        /** Haluttu pituus satunnaismerkkijonoille. */
+        private static final int LENGTH = 16;
+
+        /** Sisältää aakkoston, jonka merkkejä satunnaisjonot voi sisältää. */
         private final char[] symbols;
         /** Tilapäistaulukko uuden merkkijonon muodostukseen. */
         private final char[] buf;
 
-        /** Konstruktori alustaa olion (yksi olio riittää).
-         * @param length pituus halutuille merkkijonoille
-         */
-        public FastGeneratorForRandomStrings(int length) {
-            if (length < 1)
-                throw new IllegalArgumentException("length < 1: " + length);
-            buf = new char[length];
+        /** Konstruktori alustaa olion (yksi olio riittää). */
+        FastGeneratorForRandomStrings() {
+            if (LENGTH < 1) {
+                throw new IllegalArgumentException("length < 1: " + LENGTH);
+            }
+            buf = new char[LENGTH];
             StringBuilder tmp = new StringBuilder();
-            for (char ch = '0'; ch <= '9'; ++ch)
+            for (char ch = '0'; ch <= '9'; ++ch) {
                 tmp.append(ch);
-            for (char ch = 'a'; ch <= 'z'; ++ch)
+            }
+            for (char ch = 'a'; ch <= 'z'; ++ch) {
                 tmp.append(ch);
+            }
             symbols = tmp.toString().toCharArray();
         }
 
@@ -153,9 +160,38 @@ public class MapperImpl implements Mapper {
          * @return satunnaismerkkijono
          */
         public String nextString() {
-            for (int idx = 0; idx < buf.length; ++idx)
+            for (int idx = 0; idx < buf.length; ++idx) {
                 buf[idx] = symbols[random.nextInt(symbols.length)];
+            }
             return new String(buf);
         }
     }
+
+
+
+
+    /** Ei käytössä. Jos halutaan siirtyä "satunnaisempaan",
+     * mutta hitaampaan generaattoriin. Tässä tapauksessa
+     * olisi hyvä varmistaa, ettei palvelinta voi kyykyttää
+     * pyynnöillä, jotka aiheuttavat tämän metodin jatkuvaa
+     * kutsumista.
+     * @return satunnaismerkkijono
+     */
+    public final String getSecureRandomString() {
+        return "" + new BigInteger(maxBitLength, random)
+                .toString(numeralSystem);
+    }
+
+    /** Suurin mahdollinen määrä bittejä mitä salaisessa merkkijonossa voi
+     * olla. Random arpoo, kuinka monta bittiä salaiseen merkkijonoon lopulta
+     * tulee.
+     */
+    private final int maxBitLength = 130;
+    /** Muuttujan arvo kertoo mihin lukujärjestelmään luotu BigInteger
+     * muunnetaan, kun siitä luodaan merkkijonoesitys. Oletuksena toString
+     * luo merkkijonoesityksen 10-järjestelmään, esim. "10".toString()
+     * palauttaisi arvon 10. Tässä tapauksessa luodun BigIntegerin
+     * merkkijonoesitys on kuitenkin ilmaistu kantaluvussa 32.
+     */
+    private final int numeralSystem = 32;
 }

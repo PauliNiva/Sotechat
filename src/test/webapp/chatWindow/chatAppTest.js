@@ -2,7 +2,6 @@
 describe("ChatController", function() {
     var scope, ctrl, httpBackend, form, element;
     var stompSocket;
-    var data = '\{"userName":"Anon","channelId":"0","timeStamp":"2016-05-24T06:58:54.794Z","content":"Kirjoitan jotain"\}';
 
     beforeEach(function() {
         stompSocket = jasmine.createSpyObj('stompSocket', ['joinToChat', 'connect', 'send']);
