@@ -1,7 +1,5 @@
 angular.module('chatApp')
     .controller('userToPoolCtrl', ['$http', '$scope', '$location','queueService', function($http, $scope, $location, queueService) {
-        
-
         var JOINPOOLURL = '/joinPool';
         $scope.joinQueue = function() {
             var successJoinQueue = function(response) {

@@ -3,8 +3,8 @@
 // - Kun halutaan lähettää viesti, välitetään se Servicelle.
 //
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$location', 'stompSocket', '$http', 'connectToServer', 'queueService',
-        function ($scope, $location, stompSocket, $http, connectToServer, queueService) {
+    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'queueService',
+        function ($scope, stompSocket, connectToServer, queueService) {
 
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
