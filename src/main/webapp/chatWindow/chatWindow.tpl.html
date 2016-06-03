@@ -3,8 +3,7 @@
         <div class="col-lg-4 col-md-4 col-sm-10 col-xs-8" style="padding-right: 0px">
             <h4 class="panel-title">{{chatName}}</h4>
         </div>
-        <div class="col-lg-6 col-md-6 hidden-sm hidden-xs" style="padding-right: 0px" ng-hide="pro">
-        </div>
+        <div class="col-lg-6 col-md-6 hidden-sm hidden-xs" style="padding-right: 0px" ng-hide="pro"></div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4" ng-hide="pro">
             <button class="btn btn-danger center-block" type="button">Poistu</button>
         </div>
@@ -12,14 +11,14 @@
 
     <div class="panel-body chat-body" scroll-glue>
         <div ng-repeat="message in messages | orderBy:'time':false" class="message">
-            <div ng-include="'chatWindow/message.html'"></div>
+            <div ng-include="'chatWindow/message.tpl.html'"></div>
         </div>
     </div>
     <div class="panel-footer chat-footer">
         <form ng-submit="sendMessage()" name="messageForm">
             <div class="input-group">
                 <textarea ng-model="message" ng-enter="sendMessage();" rows="1" class="form-control chat-text"
-                          required autofocus name="messageArea"></textarea>
+                          required focus-if name="messageArea"></textarea>
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="button"><span
                             class="glyphicon glyphicon-file"></span></button>

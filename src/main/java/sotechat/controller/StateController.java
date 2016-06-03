@@ -46,7 +46,6 @@ public class StateController {
     }
 
     /** Kun customerClient haluaa pyytää tilan (mm. sivun latauksen yhteydessä).
-     * TODO: Selvitä, miksi myös hoitajalta tulee /userState pyyntöjä välillä.
      * @param req täältä päästään session-olioon käsiksi.
      * @return mitä vastataan customerClientin tilanpäivityspyyntöön.
      * @throws Exception mikä poikkeus

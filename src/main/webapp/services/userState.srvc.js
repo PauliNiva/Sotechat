@@ -1,5 +1,5 @@
 angular.module('chatApp')
-    .factory('queueService', ['$http', function ($http) {
+    .factory('userStateService', ['$http', function ($http) {
         var channelID;
         var userName;
         var userID;
@@ -34,12 +34,12 @@ angular.module('chatApp')
         };
 
         function getUserState() {
-            if (userState === 'pool') {
-                return 'pool/userInPool.tpl.html'
+            if (userState === 'queue') {
+                return 'queue/userInQueue.tpl.html'
             } else if (userState === 'chat') {
                 return 'chatWindow/userInChat.tpl.html'
             } else {
-                return 'pool/userToPool.tpl.html';
+                return 'queue/userToQueue.tpl.html';
             }
         };
 

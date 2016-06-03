@@ -1,15 +1,13 @@
 angular.module('chatApp')
-    .controller('userInPoolCtrl', ['$http', '$scope', '$location', 'queueService', 'connectToServer', '$timeout',
-        function ($http, $scope, $location, queueService, connectToServer, $timeout) {
+    .controller('userInQueueCtrl', ['$http', '$scope', 'userStateService', 'connectToServer', '$timeout',
+        function ($http, $scope, userStateService, connectToServer, $timeout) {
+            var QUEUEADDRESS = '/toClient/queue/';
             var subscribeToQueue;
             $timeout(function () {
-                queueService.setUserState('chat');
+                userStateService.setUserState('chat');
                 subscribeToQueue.unsubscribe();
                 $scope.updateState();
             }, 3000);  // test only
-
-            
-            var QUEUEADDRESS = '/toClient/queue/';
 
             var onMessage = function (response) {
                 var parsed = JSON.parse(response.body);
@@ -20,14 +18,13 @@ angular.module('chatApp')
             };
 
             var onConnection = function () {
-                subscribeToQueue = connectToServer.subscribe(QUEUEADDRESS + queueService.getChannelID(), onMessage);
+                subscribeToQueue = connectToServer.subscribe(QUEUEADDRESS + userStateService.getChannelID(), onMessage);
             };
 
             var init = function () {
-                connectToServer.connect(queueService.getChannelID(), onConnection);
+                connectToServer.connect(onConnection);
             };
 
             init();
-
 
         }]);

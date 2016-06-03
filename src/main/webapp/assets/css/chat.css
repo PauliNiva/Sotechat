@@ -102,3 +102,31 @@ html, body {
     height: 100%;
     padding: 0px;
 }
+
+.ng-isolate-scope,
+.tab-pane,
+.tab-content {
+    height: 100%;
+}
+
+.chat-animation.ng-enter,
+.chat-animation.ng-leave {
+    -webkit-transition: 0.8s linear all;
+    -moz-transition: 0.8s linear all;
+    -o-transition: 0.8s linear all;
+    transition: 0.8s linear all;
+}
+.chat-animation.ng-enter {
+    z-index: 100;
+    opacity: 0;
+}
+.chat-animation.ng-enter.ng-enter-active {
+    opacity: 1;
+}
+.chat-animation.ng-leave {
+    z-index: 101;
+    opacity: 1;
+}
+.chat-animation.ng-leave.ng-leave-active {
+    opacity: 0;
+}

@@ -8,37 +8,29 @@
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
     <script src="assets/lib/angular.js"></script>
+    <script src="assets/lib/angular-animate.js"></script>
+    <script src="assets/lib/scrollglue.js"></script>
+    <script src="assets/lib/focusIf.min.js"></script>
     <script src="assets/lib/ui-bootstrap.js"></script>
 
     <script src="app.module.js"></script>
 
     <script src="user.ctrl.js"></script>
-    <script src="chatWindow/chatWindow.controller.js"></script>
-    <script src="chatWindow/chatWindow.directives.js"></script>
-    <script src="chatWindow/chatWindow.component.js"></script>
-    <script src="proControlPanel/proCP.controller.js"></script>
+    <script src="chatWindow/chatWindow.ctrl.js"></script>
+    <script src="chatWindow/chatWindow.drc.js"></script>
+    <script src="chatWindow/chatWindow.cpn.js"></script>
 
-    <script src="pool/userToPool.ctrl.js"></script>
-    <script src="pool/userInPool.ctrl.js"></script>
+    <script src="queue/userToQueue.ctrl.js"></script>
+    <script src="queue/userInQueue.ctrl.js"></script>
 
-    <script src="services/stomp.service.js"></script>
-    <script src="services/userState.service.js"></script>
-    <script src="services/connectToServer.service.js"></script>
-
-
-
-    <script src="assets/lib/scrollglue.js"></script>
+    <script src="services/stomp.srvc.js"></script>
+    <script src="services/userState.srvc.js"></script>
+    <script src="services/connectToServer.srvc.js"></script>
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/chat.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp">
-<div class="container app-container" ng-controller="userCtrl" ng-include="state">
-
-
-    <!--  <div class="" ng-include="'pool/userToPool.tpl.html'"></div>
-      <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>
-      <div class="container col-sm-4 hidden-xs info-container" ng-include="'chatWindow/chatInfo.html'"></div>-->
-   </div>
-   </body>
-   </html>
+<div class="container app-container chat-animation" ng-controller="userCtrl" ng-include="state"></div>
+</body>
+</html>

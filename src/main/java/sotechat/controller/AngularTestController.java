@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /** Forward for /pro.
+ * TODO: Refactor Controller name
  */
 @Controller
 public class AngularTestController {

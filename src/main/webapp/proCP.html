@@ -4,25 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1, user-scalable=no">
     <title>Sosiaali ja terveys chat</title>
-    <script src="assets/lib/jquery-1.12.3.min.js"></script>
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
     <script src="assets/lib/angular.js"></script>
+    <script src="assets/lib/angular-animate.js"></script>
+    <script src="assets/lib/scrollglue.js"></script>
+    <script src="assets/lib/focusIf.min.js"></script>
     <script src="assets/lib/ui-bootstrap.js"></script>
 
     <script src="app.module.js"></script>
 
-    <script src="chatWindow/chatWindow.controller.js"></script>
-    <script src="chatWindow/chatWindow.directives.js"></script>
-    <script src="chatWindow/chatWindow.component.js"></script>
+    <script src="chatWindow/chatWindow.drc.js"></script>
+    <script src="chatWindow/chatWindow.cpn.js"></script>
+    <script src="chatWindow/proChatWindow.ctrl.js"></script>
 
-    <script src="proControlPanel/proCP.controller.js"></script>
+    <script src="proControlPanel/proCP.ctrl.js"></script>
 
-    <script src="services/stomp.service.js"></script>
-    <script src="services/userState.service.js"></script>
-    <script src="services/connectToServer.service.js"></script>
-
-    <script src="assets/lib/scrollglue.js"></script>
+    <script src="services/stomp.srvc.js"></script>
+    <script src="services/proState.srvc.js"></script>
+    <script src="services/connectToServer.srvc.js"></script>
 
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/chat.css" rel="stylesheet">

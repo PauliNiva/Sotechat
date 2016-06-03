@@ -158,7 +158,7 @@ public class StateService {
         String channelId = get(session, "channelId");
         String category = get(session, "category");
         queueService.addToQueue(channelId, category, username);
-        session.setAttribute("state", "pool");
+        session.setAttribute("state", "queue");
         /** JSON-muodossa, jotta AngularJS osaa ohjata success-metodille. */
         return "{\"content\":\"OK, please request new state now.\"}";
     }

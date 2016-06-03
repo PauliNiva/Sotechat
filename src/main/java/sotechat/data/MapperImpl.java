@@ -38,7 +38,7 @@ public class MapperImpl implements Mapper {
         this.professionalIDs = new HashSet<>();
 
         /** Kovakoodataan yksi hoitaja devausvaiheessa. */
-        mapUsernameToId("666", "hoitaja");
+        mapUsernameToId("666", "Hoitaja");
         professionalIDs.add("666");
     }
 

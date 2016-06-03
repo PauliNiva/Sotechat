@@ -1,14 +1,14 @@
 angular.module('chatApp')
-    .controller('userCtrl', ['$scope', 'queueService',
-        function ($scope, queueService) {
+    .controller('userCtrl', ['$scope', 'userStateService',
+        function ($scope, userStateService) {
             $scope.pro = false;
-            queueService.getVariablesFormServer().then(function (response) {
-                queueService.setAllVariables(response);
-                $scope.state = queueService.getUserState();
+            userStateService.getVariablesFormServer().then(function (response) {
+                userStateService.setAllVariables(response);
+                $scope.state = userStateService.getUserState();
             });
 
-            $scope.updateState = function() {
-                $scope.state = queueService.getUserState();
+            $scope.updateState = function () {
+                $scope.state = userStateService.getUserState();
             };
         }]);
         

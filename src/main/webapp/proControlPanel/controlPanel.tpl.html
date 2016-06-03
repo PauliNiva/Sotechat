@@ -11,38 +11,39 @@
                         <span style="width: 74px;" class="bootstrap-switch-label">&nbsp;</span>
                         <input id="switch-handleWidth" data-handle-width="100" type="checkbox">
                     </div>
-
                 </div>
                 <button type="button" class="btn"><span class="glyphicon glyphicon-cog"></span></button>
             </div>
         </div>
     </div>
-    <div class="row" style="margin-top: 4px" ng-include="'pool/poolProCP.tpl.html'"></div>
+    <div class="row" style="margin-top: 4px" ng-include="'queue/queueProCP.tpl.html'"></div>
 </div>
 </div>
-<div class="col-lg-9 col-md-9 chat-container ">
+<div class="col-lg-9 col-md-9 chat-container">
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
-
             <uib-tabset active="active">
-                <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" >
-            <div class="col-lg-9 col-md-9 proContainer">
-                <chat-Window-Component></chat-Window-Component>
-            </div>
-            <div class="col-lg-3 col-md-3">
-                <div class="panel panel-default">
-                    <div class="row">
-                        <div class="form-group">
-                            <button type="button" class="btn btn-block btn-primary proButton">Pyydä tunnistautumista
-                            </button>
-                            <button type="button" class="btn btn-block btn-primary proButton">Kutsu toinen</button>
-                            <button type="button" class="btn btn-block btn-danger proButton">Lopeta keskustelu</button>
+                <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" classes="chat-container">
+                    <div class="col-lg-9 col-md-9 proContainer">
+                        <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>
+                    </div>
+                    <div class="col-lg-3 col-md-3">
+                        <div class="panel panel-default">
+                            <div class="row">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-block btn-primary proButton">Pyydä
+                                        tunnistautumista
+                                    </button>
+                                    <button type="button" class="btn btn-block btn-primary proButton">Kutsu toinen
+                                    </button>
+                                    <button type="button" class="btn btn-block btn-danger proButton">Lopeta keskustelu
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row" ng-include="'proPhrases/phrasePro.tpl.html'"></div>
                         </div>
                     </div>
-                    <div class="row" ng-include="'proPhrases/phrasePro.tpl.html'"></div>
-                </div>
-            </div>
-            </uib-tab>
+                </uib-tab>
             </uib-tabset>
         </div>
     </div>

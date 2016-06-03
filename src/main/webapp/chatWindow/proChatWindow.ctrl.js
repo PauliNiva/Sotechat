@@ -1,10 +1,6 @@
-// Kontrolleri päivittää tietoja molempiin suuntiin:
-// - Kun Serviceltä tulee viesti, kontrolleri päivittää selaimessa olevan näkymän.
-// - Kun halutaan lähettää viesti, välitetään se Servicelle.
-//
 angular.module('chatApp')
-    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'queueService',
-        function ($scope, stompSocket, connectToServer, queueService) {
+    .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
+        function ($scope, stompSocket, connectToServer, proStateService) {
             $scope.pro = $scope.$parent.pro;
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
@@ -12,15 +8,17 @@ angular.module('chatApp')
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             $scope.chatName = 'Esimerkki';
 
+            var channel = this.channel;
+
             /** Funktio lähettää servicen avulla tekstikentän
              *  sisällön ja lopuksi tyhjentää tekstikentän. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
-                    var destination = "/toServer/chat/" + queueService.getChannelID();
+                    var destination = "/toServer/chat/" + channel;
                     stompSocket.send(destination, {}, JSON.stringify(
                         {
-                            'userId': queueService.getUserID(),
-                            'channelId': queueService.getChannelID(),
+                            'userId': proStateService.getUserID(),
+                            'channelId': channel,
                             'content': $scope.message
                         }));
                     $scope.message = '';
@@ -34,25 +32,15 @@ angular.module('chatApp')
                 message.content = parsed.content;
                 message.time = parsed.timeStamp;
                 message.sender = parsed.userName;
-                message.I = message.sender === queueService.getUserName();
+                message.I = message.sender === proStateService.getUsername();
                 return message;
             };
 
             var subscribe = function () {
-                sub = connectToServer.subscribe('/toClient/chat/' + queueService.getChannelID(), function (response) {
+                sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
                     $scope.messages.push(getMessage(response.body));
                 });
-
             };
 
-            var init = function () {
-                connectToServer.connect(queueService.getChannelID(), subscribe);
-            };
-            
-            if ($scope.$parent.pro) {
-                subscribe();
-            } else {
-                init();
-            }
-
+            subscribe();
         }]);
