@@ -6,8 +6,6 @@ angular.module('chatApp')
     .controller('chatController', ['$scope', '$location', 'stompSocket', '$http', 'connectToServer', 'queueService',
         function ($scope, $location, stompSocket, $http, connectToServer, queueService) {
 
-            queueService.refreshState();
-            
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             var sub;
@@ -50,9 +48,6 @@ angular.module('chatApp')
             var init = function () {
                 connectToServer.connect(queueService.getChannelID(), subscribe);
             };
-
-            queueService.getVariablesFormServer().then(function (response) {
-                queueService.setAllVariables(response);
-                init();
-            });
+            
+            init();
         }]);

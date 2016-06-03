@@ -47,7 +47,13 @@ angular.module('chatApp')
         };
 
         function getUserState() {
-            return userState;
+            if (userState === 'pool') {
+                return 'pool/userInPool.tpl.html'
+            } else if (userState === 'chat') {
+                return 'chatWindow/userInChat.tpl.html'
+            } else {
+                return 'pool/userToPool.tpl.html';
+            }
         };
 
         function getVariablesFormServer() {

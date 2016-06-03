@@ -1,12 +1,14 @@
 angular.module('chatApp')
     .controller('userToPoolCtrl', ['$http', '$scope', '$location','queueService', function($http, $scope, $location, queueService) {
-
-        queueService.refreshState();
+        
 
         var JOINPOOLURL = '/joinPool';
         $scope.joinQueue = function() {
             var successJoinQueue = function(response) {
-                queueService.refreshState();
+                queueService.getVariablesFormServer().then(function (response) {
+                    queueService.setAllVariables(response);
+                    $scope.updateState();
+                });
             };
 
             var errorJoinQueue = function(response) {
@@ -15,7 +17,6 @@ angular.module('chatApp')
 
             $http.post(JOINPOOLURL, {'username' : $scope.userName, 'startMessage' : $scope.startMessage})
                .then(successJoinQueue, errorJoinQueue);
-
         };
 
     }]);

@@ -1,7 +1,7 @@
 angular.module('chatApp', ['luegg.directives', 'ngRoute']);
 
 angular.module('chatApp').config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
-    $locationProvider.html5Mode(true);
+   /** $locationProvider.html5Mode(true);
     $routeProvider.when('/', {
         templateUrl: 'pool/userToPool.tpl.html', controller: 'userToPoolCtrl'
     }).when('/inQueue', {
@@ -10,7 +10,7 @@ angular.module('chatApp').config(['$routeProvider', '$locationProvider', functio
         templateUrl: 'chatWindow/userInChat.tpl.html'
     }).otherwise({
         redirectTo: '/'
-    });
+    });*/
 }]);
 
 angular.module('chatApp').run(['$location', 'queueService', function ($location, queueService) {

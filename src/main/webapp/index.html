@@ -12,6 +12,7 @@
 
     <script src="app.module.js"></script>
 
+    <script src="user.ctrl.js"></script>
     <script src="chatWindow/chatWindow.controller.js"></script>
     <script src="chatWindow/chatWindow.directives.js"></script>
     <script src="proControlPanel/proCP.controller.js"></script>
@@ -31,8 +32,8 @@
     <link href="assets/css/chat.css" rel="stylesheet">
 </head>
 <body ng-app="chatApp">
-<div class="container chat-container" ng-view="">
-    <base href="/">
+<div class="container chat-container" ng-controller="userCtrl" ng-include="state">
+
 
     <!--  <div class="" ng-include="'pool/userToPool.tpl.html'"></div>
       <div class="container col-xs-12 col-sm-8 chat-container" ng-include="'chatWindow/chatWindow.html'"></div>

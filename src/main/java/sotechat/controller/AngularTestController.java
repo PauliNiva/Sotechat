@@ -12,8 +12,4 @@ public class AngularTestController {
         return "forward:/proCP.html";
     }
 
-    @RequestMapping(value ={"/chat", "/inQueue"})
-    public String redirect() {
-        return "forward:/";
-    }
 }
