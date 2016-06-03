@@ -22,7 +22,7 @@ import sotechat.UserStateResponse;
 import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
-/** Reititys tilaan liittyville HTML GET- ja POST-pyynnoille.
+/** Reititys tilaan liittyville pyynnöille (GET, POST, WS).
  */
 @RestController
 public class StateController {
@@ -91,7 +91,10 @@ public class StateController {
 
 
 
-    /** Toimenpiteet, kun hoitaja avaa jonosta chatin.
+    /** Hoitaja avaa jonosta chatin, JS-WebSocket lähettää jotain /queue/id/
+     *  -> Poistetaan jonosta olio
+     *  -> Broadcastataan jonon uusi tila hoitajille
+     *  -> Herätellään avatun kanavan osalliset (yksi jonottaja)
      * @param channelId channelId
      * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
      * @throws Exception mikä poikkeus

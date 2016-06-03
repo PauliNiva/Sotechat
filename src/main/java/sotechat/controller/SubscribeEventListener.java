@@ -65,10 +65,6 @@ public class SubscribeEventListener
                 .get("SPRING.SESSION.ID").toString();
 
         HttpSession session = sessionRepo.getHttpSession(sessionId);
-        if (session == null) {
-            System.out.println("!!! ERROR !!! Failed to retrieve session for ID " + sessionId);
-            return;
-        }
 
         String channelId = get(session, "channelId");
         System.out.println("Subscribing someone to " + channelId);
