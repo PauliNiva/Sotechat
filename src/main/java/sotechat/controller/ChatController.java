@@ -201,8 +201,9 @@ public class ChatController {
             final SimpMessageHeaderAccessor accessor,
             @DestinationVariable String channelId
     ) throws Exception {
-        //mapper.channelUpgrade(channelId);
-        System.out.println("CHANNEL ID: " + channelId);
+        //upgradeSubscribersToChat(channelId);
+        // TODO: Poista jonosta
+        System.out.println("Opening channel Id: " + channelId);
         return "{\"content\":\"channel activated. request new state now.\"}";
     }
 
