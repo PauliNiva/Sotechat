@@ -10,6 +10,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import sotechat.MsgToClient;
 import sotechat.MsgToServer;
 import sotechat.StateResponse;
 import sotechat.data.Mapper;
+import sotechat.data.SessionRepo;
 
 /** Controlleri, joka käsittelee serverin puolella
  * chat-liikenteen clienttien kanssa.
@@ -37,6 +40,7 @@ public class ChatController {
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
 
+    private final SessionRepo repository;
     /** SubScribeEventHandler. */
     private final ApplicationListener subscribeEventHandler;
 
@@ -49,7 +53,9 @@ public class ChatController {
     @Autowired
     public ChatController(
             final Mapper pMapper,
-            final ApplicationListener subscribeEventHandler) {
+            final ApplicationListener subscribeEventHandler,
+            final SessionRepo repository) {
+        this.repository = repository;
         this.mapper = pMapper;
         this.subscribeEventHandler = subscribeEventHandler;
     }
@@ -130,7 +136,7 @@ public class ChatController {
         String category = session.getAttribute("category").toString();
         String channel = session.getAttribute("channelId").toString();
         // TODO: Jos hoitaja -> lista channelId:tä ?
-
+        this.repository.mapHttpSessionToSessionId(session.getId(), session);
         /** Paketoidaan muuttujat StateResponseen, joka käännetään JSONiksi. */
         return new StateResponse(state, username, userId, category, channel);
     }
