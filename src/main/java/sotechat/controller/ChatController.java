@@ -5,6 +5,8 @@ import com.google.gson.JsonParser;
 import org.joda.time.DateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -35,6 +37,9 @@ public class ChatController {
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
 
+    /** SubScribeEventHandler. */
+    private final ApplicationListener subscribeEventHandler;
+
     /** Spring taikoo tässä Singleton-instanssin mapperista.
      *
      * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
@@ -42,8 +47,11 @@ public class ChatController {
      * käyttäjä-id:n perusteella.
      */
     @Autowired
-    public ChatController(final Mapper pMapper) {
+    public ChatController(
+            final Mapper pMapper,
+            final ApplicationListener subscribeEventHandler) {
         this.mapper = pMapper;
+        this.subscribeEventHandler = subscribeEventHandler;
     }
 
     /** Alla metodi, joka käsittelee /toServer/{channelIid}
@@ -65,6 +73,7 @@ public class ChatController {
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) throws Exception {
+
 
         /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
         String timeStamp = new DateTime().toString();
@@ -142,9 +151,8 @@ public class ChatController {
         /** Tehdään JSON-objekti clientin lähettämästä JSONista. */
         String jsonString = request.getReader().readLine();
         JsonParser parser = new JsonParser();
-        JsonObject json = parser.parse(jsonString).getAsJsonObject();
-
-        String username = json.get("username").toString();
+        JsonObject payload = parser.parse(jsonString).getAsJsonObject();
+        String username = payload.get("username").getAsString();
 
 
         System.out.println("     id(joinPool) = " + session.getId() + " , username = " + username);
@@ -158,6 +166,7 @@ public class ChatController {
         }
         if (false) {
             // TODO: validoi username.
+            /** Ei JSON-muodossa, jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to reserved username.";
         }
 
@@ -172,9 +181,29 @@ public class ChatController {
 
     }
 
-    public static String stateToString(HttpSession session) {
+    /** Palauttaa String-esityksen sessioon liitetystä tilasta. Voi olla "".
+     * @param session session
+     * @return tila Stringinä, nullin sijaan tyhjä Stringi.
+     */
+    public static String stateToString(final HttpSession session) {
         if (session == null) return "";
         return session.getAttribute("state").toString();
+    }
+
+    /** Kun hoitaja ottaa jonosta chatin, tänne pitäisi tulla signaali.
+     * @param accessor accessor
+     * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
+     * @throws Exception mikä poikkeus
+     */
+    @MessageMapping("/toServer/queue/{channelId}")
+    @SendTo("/toClient/queue/{channelId}")
+    public final String popClientFromQueue(
+            final SimpMessageHeaderAccessor accessor,
+            @DestinationVariable String channelId
+    ) throws Exception {
+        //mapper.channelUpgrade(channelId);
+        System.out.println("CHANNEL ID: " + channelId);
+        return "{\"content\":\"channel activated. request new state now.\"}";
     }
 
     /** Kun client menee sivulle index.html, tiedostoon upotettu
