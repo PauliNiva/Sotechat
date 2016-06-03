@@ -7,32 +7,40 @@ public class ProStateResponse {
 
     /** Tila ("start", "inpool", "chat"). */
     private String state;
+
     /** Julkinen käyttäjänimi. */
-    private String userName;
+    private String username;
+
     /** Salainen käyttäjäID. */
     private String userId;
-    /** Kategoria (esim. "mielenterveys"). */
-    private String category;
+
+    private String QBCC;
+
+    private String online;
+
     /** Salainen kanavaID. */
-    private String channelId;
+    private String channelIds;
 
     /** Konstruktori alustaa olion.
      * @param pState state
      * @param pUsername username
      * @param pUserId userId
-     * @param pCategory category
-     * @param pChannelId channelId
+     * @param pQBCC QBCC
+     * @param pOnline online
+     * @param pChannelIds channelId
      */
     public ProStateResponse(final String pState,
-                             final String pUsername,
-                             final String pUserId,
-                             final String pCategory,
-                             final String pChannelId) {
+                            final String pUsername,
+                            final String pUserId,
+                            final String pQBCC,
+                            final String pOnline,
+                            final String pChannelIds) {
         this.state = pState;
-        this.userName = pUsername;
+        this.username = pUsername;
         this.userId = pUserId;
-        this.category = pCategory;
-        this.channelId = pChannelId;
+        this.QBCC = pQBCC;
+        this.online = pOnline;
+        this.channelIds = pChannelIds;
     }
 
     /** Antaa tilan.
@@ -45,8 +53,8 @@ public class ProStateResponse {
     /** Palauttaa julkisen käyttäjänimen.
      * @return Palauttaa julkisen käyttäjänimen.
      */
-    public final String getUserName() {
-        return this.userName;
+    public final String getUsername() {
+        return this.username;
     }
 
     /** Palauttaa salaisen käyttäjäID:n.
@@ -59,14 +67,18 @@ public class ProStateResponse {
     /** Palauttaa kategorian, esim "mielenterveys".
      * @return Palauttaa kategorian.
      */
-    public final String getCategory() {
-        return this.category;
+    public final String getQBCC() {
+        return this.QBCC;
+    }
+
+    public final String getOnline() {
+        return this.online;
     }
 
     /** Palauttaa salaisen kanavaID:n.
      * @return Palauttaa salaisen kanavaID:n.
      */
-    public final String getChannelId() {
-        return this.channelId;
+    public final String getChannelIds() {
+        return this.channelIds;
     }
 }

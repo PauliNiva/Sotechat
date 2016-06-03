@@ -12,6 +12,7 @@ import sotechat.MsgToServer;
 import sotechat.data.Mapper;
 import sotechat.service.ChatMessageService;
 import sotechat.service.QueueService;
+import sotechat.data.SessionRepo;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */
@@ -20,8 +21,12 @@ public class ChatController {
 
     /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
     private final Mapper mapper;
+
     /** QueueService. */
     private final QueueService queueService;
+
+    /** Session Repository. */
+    private final SessionRepo repository;
 
     /** SubScribeEventHandler. */
     private final ApplicationListener subscribeEventListener;
@@ -31,18 +36,21 @@ public class ChatController {
      * @param pMapper Olio, johon talletetaan tiedot käyttäjien id:istä
      * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
      * käyttäjä-id:n perusteella.
-     * @param queueService queueService
-     * @param subscribeEventListener dfojfdoidfjo
+     * @param pQueueService queueService
+     * @param pSubscribeEventListener dfojfdoidfjo
+     * @param pRepository Session Repo.
      */
     @Autowired
     public ChatController(
             final Mapper pMapper,
-            final ApplicationListener subscribeEventListener,
-            final QueueService queueService
+            final ApplicationListener pSubscribeEventListener,
+            final QueueService pQueueService,
+            final SessionRepo pRepository
     ) {
+        this.repository = pRepository;
         this.mapper = pMapper;
-        this.subscribeEventListener = subscribeEventListener;
-        this.queueService = queueService;
+        this.subscribeEventListener = pSubscribeEventListener;
+        this.queueService = pQueueService;
     }
 
     /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,
@@ -71,7 +79,6 @@ public class ChatController {
                 mapper
         );
     }
-
 
 }
 
