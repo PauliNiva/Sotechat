@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import static sotechat.util.Utils.get;
 
-/** Used to keep track who is subscribed to which channel.
- *
+/** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
+ * ja pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
  */
 @Component
 public class SubscribeEventListener
@@ -33,14 +33,14 @@ public class SubscribeEventListener
     @Autowired
     private SessionRepo sessionRepo;
 
-    /** Constructor initiates singleton instance. */
+    /** Vain 1 instanssi. */
     public SubscribeEventListener() {
         map = new HashMap<String, List<HttpSession>>();
     }
 
 
-    /** Delegates jobs to proper handler methods.
-     * @param applicationEvent all application events routed through here.
+    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille metodeil.
+     * @param applicationEvent kaikki applikaatioEventit aktivoivat taman.
      */
     @Override
     public final void onApplicationEvent(
@@ -54,7 +54,7 @@ public class SubscribeEventListener
         }
     }
 
-    /** Handles subscribe events.
+    /** Kasittelee subscribe -tapahtumat.
      * @param event event
      */
     private void handleSubscribe(final SessionSubscribeEvent event) {
@@ -81,7 +81,7 @@ public class SubscribeEventListener
         list.add(session);
     }
 
-    /** Handles unsubscribe events.
+    /** Kasittelee unsubscribe -tapahtumat.
      * @param event event
      */
     private void handleUnsubscribe(final SessionUnsubscribeEvent event) {
