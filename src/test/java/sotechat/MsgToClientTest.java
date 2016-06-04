@@ -17,11 +17,11 @@ public class MsgToClientTest {
     }
 
     /**
-     * getUserName test.
+     * getUsername test.
      */
     @Test
-    public void getUserNameWorks() {
-        Assert.assertEquals("pniva", m2c.getUserName());
+    public void getUsernameWorks() {
+        Assert.assertEquals("pniva", m2c.getUsername());
     }
 
     /**

@@ -17,11 +17,11 @@ public class JoinResponseTest {
     }
 
     /**
-     * getUserName test.
+     * getUsername test.
      */
     @Test
-    public void getUserNameWorks() {
-        Assert.assertEquals("iluaP", this.response.getUserName());
+    public void getUsernameWorks() {
+        Assert.assertEquals("iluaP", this.response.getUsername());
     }
 
     /**

@@ -45,7 +45,7 @@ public class UserStateResponse {
     /** Palauttaa julkisen käyttäjänimen.
      * @return Palauttaa julkisen käyttäjänimen.
      */
-    public final String getUserName() {
+    public final String getUsername() {
         return this.username;
     }
 

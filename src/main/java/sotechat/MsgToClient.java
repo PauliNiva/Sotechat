@@ -21,14 +21,14 @@ public class MsgToClient {
     private String content;
 
     /** Konstruktori alustaa olion annetuilla parametreillä.
-     * @param pUserName username
+     * @param pUsername username
      * @param pChannelId channelId
      * @param pTimeStamp timeStamp
      * @param pContent content
      */
-    public MsgToClient(final String pUserName, final String pChannelId,
+    public MsgToClient(final String pUsername, final String pChannelId,
                        final String pTimeStamp, final String pContent) {
-        this.username = pUserName;
+        this.username = pUsername;
         this.channelId = pChannelId;
         this.timeStamp = pTimeStamp;
         this.content = pContent;
@@ -37,7 +37,7 @@ public class MsgToClient {
     /** Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
      * @return Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
      */
-    public final String getUserName() {
+    public final String getUsername() {
         return this.username;
     }
 

@@ -13,14 +13,14 @@ public class JoinResponse {
     private String channelId;
 
     /** Konstruktori alustaa olion.
-     * @param pUserName username
+     * @param pUsername username
      * @param pUserId userId
      * @param pChannelId channelId
      */
-    public JoinResponse(final String pUserName,
+    public JoinResponse(final String pUsername,
                         final String pUserId,
                         final String pChannelId) {
-        this.username = pUserName;
+        this.username = pUsername;
         this.userId = pUserId;
         this.channelId = pChannelId;
     }
@@ -28,7 +28,7 @@ public class JoinResponse {
     /** Palauttaa julkisen käyttäjänimen.
      * @return Palauttaa julkisen käyttäjänimen.
      */
-    public final String getUserName() {
+    public final String getUsername() {
         return this.username;
     }
 
