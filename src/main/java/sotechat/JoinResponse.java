@@ -6,7 +6,7 @@ package sotechat;
 public class JoinResponse {
 
     /** Julkinen käyttäjänimi. */
-    private String userName;
+    private String username;
     /** Salainen käyttäjäID. */
     private String userId;
     /** Salainen kanavaID. */
@@ -20,7 +20,7 @@ public class JoinResponse {
     public JoinResponse(final String pUserName,
                         final String pUserId,
                         final String pChannelId) {
-        this.userName = pUserName;
+        this.username = pUserName;
         this.userId = pUserId;
         this.channelId = pChannelId;
     }
@@ -29,7 +29,7 @@ public class JoinResponse {
      * @return Palauttaa julkisen käyttäjänimen.
      */
     public final String getUserName() {
-        return this.userName;
+        return this.username;
     }
 
     /** Palauttaa salaisen käyttäjäID:n.

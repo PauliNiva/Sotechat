@@ -48,7 +48,7 @@ angular.module('chatApp')
         };
 
         function setAllVariables(response) {
-            setUsername(response.data.userName);
+            setUsername(response.data.username);
             setChannelID(response.data.channelId);
             setUserID(response.data.userId);
             setUserState(response.data.state);

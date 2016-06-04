@@ -173,11 +173,15 @@ public class StateService {
     /** Getter.
      * @return QBCC.
      */
-    public String getQueueBroadcastChannel() {
+    public final String getQueueBroadcastChannel() {
         return QUEUE_BROADCAST_CHANNEL;
     }
 
-    public String getQueueAsJson() {
+    /**
+     * Getter.
+     * @return Queue as JSON
+     */
+    public final String getQueueAsJson() {
         return queueService.toString();
     }
 }

@@ -11,7 +11,7 @@ package sotechat;
 public class MsgToClient {
 
     /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
-    private String userName;
+    private String username;
     /** Salainen avain kanavan kuunteluun ja viestien lähettämiseen. */
     private String channelId;
     /** Serverin aika viestin saapumiselle
@@ -21,14 +21,14 @@ public class MsgToClient {
     private String content;
 
     /** Konstruktori alustaa olion annetuilla parametreillä.
-     * @param pUserName userName
+     * @param pUserName username
      * @param pChannelId channelId
      * @param pTimeStamp timeStamp
      * @param pContent content
      */
     public MsgToClient(final String pUserName, final String pChannelId,
                        final String pTimeStamp, final String pContent) {
-        this.userName = pUserName;
+        this.username = pUserName;
         this.channelId = pChannelId;
         this.timeStamp = pTimeStamp;
         this.content = pContent;
@@ -38,7 +38,7 @@ public class MsgToClient {
      * @return Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
      */
     public final String getUserName() {
-        return this.userName;
+        return this.username;
     }
 
     /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää.

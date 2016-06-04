@@ -8,7 +8,7 @@ public class UserStateResponse {
     /** Tila ("start", "inpool", "chat"). */
     private String state;
     /** Julkinen käyttäjänimi. */
-    private String userName;
+    private String username;
     /** Salainen käyttäjäID. */
     private String userId;
     /** Kategoria (esim. "mielenterveys"). */
@@ -29,7 +29,7 @@ public class UserStateResponse {
                              final String pCategory,
                              final String pChannelId) {
         this.state = pState;
-        this.userName = pUsername;
+        this.username = pUsername;
         this.userId = pUserId;
         this.category = pCategory;
         this.channelId = pChannelId;
@@ -46,7 +46,7 @@ public class UserStateResponse {
      * @return Palauttaa julkisen käyttäjänimen.
      */
     public final String getUserName() {
-        return this.userName;
+        return this.username;
     }
 
     /** Palauttaa salaisen käyttäjäID:n.

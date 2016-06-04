@@ -10,7 +10,7 @@ angular.module('chatApp')
             // Muuttujat joihin tallennetaan channelId ja user id
             var channelId;
             var userId;
-            var userName;
+            var username;
             // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
             this.chatName = 'Esimerkki';
 
@@ -35,8 +35,8 @@ angular.module('chatApp')
                 var message = [];
                 message.content = parsed.content;
                 message.time = parsed.timeStamp;
-                message.sender = parsed.userName;
-                message.I = message.sender === userName;
+                message.sender = parsed.username;
+                message.I = message.sender === username;
                 return message;
             }
 
@@ -45,7 +45,7 @@ angular.module('chatApp')
              *  Näin kerrotaan palvelimelle, että haluamme chattiin. */
             var joinToChat = function () {
                 $http.get("/join").then(function (response) {
-                    userName = response.data.userName;
+                    username = response.data.username;
                     channelId = response.data.channelId;
                     userId = response.data.userId;
                     initStompClient();

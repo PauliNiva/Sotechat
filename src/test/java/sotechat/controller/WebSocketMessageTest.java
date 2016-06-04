@@ -106,7 +106,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "676", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "Morko", true);
+        msgUtil.add("username", "Morko", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
         /**
          * Rakennetaan vielä edellä muodostetusta viestistä Message-olio,
@@ -133,7 +133,7 @@ public class WebSocketMessageTest {
 
         /**
          * Tarkistetaan, että vastauksena tullut JsonObject sisältää
-         * oikeat kentät, eli userName, timeStamp, content ja channelId,
+         * oikeat kentät, eli username, timeStamp, content ja channelId,
          * mutta ei userId:ta! Niiden kenttien, jotka MsgUtil-olion avulla
          * on aiemmin asetettu falseksi ei pitäisi löytyä jsonMessagesta.
          */
@@ -157,7 +157,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -187,7 +187,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -215,7 +215,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "243", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();

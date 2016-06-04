@@ -31,7 +31,7 @@ angular.module('chatApp')
                 var message = [];
                 message.content = parsed.content;
                 message.time = parsed.timeStamp;
-                message.sender = parsed.userName;
+                message.sender = parsed.username;
                 message.I = message.sender === proStateService.getUsername();
                 return message;
             };
