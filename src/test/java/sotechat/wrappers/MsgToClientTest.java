@@ -1,8 +1,9 @@
-package sotechat;
+package sotechat.wrappers;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
+import sotechat.wrappers.MsgToClient;
 
 public class MsgToClientTest {
 

@@ -6,8 +6,8 @@ import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
-import sotechat.ProStateResponse;
-import sotechat.UserStateResponse;
+import sotechat.wrappers.ProStateResponse;
+import sotechat.wrappers.UserStateResponse;
 import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
 

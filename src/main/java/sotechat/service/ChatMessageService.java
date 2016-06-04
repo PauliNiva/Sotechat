@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
-import sotechat.MsgToClient;
-import sotechat.MsgToServer;
+import sotechat.wrappers.MsgToClient;
+import sotechat.wrappers.MsgToServer;
 import sotechat.data.Mapper;
 
 /**

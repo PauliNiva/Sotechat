@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 // polun /login mäppäys
                 // löytyy tiedostosta MvcConfig
-                .loginPage("/login")
+                .loginPage("/login.html")
                 // pääsy login-sivulle
                 // sallitaan kaikille
                 .permitAll()

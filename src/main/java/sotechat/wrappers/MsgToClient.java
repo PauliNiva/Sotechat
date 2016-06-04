@@ -1,4 +1,4 @@
-package sotechat;
+package sotechat.wrappers;
 
 /** Palvelimen asiakasohjelmalle lähettämä viesti on talletettu
  * MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon

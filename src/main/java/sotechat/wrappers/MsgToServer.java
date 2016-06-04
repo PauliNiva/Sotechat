@@ -1,4 +1,4 @@
-package sotechat;
+package sotechat.wrappers;
 
 /** Asiakasohjelman palvelimelle lähettämä viesti paketoidaan MsgToServer-olion
  * sisälle, ennen kuin palvelimen ChatController-luokka voi käsitellä sitä.

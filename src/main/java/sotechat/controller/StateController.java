@@ -1,25 +1,17 @@
 package sotechat.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
-import sotechat.JoinResponse;
-import sotechat.ProStateResponse;
-import sotechat.UserStateResponse;
-import sotechat.data.SessionRepo;
+import sotechat.wrappers.ProStateResponse;
+import sotechat.wrappers.UserStateResponse;
 import sotechat.service.StateService;
 
 /** Reititys tilaan liittyville pyynnöille (GET, POST, WS).
@@ -91,9 +83,11 @@ public class StateController {
 
 
     /** Hoitaja avaa jonosta chatin, JS-WebSocket lähettää jotain /queue/id/
+     *  Tämä metodi aktivoituu, kun kyseinen signaali saapuu palvelimelle.
+     *  Toimenpiteet mitä tehdään:
      *  -> Poistetaan jonosta olio
      *  -> Broadcastataan jonon uusi tila hoitajille
-     *  -> Herätellään avatun kanavan osalliset (yksi jonottaja)
+     *  -> Herätellään avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
      * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
      * @throws Exception mikä poikkeus
