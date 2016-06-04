@@ -5,6 +5,7 @@ angular.module('chatApp')
         var username;
         var userID;
         var online;
+        var qbcc;
 
         function addChannelID(value) {
             channelIDs.push(value);
@@ -22,8 +23,16 @@ angular.module('chatApp')
             online = value;
         };
 
+        function setQueueBroadcastChannel(value) {
+            qbcc = value;
+        };
+
         function getOnline() {
             return online;
+        };
+
+        function getQueueBroadcastChannel() {
+            return qbcc;
         };
 
         function getChannelIDs() {
@@ -39,7 +48,7 @@ angular.module('chatApp')
         };
 
         function addAllChannels(values) {
-            addChannelID(values);
+            channelIDs = JSON.parse(values);
         };
 
         function getVariablesFormServer() {
@@ -50,12 +59,14 @@ angular.module('chatApp')
             setUsername(response.data.username);
             addAllChannels(response.data.channelIds);
             setUserID(response.data.userId);
+            setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
         };
 
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
             setAllVariables: setAllVariables,
+            getQueueBroadcastChannel: getQueueBroadcastChannel,
             getChannelIDs: getChannelIDs,
             getUsername: getUsername,
             getUserID: getUserID,

@@ -14,7 +14,6 @@ angular.module('chatApp')
                     status = true;
                     answer();
                 }, function (error) {
-
                     status = false;
                 });
             } else {

@@ -5,8 +5,11 @@ angular.module('chatApp')
         $scope.chats = [];
 
         var answer = function () {
+            connectToServer.subscribe(proStateService.getQueueBroadcastChannel());
+            $scope.username = proStateService.getUsername();
             var i = 1;
-            angular.forEach(JSON.parse(proStateService.getChannelIDs()), function (key) {
+            console.log(proStateService.getChannelIDs());
+            angular.forEach(proStateService.getChannelIDs(), function (key) {
                 $scope.chats.push({title: 'Chat' + i, channel: key});
                 i++;
             });
