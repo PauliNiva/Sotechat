@@ -1,7 +1,7 @@
 angular.module('chatApp')
     .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
         function ($scope, stompSocket, connectToServer, proStateService) {
-            $scope.pro = $scope.$parent.pro;
+            $scope.pro = true;
             // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
             $scope.messages = [];
             var sub;

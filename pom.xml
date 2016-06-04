@@ -280,7 +280,8 @@
                         <include>src/main/webapp/assets/lib/*.js</include>
                         <include>src/main/webapp/chatWindow/*.js</include>
                     </sourceIncludes>
-                    <jsTestSrcDir>${project.basedir}/src/test/webapp/chatWindow/</jsTestSrcDir>
+                    <jsTestSrcDir>${project.basedir}/src/test/webapp/</jsTestSrcDir>
+
                     <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
                     <phantomjs>
                         <version>2.1.1</version>

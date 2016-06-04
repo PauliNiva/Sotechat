@@ -1,10 +1,11 @@
 "use strict";
 describe("ChatController", function() {
     var scope, ctrl, httpBackend, form, element;
-    var stompSocket;
+    var stompSocket, connectToServer;
 
     beforeEach(function() {
         stompSocket = jasmine.createSpyObj('stompSocket', ['joinToChat', 'connect', 'send']);
+        connectToServer = jasmine.createSpyObj('connectToServer', ['subscribe', 'connect']);
         module('chatApp');
         inject(function ($rootScope, $controller, $compile, $httpBackend, $http) {
              element = angular.element(
@@ -24,7 +25,8 @@ describe("ChatController", function() {
             ctrl = $controller('chatController', {
                 $scope: scope,
                 $http: $http,
-                stompSocket: stompSocket
+                stompSocket: stompSocket,
+                connectToServer:connectToServer
             });
             $compile(element)(scope);
             scope.$digest();
@@ -33,6 +35,10 @@ describe("ChatController", function() {
 
     it('Messages empty at te begining', function() {
         expect(scope.messages).toEqual([]);
+    });
+
+    it('User chatController pro varianle is false', function() {
+        expect(scope.pro).toEqual(false);
     });
 
     it("Can't sent empty message", function() {

@@ -33,8 +33,8 @@ angular.module('chatApp')
                 var message = [];
                 message.content = parsed.content;
                 message.time = parsed.timeStamp;
-                message.sender = parsed.userName;
-                message.I = message.sender === userStateService.getUserName();
+                message.sender = parsed.username;
+                message.I = message.sender === userStateService.getUsername();
                 return message;
             };
 
