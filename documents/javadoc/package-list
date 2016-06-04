@@ -1,1 +1,11 @@
+<<<<<<< HEAD
 sotechat.queue
+=======
+sotechat
+sotechat.config
+sotechat.controller
+sotechat.data
+sotechat.domain
+sotechat.util
+sotechat.websocket
+>>>>>>> bc5f70ca0e25778878547a29169662c7e036deef

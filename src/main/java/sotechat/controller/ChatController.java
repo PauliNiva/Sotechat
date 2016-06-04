@@ -1,18 +1,14 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.MsgToClient;
 import sotechat.MsgToServer;
-import sotechat.data.Mapper;
 import sotechat.service.ChatMessageService;
-import sotechat.service.QueueService;
-import sotechat.data.SessionRepo;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */
@@ -60,4 +56,3 @@ public class ChatController {
     }
 
 }
-

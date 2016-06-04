@@ -19,7 +19,7 @@ scenario "user can see a message that has been sent to the server", {
                 button.submit()
         }
         then 'the message appears in the chat window', {
-                Thread.sleep(1000)
+                Thread.sleep(2000)
                 element = driver.findElement(By.name("messageArea"))
                 element.getText().equals("")shouldBe true
                 driver.getPageSource().contains("I want to send this message").shouldBe true

@@ -37,7 +37,7 @@ scenario "a professional can't see a control panel for chat when not logged in",
         then 'control panel is not visible to the user', {
             driver.getCurrentUrl().shouldEqual "http://localhost:8080/login?error"
             page = driver.getPageSource()
-            page.contains("Väärä käyttäjätunnus tai salasana.").shouldBe true
+            page.contains("tunnus tai salasana.").shouldBe true
             driver.quit()
         }
 }

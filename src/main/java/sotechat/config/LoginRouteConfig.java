@@ -10,7 +10,9 @@ import org.springframework.web.servlet.config.annotation
  *  määritellä login-resurssin löytymistä webapp
  *  -kansiosta ei toiminut.)
  *  (TODO: Selkeämpi mäppäys (myös index.html,
- *  *  joka löytyy nyt jotenkin maagisesti). */
+ *  *  joka löytyy nyt jotenkin maagisesti).
+ *  TODO: Tämä luokka routtaa urleja, joten kuuluisiko se controller-pakettiin?
+ *  */
 @Configuration
 public class LoginRouteConfig extends WebMvcConfigurerAdapter {
 
