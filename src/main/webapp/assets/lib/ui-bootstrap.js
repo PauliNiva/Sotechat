@@ -2681,7 +2681,7 @@ function($scope, $element, $attrs, $compile, $log, $parse, $window, $document, $
 
     if (!isHtml5DateInput) {
       // Internal API to maintain the correct ng-invalid-[key] class
-      ngModel.$$parserName = 'date';
+      ngModel.$$parsername = 'date';
       ngModel.$validators.date = validator;
       ngModel.$parsers.unshift(parseDate);
       ngModel.$formatters.push(function(value) {

@@ -23284,7 +23284,7 @@ function createDateInputType(type, regexp, parseDate, format) {
     var timezone = ctrl && ctrl.$options && ctrl.$options.timezone;
     var previousDate;
 
-    ctrl.$$parserName = type;
+    ctrl.$$parsername = type;
     ctrl.$parsers.push(function(value) {
       if (ctrl.$isEmpty(value)) return null;
       if (regexp.test(value)) {
@@ -23364,7 +23364,7 @@ function numberInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   badInputChecker(scope, element, attr, ctrl);
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
 
-  ctrl.$$parserName = 'number';
+  ctrl.$$parsername = 'number';
   ctrl.$parsers.push(function(value) {
     if (ctrl.$isEmpty(value))      return null;
     if (NUMBER_REGEXP.test(value)) return parseFloat(value);
@@ -23420,7 +23420,7 @@ function urlInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
   stringBasedInputType(ctrl);
 
-  ctrl.$$parserName = 'url';
+  ctrl.$$parsername = 'url';
   ctrl.$validators.url = function(modelValue, viewValue) {
     var value = modelValue || viewValue;
     return ctrl.$isEmpty(value) || URL_REGEXP.test(value);
@@ -23433,7 +23433,7 @@ function emailInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
   stringBasedInputType(ctrl);
 
-  ctrl.$$parserName = 'email';
+  ctrl.$$parsername = 'email';
   ctrl.$validators.email = function(modelValue, viewValue) {
     var value = modelValue || viewValue;
     return ctrl.$isEmpty(value) || EMAIL_REGEXP.test(value);
@@ -26663,7 +26663,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
     processAsyncValidators();
 
     function processParseErrors() {
-      var errorKey = ctrl.$$parserName || 'parse';
+      var errorKey = ctrl.$$parsername || 'parse';
       if (isUndefined(parserValid)) {
         setValidity(errorKey, null);
       } else {
@@ -26675,7 +26675,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
             setValidity(name, null);
           });
         }
-        // Set the parse error last, to prevent unsetting it, should a $validators key == parserName
+        // Set the parse error last, to prevent unsetting it, should a $validators key == parsername
         setValidity(errorKey, parserValid);
         return parserValid;
       }
