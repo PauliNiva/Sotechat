@@ -5,10 +5,11 @@ angular.module('chatApp')
         $scope.chats = [];
 
         var answer = function () {
-            angular.forEach(proStateService.getChannelIDs(), function (key) {
-                $scope.chats.push({title: 'Chat1', channel: key});
+            var i = 1;
+            angular.forEach(JSON.parse(proStateService.getChannelIDs()), function (key) {
+                $scope.chats.push({title: 'Chat' + i, channel: key});
+                i++;
             });
-
         };
 
         var init = function () {
