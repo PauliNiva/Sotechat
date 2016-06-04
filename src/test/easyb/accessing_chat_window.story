@@ -8,7 +8,7 @@ scenario "User can open a chat window", {
             driver = new FirefoxDriver()
         }
         when 'a link is clicked', {
-            driver.get("http://localhost:8443")
+            driver.get("http://localhost:8080")
         }
         then 'a chat window is opened', {
             page = driver.getPageSource()
