@@ -116,6 +116,8 @@ public class StateService {
         String channelIds = get(session, "channelIds");
         /** Note: ammattilaisella kaikki attribuutit relevantteja aina. */
 
+        System.out.println("Hoitajan kanavat: " + channelIds);
+
         /** Paketoidaan muuttujat StateResponseen, joka käännetään JSONiksi. */
         return new ProStateResponse(
                 state, username, userId, qbcc, online, channelIds);
@@ -141,12 +143,12 @@ public class StateService {
         System.out.println("     id(joinPool) = " + session.getId() + " , username = " + username);
 
         if (!get(session, "state").equals("start")) {
-            /** Ei JSON-muodossa, jotta AngularJS osaa ohjata fail-metodille. */
+            /** String (ei JSON), jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to bad state.";
         }
         if (false) {
             // TODO: validoi username.
-            /** Ei JSON-muodossa, jotta AngularJS osaa ohjata fail-metodille. */
+            /** String (ei JSON), jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to reserved username.";
         }
 

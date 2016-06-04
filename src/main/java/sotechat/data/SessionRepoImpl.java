@@ -59,7 +59,7 @@ public class SessionRepoImpl extends MapSessionRepository
             userId = mapperService.getIdFromRegisteredName(username.toString());
             session.setAttribute("state", "notRelevantForProfessional");
             session.setAttribute("category", "notRelevantForProfessional");
-            session.setAttribute("channelIds", "DEV_CHANNEL"); // TODO
+            session.setAttribute("channelIds", "[\"Autot\", \"Mopot\"]"); // TODO
         } else if (get(session, "username").isEmpty()) {
             /* Uusi käyttäjä */
             username = "Anon";

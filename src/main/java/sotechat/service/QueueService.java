@@ -70,7 +70,7 @@ public class QueueService {
      */
     public final String firstOfQueue() {
         try {
-            QueueItem first = queue.getFirst();
+            QueueItem first = queue.pollFirst();
             return jsonObject(first);
         } catch (Exception e){
             return "";

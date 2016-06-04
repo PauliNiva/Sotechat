@@ -42,12 +42,12 @@ public class QueueImpl implements Queue {
     }
 
     /**
-     * getFirst -metodi poistaa ja palauttaa jonon ensimmäisen QueueItemin.
+     * pollFirst -metodi poistaa ja palauttaa jonon ensimmäisen QueueItemin.
      * Jos jono on tyhjä palautetaan null.
      * @return jonon ensimmäinen QueueItem tai null, jos jono on tyhjä.
      */
     @Override
-    public final synchronized QueueItem getFirst() {
+    public final synchronized QueueItem pollFirst() {
 
         return this.queue.pollFirst();
     }

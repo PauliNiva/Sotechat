@@ -23,7 +23,7 @@ public interface Queue {
      * metodi palauttaa jonon ensimmäisen alkion
      * @return jonon ensimmäinen alkio
      */
-    QueueItem getFirst();
+    QueueItem pollFirst();
 
     /**
      * metodi palauttaa kategorian ensimmäisen alkion jonossa
