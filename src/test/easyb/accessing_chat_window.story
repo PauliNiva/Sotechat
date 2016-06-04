@@ -3,7 +3,7 @@ import org.openqa.selenium.firefox.FirefoxDriver
 
 description 'As a user I want to access a chat window'
 
-scenario "User can open a chat window", {
+scenario "User can open the page", {
         given 'User is on a right page', {
             driver = new FirefoxDriver()
         }
@@ -12,10 +12,8 @@ scenario "User can open a chat window", {
         }
         then 'a chat window is opened', {
             page = driver.getPageSource()
-            page.contains("panel panel-default chat-panel").shouldBe true
-            page.contains("chatController as chat").shouldBe true
-            page.contains("panel-body chat-body").shouldBe true
+            page.contains("Aloitusviesti").shouldBe true
+            page.contains("Nimimerkki").shouldBe true
             driver.quit()
         }
 }
-

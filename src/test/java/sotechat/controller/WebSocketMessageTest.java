@@ -45,7 +45,8 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Testit WebSocket-viestien lähetykselle
+ * Testit chattiin kirjoitettujen viestien käsittelyyn ja kuljetukseen.
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {

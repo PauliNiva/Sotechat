@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration
 
 /** Tämä konfiguraatiotiedosto ottaa Spring Securityn käyttöön
  *  yhdessä joidenkin pom.xml -määrityksien kanssa. */
-
-
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
