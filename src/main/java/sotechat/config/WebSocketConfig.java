@@ -13,10 +13,10 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.SessionRepoImpl;
 
 
-/** Palvelin käsittelee kahta erityyppistä liikennettä: HTML ja WebSockets.
- * Tämä konfiguraatioluokka koskee WebSocket-liikenteen käsittelyä.
- * Ilmeisesti tässä määritellään polut, joihin tulevat/menevät viestit
- * käsitellään - ja muihin polkuihin menevät viestit unohdetaan. */
+/** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
+ * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
+ * Ilmeisesti tassa maaritellaan polut, joihin tulevat/menevat viestit
+ * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan. */
 @Configuration
 @EnableScheduling
 @EnableWebSocketMessageBroker
@@ -30,11 +30,11 @@ public class WebSocketConfig extends
     private SessionRepoImpl repository;
 
 
-    /** Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
-     * välittääkseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
+    /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
+     * valittaakseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
      * Palvelimen viestit tulevat ChatController-luokalta.
      *
-     * @param conf Välittäjäolio, joka välittää viestit WebSocketin kautta
+     * @param conf Valittajaolio, joka valittaa viestit WebSocketin kautta
      *               palvelimen ChatController-luokalta asiakasohjelmalle.
      */
     @Override
@@ -42,13 +42,13 @@ public class WebSocketConfig extends
         conf.enableSimpleBroker("/toClient");
     }
 
-    /** Metodi käyttää StompEndpointRegistry-luokan metodia addEndpoint
-     * määrittääkseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
-     * pääteosoitteen. Tässä ohjelmassa viestit ohjautuvat
+    /** Metodi kayttaa StompEndpointRegistry-luokan metodia addEndpoint
+     * maarittaakseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
+     * paateosoitteen. Tassa ohjelmassa viestit ohjautuvat
      * ChatController-luokalle.
      *
-     * @param reg Luokka, joka määrittää WebSocketin kautta tulleille
-     *                 asiakasohjelmien viesteille pääteosoitteen.
+     * @param reg Luokka, joka maarittaa WebSocketin kautta tulleille
+     *                 asiakasohjelmien viesteille paateosoitteen.
      */
     @Override
     public final void configureStompEndpoints(final StompEndpointRegistry reg) {

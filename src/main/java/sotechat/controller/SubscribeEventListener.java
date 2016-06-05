@@ -38,6 +38,14 @@ public class SubscribeEventListener
         map = new HashMap<String, List<HttpSession>>();
     }
 
+    public List<HttpSession> getSubscribers(String channelId) {
+        List<HttpSession> subs = map.get(channelId);
+        if (subs == null) {
+            subs = new ArrayList<HttpSession>();
+        }
+        return subs;
+    }
+
 
     /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille metodeil.
      * @param applicationEvent kaikki applikaatioEventit aktivoivat taman.

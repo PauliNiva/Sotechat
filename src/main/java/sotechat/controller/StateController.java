@@ -14,7 +14,7 @@ import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
 import sotechat.service.StateService;
 
-/** Reititys tilaan liittyville pyynnöille (GET, POST, WS).
+/** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
 @RestController
 public class StateController {
@@ -26,7 +26,7 @@ public class StateController {
     private SimpMessagingTemplate brokerMessagingTemplate;
 
 
-    /** Spring taikoo tässä Singleton-instanssit palveluista.
+    /** Spring taikoo tassa Singleton-instanssit palveluista.
      *
      * @param pStateService ssdofofsd
      */
@@ -37,10 +37,10 @@ public class StateController {
         this.stateService = pStateService;
     }
 
-    /** Kun customerClient haluaa pyytää tilan (mm. sivun latauksen yhteydessä).
-     * @param req täältä päästään session-olioon käsiksi.
-     * @return mitä vastataan customerClientin tilanpäivityspyyntöön.
-     * @throws Exception mikä poikkeus
+    /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
+     * @param req taalta paastaan session-olioon kasiksi.
+     * @return mita vastataan customerClientin tilanpaivityspyyntoon.
+     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
@@ -51,11 +51,11 @@ public class StateController {
         return stateService.respondToUserStateRequest(req, professional);
     }
 
-    /** Kun proClient haluaa pyytää tilan (mm. sivun lataus).
-     * @param req täältä päästään session-olioon käsiksi.
+    /** Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
+     * @param req taalta paastaan session-olioon kasiksi.
      * @param professional kirjautumistiedot
-     * @return mitä vastataan proClientin tilanpäivityspyyntöön.
-     * @throws Exception mikä poikkeus
+     * @return mita vastataan proClientin tilanpaivityspyyntoon.
+     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/proState", method = RequestMethod.GET)
     public final ProStateResponse returnProStateResponse(
@@ -67,10 +67,10 @@ public class StateController {
     }
 
 
-    /** Kun client lähettää avausviestin ja haluaa liittyä pooliin.
+    /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
      * @param request request
-     * @return mitä vastataan clientille
-     * @throws Exception mikä poikkeus
+     * @return mita vastataan clientille
+     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
     public final String respondToJoinPoolRequest(
@@ -82,15 +82,15 @@ public class StateController {
 
 
 
-    /** Hoitaja avaa jonosta chatin, JS-WebSocket lähettää jotain /queue/id/
-     *  Tämä metodi aktivoituu, kun kyseinen signaali saapuu palvelimelle.
-     *  Toimenpiteet mitä tehdään:
+    /** Hoitaja avaa jonosta chatin, JS-WebSocket lahettaa jotain /queue/id/
+     *  Tama metodi aktivoituu, kun kyseinen signaali saapuu palvelimelle.
+     *  Toimenpiteet mita tehdaan:
      *  -> Poistetaan jonosta olio
      *  -> Broadcastataan jonon uusi tila hoitajille
-     *  -> Herätellään avatun kanavan osalliset (eli yksi jonottaja)
+     *  -> Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
      * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
-     * @throws Exception mikä poikkeus
+     * @throws Exception mika poikkeus
      */
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")

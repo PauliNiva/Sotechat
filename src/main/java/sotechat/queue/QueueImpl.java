@@ -25,13 +25,13 @@ public class QueueImpl implements Queue {
     }
 
     /**
-     * addTo -metodi lisää jonoon uuden QueueItemin, johon on talletettu
-     * jonottavan käyttäjän kanavan id, keskustelun aihealue sekä jonottavan
-     * käyttäjän nimi. Palauttaa true, jos lisäys onnistui.
+     * addTo -metodi lisaa jonoon uuden QueueItemin, johon on talletettu
+     * jonottavan kayttajan kanavan id, keskustelun aihealue seka jonottavan
+     * kayttajan nimi. Palauttaa true, jos lisays onnistui.
      * @param channelId jonottajan kanavan id
      * @param category keskustelun aihealue
-     * @param username jonottajan käyttäjänimi
-     * @return true jos lisäys onnistui
+     * @param username jonottajan kayttajanimi
+     * @return true jos lisays onnistui
      */
     @Override
     public final synchronized boolean addTo(final String channelId,
@@ -42,9 +42,9 @@ public class QueueImpl implements Queue {
     }
 
     /**
-     * pollFirst -metodi poistaa ja palauttaa jonon ensimmäisen QueueItemin.
-     * Jos jono on tyhjä palautetaan null.
-     * @return jonon ensimmäinen QueueItem tai null, jos jono on tyhjä.
+     * pollFirst -metodi poistaa ja palauttaa jonon ensimmaisen QueueItemin.
+     * Jos jono on tyhja palautetaan null.
+     * @return jonon ensimmainen QueueItem tai null, jos jono on tyhja.
      */
     @Override
     public final synchronized QueueItem pollFirst() {
@@ -53,10 +53,10 @@ public class QueueImpl implements Queue {
     }
 
     /**
-     * getFirstFrom -metodi palauttaa jonossa ensimmäisenä olevan QueueItemin
+     * getFirstFrom -metodi palauttaa jonossa ensimmaisena olevan QueueItemin
      * parametrina annetusta kategoriasta.
-     * @param category minkä aihealueen ensimmäinen QueueItem halutaan
-     * @return aihealueen ensimmäinen QueueItem
+     * @param category minka aihealueen ensimmainen QueueItem halutaan
+     * @return aihealueen ensimmainen QueueItem
      */
     @Override
     public final synchronized QueueItem getFirstFrom(final String category) {
@@ -74,7 +74,7 @@ public class QueueImpl implements Queue {
     /**
      * Poistaa ja palauttaa jonosta QueueItemin parametrina annetun kanavaid:n
      * perusteella.
-     * @param channelId etsittävän QueueItemin kanavaid
+     * @param channelId etsittavan QueueItemin kanavaid
      * @return  QueueItem jolla on haettu kanavaid
      */
     @Override
@@ -101,7 +101,7 @@ public class QueueImpl implements Queue {
 
     /**
      * itemsBefore -metodi palauttaa parametrina annetun kanavaid:n omaavaa
-     * QueueItemia edeltävän jonon pituuden
+     * QueueItemia edeltavan jonon pituuden
      * @param channelId Haetun QueueItemin kanavaid
      * @return kuinka monta QueueItemia on jonossa ennen haettua QueueItemia
      */

@@ -5,10 +5,10 @@ public class ProStateResponse {
     /** Tila ("start", "inpool", "chat"). */
     private String state;
 
-    /** Julkinen käyttäjänimi. */
+    /** Julkinen kayttajanimi. */
     private String username;
 
-    /** Salainen käyttäjäID. */
+    /** Salainen kayttajaID. */
     private String userId;
 
     private String QBCC;
@@ -47,15 +47,15 @@ public class ProStateResponse {
         return this.state;
     }
 
-    /** Palauttaa julkisen käyttäjänimen.
-     * @return Palauttaa julkisen käyttäjänimen.
+    /** Palauttaa julkisen kayttajanimen.
+     * @return Palauttaa julkisen kayttajanimen.
      */
     public final String getUsername() {
         return this.username;
     }
 
-    /** Palauttaa salaisen käyttäjäID:n.
-     * @return Palauttaa salaisen käyttäjäID:n.
+    /** Palauttaa salaisen kayttajaID:n.
+     * @return Palauttaa salaisen kayttajaID:n.
      */
     public final String getUserId() {
         return this.userId;

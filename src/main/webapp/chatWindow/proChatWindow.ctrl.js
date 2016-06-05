@@ -2,16 +2,16 @@ angular.module('chatApp')
     .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
         function ($scope, stompSocket, connectToServer, proStateService) {
             $scope.pro = true;
-            // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
+            // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             var sub;
-            // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
+            // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
             $scope.chatName = 'Esimerkki';
 
             var channel = this.channel;
 
-            /** Funktio lähettää servicen avulla tekstikentän
-             *  sisällön ja lopuksi tyhjentää tekstikentän. */
+            /** Funktio lahettaa servicen avulla tekstikentan
+             *  sisallon ja lopuksi tyhjentaa tekstikentan. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
                     var destination = "/toServer/chat/" + channel;

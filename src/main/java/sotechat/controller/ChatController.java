@@ -29,18 +29,18 @@ public class ChatController {
     }
 
     /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,
-     * joka palauttaa meille viestin kanavalle lähetettävässä muodossa
-     * - tai null, jos viesti hylätään eikä sitä välitetä kanavalle.
+     * joka palauttaa meille viestin kanavalle lahetettavassa muodossa
+     * - tai null, jos viesti hylataan eika sita valiteta kanavalle.
      * MessageMapping annotaatiossa polku *palvelimelle* saapuviin viesteihin.
      *
-     * @param msgToServer Asiakasohjelman JSON-muodossa lähettämä viesti,
-     *                    joka on paketoitu MsgToServer-olion sisälle.
-     * @param accessor Haetaan session-tiedot täältä.
-     * @return Palautusarvoa ei käytetä kuten yleensä, vaan SendTo-
-     *         annotaatiossa on polku *clienteille* lähetettäviin viesteihin.
-     *         Spring-magialla lähetetään viesti kaikille kanavaan
+     * @param msgToServer Asiakasohjelman JSON-muodossa lahettama viesti,
+     *                    joka on paketoitu MsgToServer-olion sisalle.
+     * @param accessor Haetaan session-tiedot taalta.
+     * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
+     *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
+     *         Spring-magialla lahetetaan viesti kaikille kanavaan
      *         subscribanneille clienteille JSONina.
-     * @throws Exception mikä poikkeus?
+     * @throws Exception mika poikkeus?
      */
     @MessageMapping("/toServer/chat/{channelId}")
     @SendTo("/toClient/chat/{channelId}")

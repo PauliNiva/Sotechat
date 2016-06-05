@@ -11,11 +11,11 @@ import java.security.Principal;
 public final class Utils {
 
     /** Esim: get(session, "username") -> "Matti".
-     * Toistoa oli niin paljon, että eriytettiin omaksi metodiksi.
-     * Palauttaa nullin sijaan tyhjän Stringin, jotta käsittely helpottuisi.
+     * Toistoa oli niin paljon, etta eriytettiin omaksi metodiksi.
+     * Palauttaa nullin sijaan tyhjan Stringin, jotta kasittely helpottuisi.
      * @param session HttpSession-objekti
      * @param attributeName Avain haettavalle attribuutille
-     * @return Haettavan attribuutin arvo Stringinä
+     * @return Haettavan attribuutin arvo Stringina
      */
     public static String get(
             final HttpSession session,

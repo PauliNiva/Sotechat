@@ -1,15 +1,15 @@
 package sotechat.wrappers;
 
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
- * kun "tavalliselle käyttäjälle" kerrotaan state.
+ * kun "tavalliselle kayttajalle" kerrotaan state.
  */
 public class UserStateResponse {
 
     /** Tila ("start", "inpool", "chat"). */
     private String state;
-    /** Julkinen käyttäjänimi. */
+    /** Julkinen kayttajanimi. */
     private String username;
-    /** Salainen käyttäjäID. */
+    /** Salainen kayttajaID. */
     private String userId;
     /** Kategoria (esim. "mielenterveys"). */
     private String category;
@@ -42,15 +42,15 @@ public class UserStateResponse {
         return this.state;
     }
 
-    /** Palauttaa julkisen käyttäjänimen.
-     * @return Palauttaa julkisen käyttäjänimen.
+    /** Palauttaa julkisen kayttajanimen.
+     * @return Palauttaa julkisen kayttajanimen.
      */
     public final String getUsername() {
         return this.username;
     }
 
-    /** Palauttaa salaisen käyttäjäID:n.
-     * @return Palauttaa salaisen käyttäjäID:n.
+    /** Palauttaa salaisen kayttajaID:n.
+     * @return Palauttaa salaisen kayttajaID:n.
      */
     public final String getUserId() {
         return this.userId;

@@ -8,7 +8,7 @@ import sotechat.queue.QueueItem;
 import java.util.List;
 
 /**
- * QueueService luokka tarjoaa palvelut jonoon lisäämiseen, jonosta
+ * QueueService luokka tarjoaa palvelut jonoon lisaamiseen, jonosta
  * poistamiseen ja jonon tarkasteluun
  * Created by varkoi on 2.6.2016.
  */
@@ -23,7 +23,7 @@ public class QueueService {
 
     /**
      * konstruktori alustaa jonon parametrina annetulla jono oliolla
-     * @param queue jono olio, johon jonottavien käyttäjien tiedot tallennetaan
+     * @param queue jono olio, johon jonottavien kayttajien tiedot tallennetaan
      */
     @Autowired
     public QueueService(Queue queue){
@@ -31,13 +31,13 @@ public class QueueService {
     }
 
     /**
-     * addToQueue -metodi lisää jonon perälle alkion, jossa tiedot jonottajan
-     * kanavaid:stä keskustelun aihealueesta ja jonottajan käyttäjänimestä.
-     * Palauttaa true jos lisäys onnistui.
+     * addToQueue -metodi lisaa jonon peralle alkion, jossa tiedot jonottajan
+     * kanavaid:sta keskustelun aihealueesta ja jonottajan kayttajanimesta.
+     * Palauttaa true jos lisays onnistui.
      * @param channelId jonottajan kanavaid
      * @param category keskustelun aihealue
-     * @param username jonottajan käyttäjänimi
-     * @return true jos lisäys onnitui
+     * @param username jonottajan kayttajanimi
+     * @return true jos lisays onnitui
      */
     public final boolean addToQueue(String channelId, String category,
                                  String username){
@@ -62,11 +62,11 @@ public class QueueService {
     }
 
     /**
-     * firstOfQueue -metodi palauttaa jonon ensimmäisen alkion JSON -olion
-     * muodossa ja samalla poistaa sen jonosta tai jos jono on tyhjä
-     * palautetaan tyhjä String
-     * @return jonon ensimmäinen alkio JSON oliona, jossa muuttujina kanavaid,
-     * keskustelun aihealue (kategoria) sekä käyttäjänimi
+     * firstOfQueue -metodi palauttaa jonon ensimmaisen alkion JSON -olion
+     * muodossa ja samalla poistaa sen jonosta tai jos jono on tyhja
+     * palautetaan tyhja String
+     * @return jonon ensimmainen alkio JSON oliona, jossa muuttujina kanavaid,
+     * keskustelun aihealue (kategoria) seka kayttajanimi
      */
     public final String firstOfQueue() {
         try {
@@ -78,12 +78,12 @@ public class QueueService {
     }
 
     /**
-     * firstOfCategory -metodi palauttaa ensimmäisen alkion jonosta parametrina
+     * firstOfCategory -metodi palauttaa ensimmaisen alkion jonosta parametrina
      * annetusta kategoriasta JSON olion muodossa ja samalla poistaa sen
-     * jonosta tai jos jono on tyhjä palautetaan tyhjä String
+     * jonosta tai jos jono on tyhja palautetaan tyhja String
      * @param category aihealue, jonka keskusteluja haetaan
-     * @return jonon ensimmäinen alkio haetusta kategoriasta JSON oliona, jossa
-     * muuttujina kanavaid, keskustelun aihealue (kategoria) sekä käyttäjänimi
+     * @return jonon ensimmainen alkio haetusta kategoriasta JSON oliona, jossa
+     * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
      */
     public final String firstOfCategory(String category){
         try {
@@ -95,11 +95,11 @@ public class QueueService {
     }
 
     /**
-     * Poistaa jonosta alkion kanavaid:n perusteella ja palauttaa sitä
-     * esittävän JSON -olion
+     * Poistaa jonosta alkion kanavaid:n perusteella ja palauttaa sita
+     * esittavan JSON -olion
      * @param channelId kanavaid, jota vastaava alkio halutaan ottaa jonosta
-     * @return haettua kanavaid:tä vastaava alkio JSON -oliona, jossa
-     * muuttujina kanavaid, keskustelun aihealue (kategoria) sekä käyttäjänimi
+     * @return haettua kanavaid:ta vastaava alkio JSON -oliona, jossa
+     * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
      */
     public final String removeFromQueue(String channelId){
         try {
@@ -112,18 +112,18 @@ public class QueueService {
 
     /**
      * queueLength -metodi palauttaa jonon pituuden
-     * @return jonon alkioiden määrä
+     * @return jonon alkioiden maara
      */
     public final int queueLength(){
         return queue.length();
     }
 
     /**
-     * queueLength -metodi palauttaa parametrina annettua vanavaid:tä vastaavaa
-     * alkiota edeltävän jonon pituuden
-     * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
-     *                  halutaan selvittää
-     * @return  alkioiden määrä, jotka edeltävät haettua alkiota
+     * queueLength -metodi palauttaa parametrina annettua vanavaid:ta vastaavaa
+     * alkiota edeltavan jonon pituuden
+     * @param channelId kanavaid, jota vastaavaa alkiota edeltavan jonon pituus
+     *                  halutaan selvittaa
+     * @return  alkioiden maara, jotka edeltavat haettua alkiota
      */
     public final int queueLength(final String channelId){
         return queue.itemsBefore(channelId);

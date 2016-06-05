@@ -9,12 +9,12 @@ import sotechat.wrappers.MsgToServer;
 import sotechat.data.Mapper;
 
 /**
- * Logiikka chat-viestien käsittelyyn.
+ * Logiikka chat-viestien kasittelyyn.
  */
 @Service
 public class ChatMessageService {
 
-    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
+    /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
     private final Mapper mapper;
 
     /**
@@ -29,43 +29,43 @@ public class ChatMessageService {
     }
 
 
-    /** Logiikka saapuvien chat-viestien käsittelyyn.
-     * Palauttaa viestin muodossa, joka voidaan lähettää kanavalla olijoille.
+    /** Logiikka saapuvien chat-viestien kasittelyyn.
+     * Palauttaa viestin muodossa, joka voidaan lahettaa kanavalla olijoille.
      * @param msgToServer saapuva viesti
      * @param accessor accessor
-     * @return msgToClient eli lähtevä viesti
+     * @return msgToClient eli lahteva viesti
      */
     public MsgToClient processMessage(
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) {
-        /** Annetaan timeStamp juuri tässä muodossa AngularJS:ää varten. */
+        /** Annetaan timeStamp juuri tassa muodossa AngularJS:aa varten. */
         String timeStamp = new DateTime().toString();
 
-        /** Selvitetään käyttäjänimi annetun userId:n perusteella. */
+        /** Selvitetaan kayttajanimi annetun userId:n perusteella. */
         String userId = msgToServer.getUserId();
         if (!mapper.isUserIdMapped(userId)) {
-            /** Kelvoton ID, hylätään viesti. */
+            /** Kelvoton ID, hylataan viesti. */
             return null;
         }
         if (mapper.isUserProfessional(userId)) {
-            /** ID kuuluu ammattilaiselle, varmistetaan että on kirjautunut. */
+            /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
 
             if (accessor.getUser() == null) {
-                /** Ei kirjautunut, hylätään viesti. */
+                /** Ei kirjautunut, hylataan viesti. */
                 return null;
             }
             String username = accessor.getUser().getName();
             String authId = mapper.getIdFromRegisteredName(username);
             if (!userId.equals(authId)) {
-                /** Kirjautunut ID eri kuin viestiin merkitty lähettäjän ID. */
+                /** Kirjautunut ID eri kuin viestiin merkitty lahettajan ID. */
                 return null;
             }
 
         }
         String username = mapper.getUsernameFromId(userId);
 
-        /** MsgToClient paketoidaan JSONiksi ja lähetetään WebSocketilla. */
+        /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
         return new MsgToClient(username, msgToServer.getChannelId(),
                 timeStamp, msgToServer.getContent());
     }

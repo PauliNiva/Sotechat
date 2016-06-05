@@ -1,3 +1,5 @@
 /**
- * Paketti sisältää yleishyodyllisia staattisia funktioita.
+ * Paketti sisaltaa yleishyodyllisia staattisia funktioita.
  */
+package sotechat.util;
+
