@@ -3,16 +3,16 @@ package sotechat.queue;
 import java.util.List;
 
 /**
- * Jono rajapinta määrittelee jonon metodit
+ * Jono rajapinta maarittelee jonon metodit
  * Created by varkoi on 2.6.2016.
  */
 public interface Queue {
     /**
-     * Lisää uuden alkion jonon perään, jolla parametrina annetut tiedot
+     * Lisaa uuden alkion jonon peraan, jolla parametrina annetut tiedot
      * muuttujinaan
      * @param channelId jonottajan kanavan id
      * @param category keskustelun aihealue
-     * @param username jonottajan käyttäjänimi
+     * @param username jonottajan kayttajanimi
      */
     boolean addTo(String channelId,
                String category,
@@ -20,15 +20,15 @@ public interface Queue {
 
 
     /**
-     * metodi palauttaa jonon ensimmäisen alkion
-     * @return jonon ensimmäinen alkio
+     * metodi palauttaa jonon ensimmaisen alkion
+     * @return jonon ensimmainen alkio
      */
     QueueItem pollFirst();
 
     /**
-     * metodi palauttaa kategorian ensimmäisen alkion jonossa
+     * metodi palauttaa kategorian ensimmaisen alkion jonossa
      * @param category keskustelun aihealue
-     * @return kategorian ensimmäinen alkio jonossa
+     * @return kategorian ensimmainen alkio jonossa
      */
     QueueItem getFirstFrom(String category);
 
@@ -46,9 +46,9 @@ public interface Queue {
     int length();
 
     /**
-     * metodi palauttaa haettua alkiota edeltävän jonon pituuden
+     * metodi palauttaa haettua alkiota edeltavan jonon pituuden
      * @param channelId haetun alkion kanavaid
-     * @return edeltävän jonon pituus
+     * @return edeltavan jonon pituus
      */
     int itemsBefore(String channelId);
 

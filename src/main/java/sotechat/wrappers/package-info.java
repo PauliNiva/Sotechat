@@ -1,3 +1,3 @@
 /**
- Paketti sisältää wrapper-luokkia Spring/JSON käsittelyä varten.
+ Paketti sisaltaa wrapper-luokkia Spring/JSON kasittelya varten.
  */

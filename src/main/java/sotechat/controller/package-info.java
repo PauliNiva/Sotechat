@@ -1,3 +1,3 @@
-/** Tämä paketti sisältää sovelluksen kontrollerit.
+/** Tama paketti sisaltaa sovelluksen kontrollerit.
  **/
 package sotechat.controller;

@@ -14,15 +14,15 @@ public class QueueItem {
      */
     String category;
     /**
-     * jonottavan käyttäjän nimi
+     * jonottavan kayttajan nimi
      */
     String username;
 
     /**
      * konstruktori alustaa olion annetuilla parametreilla
-     * @param channelId jonottavan henkilön kanavan id
+     * @param channelId jonottavan henkilon kanavan id
      * @param category keskustelun aihealue
-     * @param username jonottavan käyttäjän nimi
+     * @param username jonottavan kayttajan nimi
      */
     public QueueItem(String channelId, String category, String username) {
         this.channelId = channelId;
@@ -31,7 +31,7 @@ public class QueueItem {
     }
 
     /**
-     * palauttaa jonottavan henkilön kanavan id:n
+     * palauttaa jonottavan henkilon kanavan id:n
      * @return  kanavan id
      */
     public String getChannelId() {
@@ -39,7 +39,7 @@ public class QueueItem {
     }
 
     /**
-     * palauttaa jonottavan henkilön keskustelun aihealueen
+     * palauttaa jonottavan henkilon keskustelun aihealueen
      * @return keskustelun aihealue
      */
     public String getCategory() {
@@ -47,8 +47,8 @@ public class QueueItem {
     }
 
     /**
-     * palauttaa jonottavan henkilön nimen
-     * @return henkilön nimi
+     * palauttaa jonottavan henkilon nimen
+     * @return henkilon nimi
      */
     public String getUsername() {
         return username;

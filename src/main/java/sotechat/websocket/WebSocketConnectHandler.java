@@ -1,7 +1,7 @@
 /*package sotechat.websocket;
 
 /**
- * Luokka ei vielä käytössä.
+ * Luokka ei viela kaytossa.
  */
 /*import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;

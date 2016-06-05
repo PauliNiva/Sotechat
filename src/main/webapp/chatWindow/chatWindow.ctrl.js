@@ -1,19 +1,19 @@
-// Kontrolleri päivittää tietoja molempiin suuntiin:
-// - Kun Serviceltä tulee viesti, kontrolleri päivittää selaimessa olevan näkymän.
-// - Kun halutaan lähettää viesti, välitetään se Servicelle.
+// Kontrolleri paivittaa tietoja molempiin suuntiin:
+// - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
+// - Kun halutaan lahettaa viesti, valitetaan se Servicelle.
 //
 angular.module('chatApp')
     .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService',
         function ($scope, stompSocket, connectToServer, userStateService) {
             $scope.pro = false;
-            // Taulukko "messages" sisältää chat-ikkunassa näkyvät viestit.
+            // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             var sub;
-            // Määritellään chatin nimi templateen, tällä hetkellä kovakoodattu
+            // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
             $scope.chatName = 'Esimerkki';
 
-            /** Funktio lähettää servicen avulla tekstikentän
-             *  sisällön ja lopuksi tyhjentää tekstikentän. */
+            /** Funktio lahettaa servicen avulla tekstikentan
+             *  sisallon ja lopuksi tyhjentaa tekstikentan. */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
                     var destination = "/toServer/chat/" + userStateService.getChannelID();

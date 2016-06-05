@@ -1,26 +1,26 @@
 package sotechat.wrappers;
 
-/** Palvelimen asiakasohjelmalle lähettämä viesti on talletettu
- * MsgToClient-olioon. Olion sisältö muokataan JSON-muotoon
+/** Palvelimen asiakasohjelmalle lahettama viesti on talletettu
+ * MsgToClient-olioon. Olion sisalto muokataan JSON-muotoon
  * Jackson-kirjaston avulla ennen kuin asiakasohjelma saa viestin.
  *
- * Syyt, miksi yksi Message-luokka ei riitä:
+ * Syyt, miksi yksi Message-luokka ei riita:
  *  - Halutaan timeStampit serverin, ei clientin toimesta
- *  - Ei haluta vuotaa salaisia käyttäjäID:t kaikille
+ *  - Ei haluta vuotaa salaisia kayttajaID:t kaikille
  */
 public class MsgToClient {
 
     /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
     private String username;
-    /** Salainen avain kanavan kuunteluun ja viestien lähettämiseen. */
+    /** Salainen avain kanavan kuunteluun ja viestien lahettamiseen. */
     private String channelId;
     /** Serverin aika viestin saapumiselle
-     *  erityisessä muodossa AngularJS varten. */
+     *  erityisessa muodossa AngularJS varten. */
     private String timeStamp;
-    /** Viestin sisältö. */
+    /** Viestin sisalto. */
     private String content;
 
-    /** Konstruktori alustaa olion annetuilla parametreillä.
+    /** Konstruktori alustaa olion annetuilla parametreilla.
      * @param pUsername username
      * @param pChannelId channelId
      * @param pTimeStamp timeStamp
@@ -41,7 +41,7 @@ public class MsgToClient {
         return this.username;
     }
 
-    /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittää.
+    /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittaa.
      * @return Palauttaa salaisen avaimen.
      */
     public final String getChannelId() {
@@ -55,8 +55,8 @@ public class MsgToClient {
         return this.timeStamp;
     }
 
-    /** Palauttaa viestin sisällön.
-     * @return Palauttaa viestin sisällön.
+    /** Palauttaa viestin sisallon.
+     * @return Palauttaa viestin sisallon.
      */
     public final String getContent() {
         return this.content;

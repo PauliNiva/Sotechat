@@ -1,3 +1,3 @@
-/** Tämä paketti sisältää sovelluksen domain-oliot.
+/** Tama paketti sisaltaa sovelluksen domain-oliot.
  **/
 package sotechat.domain;

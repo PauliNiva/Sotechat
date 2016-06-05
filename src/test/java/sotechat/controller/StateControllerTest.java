@@ -58,7 +58,7 @@ public class StateControllerTest {
                 .build();
     }
 
-    /** Get pyyntö polkuun "/userState" palauttaa statukseksen OK.
+    /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.
      * @throws Exception
      */
     @Test

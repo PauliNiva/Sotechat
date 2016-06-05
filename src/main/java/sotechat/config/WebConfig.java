@@ -6,17 +6,17 @@ import org.springframework.web.servlet.config.annotation.
 import org.springframework.web.servlet.config.annotation.
         WebMvcConfigurerAdapter;
 
-/** Määrittelee Springille fronttipuolen tiedostopolun.
+/** Maarittelee Springille fronttipuolen tiedostopolun.
  */
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
 
-    /** Määrittelee, että /resources/ pyyntöihin haetaan
+    /** Maarittelee, etta /resources/ pyyntoihin haetaan
      *  tiedostot todellisesta polusta /webapp/. */
     @Override
     public final void addResourceHandlers(final ResourceHandlerRegistry reg) {
         reg.addResourceHandler("/resources/**")
                 .addResourceLocations("\"classpath:/webapp/\"");
-        /* Näköjään toimii. Miksi polku vaatii nuo escapetut hipsut? */
+        /* Nakojaan toimii. Miksi polku vaatii nuo escapetut hipsut? */
     }
 }

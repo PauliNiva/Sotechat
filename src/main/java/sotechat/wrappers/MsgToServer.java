@@ -1,25 +1,25 @@
 package sotechat.wrappers;
 
-/** Asiakasohjelman palvelimelle lähettämä viesti paketoidaan MsgToServer-olion
- * sisälle, ennen kuin palvelimen ChatController-luokka voi käsitellä sitä.
+/** Asiakasohjelman palvelimelle lahettama viesti paketoidaan MsgToServer-olion
+ * sisalle, ennen kuin palvelimen ChatController-luokka voi kasitella sita.
  */
 public class MsgToServer {
 
-    /** Käyttäjän yksilöivä salainen ID. */
+    /** Kayttajan yksiloiva salainen ID. */
     private String userId;
-    /** Kanavan yksilöivä salainen ID. */
+    /** Kanavan yksiloiva salainen ID. */
     private String channelId;
-    /** Viestin sisältö. */
+    /** Viestin sisalto. */
     private String content;
 
 
 
-    /** Huom: Älä lisää konstruktoria, se rikkoo Springin. */
+    /** Huom: Äla lisaa konstruktoria, se rikkoo Springin. */
 
 
 
-    /** Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille.
-     * @return Palauttaa käyttäjäID:n, jota ei saa vuotaa muille käyttäjille.
+    /** Palauttaa kayttajaID:n, jota ei saa vuotaa muille kayttajille.
+     * @return Palauttaa kayttajaID:n, jota ei saa vuotaa muille kayttajille.
      */
     public final String getUserId() {
         return this.userId;
@@ -32,8 +32,8 @@ public class MsgToServer {
         return this.channelId;
     }
 
-    /** Palauttaa viestin sisällön.
-     * @return Palauttaa viestin sisällön.
+    /** Palauttaa viestin sisallon.
+     * @return Palauttaa viestin sisallon.
      */
     public final String getContent() {
         return this.content;

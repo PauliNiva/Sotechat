@@ -13,9 +13,13 @@ import static sotechat.util.Utils.get;
 public class SessionRepoImpl extends MapSessionRepository
     implements SessionRepo {
 
+    /** Avain sessio-ID, arvo HttpSession-olio. */
     private HashMap<String, HttpSession> httpSessions;
 
-    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
+    /** Kaytetaan testauksessa. */
+    private HttpSession latestSession;
+
+    /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
     private final Mapper mapperService;
 
     @Autowired
@@ -31,6 +35,7 @@ public class SessionRepoImpl extends MapSessionRepository
     public void
     mapHttpSessionToSessionId(String sessionId, HttpSession session) {
         this.httpSessions.put(sessionId, session);
+        this.latestSession = session;
     }
 
     @Override
@@ -38,7 +43,12 @@ public class SessionRepoImpl extends MapSessionRepository
         return httpSessions.get(sessionId);
     }
 
-    /** Metodi päivittää tarvittaessa session-attribuuttien state,
+    @Override
+    public HttpSession getLatestHttpSession() {
+        return latestSession;
+    }
+
+    /** Metodi paivittaa tarvittaessa session-attribuuttien state,
      * userId ja username vastaamaan ajanmukaisia arvoja.
      * @param session session
      * @param professional professional
@@ -52,7 +62,7 @@ public class SessionRepoImpl extends MapSessionRepository
         Object username = session.getAttribute("username");
         Object userId = session.getAttribute("userId");
 
-        /** Päivitetään muuttujat, jos tarpeellista. */
+        /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {
             /* Jos client on autentikoitunut ammattilaiseksi */
             username = professional.getName();
@@ -61,25 +71,25 @@ public class SessionRepoImpl extends MapSessionRepository
             session.setAttribute("category", "notRelevantForProfessional");
             session.setAttribute("channelIds", "[\"Autot\", \"Mopot\"]"); // TODO
         } else if (get(session, "username").isEmpty()) {
-            /* Uusi käyttäjä */
+            /* Uusi kayttaja */
             username = "Anon";
             userId = mapperService.generateNewId();
             session.setAttribute("state", "start");
             session.setAttribute("category", "DRUGS"); //TODO
 
-            /** Oikea kanavaID annetaan vasta nimen/aloitusviestin jälkeen. */
+            /** Oikea kanavaID annetaan vasta nimen/aloitusviestin jalkeen. */
             String channelNotRelevantYet = mapperService.generateNewId();
             session.setAttribute("channelId", channelNotRelevantYet);
             /** Random kanava failsafena, jos jonkin virheen vuoksi
-             * käyttäjät päätyisivätkin sinne keskustelemaan,
-             * tyhjä kanava on parempi kuin kasa trolleja. */
+             * kayttajat paatyisivatkin sinne keskustelemaan,
+             * tyhja kanava on parempi kuin kasa trolleja. */
         }
 
-        /** Liitetään muuttujien tieto sessioon (monesti aiemman päälle). */
+        /** Liitetaan muuttujien tieto sessioon (monesti aiemman paalle). */
         session.setAttribute("username", username);
         session.setAttribute("userId", userId);
 
-        /** Kirjataan tiedot mapperiin (monesti aiemman päälle). */
+        /** Kirjataan tiedot mapperiin (monesti aiemman paalle). */
         mapperService.mapUsernameToId(userId.toString(), username.toString());
     }
 
