@@ -77,7 +77,9 @@ public class StateController {
             final HttpServletRequest request
             ) throws Exception {
 
-        return stateService.respondToJoinPoolRequest(request);
+        String answer = stateService.respondToJoinPoolRequest(request);
+        broadcastQueue();
+        return answer;
     }
 
 
@@ -99,10 +101,17 @@ public class StateController {
             ) throws Exception {
 
         String wakeUp = stateService.popQueue(channelId);
+        broadcastQueue();
+        return wakeUp;
+    }
+
+    /**
+     * TODO: Test this works.
+     */
+    private final void broadcastQueue() {
         String qbcc = "/" + stateService.getQueueBroadcastChannel();
         String qAsJson = stateService.getQueueAsJson();
-        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson); //TODO:TEST THIS
-        return wakeUp;
+        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }
 
 }
