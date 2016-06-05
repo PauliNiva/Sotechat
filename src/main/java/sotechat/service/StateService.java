@@ -40,7 +40,7 @@ public class StateService {
     private final SessionRepo sessionRepo;
 
     /** Channel where queue status is broadcasted. */
-    private static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
+    public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
 
 
 
@@ -194,13 +194,6 @@ public class StateService {
         queueService.removeFromQueue(channelId);
 
         return "{\"content\":\"channel activated. request new state now.\"}";
-    }
-
-    /** Getter.
-     * @return QBCC.
-     */
-    public final String getQueueBroadcastChannel() {
-        return QUEUE_BROADCAST_CHANNEL;
     }
 
     /**

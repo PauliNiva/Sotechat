@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.SessionRepo;
+import sotechat.service.StateService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,8 +21,8 @@ import java.util.Map;
 import static sotechat.util.Utils.get;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
- * ja pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
- * TODO: When someone joins QBCC, broadcast queue.
+ *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
+ *  - kun joku subscribaa QBCC kanavalle, pyytaa QueueBroadcasteria castaamaan.
  */
 @Component
 public class SubscribeEventListener
@@ -33,6 +34,10 @@ public class SubscribeEventListener
     /** Session Repository. */
     @Autowired
     private SessionRepo sessionRepo;
+
+    /** Queue Broadcaster. */
+    @Autowired
+    private QueueBroadcaster queueBroadcaster;
 
     /** Vain 1 instanssi. */
     public SubscribeEventListener() {
@@ -72,22 +77,28 @@ public class SubscribeEventListener
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
                 .get("SPRING.SESSION.ID").toString();
-        String channelId = SimpMessageHeaderAccessor
+        String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
         HttpSession session = sessionRepo.getHttpSession(sessionId);
 
-        System.out.println("Subscribing someone to " + channelId);
-        if (channelId.isEmpty()) {
+        System.out.println("Subscribing someone to " + channelIdWithPath);
+        if (channelIdWithPath.isEmpty()) {
             return;
         }
 
         /** Add session to list of subscribers to channelId. */
-        List<HttpSession> list = map.get(channelId);
+        List<HttpSession> list = map.get(channelIdWithPath);
         if (list == null) {
             list = new ArrayList<>();
-            map.put(channelId, list);
+            map.put(channelIdWithPath, list);
         }
         list.add(session);
+
+        /** Jos subscribattu QBCC (jonotiedotuskanava), tiedotetaan. */
+        String qbcc = "/toClient/" + StateService.QUEUE_BROADCAST_CHANNEL;
+        if (channelIdWithPath.equals(qbcc)) {
+            queueBroadcaster.broadcastQueue();
+        }
     }
 
     /** TODO: Kasittelee unsubscribe -tapahtumat.

@@ -38,7 +38,7 @@ public class WebSocketConfig extends
      */
     @Override
     public final void configureMessageBroker(final MessageBrokerRegistry conf) {
-        conf.enableSimpleBroker("/toClient", "/QBCC");
+        conf.enableSimpleBroker("/toClient");
     }
 
     /** Metodi kayttaa StompEndpointRegistry-luokan metodia addEndpoint

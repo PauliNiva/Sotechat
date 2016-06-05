@@ -1,5 +1,6 @@
 angular.module('chatApp')
     .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', function ($scope, connectToServer, proStateService) {
+        var QUEUEADDRESS = '/toClient/';
         $scope.pro = true;
 
         $scope.chats = [];
@@ -9,7 +10,7 @@ angular.module('chatApp')
         };
 
         var answer = function () {
-            connectToServer.subscribe(proStateService.getQueueBroadcastChannel(), queue);
+            connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
             $scope.username = proStateService.getUsername();
             var i = 1;
             console.log(proStateService.getChannelIDs());

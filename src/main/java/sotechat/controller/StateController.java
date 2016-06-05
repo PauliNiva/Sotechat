@@ -22,10 +22,8 @@ public class StateController {
     /** State Service. */
     private final StateService stateService;
 
-    /** Channel where queue status is broadcasted. */
-    private static final String QUEUE_BROADCAST_CHANNEL = "/QBCC";
-
-    private SimpMessagingTemplate brokerMessagingTemplate;
+    /** Queue Broadcaster. */
+    private final QueueBroadcaster queueBroadcaster;
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
@@ -35,10 +33,10 @@ public class StateController {
     @Autowired
     public StateController(
             final StateService pStateService,
-            final SimpMessagingTemplate pSimpMessagingTemplate
+            final QueueBroadcaster pQueueBroadcaster
     ) {
         this.stateService = pStateService;
-        this.brokerMessagingTemplate = pSimpMessagingTemplate;
+        this.queueBroadcaster = pQueueBroadcaster;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
@@ -82,7 +80,7 @@ public class StateController {
             ) throws Exception {
 
         String answer = stateService.respondToJoinPoolRequest(request);
-        broadcastQueue();
+        queueBroadcaster.broadcastQueue();
         return answer;
     }
 
@@ -105,19 +103,8 @@ public class StateController {
             ) throws Exception {
 
         String wakeUp = stateService.popQueue(channelId);
-        broadcastQueue();
+        queueBroadcaster.broadcastQueue();
         return wakeUp;
-    }
-
-    /**
-     * TODO: Test this works.
-     * TODO: Protection against flooding (max 1 broadcast/second).
-     */
-    private final void broadcastQueue() {
-        String qbcc = QUEUE_BROADCAST_CHANNEL;
-        String qAsJson = stateService.getQueueAsJson();
-        System.out.println("Calling broker thingie with " + qbcc + " and " + qAsJson);
-        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }
 
 }
