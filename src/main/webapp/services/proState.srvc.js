@@ -24,7 +24,7 @@ angular.module('chatApp')
         };
 
         function setQueueBroadcastChannel(value) {
-            qbcc = value;
+            qbcc = '/' + value;
         };
 
         function getOnline() {

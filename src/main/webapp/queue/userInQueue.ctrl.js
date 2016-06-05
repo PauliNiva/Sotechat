@@ -3,18 +3,12 @@ angular.module('chatApp')
         function ($http, $scope, userStateService, connectToServer, $timeout) {
             var QUEUEADDRESS = '/toClient/queue/';
             var subscribeToQueue;
-            $timeout(function () {
-                userStateService.setUserState('chat');
-                subscribeToQueue.unsubscribe();
-                $scope.updateState();
-            }, 3000);  // test only
+
 
             var onMessage = function (response) {
                 var parsed = JSON.parse(response.body);
-                if (parsed.content === 'etene') {
                     subscribeToQueue.unsubscribe();
                     $scope.updateState();
-                }
             };
 
             var onConnection = function () {

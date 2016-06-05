@@ -1,13 +1,8 @@
 angular.module('chatApp')
-    .controller('pronQueueCtrl', ['$scope', 'userStateService',
-        function ($scope, userStateService) {
+    .controller('proQueueCtrl', ['$scope',
+        function ($scope) {
             var QUEUEADDRESS = '/toClient/queue/';
             var subscribeToQueue;
-            $timeout(function () {
-                userStateService.setUserState('chat');
-                subscribeToQueue.unsubscribe();
-                $scope.updateState();
-            }, 3000);  // test only
 
             var onMessage = function (response) {
                 var parsed = JSON.parse(response.body);
@@ -25,6 +20,6 @@ angular.module('chatApp')
                 connectToServer.connect(onConnection);
             };
 
-            init();
+
 
         }]);

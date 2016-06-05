@@ -4,8 +4,12 @@ angular.module('chatApp')
 
         $scope.chats = [];
 
+        var queue = function(response) {
+            console.log(response);
+        };
+
         var answer = function () {
-            connectToServer.subscribe(proStateService.getQueueBroadcastChannel());
+            connectToServer.subscribe(proStateService.getQueueBroadcastChannel(), queue);
             $scope.username = proStateService.getUsername();
             var i = 1;
             console.log(proStateService.getChannelIDs());
