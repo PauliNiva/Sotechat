@@ -22,7 +22,9 @@ public class StateController {
     /** State Service. */
     private final StateService stateService;
 
-    @Autowired
+    /** Channel where queue status is broadcasted. */
+    private static final String QUEUE_BROADCAST_CHANNEL = "/QBCC";
+
     private SimpMessagingTemplate brokerMessagingTemplate;
 
 
@@ -32,9 +34,11 @@ public class StateController {
      */
     @Autowired
     public StateController(
-            final StateService pStateService
+            final StateService pStateService,
+            final SimpMessagingTemplate pSimpMessagingTemplate
     ) {
         this.stateService = pStateService;
+        this.brokerMessagingTemplate = pSimpMessagingTemplate;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
@@ -107,10 +111,12 @@ public class StateController {
 
     /**
      * TODO: Test this works.
+     * TODO: Protection against flooding (max 1 broadcast/second).
      */
     private final void broadcastQueue() {
-        String qbcc = "/" + stateService.getQueueBroadcastChannel();
+        String qbcc = QUEUE_BROADCAST_CHANNEL;
         String qAsJson = stateService.getQueueAsJson();
+        System.out.println("Calling broker thingie with " + qbcc + " and " + qAsJson);
         brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }
 

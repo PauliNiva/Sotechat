@@ -164,7 +164,8 @@ public class StateService {
          * nimimerkilla (olennainen vasta vertaistukichatissa). */
         SubscribeEventListener customClass =
                 (SubscribeEventListener) subscribeEventListener;
-        List<HttpSession> list = customClass.getSubscribers(channelId);
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
         for (HttpSession other : list) {
             if (get(other, "username").equals(username)) {
                 /** String (ei JSON) (AngularJS varten) */

@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -51,11 +52,12 @@ public class StateControllerTest {
         ApplicationListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
         SessionRepo sessions = new SessionRepoImpl(mapper);
+       // SimpMessagingTemplate broker = new SimpMessagingTemplate();
         StateService state = new StateService(
                 mapper, listener, qService, sessions);
-        mvc = MockMvcBuilders
-                .standaloneSetup(new StateController(state))
-                .build();
+       // mvc = MockMvcBuilders
+        //        .standaloneSetup(new StateController(state, broker))
+        //        .build();
     }
 
     /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.

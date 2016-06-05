@@ -32,20 +32,18 @@ public class WebSocketConfig extends
 
     /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
      * valittaakseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
-     * Palvelimen viestit tulevat ChatController-luokalta.
      *
      * @param conf Valittajaolio, joka valittaa viestit WebSocketin kautta
      *               palvelimen ChatController-luokalta asiakasohjelmalle.
      */
     @Override
     public final void configureMessageBroker(final MessageBrokerRegistry conf) {
-        conf.enableSimpleBroker("/toClient");
+        conf.enableSimpleBroker("/toClient", "/QBCC");
     }
 
     /** Metodi kayttaa StompEndpointRegistry-luokan metodia addEndpoint
      * maarittaakseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
-     * paateosoitteen. Tassa ohjelmassa viestit ohjautuvat
-     * ChatController-luokalle.
+     * paateosoitteen.
      *
      * @param reg Luokka, joka maarittaa WebSocketin kautta tulleille
      *                 asiakasohjelmien viesteille paateosoitteen.

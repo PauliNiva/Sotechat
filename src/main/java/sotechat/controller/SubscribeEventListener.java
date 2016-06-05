@@ -21,6 +21,7 @@ import static sotechat.util.Utils.get;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  * ja pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
+ * TODO: When someone joins QBCC, broadcast queue.
  */
 @Component
 public class SubscribeEventListener
@@ -66,15 +67,15 @@ public class SubscribeEventListener
      * @param event event
      */
     private void handleSubscribe(final SessionSubscribeEvent event) {
-        System.out.println("SUB = " + event.toString());
+        //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
                 .get("SPRING.SESSION.ID").toString();
-
+        String channelId = SimpMessageHeaderAccessor
+                .getDestination(headers);
         HttpSession session = sessionRepo.getHttpSession(sessionId);
 
-        String channelId = get(session, "channelId");
         System.out.println("Subscribing someone to " + channelId);
         if (channelId.isEmpty()) {
             return;
@@ -89,7 +90,7 @@ public class SubscribeEventListener
         list.add(session);
     }
 
-    /** Kasittelee unsubscribe -tapahtumat.
+    /** TODO: Kasittelee unsubscribe -tapahtumat.
      * @param event event
      */
     private void handleUnsubscribe(final SessionUnsubscribeEvent event) {
