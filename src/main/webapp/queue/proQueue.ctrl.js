@@ -1,9 +1,11 @@
 angular.module('chatApp')
-    .controller('proQueueCtrl', ['$scope', 'connectToServer','stompSocket',
-        function ($scope, connectToServer,stompSocket) {
+    .controller('proQueueCtrl', ['$scope', 'queueProService','stompSocket',
+        function ($scope, queueProService,stompSocket) {
 
             $scope.nextFromQueue = function() {
-                stompSocket.send('/toServer/queue/' + $scope.queue[0].channelID, {}, '');
-                $scope.getChannelsFromServer();
+                var channeID = $scope.queue[0].channelID;
+                stompSocket.send('/toServer/queue/' + channeID, {}, '');
+                queueProService.removeFirstFromQueue();
+                $scope.addChatTab(channeID);
             };
         }]);
