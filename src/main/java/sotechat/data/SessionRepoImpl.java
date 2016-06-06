@@ -28,6 +28,9 @@ public class SessionRepoImpl extends MapSessionRepository
     /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
     private final Mapper mapperService;
 
+    /** Konstruktori.
+     * @param pMapper mapperi.
+     */
     @Autowired
     public SessionRepoImpl(
             final Mapper pMapper
@@ -38,15 +41,28 @@ public class SessionRepoImpl extends MapSessionRepository
         this.proChannels = new HashMap<>();
     }
 
+    /** Jotta voidaan kaivaa sessionId:lla session-olio.
+     * @param sessionId sessionID
+     * @param session session-olio
+     */
     @Override
-    public void
-    mapHttpSessionToSessionId(String sessionId, HttpSession session) {
+    public final void
+    mapHttpSessionToSessionId(
+            String sessionId,
+            HttpSession session
+    ) {
         this.httpSessions.put(sessionId, session);
         this.latestSession = session;
     }
 
+    /** Kaivaa sessionId:lla session-olion.
+     * @param sessionId sessionId
+     * @return sesson-olio
+     */
     @Override
-    public HttpSession getHttpSession(String sessionId) {
+    public final HttpSession getHttpSession(
+            String sessionId
+    ) {
         return httpSessions.get(sessionId);
     }
 
@@ -76,21 +92,15 @@ public class SessionRepoImpl extends MapSessionRepository
             userId = mapperService.getIdFromRegisteredName(username.toString());
             session.setAttribute("state", "notRelevantForProfessional");
             session.setAttribute("category", "notRelevantForProfessional");
-            String channelIds = jsonFriendlyFormat(proChannels.get(session.getId()));
-            session.setAttribute("channelIds", channelIds);
+            updateSessionChannels(session);
         } else if (get(session, "username").isEmpty()) {
             /* Uusi kayttaja */
             username = "Anon";
             userId = mapperService.generateNewId();
             session.setAttribute("state", "start");
             session.setAttribute("category", "DRUGS"); //TODO
-
-            /** Oikea kanavaID annetaan vasta nimen/aloitusviestin jalkeen. */
-            String channelNotRelevantYet = mapperService.generateNewId();
-            session.setAttribute("channelId", channelNotRelevantYet);
-            /** Random kanava failsafena, jos jonkin virheen vuoksi
-             * kayttajat paatyisivatkin sinne keskustelemaan,
-             * tyhja kanava on parempi kuin kasa trolleja. */
+            String randomNewChannel = mapperService.generateNewId();
+            session.setAttribute("channelId", randomNewChannel);
         }
 
         /** Liitetaan muuttujien tieto sessioon (monesti aiemman paalle). */
@@ -101,8 +111,15 @@ public class SessionRepoImpl extends MapSessionRepository
         mapperService.mapUsernameToId(userId.toString(), username.toString());
     }
 
+    /** When pro user opened a new chat.
+     * @param session session
+     * @param channelId channelId
+     */
     @Override
-    public void addChannel(HttpSession session, String channelId) {
+    public final void addChannel(
+            final HttpSession session,
+            final String channelId
+    ) {
         if (session.getAttribute("channelIds") != null) {
             /** Case: pro user with multiple channels. */
             HashSet<String> channels = proChannels.get(session.getId());
@@ -111,25 +128,54 @@ public class SessionRepoImpl extends MapSessionRepository
                 proChannels.put(session.getId(), channels);
             }
             channels.add(channelId);
-            String channelIds = jsonFriendlyFormat(channels);
-            session.setAttribute("channelIds", channelIds);
+            updateSessionChannels(session);
         } else {
-            /** Case: regular user with single channel. */
+            /** Case: regular user with single channel. Never called? */
             session.setAttribute("channelId", channelId);
         }
     }
 
-    //@Override TODO
-    public void removeChannel(HttpSession session, String channelId) {
+    /** When pro user closes a chat window.
+     * @param session session
+     * @param channelId closed channel Id.
+     */
+    @Override
+    public final void removeChannel(
+            HttpSession session,
+            String channelId
+    ) {
+        if (session.getAttribute("channelIds") != null) {
+            /** Case: pro user with multiple channels. */
+            HashSet<String> channels = proChannels.get(session.getId());
+            if (channels != null) {
+                channels.remove(channelId);
+            }
+            updateSessionChannels(session);
+        }
+    }
 
+    /** Kutsu tata metodia proChannels -paivityksen jalkeen.
+     * Metodi paivittaa sessionsin tiedot proChannelsin tietojen perusteella.
+     * @param session session
+     */
+    private final void updateSessionChannels(
+            final HttpSession session
+    ) {
+        HashSet<String> channels = proChannels.get(session.getId());
+        String channelIds = getChannelsAsJsonFriendly(channels);
+        session.setAttribute("channelIds", channelIds);
     }
 
     /** Annettuna setti kanavia, tuottaa Stringin halutussa muotoilussa.
      * @param channels sdfdf
      * @return rrrrg
      */
-    private String jsonFriendlyFormat(HashSet<String> channels) {
-        if (channels == null || channels.isEmpty()) return "[]";
+    private String getChannelsAsJsonFriendly(
+            HashSet<String> channels
+    ) {
+        if (channels == null || channels.isEmpty()) {
+            return "[]";
+        }
         String output = "[";
         for (String channel : channels) {
             output += "\"" + channel + "\", ";

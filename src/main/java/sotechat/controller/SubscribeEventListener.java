@@ -100,7 +100,11 @@ public class SubscribeEventListener
             queueBroadcaster.broadcastQueue();
         }
 
-        /** Jos subscribattu /chat/kanavalle,  */
+        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan viestihistoria
+         * kaikille kanavan subscribaajille (alkuun "tyhjenna naytto" spessu) */
+        if (channelIdWithPath.startsWith("/toClient/chat/")) {
+
+        }
     }
 
     /** TODO: Kasittelee unsubscribe -tapahtumat.
