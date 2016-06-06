@@ -30,7 +30,6 @@ public class QueueBroadcaster {
     ) {
         this.queueService = pQueueService;
         this.brokerMessagingTemplate = pSimpMessagingTemplate;
-     //   setBroadcastEvery1Second();
     }
 
     /**
