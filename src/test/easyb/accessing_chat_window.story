@@ -42,11 +42,11 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
             element.submit()
         }
         when 'a professional chooses the started conversation from a pool', {
-            element = waitPro.until(ExpectedConditions.presenceOfElementLocated(By.name("next")))
+            element = waitPro.until(ExpectedConditions.elementToBeClickable(By.name("next")))
             element.click()
         }
         then 'a chat window is opened for the user', {
-            Thread.sleep(2000)
+            Thread.sleep(3000)
             page = driver.getPageSource()
             page.contains("panel-body chat-body").shouldBe true
             page.contains("panel panel-default userToPool-panel").shouldBe false
