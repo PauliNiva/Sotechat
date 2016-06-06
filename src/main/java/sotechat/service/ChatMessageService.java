@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
+import sotechat.data.ChatLogger;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.data.Mapper;
@@ -17,15 +18,20 @@ public class ChatMessageService {
     /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
     private final Mapper mapper;
 
+    /** ChatLogger. */
+    private final ChatLogger chatLogger;
+
     /**
      * Constructor autowires mapper.
      * @param pMapper mapper.
      */
     @Autowired
     public ChatMessageService(
-            final Mapper pMapper
+            final Mapper pMapper,
+            final ChatLogger pChatLogger
     ) {
         this.mapper = pMapper;
+        this.chatLogger = pChatLogger;
     }
 
 
@@ -65,9 +71,16 @@ public class ChatMessageService {
         }
         String username = mapper.getUsernameFromId(userId);
 
-        /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
-        return new MsgToClient(username, msgToServer.getChannelId(),
+        //TODO: tarkista, etta user on subscribannut kanavalle.
+
+        MsgToClient msg = new MsgToClient(username, msgToServer.getChannelId(),
                 timeStamp, msgToServer.getContent());
+
+        /** Tallennetaan viesti lokeihin. */
+        chatLogger.log(msg);
+
+        /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
+        return msg;
     }
 
 }

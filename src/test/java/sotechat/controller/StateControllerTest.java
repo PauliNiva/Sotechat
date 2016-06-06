@@ -71,9 +71,9 @@ public class StateControllerTest {
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
         StateService state = new StateService(
                 mapper, listener, qService, sessions);
-        mvc = MockMvcBuilders
-                .standaloneSetup(new StateController(state, broadcaster))
-                .build();
+        //mvc = MockMvcBuilders
+        //        .standaloneSetup(new StateController(state, broadcaster))
+        //        .build();
     }
 
     /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.
@@ -139,6 +139,4 @@ public class StateControllerTest {
 
     }
 
-    @Test
-    public void 
 }
