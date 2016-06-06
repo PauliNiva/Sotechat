@@ -99,7 +99,7 @@ public class SessionRepoImpl extends MapSessionRepository
             username = "Anon";
             userId = mapperService.generateNewId();
             session.setAttribute("state", "start");
-            session.setAttribute("category", "DRUGS"); //TODO
+            session.setAttribute("category", "Kategoria"); //TODO
             String randomNewChannel = mapperService.generateNewId();
             session.setAttribute("channelId", randomNewChannel);
         }
