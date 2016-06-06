@@ -33,15 +33,13 @@ scenario "professional can pick the first client from a pool of chats to start a
     then 'a chat window is opened that has a connection to the customer', {
         page = prodr.getPageSource()
         page.contains("panel-body chat-body").shouldBe true
-    }
-    and 'the customer is removed from queue', {
-        element = prodr.findElement(By.name("queuerName"))
-        element.getText().contains("Matti").shouldBe false
         driver.quit()
+        prodr.quit()
     }
 }
+
 /*
-scenario "professional can pick a customer of her/his choosing from the chat pool to start a conversation", {
+scenario "professional can pick a customer of her or his choosing from the chat pool to start a conversation", {
     given 'professional has logged in', {
     }
     and 'a customer has accessed a chat window', {
@@ -53,6 +51,14 @@ scenario "professional can pick a customer of her/his choosing from the chat poo
         element.sendKeys("Moi!")
         element = driver.findElement(By.tagName("button"))
         element.submit()
+        prodr = new FirefoxDriver()
+        prodr.get("http://localhost:8080/proCP.html")
+        element = prodr.findElement(By.name("username"))
+        element.sendKeys("Hoitaja")
+        element = prodr.findElement(By.name("password"))
+        element.sendKeys("salasana")
+        element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
+        element.submit()
         }
     }
     when 'professional click´s a button next to customers name', {
@@ -63,10 +69,6 @@ scenario "professional can pick a customer of her/his choosing from the chat poo
     then 'a chat window is opened tha has a connection to the chosen customer', {
         page = prodr.getPageSource()
         page.contains("panel-body chat-body").shouldBe true
-    }
-    and 'the customer is removed from queue', {
-        element = prodr.findElement(By.name("queuerName"))
-        element.getText().contains("Matti").shouldBe false
         driver.quit()
         prodr.quit()
     }

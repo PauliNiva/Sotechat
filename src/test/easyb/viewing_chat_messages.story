@@ -74,7 +74,6 @@ scenario "user can view multiple messages he or she has sent in a time order", {
                       last.shouldBeLessThan this
                     last = this
                 }
-
-        }
 }
+
 */

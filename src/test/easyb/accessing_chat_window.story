@@ -10,9 +10,9 @@ scenario "User cannot see the chat window if she/he has not been picked from a p
     }
     when 'a starting message is submitted', {
             element = driver.findElement(By.id("username"))
-            element.sendKeys("Matti")
+            element.sendKeys("Eero")
             element = driver.findElement(By.id("startMessage"))
-            element.sendKeys("Moikka!")
+            element.sendKeys("Moikkamoi!")
             element = driver.findElement(By.tagName("button"))
             element.submit()
     }
@@ -22,7 +22,6 @@ scenario "User cannot see the chat window if she/he has not been picked from a p
             page.contains("Olet jonossa").shouldBe true
             page.contains("panel-body chat-body").shouldBe false
             page.contains("messageForm").shouldBe false
-            page.contains("Moikka!").shouldBe false
     }
 }
 
@@ -48,9 +47,8 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
             Thread.sleep(2000)
             page = driver.getPageSource()
             page.contains("panel-body chat-body").shouldBe true
-            page.contains("messageForm").shouldBe true
             page.contains("panel panel-default userToPool-panel").shouldBe false
-            page.contains("Aloitusviesti:").shouldbe false
+            page.contains("Aloitusviesti:").shouldBe false
             driver.quit()
             proDriver.quit()
         }
