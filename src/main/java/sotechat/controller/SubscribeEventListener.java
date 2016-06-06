@@ -39,6 +39,10 @@ public class SubscribeEventListener
     @Autowired
     private QueueBroadcaster queueBroadcaster;
 
+    /** Chat Log Broadcaster. */
+    @Autowired
+    private ChatLogBroadcaster chatLogBroadcaster;
+
     /** Vain 1 instanssi. */
     public SubscribeEventListener() {
         map = new HashMap<String, List<HttpSession>>();
@@ -69,6 +73,7 @@ public class SubscribeEventListener
     }
 
     /** Kasittelee subscribe -tapahtumat.
+     * TODO: Esta subscribe kanaville, joita ei ole.
      * @param event event
      */
     private void handleSubscribe(final SessionSubscribeEvent event) {
@@ -102,8 +107,10 @@ public class SubscribeEventListener
 
         /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan viestihistoria
          * kaikille kanavan subscribaajille (alkuun "tyhjenna naytto" spessu) */
-        if (channelIdWithPath.startsWith("/toClient/chat/")) {
-
+        String chatPrefix = "/toClient/chat/";
+        if (channelIdWithPath.startsWith(chatPrefix)) {
+            String channelId = channelIdWithPath.substring(chatPrefix.length());
+            chatLogBroadcaster.broadcast(channelId);
         }
     }
 

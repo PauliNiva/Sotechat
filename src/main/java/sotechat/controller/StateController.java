@@ -5,7 +5,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,22 +25,28 @@ public class StateController {
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
+    /** Testi. */
+    private final ChatLogBroadcaster chatLogBroadcaster;
+
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
-     *
-     * @param pStateService ssdofofsd
+     * @param pStateService state service
+     * @param pQueueBroadcaster queue Broadcaster
      */
     @Autowired
     public StateController(
             final StateService pStateService,
-            final QueueBroadcaster pQueueBroadcaster
+            final QueueBroadcaster pQueueBroadcaster,
+            final ChatLogBroadcaster pChatLogBroadcaster
     ) {
         this.stateService = pStateService;
         this.queueBroadcaster = pQueueBroadcaster;
+        this.chatLogBroadcaster = pChatLogBroadcaster;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
      * @param req taalta paastaan session-olioon kasiksi.
+     * @param professional autentikointitiedot
      * @return mita vastataan customerClientin tilanpaivityspyyntoon.
      * @throws Exception mika poikkeus
      */
@@ -94,6 +99,7 @@ public class StateController {
      *  -> Broadcastataan jonon uusi tila hoitajille
      *  -> Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
+     * @param accessor accessor
      * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
      * @throws Exception mika poikkeus
      */

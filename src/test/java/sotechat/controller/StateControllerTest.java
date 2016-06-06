@@ -19,10 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import sotechat.data.Mapper;
-import sotechat.data.MapperImpl;
-import sotechat.data.SessionRepo;
-import sotechat.data.SessionRepoImpl;
+import sotechat.data.*;
 import sotechat.queue.Queue;
 import sotechat.queue.QueueImpl;
 import sotechat.service.ChatMessageService;
@@ -54,6 +51,7 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
+        ChatLogger chatLogger = new ChatLogger();
         Mapper mapper = new MapperImpl();
         SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
@@ -71,10 +69,11 @@ public class StateControllerTest {
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
+        ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(chatLogger, broker);
         StateService state = new StateService(
                 mapper, listener, qService, sessions);
         mvc = MockMvcBuilders
-                .standaloneSetup(new StateController(state, broadcaster))
+                .standaloneSetup(new StateController(state, broadcaster, logBroadcaster))
                 .build();
     }
 
