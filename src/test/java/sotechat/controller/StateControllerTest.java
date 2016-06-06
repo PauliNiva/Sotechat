@@ -49,7 +49,7 @@ public class StateControllerTest {
     @Before
     public void setUp() throws Exception {
         Mapper mapper = new MapperImpl();
-        ApplicationListener listener = new SubscribeEventListener();
+        SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
         SessionRepo sessions = new SessionRepoImpl(mapper);
        // SimpMessagingTemplate broker = new SimpMessagingTemplate();

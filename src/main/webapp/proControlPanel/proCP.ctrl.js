@@ -4,16 +4,24 @@ angular.module('chatApp')
         $scope.pro = true;
 
         $scope.chats = [];
+        $scope.queue = [];
 
         var queue = function(response) {
-            console.log(response);
+            $scope.queue = [];
+            angular.forEach(JSON.parse(response.body).jono,function(key) {
+                var queueObject = [];
+                queueObject.username = key.username;
+                queueObject.channelID = key.channelId;
+                queueObject.category = key.category;
+                $scope.queue.push(queueObject);
+            });
+            console.log($scope.queue)
         };
 
         var answer = function () {
             connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
             $scope.username = proStateService.getUsername();
             var i = 1;
-            console.log(proStateService.getChannelIDs());
             angular.forEach(proStateService.getChannelIDs(), function (key) {
                 $scope.chats.push({title: 'Chat' + i, channel: key});
                 i++;

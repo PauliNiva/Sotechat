@@ -8,7 +8,10 @@ angular.module('chatApp')
             });
 
             $scope.updateState = function () {
-                $scope.state = userStateService.getUserState();
+                userStateService.getVariablesFormServer().then(function (response) {
+                    userStateService.setAllVariables(response);
+                    $scope.state = userStateService.getUserState();
+                });
             };
         }]);
         
