@@ -124,7 +124,6 @@ public class QueueService {
      * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
      *                  halutaan selvittää
      * @return  alkioiden määrä, jotka edeltävät haettua alkiota
->>>>>>> 2567743a4ee8a7b55a63df915281c24e018e5e8a
      */
     public final int queueLength(final String channelId) {
         return queue.itemsBefore(channelId);
