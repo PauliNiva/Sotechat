@@ -25,7 +25,8 @@ scenario "user can see a message that has been sent to the server", {
                 element.sendKeys("salasana")
                 element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
                 element.submit()
-                element = prodr.findElement(By.name("next")
+                Thread.sleep(2000)
+                element = prodr.findElement(By.name("next"))
                 element.click()
         }
         when 'a message has been written to the right text field in the chat window', {
@@ -42,6 +43,7 @@ scenario "user can see a message that has been sent to the server", {
                 element.getText().equals("")shouldBe true
                 driver.getPageSource().contains("I want to send this message").shouldBe true
                 driver.quit()
+                prodr.quit()
         }
 }
 

@@ -1,3 +1,4 @@
+/*
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import sotechat.Application
@@ -41,3 +42,4 @@ scenario "Queuing user is shown the queue page", {
         driver.quit()
     }
 }
+*/

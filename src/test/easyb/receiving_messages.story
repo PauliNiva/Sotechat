@@ -9,6 +9,7 @@ scenario "user can view a message the other party has sent to the discussion", {
     given 'a customer and a professional have accessed the chat window', {
         custdr = new FirefoxDriver()
         custdr.get("http://localhost:8080")
+        Thread.sleep(1000)
         element = custdr.findElement(By.id("username"))
         element.sendKeys("Matti")
         element = custdr.findElement(By.id("startMessage"))
@@ -23,7 +24,8 @@ scenario "user can view a message the other party has sent to the discussion", {
         element.sendKeys("salasana")
         element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
         element.submit()
-        element = prodr.findElement(By.name("next")
+        Thread.sleep(2000)
+        element = prodr.findElement(By.name("next"))
         element.click()
         }
     when 'the other person sends a message', {

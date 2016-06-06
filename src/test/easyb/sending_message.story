@@ -27,7 +27,8 @@ scenario "user cand write a message on a text input", {
         element.sendKeys("salasana")
         element = proDriver.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
         element.submit()
-        element = proDriver.findElement(By.name("next")
+        Thread.sleep(2000)
+        element = proDriver.findElement(By.name("next"))
         element.click()
     }
     then 'text can be applied to a text field', {
@@ -76,6 +77,7 @@ scenario "user can send the message he or she has written to the server by press
         page = driver.getPageSource()
         page.contains("my second testmessage").shouldBe true
         driver.quit()
+        proDriver.quit()
     }
 }
 

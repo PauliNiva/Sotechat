@@ -39,7 +39,8 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
             element.submit()
         }
         when 'a professional chooses the started conversation from a pool', {
-            element = proDriver.findElement(By.name("next")
+            Thread.sleep(2000)
+            element = proDriver.findElement(By.name("next"))
             element.click()
         }
         then 'a chat window is opened for the user', {
@@ -51,6 +52,7 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
             page.contains("panel panel-default userToPool-panel").shouldBe false
             page.contains("Aloitusviesti:").shouldbe false
             driver.quit()
+            proDriver.quit()
         }
 }
 
