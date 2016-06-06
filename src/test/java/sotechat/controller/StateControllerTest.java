@@ -174,28 +174,4 @@ public class StateControllerTest {
         String content = result.getResponse().getContentAsString();
         assertEquals("Denied join pool request due to reserved username.", content);
     }
-
-  /*  @Test
-    public void
-    joiningChatPoolFailsIfUserWithSameUserNameIsAlreadyInChat() throws Exception {
-        String json = "{\"username\":\"Hemuli\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(MockMvcRequestBuilders.post("/joinPool")
-                .contentType(MediaType.APPLICATION_JSON).content(json)
-                .sessionAttr("channelId", "2")
-                .sessionAttr("state", "start")
-                .sessionAttr("userId", "123")
-                .sessionAttr("category", "DRUGS"))
-                .andExpect(status().isOk());
-
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/joinPool")
-                .contentType(MediaType.APPLICATION_JSON).content(json)
-                .sessionAttr("channelId", "2")
-                .sessionAttr("state", "start")
-                .sessionAttr("userId", "123")
-                .sessionAttr("category", "DRUGS"))
-                .andExpect(status().isOk())
-                .andReturn();
-        String content = result.getResponse().getContentAsString();
-        assertEquals("Denied join pool request due to bad state.", content);
-    }*/
 }

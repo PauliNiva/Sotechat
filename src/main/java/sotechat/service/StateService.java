@@ -204,7 +204,6 @@ public class StateService {
             System.out.println("Hacking attempt?");
             return "";
         }
-
         /** Add channelId to popper's channels. */
         String sessionId =  accessor
                         .getSessionAttributes()
@@ -214,7 +213,6 @@ public class StateService {
         System.out.println("Getting session ID " + sessionId);
         System.out.println("Session is null ? " + (session == null));
         sessionRepo.addChannel(session, channelId);
-
         queueService.removeFromQueue(channelId);
 
         String channelIdWithPath = "/toClient/queue/" + channelId;

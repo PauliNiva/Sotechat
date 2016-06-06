@@ -109,7 +109,6 @@ public class StateController {
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
-
         String wakeUp = stateService.popQueue(channelId, accessor);
         queueBroadcaster.broadcastQueue();
         return wakeUp;
