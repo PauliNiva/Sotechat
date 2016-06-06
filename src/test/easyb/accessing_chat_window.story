@@ -17,6 +17,7 @@ scenario "User cannot see the chat window if she/he has not been picked from a p
             element.submit()
     }
     then 'a queueing view is showed to the user', {
+            Thread.sleep(1000)
             page = driver.getPageSource()
             page.contains("Olet jonossa").shouldBe true
             page.contains("panel-body chat-body").shouldBe false
@@ -48,7 +49,6 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
             page = driver.getPageSource()
             page.contains("panel-body chat-body").shouldBe true
             page.contains("messageForm").shouldBe true
-            page.contains("Moikka!").shouldBe true
             page.contains("panel panel-default userToPool-panel").shouldBe false
             page.contains("Aloitusviesti:").shouldbe false
             driver.quit()
