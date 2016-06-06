@@ -24,7 +24,8 @@ public class WebSocketConfig extends
         AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
     /**
-     * Session Repository.
+     * SessionRepoImpl needs to be autowired so that WebSocket-sessions are
+     * stored in it.
      */
     @Autowired
     private SessionRepoImpl repository;

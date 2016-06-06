@@ -1,54 +1,57 @@
 angular.module('chatApp')
-    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', function ($scope, connectToServer, proStateService) {
-        var QUEUEADDRESS = '/toClient/';
-        $scope.pro = true;
+    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', 'queueProService',
+        function ($scope, connectToServer, proStateService, queueProService) {
+            var QUEUEADDRESS = '/toClient/';
+            var tabCount = 0;
+            $scope.pro = true;
+            $scope.inQueue = 0;
+            $scope.chats = [];
+            $scope.queue = queueProService.queue;
+            $scope.queueStatus = function () {
+                $scope.queue.length === 0
+            };
 
-        $scope.chats = [];
-        $scope.queue = [];
-        $scope.queueStatus = function () {$scope.queue.length === 0};
-        $scope.inQueue = $scope.queue.length;
+            $scope.$watch(function () {
+                return queueProService.queue.length;
+            }, function (lenght) {
+                $scope.inQueue = lenght;
+            }, true);
 
-        var queue = function(response) {
-            $scope.queue = [];
-            angular.forEach(JSON.parse(response.body).jono,function(key) {
-                var queueObject = [];
-                queueObject.username = key.username;
-                queueObject.channelID = key.channelId;
-                queueObject.category = key.category;
-                $scope.queue.push(queueObject);
-            });
-        };
+            var queue = function (response) {
+                angular.forEach(JSON.parse(response.body).jono, function (key) {
+                    queueProService.addToQueue(key);
+                    console.log(queueProService.queue.length);
+                    console.log($scope.inQueue);
+                });
+            };
 
-        $scope.getChannelsFromServer = function() {
+            $scope.addChatTab = function (channelID) {
+                $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
+            };
+
+            var updateChannels = function () {
+                tabCount = 1;
+                $scope.chats = [];
+                angular.forEach(proStateService.getChannelIDs(), function (key) {
+                    $scope.chats.push({title: 'Chat' + tabCount, channel: key});
+                    tabCount++;
+                });
+            };
+
+            var answer = function () {
+                connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
+                $scope.username = proStateService.getUsername();
+                updateChannels();
+            };
+
+            var init = function () {
+                connectToServer.connect(answer);
+            };
+
+
             proStateService.getVariablesFormServer().then(function (response) {
                 proStateService.setAllVariables(response);
-                updateChannels();
+                init();
             });
-        };
 
-        var updateChannels = function() {
-            var i = 1;
-            $scope.chats = [];
-            angular.forEach(proStateService.getChannelIDs(), function (key) {
-                $scope.chats.push({title: 'Chat' + i, channel: key});
-                i++;
-            });
-        };
-
-        var answer = function () {
-            connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
-            $scope.username = proStateService.getUsername();
-            updateChannels();
-        };
-
-        var init = function () {
-            connectToServer.connect(answer);
-        };
-
-
-        proStateService.getVariablesFormServer().then(function (response) {
-            proStateService.setAllVariables(response);
-            init();
-        });
-
-    }]);
+        }]);

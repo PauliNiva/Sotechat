@@ -158,7 +158,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "Hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -188,7 +188,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "Hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();

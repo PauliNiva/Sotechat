@@ -162,7 +162,6 @@ public class StateService {
             /** String (ei JSON) (AngularJS varten) */
             return "Denied join pool request due to reserved username.";
         }
-
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta vertaistukichatissa). */
         String channelIdWithPath = "/toClient/chat/" + channelId;
@@ -177,13 +176,13 @@ public class StateService {
 
         /** Hyvaksytaan kayttajan valitsema nimimerkki. */
         session.setAttribute("username", username);
-
         /** Mapataan nimimerkki ja kayttajatunnus. */
         String userId = get(session, "userId");
         mapperService.mapUsernameToId(userId, username);
 
         /** Asetetaan kayttaja jonoon odottamaan palvelua. */
         String category = get(session, "category");
+
         queueService.addToQueue(channelId, category, username);
         session.setAttribute("state", "queue");
 

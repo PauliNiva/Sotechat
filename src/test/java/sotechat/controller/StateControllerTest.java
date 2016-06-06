@@ -1,5 +1,7 @@
 package sotechat.controller;
 
+import com.google.gson.Gson;
+import groovy.json.JsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,12 +60,12 @@ public class StateControllerTest {
                 new MessageChannel() {
             @Override
             public boolean send(Message<?> message) {
-                return false;
+                return true;
             }
 
             @Override
             public boolean send(Message<?> message, long l) {
-                return false;
+                return true;
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
@@ -99,4 +101,44 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.category").isNotEmpty());
     }
 
+    @Test
+    public void testGetProStatReturnsOK() throws Exception {
+         mvc.perform(MockMvcRequestBuilders
+                .get("/proState").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetProStateReturnsPlausibleValues() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                .get("/proState").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.state", is("start")))
+                .andExpect(jsonPath("$.username", is("Anon")))
+                .andExpect(jsonPath("$.userId").isNotEmpty())
+                .andExpect(jsonPath("$.online", is("true")))
+                .andExpect(jsonPath("$.qbcc", is("QBCC")))
+                .andExpect(jsonPath("$.channelIds", is("")));
+    }
+
+    @Test
+    public void
+    testJoinPoolSucceedsWithNormalUserAndStartMessage() throws Exception {
+
+        String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
+        mvc.perform(MockMvcRequestBuilders.post("/joinPool")
+                    .contentType(MediaType.APPLICATION_JSON).content(json)
+                    .sessionAttr("channelId", "2")
+                    .sessionAttr("state", "start")
+                    .sessionAttr("userId", "4")
+                    .sessionAttr("category", "DRUGS"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("OK, please request new state now.")));
+
+    }
+
+    @Test
+    public void 
 }
