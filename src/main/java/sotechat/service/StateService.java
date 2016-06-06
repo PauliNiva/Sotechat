@@ -34,7 +34,7 @@ public class StateService {
     private final QueueService queueService;
 
     /** SubScribeEventHandler. */
-    private final ApplicationListener subscribeEventListener;
+    private final SubscribeEventListener subscribeEventListener;
 
     /** Session Repository. */
     private final SessionRepo sessionRepo;
@@ -56,7 +56,7 @@ public class StateService {
     public StateService(
             final Mapper pMapper,
             /* HUOM: Spring ei salli "pSubsc..." tyyppista nimentaa tuolle. */
-            final ApplicationListener subscribeEventListener,
+            final SubscribeEventListener subscribeEventListener,
             final QueueService pQueueService,
             final SessionRepo pSessionRepo
     ) {
@@ -162,10 +162,9 @@ public class StateService {
 
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta vertaistukichatissa). */
-        SubscribeEventListener customClass =
-                (SubscribeEventListener) subscribeEventListener;
         String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
+        List<HttpSession> list = subscribeEventListener
+                .getSubscribers(channelIdWithPath);
         for (HttpSession other : list) {
             if (get(other, "username").equals(username)) {
                 /** String (ei JSON) (AngularJS varten) */
@@ -196,9 +195,11 @@ public class StateService {
         /** Set state of members in channel to "chat". */
         SubscribeEventListener customClass =
                 (SubscribeEventListener) subscribeEventListener;
-        String channelIdWithPath = "/toClient/chat/" + channelId;
+        String channelIdWithPath = "/toClient/queue/" + channelId;
         List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
+        System.out.println("Heissan channelIdWithPath = " + channelIdWithPath);
         for (HttpSession member : list) {
+            System.out.println("Setting state of someone.");
             member.setAttribute("state", "chat");
         }
 
