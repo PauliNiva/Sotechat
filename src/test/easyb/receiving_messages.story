@@ -1,6 +1,6 @@
-
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.*;
 import java.util.concurrent.TimeUnit
 
 description 'As a user I want to see the messages other people have sent to discussion'

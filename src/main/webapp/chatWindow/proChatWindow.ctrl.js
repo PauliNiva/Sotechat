@@ -38,7 +38,11 @@ angular.module('chatApp')
 
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
-                    $scope.messages.push(getMessage(response.body));
+                    if (response.body != '$CLEAR$') {
+                        $scope.messages.push(getMessage(response.body));
+                    } else  {
+                        $scope.messages.length = 0;
+                    }
                 });
             };
 

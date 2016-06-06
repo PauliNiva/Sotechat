@@ -1,6 +1,6 @@
-
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.*;
 import org.openqa.selenium.Keys
 
 description 'As a user I want to send a message'

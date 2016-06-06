@@ -1,6 +1,6 @@
-
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.*;
 import java.util.List
 import java.lang.Integer
 
@@ -10,36 +10,38 @@ description 'As a user I want to view the messages I have sent in the chat windo
 scenario "user can see a message that has been sent to the server", {
         given 'a chat window is accessed', {
                 driver = new FirefoxDriver()
+                wait = new WebDriverWait(driver, 3)
                 driver.get("http://localhost:8080")
-                element = driver.findElement(By.id("username"))
+                element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
                 element.sendKeys("Matti")
-                element = driver.findElement(By.id("startMessage"))
+                element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("startMessage")))
                 element.sendKeys("Moikka!")
-                element = driver.findElement(By.tagName("button"))
+                element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("button")))
                 element.submit()
                 prodr = new FirefoxDriver()
+                wait2 = new WebDriverWait(prodr, 3)
                 prodr.get("http://localhost:8080/proCP.html")
-                element = prodr.findElement(By.name("username"))
+                element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
                 element.sendKeys("Hoitaja")
-                element = prodr.findElement(By.name("password"))
+                element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("password")))
                 element.sendKeys("salasana")
-                element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
+                element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type='submit'][value='Sign In']")))
                 element.submit()
                 Thread.sleep(2000)
-                element = prodr.findElement(By.name("next"))
+                element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("next")))
                 element.click()
         }
         when 'a message has been written to the right text field in the chat window', {
-                element = driver.findElement(By.name("messageArea"))
+                element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
                 element.sendKeys("I want to send this message")
         }
         and 'submit button is pressed', {
-                button = driver.findElement(By.name("send"))
+                button = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("send")))
                 button.submit()
         }
         then 'the message appears in the chat window', {
-                Thread.sleep(2000)
-                element = driver.findElement(By.name("messageArea"))
+                Thread.sleep(3000)
+                element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
                 element.getText().equals("")shouldBe true
                 driver.getPageSource().contains("I want to send this message").shouldBe true
                 driver.quit()
