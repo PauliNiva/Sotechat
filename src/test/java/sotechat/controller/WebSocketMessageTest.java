@@ -95,7 +95,7 @@ public class WebSocketMessageTest {
          * komentoa kaytetaan, jotta viesti voidaan lahettaa(SEND).
          */
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
 
         /**
@@ -152,13 +152,13 @@ public class WebSocketMessageTest {
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new TestPrincipal("hoitaja"));
+        headers.setUser(new TestPrincipal("Hoitaja"));
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
-        msgUtil.add("channelIds", "[\"DEV_CHANNEL\"]", true);
+        msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
+        msgUtil.add("username", "Hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -188,7 +188,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
+        msgUtil.add("username", "Hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -216,7 +216,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "243", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
+        msgUtil.add("username", "Hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -245,7 +245,7 @@ public class WebSocketMessageTest {
     public StompHeaderAccessor setDefaultHeadersForChannel(String channel) {
         StompHeaderAccessor headers = StompHeaderAccessor
                 .create(StompCommand.SEND);
-        headers.setDestination("/toServer/chat/DEV_CHANNEL");
+        headers.setDestination(channel);
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
         headers.setSessionAttributes(new HashMap<String, Object>());
