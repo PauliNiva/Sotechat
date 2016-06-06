@@ -196,11 +196,4 @@ public class StateService {
         return "{\"content\":\"channel activated. request new state now.\"}";
     }
 
-    /**
-     * Getter.
-     * @return Queue as JSON
-     */
-    public final String getQueueAsJson() {
-        return queueService.toString();
-    }
 }

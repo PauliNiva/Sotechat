@@ -28,7 +28,7 @@ import static sotechat.util.Utils.get;
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
-    /** Key = channelID, value = list of subscribed sessions. */
+    /** Key = channelIDWithPath, value = list of subscribed sessions. */
     private HashMap<String, List<HttpSession>> map;
 
     /** Session Repository. */

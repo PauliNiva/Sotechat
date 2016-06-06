@@ -3,29 +3,29 @@ package sotechat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import sotechat.service.QueueService;
 import sotechat.service.StateService;
 
 /** Tiedottaa jonon tilanteesta kaikille QBCC subscribanneille. */
 @Component
 public class QueueBroadcaster {
 
-    /** State Service. */
-    private final StateService stateService;
+    /** Queue Service. */
+    private final QueueService queueService;
 
     /** Taikoo viestien lahetyksen. */
     private SimpMessagingTemplate brokerMessagingTemplate;
 
     /** Konstruktori.
      *
-     * @param pStateService sffdsdf
      * @param pSimpMessagingTemplate sffsdsdf
      */
     @Autowired
     public QueueBroadcaster(
-            final StateService pStateService,
+            final QueueService pQueueService,
             final SimpMessagingTemplate pSimpMessagingTemplate
     ) {
-        this.stateService = pStateService;
+        this.queueService = pQueueService;
         this.brokerMessagingTemplate = pSimpMessagingTemplate;
     }
 
@@ -35,7 +35,7 @@ public class QueueBroadcaster {
      */
     public final void broadcastQueue() {
         String qbcc = "/toClient/" + StateService.QUEUE_BROADCAST_CHANNEL;
-        String qAsJson = stateService.getQueueAsJson();
+        String qAsJson = queueService.toString();
         brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }
 
