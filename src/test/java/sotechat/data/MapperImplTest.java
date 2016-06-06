@@ -9,10 +9,10 @@ public class MapperImplTest {
     @Test
     public void testi() {
         Assert.assertEquals("UNKNOWN_USERNAME", mapper.getUsernameFromId("1"));
-        Assert.assertEquals("hoitaja", mapper.getUsernameFromId("666"));
+        Assert.assertEquals("Hoitaja", mapper.getUsernameFromId("666"));
         Assert.assertTrue(mapper.isUserIdMapped("666"));
         Assert.assertEquals("UNKNOWN_ID", mapper.getIdFromRegisteredName("hoitsu"));
-        Assert.assertEquals("666", mapper.getIdFromRegisteredName("hoitaja"));
+        Assert.assertEquals("666", mapper.getIdFromRegisteredName("Hoitaja"));
         Assert.assertNotNull(mapper.getSecureRandomString());
     }
 }

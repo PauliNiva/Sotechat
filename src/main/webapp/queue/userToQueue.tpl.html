@@ -1,0 +1,16 @@
+<div class="panel panel-default userToPool-panel" ng-controller="userToQueueCtrl">
+    <div class="panel-body">
+        <h4>X keskusteluun liittyminen</h4>
+        <form ng-submit="joinQueue()">
+            <div class="form-group">
+                <label for="username">Nimimerkki:</label>
+                <input ng-model="username" type="text" class="form-control" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="startMessage">Aloitusviesti:</label>
+                <textarea ng-model="startMessage" class="form-control" id="startMessage" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Siirry jonottamaan</button>
+        </form>
+    </div>
+</div>

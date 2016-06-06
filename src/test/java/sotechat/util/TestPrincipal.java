@@ -3,8 +3,8 @@ package sotechat.util;
 import java.security.Principal;
 
 /**
- * Luokka, jonka avulla voidaan testaamisessa simuloida rekisteröityneen
- * käyttäjän kirjautumista.
+ * Luokka, jonka avulla voidaan testaamisessa simuloida rekisteroityneen
+ * kayttajan kirjautumista.
  */
 public class TestPrincipal implements Principal {
 

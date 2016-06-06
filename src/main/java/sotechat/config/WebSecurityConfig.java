@@ -10,36 +10,35 @@ import org.springframework.security.config.annotation.web.configuration
 import org.springframework.security.config.annotation.web.configuration
         .EnableWebSecurity;
 
-/** Tämä konfiguraatiotiedosto ottaa Spring Securityn käyttöön
- *  yhdessä joidenkin pom.xml -määrityksien kanssa. */
-
-
+/** Tama konfiguraatiotiedosto ottaa Spring Securityn kayttoon
+ *  yhdessa joidenkin pom.xml -maarityksien kanssa. */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    /** Määrittelee mm. kirjautumisvaatimuksen sivulle /pro. */
+    /** Maarittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.csrf().disable();
         http
-                // "määritellään seuraavaksi, mitkä
-                // pyynnöt vaativat kirjautumisen"
+                // "maaritellaan seuraavaksi, mitka
+                // pyynnot vaativat kirjautumisen"
                 .authorizeRequests()
-                // pyynnöt polkuun /pro
+                // pyynnot polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/proCP.html").authenticated()
-                // muut pyynnöt
+                .antMatchers("/pro", "/proCP.html").authenticated()
+                // muut pyynnot
                 // sallitaan kaikille
                 .anyRequest().permitAll()
                 .and()
-                // jotenkin kai yhdistää
+                // jotenkin kai yhdistaa
                 // login-sivun session luomiseen
                 .formLogin()
-                // polun /login mäppäys
-                // löytyy tiedostosta MvcConfig
+                // polun /login mappays
+                // loytyy tiedostosta MvcConfig
                 .loginPage("/login")
-                // pääsy login-sivulle
+                // paasy login-sivulle
                 // sallitaan kaikille
                 .permitAll()
                 .and()
@@ -55,14 +54,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // CsrfFilter.class);
 
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
-         * pyyntöjen uudelleenohjaamisessa login.html -sivulle.
-          * TODO: Mitenköhän uudelleenohjaus tarkalleen ottaen toimii? */
+         * pyyntojen uudelleenohjaamisessa login.html -sivulle.
+          * TODO: Mitenkohan uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
     /** Kovakoodataan hoitajan tunnukset siihen saakka,
-     * että tietokanta on käytössä.
-     * @param auth mikä tämä on?
-     * @throws Exception mikä poikkeus?
+     * etta tietokanta on kaytossa.
+     * @param auth mika tama on?
+     * @throws Exception mika poikkeus?
      */
     @Autowired
      public final void configureGlobal(
@@ -72,6 +71,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("Hoitaja")
                 .password("salasana")
                 .roles("USER");
-                // TODO: selvitä roolin merkitys.
+                // TODO: selvita roolin merkitys.
     }
 }

@@ -1,4 +1,4 @@
 /**
- * Tämä paketti sisältää sovelluksen palvelinpuolen toiminnan.
+ * Tama paketti sisaltaa sovelluksen palvelinpuolen toiminnan.
  */
 package sotechat;

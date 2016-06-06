@@ -5,23 +5,23 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * WebSocket-viestin testaamista helpottava luokka. Löytyy metodi Json-
- * muotoisen viestin generoimiseksi, sekä apumetodit sen tarkistamiseksi,
- * että vastausviestissä on vain halutut kentät.
+ * WebSocket-viestin testaamista helpottava luokka. Loytyy metodi Json-
+ * muotoisen viestin generoimiseksi, seka apumetodit sen tarkistamiseksi,
+ * etta vastausviestissa on vain halutut kentat.
  */
 public class MsgUtil {
     /**
-     * Settiin lisätään ne kentät joiden halutaan löytyvän palvelimen
-     * lähettämästä vastauksesta. Eli ne kentät, jotka löytyvät MsgToClient-
-     * oliosta. Settiin ei haluta lisätä sellaisia kenttiä, jotka löytyvät
-     * palvelimelle lähetettävästä viestistä(MsgToServer), mutta jotka
-     * eivät löydy palvelimen lähettämästä vastauksesta(MsgToClient).
+     * Settiin lisataan ne kentat joiden halutaan loytyvan palvelimen
+     * lahettamasta vastauksesta. Eli ne kentat, jotka loytyvat MsgToClient-
+     * oliosta. Settiin ei haluta lisata sellaisia kenttia, jotka loytyvat
+     * palvelimelle lahetettavasta viestista(MsgToServer), mutta jotka
+     * eivat loydy palvelimen lahettamasta vastauksesta(MsgToClient).
      */
     private HashSet<String> halutaanLahettaa;
     /**
-     * Mappiin talletetaan kaikki avaimet ja niitä vastaavat arvot. Sekä ne
-     * avain-arvo -parit, jotka löytyvät MsgToClient-olioista, että ne, jotka
-     * löytyvät MsgToServer-olioista.
+     * Mappiin talletetaan kaikki avaimet ja niita vastaavat arvot. Seka ne
+     * avain-arvo -parit, jotka loytyvat MsgToClient-olioista, etta ne, jotka
+     * loytyvat MsgToServer-olioista.
      */
     private HashMap<String, String> map;
 
@@ -31,18 +31,18 @@ public class MsgUtil {
     }
 
     /**
-     * Tässä metodissa määritellään, minkä kenttien halutaan löytyvän
-     * vastausviestistä. Kun lisätään avain-arvo -pareja mappiin, määritellään
-     * lisäksi boolean-muuttujalle arvo. Se on true, jos halutaan, että avain
-     * löytyy palvelimen lähettämästä vastausviestistä. False silloin, jos
-     * avaimen ei haluta löytyvän. Settiin lisätään vain ne arvot, joiden
-     * halutaan löytyvän vastauksesta, kun taas Mappiin lisätään kaikki.
+     * Tassa metodissa maaritellaan, minka kenttien halutaan loytyvan
+     * vastausviestista. Kun lisataan avain-arvo -pareja mappiin, maaritellaan
+     * lisaksi boolean-muuttujalle arvo. Se on true, jos halutaan, etta avain
+     * loytyy palvelimen lahettamasta vastausviestista. False silloin, jos
+     * avaimen ei haluta loytyvan. Settiin lisataan vain ne arvot, joiden
+     * halutaan loytyvan vastauksesta, kun taas Mappiin lisataan kaikki.
      *
      * @param key Avain, esim userId tai channelId
      * @param value Arvo, esim userId:n arvo voi olla 542
-     * @param lahetetaan Halutaanko, että palvelimen vastausviestistä
-     *                   löytyy tietty kenttä. Esim. ei haluta, että
-     *                   palvelimen paluuviestissä olisi userId.
+     * @param lahetetaan Halutaanko, etta palvelimen vastausviestista
+     *                   loytyy tietty kentta. Esim. ei haluta, etta
+     *                   palvelimen paluuviestissa olisi userId.
      */
     public void add(String key, String value, boolean lahetetaan) {
         if (lahetetaan) halutaanLahettaa.add(key);
@@ -51,7 +51,7 @@ public class MsgUtil {
 
     /**
      * Luodaan Mappiin talletetuista avain-arvo -pareista Json-muotoinen String,
-     * joka voidaan lähettää palvelimelle.
+     * joka voidaan lahettaa palvelimelle.
      * @return Palauttaa Json-muotoisen Stringin
      */
     public String mapToString() {
@@ -65,8 +65,8 @@ public class MsgUtil {
     }
 
     /**
-     * Palauttaa Setin, jota voidaan käyttää testaamisessa apuvälineenä.
-     * Setissä on ne arvot joiden halutaan löytyvän vastausviestistä.
+     * Palauttaa Setin, jota voidaan kayttaa testaamisessa apuvalineena.
+     * Setissa on ne arvot joiden halutaan loytyvan vastausviestista.
      * @return
      */
     public HashSet<String> getMsgUtilSet() {

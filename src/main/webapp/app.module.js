@@ -1,1 +1,2 @@
-angular.module('chatApp', ['luegg.directives']);
+angular.module('chatApp', ['luegg.directives', 'focus-if', 'ui.bootstrap', 'ngAnimate']);
+

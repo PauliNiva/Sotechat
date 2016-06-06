@@ -16,9 +16,8 @@ scenario "User can open a chat window when she/he is picked from a pool of custo
         }
         then 'a chat window is opened for the user', {
             page = driver.getPageSource()
-            page.contains("panel panel-default chat-panel").shouldBe true
-            page.contains("chatController as chat").shouldBe true
-            page.contains("panel-body chat-body").shouldBe true
+            page.contains("Aloitusviesti").shouldBe true
+            page.contains("Nimimerkki").shouldBe true
             driver.quit()
         }
 }
@@ -34,4 +33,3 @@ scenario "User cannot see the chat window if she/he has not been picked from a p
 
     }
 }
-

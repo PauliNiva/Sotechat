@@ -1,27 +1,39 @@
 package sotechat.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web
-        .socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.session.ExpiringSession;
+import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
 import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import sotechat.data.SessionRepoImpl;
 
 
-/** Palvelin käsittelee kahta erityyppistä liikennettä: HTML ja WebSockets.
- * Tämä konfiguraatioluokka koskee WebSocket-liikenteen käsittelyä.
- * Ilmeisesti tässä määritellään polut, joihin tulevat/menevät viestit
- * käsitellään - ja muihin polkuihin menevät viestit unohdetaan. */
+/** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
+ * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
+ * Ilmeisesti tassa maaritellaan polut, joihin tulevat/menevat viestit
+ * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan. */
 @Configuration
+@EnableScheduling
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class WebSocketConfig extends
+        AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
-    /** Metodi käyttää MessageBrokerRegistry-luokan metodia enableSimpleBroker
-     * välittääkseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
-     * Palvelimen viestit tulevat ChatController-luokalta.
+    /**
+     * Session Repository.
+     */
+    @Autowired
+    private SessionRepoImpl repository;
+
+
+    /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
+     * valittaakseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
      *
-     * @param conf Välittäjäolio, joka välittää viestit WebSocketin kautta
+     * @param conf Valittajaolio, joka valittaa viestit WebSocketin kautta
      *               palvelimen ChatController-luokalta asiakasohjelmalle.
      */
     @Override
@@ -29,16 +41,15 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         conf.enableSimpleBroker("/toClient");
     }
 
-    /** Metodi käyttää StompEndpointRegistry-luokan metodia addEndpoint
-     * määrittääkseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
-     * pääteosoitteen. Tässä ohjelmassa viestit ohjautuvat
-     * ChatController-luokalle.
+    /** Metodi kayttaa StompEndpointRegistry-luokan metodia addEndpoint
+     * maarittaakseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
+     * paateosoitteen.
      *
-     * @param reg Luokka, joka määrittää WebSocketin kautta tulleille
-     *                 asiakasohjelmien viesteille pääteosoitteen.
+     * @param reg Luokka, joka maarittaa WebSocketin kautta tulleille
+     *                 asiakasohjelmien viesteille paateosoitteen.
      */
     @Override
-    public final void registerStompEndpoints(final StompEndpointRegistry reg) {
+    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 }

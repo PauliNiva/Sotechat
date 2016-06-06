@@ -2,47 +2,47 @@ package sotechat.data;
 
 /**
  * Jotta Springin Dependency Injection toimisi,
- * Mapperilla täytyy olla oma interface.
+ * Mapperilla taytyy olla oma interface.
  */
 public interface Mapper {
     /** Metodi, jonka tarkoituksena on tallettaa tietorakenteeseen
-     * avain-arvo pari, jossa käyttäjän ID on avain ja käyttäjänimi on arvo,
+     * avain-arvo pari, jossa kayttajan ID on avain ja kayttajanimi on arvo,
      * johon avain viittaa.
-     * @param id Käyttäjän ID.
-     * @param username Käyttäjätunnus
+     * @param id Kayttajan ID.
+     * @param username Kayttajatunnus
      */
     void mapUsernameToId(String id, String username);
 
-    /** Metodi, joka mahdollistaa käyttäjänimen hakemisen tietorakenteesta
-     * käyttäjän id:n perusteella.
-     * @param id Käyttäjän ID.
-     * @return Palauttaa käyttäjänimen.
+    /** Metodi, joka mahdollistaa kayttajanimen hakemisen tietorakenteesta
+     * kayttajan id:n perusteella.
+     * @param id Kayttajan ID.
+     * @return Palauttaa kayttajanimen.
      */
     String getUsernameFromId(String id);
 
-    /** Metodi joka mahdollistaa rekisteröityneen käyttäjän(hoitajan)
-     * käyttäjäId:n hakemisen tietorakenteesta käyttäjänimen perusteella.
-     * Hoitajan käyttäjänimi on uniikki, koska rekisteröityminen vaatii sitä.
-     * @param registeredName Rekisteröityneen käyttäjän käyttäjänimi.
-     * @return Palauttaa rekisteröityneen käyttäjän ID:n.
+    /** Metodi joka mahdollistaa rekisteroityneen kayttajan(hoitajan)
+     * kayttajaId:n hakemisen tietorakenteesta kayttajanimen perusteella.
+     * Hoitajan kayttajanimi on uniikki, koska rekisteroityminen vaatii sita.
+     * @param registeredName Rekisteroityneen kayttajan kayttajanimi.
+     * @return Palauttaa rekisteroityneen kayttajan ID:n.
      */
     String getIdFromRegisteredName(String registeredName);
 
-    /** Metodi generoi uniikin id:n käyttäjälle.
+    /** Metodi generoi uniikin id:n kayttajalle.
      * @return Palauttaa generoidun ID:n.
      */
     String generateNewId();
 
-    /** Metodi tarkistaa, onko tietty käyttäjäId jo talletettuna
+    /** Metodi tarkistaa, onko tietty kayttajaId jo talletettuna
      * tietorakenteeseen.
-     * @param id Se käyttäjän ID, jonka olemassaolo tietorakenteesta halutaan
+     * @param id Se kayttajan ID, jonka olemassaolo tietorakenteesta halutaan
      *           tarkistaa.
-     * @return Palauttaa true, jos käyttäjä ID löytyy, ja false, jos ei löydy.
+     * @return Palauttaa true, jos kayttaja ID loytyy, ja false, jos ei loydy.
      */
     boolean isUserIdMapped(String id);
 
-    /** Metodi tarkistaa, kuuluuko jokin käyttäjäID
-     * rekisteröityneelle käyttäjälle.
+    /** Metodi tarkistaa, kuuluuko jokin kayttajaID
+     * rekisteroityneelle kayttajalle.
      * @param id id
      * @return true, jos kuuluu.
      */
