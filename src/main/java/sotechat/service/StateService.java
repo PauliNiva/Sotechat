@@ -152,6 +152,9 @@ public class StateService {
 
         /** Tarkistetaan etta aiempi tila on "start". */
         if (!get(session, "state").equals("start")) {
+            for (int i = 0; i < 50; i++) {
+                System.out.println(channelId);
+            }
             /** String (ei JSON), jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to bad state.";
         }
@@ -162,12 +165,17 @@ public class StateService {
             /** String (ei JSON) (AngularJS varten) */
             return "Denied join pool request due to reserved username.";
         }
-
+        for (int i = 0; i < 50; i++) {
+            System.out.println("asdasdasdasd");
+        }
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta vertaistukichatissa). */
         String channelIdWithPath = "/toClient/chat/" + channelId;
         List<HttpSession> list = subscribeEventListener
                 .getSubscribers(channelIdWithPath);
+        for (int i = 0; i < 50; i++) {
+            System.out.println("mörlöörölösa");
+        }
         for (HttpSession other : list) {
             if (get(other, "username").equals(username)) {
                 /** String (ei JSON) (AngularJS varten) */

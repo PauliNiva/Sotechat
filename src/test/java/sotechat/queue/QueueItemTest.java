@@ -5,9 +5,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by varkoi on 3.6.2016.
- */
 public class QueueItemTest {
 
     QueueItem item;

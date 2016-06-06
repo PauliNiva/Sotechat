@@ -30,10 +30,9 @@ public class QueueBroadcaster {
     ) {
         this.queueService = pQueueService;
         this.brokerMessagingTemplate = pSimpMessagingTemplate;
-        //setBroadcastEvery1Second();
     }
 
-    /**
+    /** NOT CURRENTLY IN USE.
      * Broadcasting every 1 second to fix subscribe+broadcast timing issues.
      * TODO: Properly for production.
      */
@@ -51,9 +50,20 @@ public class QueueBroadcaster {
      * TODO: Protection against flooding (max 1 broadcast/second).
      */
     public final void broadcastQueue() {
-        String qbcc = "/toClient/" + StateService.QUEUE_BROADCAST_CHANNEL;
-        String qAsJson = queueService.toString();
-        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
+        int delay = 50; // milliseconds
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                String qbcc = "/toClient/" +
+                        StateService.QUEUE_BROADCAST_CHANNEL;
+                String qAsJson = queueService.toString();
+                brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
+            }
+        }, delay);
+
     }
+
+
 
 }
