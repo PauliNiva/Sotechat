@@ -7,21 +7,22 @@ angular.module('chatApp')
             $scope.inQueue = 0;
             $scope.chats = [];
             $scope.queue = queueProService.queue;
-            $scope.queueStatus = function () {
-                $scope.queue.length === 0
-            };
+            $scope.queueStatus = $scope.inQueue === 0;
+
 
             $scope.$watch(function () {
                 return queueProService.queue.length;
             }, function (lenght) {
                 $scope.inQueue = lenght;
+                $scope.queueStatus = $scope.inQueue === 0;
             }, true);
 
             var queue = function (response) {
+                queueProService.clear();
                 angular.forEach(JSON.parse(response.body).jono, function (key) {
+                    console.log(key);
                     queueProService.addToQueue(key);
-                    console.log(queueProService.queue.length);
-                    console.log($scope.inQueue);
+                    console.log(queueProService.queue);
                 });
             };
 
@@ -39,6 +40,7 @@ angular.module('chatApp')
             };
 
             var answer = function () {
+
                 connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
                 $scope.username = proStateService.getUsername();
                 updateChannels();

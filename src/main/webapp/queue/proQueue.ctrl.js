@@ -3,9 +3,10 @@ angular.module('chatApp')
         function ($scope, queueProService,stompSocket) {
 
             $scope.nextFromQueue = function() {
-                var channeID = $scope.queue[0].channelID;
-                stompSocket.send('/toServer/queue/' + channeID, {}, '');
-                queueProService.removeFirstFromQueue();
-                $scope.addChatTab(channeID);
+                var channelID = queueProService.removeFirstFromQueue().channelID;
+                if (channelID != null) {
+                    stompSocket.send('/toServer/queue/' + channelID, {}, '');
+                    $scope.addChatTab(channelID);
+                }
             };
         }]);

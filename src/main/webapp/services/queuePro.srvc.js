@@ -7,9 +7,11 @@ angular.module('chatApp')
             if (queue.length > 0) {
                 var first = queue[0];
                 queue.splice(0,1);
+                console.log(queue);
                 length--;
                 return first;
             }
+            return null;
         };
 
         var addToQueue = function(key) {
@@ -18,6 +20,7 @@ angular.module('chatApp')
             queueObject.channelID = key.channelId;
             queueObject.category = key.category;
             queue.push(queueObject);
+            console.log("moi2");
             length++;
         };
 
@@ -25,9 +28,16 @@ angular.module('chatApp')
             return length;
         };
 
+        var clear = function () {
+            queue.length = 0;
+            console.log("moi1");
+            length = 0;
+        };
+
         var queueService = {
             removeFirstFromQueue:removeFirstFromQueue,
             addToQueue:addToQueue,
+            clear:clear,
             queue:queue,
             getLength:getLength
         };
