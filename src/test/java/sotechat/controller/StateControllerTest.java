@@ -138,11 +138,6 @@ public class StateControllerTest {
                         is("OK, please request new state now.")));
     }
 
-    /**
-     * TODO tarkista, että ohjaa virhesivulle, tai että onko JSON:ia ei olamassa.
-     *
-     * @throws Exception
-     */
     @Test
     public void
     joiningChatPoolFailsWithNormalUserIfStateIsNotStart() throws Exception {
