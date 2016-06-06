@@ -188,18 +188,32 @@ public class StateService {
         return "{\"content\":\"OK, please request new state now.\"}";
     }
 
-    public String popQueue(String channelId) {
-        System.out.println("Opening channel Id: " + channelId);
+    /** Popping user from queue.
+     * @param channelId sdf
+     * @param req dg
+     * @param professional dgdg
+     * @return dfgdfg
+     */
+    public final String popQueue(String channelId,
+                           HttpServletRequest req,
+                           Principal professional
+    ) {
+        /** Verify that popper is authenticated. */
+        if (professional == null) {
+            System.out.println("Hacking attempt?");
+            return "";
+        }
+
+        /** Add channelId to popper's channels. */
+        HttpSession session = req.getSession();
+        sessionRepo.addChannel(session, channelId);
+
         queueService.removeFromQueue(channelId);
 
-        /** Set state of members in channel to "chat". */
-        SubscribeEventListener customClass =
-                (SubscribeEventListener) subscribeEventListener;
         String channelIdWithPath = "/toClient/queue/" + channelId;
-        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
-        System.out.println("Heissan channelIdWithPath = " + channelIdWithPath);
+        List<HttpSession> list = subscribeEventListener.
+                getSubscribers(channelIdWithPath);
         for (HttpSession member : list) {
-            System.out.println("Setting state of someone.");
             member.setAttribute("state", "chat");
         }
 

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.HashSet;
+
 import static sotechat.util.Utils.get;
 
 @Component
@@ -15,6 +17,10 @@ public class SessionRepoImpl extends MapSessionRepository
 
     /** Avain sessio-ID, arvo HttpSession-olio. */
     private HashMap<String, HttpSession> httpSessions;
+
+    /** Avain = pro kayttajan sessio ID.
+     *  Arvo = Setti kanavia, joilla kayttaja on. */
+    private HashMap<String, HashSet<String>> proChannels;
 
     /** Kaytetaan testauksessa. */
     private HttpSession latestSession;
@@ -28,7 +34,8 @@ public class SessionRepoImpl extends MapSessionRepository
     ) {
         super();
         this.mapperService = pMapper;
-        this.httpSessions = new HashMap();
+        this.httpSessions = new HashMap<>();
+        this.proChannels = new HashMap<>();
     }
 
     @Override
@@ -91,6 +98,44 @@ public class SessionRepoImpl extends MapSessionRepository
 
         /** Kirjataan tiedot mapperiin (monesti aiemman paalle). */
         mapperService.mapUsernameToId(userId.toString(), username.toString());
+    }
+
+    @Override
+    public void addChannel(HttpSession session, String channelId) {
+        if (session.getAttribute("channelIds") != null) {
+            /** Case: pro user with multiple channels. */
+            HashSet<String> channels = proChannels.get(session.getId());
+            if (channels == null) {
+                channels = new HashSet<>();
+                proChannels.put(session.getId(), channels);
+            }
+            channels.add(channelId);
+            String channelIds = jsonFriendlyFormat(channels);
+            session.setAttribute("channelIds", channelIds);
+        } else {
+            /** Case: regular user with single channel. */
+            session.setAttribute("channelId", channelId);
+        }
+    }
+
+    //@Override TODO
+    public void removeChannel(HttpSession session, String channelId) {
+
+    }
+
+    /** Annettuna setti kanavia, tuottaa Stringin halutussa muotoilussa.
+     * @param channels sdfdf
+     * @return rrrrg
+     */
+    private String jsonFriendlyFormat(HashSet<String> channels) {
+        if (channels.isEmpty()) return "[]";
+        String output = "[";
+        for (String channel : channels) {
+            output += channel + ", ";
+        }
+        output.substring(0, output.length() - 2);
+        output += "]";
+        return output;
     }
 
 

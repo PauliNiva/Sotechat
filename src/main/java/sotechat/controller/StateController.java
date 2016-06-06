@@ -99,10 +99,12 @@ public class StateController {
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
     public final String popClientFromQueue(
-            final @DestinationVariable String channelId
+            final @DestinationVariable String channelId,
+            final HttpServletRequest req,
+            final Principal professional
             ) throws Exception {
 
-        String wakeUp = stateService.popQueue(channelId);
+        String wakeUp = stateService.popQueue(channelId, req, professional);
         queueBroadcaster.broadcastQueue();
         return wakeUp;
     }

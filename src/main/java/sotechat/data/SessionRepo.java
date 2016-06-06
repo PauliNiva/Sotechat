@@ -11,4 +11,5 @@ public interface SessionRepo {
             HttpSession session,
             Principal professional
     );
+    void addChannel(HttpSession session, String channelId);
 }
