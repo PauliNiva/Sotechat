@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -49,15 +51,27 @@ public class StateControllerTest {
     @Before
     public void setUp() throws Exception {
         Mapper mapper = new MapperImpl();
-        ApplicationListener listener = new SubscribeEventListener();
+        SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
         SessionRepo sessions = new SessionRepoImpl(mapper);
-       // SimpMessagingTemplate broker = new SimpMessagingTemplate();
+        SimpMessagingTemplate broker = new SimpMessagingTemplate(
+                new MessageChannel() {
+            @Override
+            public boolean send(Message<?> message) {
+                return false;
+            }
+
+            @Override
+            public boolean send(Message<?> message, long l) {
+                return false;
+            }
+        });
+        QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
         StateService state = new StateService(
                 mapper, listener, qService, sessions);
-       // mvc = MockMvcBuilders
-        //        .standaloneSetup(new StateController(state, broker))
-        //        .build();
+        mvc = MockMvcBuilders
+                .standaloneSetup(new StateController(state, broadcaster))
+                .build();
     }
 
     /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.

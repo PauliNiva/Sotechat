@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,10 +100,11 @@ public class StateController {
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
     public final String popClientFromQueue(
-            final @DestinationVariable String channelId
+            final @DestinationVariable String channelId,
+            final SimpMessageHeaderAccessor accessor
             ) throws Exception {
 
-        String wakeUp = stateService.popQueue(channelId);
+        String wakeUp = stateService.popQueue(channelId, accessor);
         queueBroadcaster.broadcastQueue();
         return wakeUp;
     }

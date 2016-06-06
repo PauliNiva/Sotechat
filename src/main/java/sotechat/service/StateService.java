@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
 import sotechat.wrappers.ProStateResponse;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import static sotechat.util.Utils.get;
 
@@ -34,7 +36,7 @@ public class StateService {
     private final QueueService queueService;
 
     /** SubScribeEventHandler. */
-    private final ApplicationListener subscribeEventListener;
+    private final SubscribeEventListener subscribeEventListener;
 
     /** Session Repository. */
     private final SessionRepo sessionRepo;
@@ -56,7 +58,7 @@ public class StateService {
     public StateService(
             final Mapper pMapper,
             /* HUOM: Spring ei salli "pSubsc..." tyyppista nimentaa tuolle. */
-            final ApplicationListener subscribeEventListener,
+            final SubscribeEventListener subscribeEventListener,
             final QueueService pQueueService,
             final SessionRepo pSessionRepo
     ) {
@@ -106,6 +108,7 @@ public class StateService {
 
         HttpSession session = req.getSession();
         System.out.println("     State request from proClient " + session.getId());
+        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
 
         /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
         sessionRepo.updateSessionAttributes(session, professional);
@@ -162,10 +165,9 @@ public class StateService {
 
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta vertaistukichatissa). */
-        SubscribeEventListener customClass =
-                (SubscribeEventListener) subscribeEventListener;
         String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
+        List<HttpSession> list = subscribeEventListener
+                .getSubscribers(channelIdWithPath);
         for (HttpSession other : list) {
             if (get(other, "username").equals(username)) {
                 /** String (ei JSON) (AngularJS varten) */
@@ -189,15 +191,36 @@ public class StateService {
         return "{\"content\":\"OK, please request new state now.\"}";
     }
 
-    public String popQueue(String channelId) {
-        System.out.println("Opening channel Id: " + channelId);
+    /** Popping user from queue.
+     * @param channelId sdf
+     * @param req dg
+     * @param professional dgdg
+     * @return dfgdfg
+     */
+    public final String popQueue(final String channelId,
+                                 final SimpMessageHeaderAccessor accessor
+    ) {
+        /** Verify that popper is authenticated. */
+        if (accessor.getUser() == null) {
+            System.out.println("Hacking attempt?");
+            return "";
+        }
+
+        /** Add channelId to popper's channels. */
+        String sessionId =  accessor
+                        .getSessionAttributes()
+                        .get("SPRING.SESSION.ID").
+                        toString();
+        HttpSession session = sessionRepo.getHttpSession(sessionId);
+        System.out.println("Getting session ID " + sessionId);
+        System.out.println("Session is null ? " + (session == null));
+        sessionRepo.addChannel(session, channelId);
+
         queueService.removeFromQueue(channelId);
 
-        /** Set state of members in channel to "chat". */
-        SubscribeEventListener customClass =
-                (SubscribeEventListener) subscribeEventListener;
-        String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
+        String channelIdWithPath = "/toClient/queue/" + channelId;
+        List<HttpSession> list = subscribeEventListener.
+                getSubscribers(channelIdWithPath);
         for (HttpSession member : list) {
             member.setAttribute("state", "chat");
         }

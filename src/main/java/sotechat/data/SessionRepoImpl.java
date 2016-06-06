@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.HashSet;
+
 import static sotechat.util.Utils.get;
 
 @Component
@@ -15,6 +17,10 @@ public class SessionRepoImpl extends MapSessionRepository
 
     /** Avain sessio-ID, arvo HttpSession-olio. */
     private HashMap<String, HttpSession> httpSessions;
+
+    /** Avain = pro kayttajan sessio ID.
+     *  Arvo = Setti kanavia, joilla kayttaja on. */
+    private HashMap<String, HashSet<String>> proChannels;
 
     /** Kaytetaan testauksessa. */
     private HttpSession latestSession;
@@ -28,7 +34,8 @@ public class SessionRepoImpl extends MapSessionRepository
     ) {
         super();
         this.mapperService = pMapper;
-        this.httpSessions = new HashMap();
+        this.httpSessions = new HashMap<>();
+        this.proChannels = new HashMap<>();
     }
 
     @Override
@@ -69,7 +76,8 @@ public class SessionRepoImpl extends MapSessionRepository
             userId = mapperService.getIdFromRegisteredName(username.toString());
             session.setAttribute("state", "notRelevantForProfessional");
             session.setAttribute("category", "notRelevantForProfessional");
-            session.setAttribute("channelIds", "[\"Autot\", \"Mopot\"]"); // TODO
+            String channelIds = jsonFriendlyFormat(proChannels.get(session.getId()));
+            session.setAttribute("channelIds", channelIds);
         } else if (get(session, "username").isEmpty()) {
             /* Uusi kayttaja */
             username = "Anon";
@@ -91,6 +99,47 @@ public class SessionRepoImpl extends MapSessionRepository
 
         /** Kirjataan tiedot mapperiin (monesti aiemman paalle). */
         mapperService.mapUsernameToId(userId.toString(), username.toString());
+    }
+
+    @Override
+    public void addChannel(HttpSession session, String channelId) {
+        if (session.getAttribute("channelIds") != null) {
+            /** Case: pro user with multiple channels. */
+            HashSet<String> channels = proChannels.get(session.getId());
+            if (channels == null) {
+                channels = new HashSet<>();
+                proChannels.put(session.getId(), channels);
+            }
+            channels.add(channelId);
+            String channelIds = jsonFriendlyFormat(channels);
+            session.setAttribute("channelIds", channelIds);
+        } else {
+            /** Case: regular user with single channel. */
+            session.setAttribute("channelId", channelId);
+        }
+    }
+
+    //@Override TODO
+    public void removeChannel(HttpSession session, String channelId) {
+
+    }
+
+    /** Annettuna setti kanavia, tuottaa Stringin halutussa muotoilussa.
+     * @param channels sdfdf
+     * @return rrrrg
+     */
+    private String jsonFriendlyFormat(HashSet<String> channels) {
+        if (channels == null || channels.isEmpty()) return "[]";
+        String output = "[";
+        for (String channel : channels) {
+            output += "\"" + channel + "\", ";
+        }
+        System.out.println("Output orig : " + output);
+        System.out.println("Length orig : " + output.length());
+        output = output.substring(0, output.length() - 2);
+        System.out.println("after sub: " + output);
+        output += "]";
+        return output;
     }
 
 

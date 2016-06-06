@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /** Tiedottaa jonon tilanteesta kaikille QBCC subscribanneille. */
 @Component
 public class QueueBroadcaster {
@@ -27,6 +30,21 @@ public class QueueBroadcaster {
     ) {
         this.queueService = pQueueService;
         this.brokerMessagingTemplate = pSimpMessagingTemplate;
+        //setBroadcastEvery1Second();
+    }
+
+    /**
+     * Broadcasting every 1 second to fix subscribe+broadcast timing issues.
+     * TODO: Properly for production.
+     */
+    public void setBroadcastEvery1Second() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                broadcastQueue();
+            }
+        }, 1*1000, 1*1000);
     }
 
     /**
