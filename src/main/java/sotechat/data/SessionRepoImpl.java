@@ -76,7 +76,8 @@ public class SessionRepoImpl extends MapSessionRepository
             userId = mapperService.getIdFromRegisteredName(username.toString());
             session.setAttribute("state", "notRelevantForProfessional");
             session.setAttribute("category", "notRelevantForProfessional");
-            session.setAttribute("channelIds", "[\"Autot\", \"Mopot\"]"); // TODO
+            String channelIds = jsonFriendlyFormat(proChannels.get(session.getId()));
+            session.setAttribute("channelIds", channelIds);
         } else if (get(session, "username").isEmpty()) {
             /* Uusi kayttaja */
             username = "Anon";
@@ -128,12 +129,15 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return rrrrg
      */
     private String jsonFriendlyFormat(HashSet<String> channels) {
-        if (channels.isEmpty()) return "[]";
+        if (channels == null || channels.isEmpty()) return "[]";
         String output = "[";
         for (String channel : channels) {
-            output += channel + ", ";
+            output += "\"" + channel + "\", ";
         }
-        output.substring(0, output.length() - 2);
+        System.out.println("Output orig : " + output);
+        System.out.println("Length orig : " + output.length());
+        output = output.substring(0, output.length() - 2);
+        System.out.println("after sub: " + output);
         output += "]";
         return output;
     }
