@@ -99,6 +99,8 @@ public class SubscribeEventListener
         if (channelIdWithPath.equals(qbcc)) {
             queueBroadcaster.broadcastQueue();
         }
+
+        /** Jos subscribattu /chat/kanavalle,  */
     }
 
     /** TODO: Kasittelee unsubscribe -tapahtumat.
