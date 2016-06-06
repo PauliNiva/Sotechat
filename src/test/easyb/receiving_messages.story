@@ -6,24 +6,39 @@ import java.util.concurrent.TimeUnit
 description 'As a user I want to see the messages other people have sent to discussion'
 
 scenario "user can view a message the other party has sent to the discussion", {
-    given 'two persons have accessed the chat window', {
-        firstdr = new FirefoxDriver()
-        firstdr.get("http://localhost:8080")
-        seconddr = new FirefoxDriver()
-        seconddr.get("http://localhost:8080")
+    given 'a customer and a professional have accessed the chat window', {
+        custdr = new FirefoxDriver()
+        custdr.get("http://localhost:8080")
+        element = custdr.findElement(By.id("username"))
+        element.sendKeys("Matti")
+        element = custdr.findElement(By.id("startMessage"))
+        element.sendKeys("Moikka!")
+        element = custdr.findElement(By.tagName("button"))
+        element.submit()
+        prodr = new FirefoxDriver()
+        prodr.get("http://localhost:8080/proCP.html")
+        element = prodr.findElement(By.name("username"))
+        element.sendKeys("Hoitaja")
+        element = prodr.findElement(By.name("password"))
+        element.sendKeys("salasana")
+        element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
+        element.submit()
+        element = prodr.findElement(By.name("next")
+        element.click()
         }
     when 'the other person sends a message', {
-        element = firstdr.findElement(By.name("messageArea"))
+        Thread.sleep(2000)
+        element = custdr.findElement(By.name("messageArea"))
         element.sendKeys("Can you see this message?")
-        element = firstdr.findElement(By.name("send"))
+        element = custdr.findElement(By.name("send"))
         element.submit()
     }
     then 'user can view it in the chat window', {
         Thread.sleep(1000)
-        page = seconddr.getPageSource()
+        page = prodr.getPageSource()
         page.contains("Can you see this message?").shouldBe true
-        firstdr.quit()
-        seconddr.quit()
+        custdr.quit()
+        prodr.quit()
     }
 }
 /*

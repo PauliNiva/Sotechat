@@ -8,13 +8,31 @@ import java.lang.Integer
 description 'As a user I want to view the messages I have sent in the chat window'
 
 scenario "user can see a message that has been sent to the server", {
-        given 'a message has been written to the right text field in the chat window', {
+        given 'a chat window is accessed', {
                 driver = new FirefoxDriver()
                 driver.get("http://localhost:8080")
+                element = driver.findElement(By.id("username"))
+                element.sendKeys("Matti")
+                element = driver.findElement(By.id("startMessage"))
+                element.sendKeys("Moikka!")
+                element = driver.findElement(By.tagName("button"))
+                element.submit()
+                prodr = new FirefoxDriver()
+                prodr.get("http://localhost:8080/proCP.html")
+                element = prodr.findElement(By.name("username"))
+                element.sendKeys("Hoitaja")
+                element = prodr.findElement(By.name("password"))
+                element.sendKeys("salasana")
+                element = prodr.findElement(By.cssSelector("input[type='submit'][value='Sign In']"))
+                element.submit()
+                element = prodr.findElement(By.name("next")
+                element.click()
+        }
+        when 'a message has been written to the right text field in the chat window', {
                 element = driver.findElement(By.name("messageArea"))
                 element.sendKeys("I want to send this message")
         }
-        when 'submit button is pressed', {
+        and 'submit button is pressed', {
                 button = driver.findElement(By.name("send"))
                 button.submit()
         }
