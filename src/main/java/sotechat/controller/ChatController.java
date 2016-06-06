@@ -15,11 +15,30 @@ import sotechat.service.ChatMessageService;
 @RestController
 public class ChatController {
 
+<<<<<<< HEAD
     /** Tarjoaa logiikan. */
     private final ChatMessageService chatMessageService;
 
     /** Konstruktori, jolla Spring taikoo singleton-instanssin servicesta.
      * @param pChatService Chat Message Service.
+=======
+    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
+    private final Mapper mapper;
+
+    /** Hoitaa jonon palvelut */
+    @Autowired
+    private final QueueService queueService;
+
+    /** SubScribeEventHandler. */
+    private final ApplicationListener subscribeEventHandler;
+
+    /** Spring taikoo tässä Singleton-instanssin mapperista.
+     *
+     * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
+     * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
+     * käyttäjä-id:n perusteella.
+     * @param queueService hoitaa jonon palvelut
+>>>>>>> 2567743a4ee8a7b55a63df915281c24e018e5e8a
      */
     @Autowired
     public ChatController(

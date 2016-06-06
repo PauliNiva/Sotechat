@@ -119,14 +119,28 @@ public class QueueService {
     }
 
     /**
-     * queueLength -metodi palauttaa parametrina annettua vanavaid:ta vastaavaa
-     * alkiota edeltavan jonon pituuden
-     * @param channelId kanavaid, jota vastaavaa alkiota edeltavan jonon pituus
-     *                  halutaan selvittaa
-     * @return  alkioiden maara, jotka edeltavat haettua alkiota
+     * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
+     * alkiota edeltävän jonon pituuden
+     * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
+     *                  halutaan selvittää
+     * @return  alkioiden määrä, jotka edeltävät haettua alkiota
+>>>>>>> 2567743a4ee8a7b55a63df915281c24e018e5e8a
      */
-    public final int queueLength(final String channelId){
+    public final int queueLength(final String channelId) {
         return queue.itemsBefore(channelId);
+    }
+
+    /**
+     * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
+     * alkiota edeltävän jonon pituuden parametrina annetussa kategoriassa
+     * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
+     *                  halutaan selvittää
+     * @param category aihealue, jonka alkiot otetaan laskussa mukaan
+     * @return aihealueeseen kuuluvien alkioiden määrä, jotka edeltävät haettua
+     * alkiota
+     */
+    public final int queueLength(final String channelId, final String category){
+        return queue.itemsBeforeIn(channelId, category);
     }
 
     /**
