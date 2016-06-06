@@ -169,4 +169,5 @@ public class StateControllerTest {
         String content = result.getResponse().getContentAsString();
         assertEquals("Denied join pool request due to reserved username.", content);
     }
+
 }

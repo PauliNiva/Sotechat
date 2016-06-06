@@ -1,29 +1,45 @@
-
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.*;
 import java.util.concurrent.TimeUnit
 
 description 'As a user I want to see the messages other people have sent to discussion'
 
 scenario "user can view a message the other party has sent to the discussion", {
-    given 'two persons have accessed the chat window', {
-        firstdr = new FirefoxDriver()
-        firstdr.get("http://localhost:8080")
-        seconddr = new FirefoxDriver()
-        seconddr.get("http://localhost:8080")
+    given 'a customer and a professional have accessed the chat window', {
+        custdr = new FirefoxDriver()
+        wait = new WebDriverWait(custdr, 3)
+        custdr.get("http://localhost:8080")
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
+        element.sendKeys("Matti")
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("startMessage")))
+        element.sendKeys("Moikka!")
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("button")))
+        element.submit()
+        prodr = new FirefoxDriver()
+        wait2 = new WebDriverWait(prodr, 3)
+        prodr.get("http://localhost:8080/proCP.html")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
+        element.sendKeys("Hoitaja")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("password")))
+        element.sendKeys("salasana")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type='submit'][value='Sign In']")))
+        element.submit()
+        element = wait2.until(ExpectedConditions.elementToBeClickable(By.name("next")))
+        element.click()
         }
     when 'the other person sends a message', {
-        element = firstdr.findElement(By.name("messageArea"))
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         element.sendKeys("Can you see this message?")
-        element = firstdr.findElement(By.name("send"))
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("send")))
         element.submit()
     }
     then 'user can view it in the chat window', {
-        Thread.sleep(1000)
-        page = seconddr.getPageSource()
+        Thread.sleep(3000)
+        page = prodr.getPageSource()
         page.contains("Can you see this message?").shouldBe true
-        firstdr.quit()
-        seconddr.quit()
+        custdr.quit()
+        prodr.quit()
     }
 }
 /*
