@@ -5,6 +5,8 @@ angular.module('chatApp')
 
         $scope.chats = [];
         $scope.queue = [];
+        $scope.queueStatus = function () {$scope.queue.length === 0};
+        $scope.inQueue = $scope.queue.length;
 
         var queue = function(response) {
             $scope.queue = [];
@@ -15,17 +17,28 @@ angular.module('chatApp')
                 queueObject.category = key.category;
                 $scope.queue.push(queueObject);
             });
-            console.log($scope.queue)
+        };
+
+        $scope.getChannelsFromServer = function() {
+            proStateService.getVariablesFormServer().then(function (response) {
+                proStateService.setAllVariables(response);
+                updateChannels();
+            });
+        };
+
+        var updateChannels = function() {
+            var i = 1;
+            $scope.chats = [];
+            angular.forEach(proStateService.getChannelIDs(), function (key) {
+                $scope.chats.push({title: 'Chat' + i, channel: key});
+                i++;
+            });
         };
 
         var answer = function () {
             connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
             $scope.username = proStateService.getUsername();
-            var i = 1;
-            angular.forEach(proStateService.getChannelIDs(), function (key) {
-                $scope.chats.push({title: 'Chat' + i, channel: key});
-                i++;
-            });
+            updateChannels();
         };
 
         var init = function () {
@@ -37,4 +50,5 @@ angular.module('chatApp')
             proStateService.setAllVariables(response);
             init();
         });
+
     }]);
