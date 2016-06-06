@@ -60,12 +60,12 @@ public class StateControllerTest {
                 new MessageChannel() {
             @Override
             public boolean send(Message<?> message) {
-                return false;
+                return true;
             }
 
             @Override
             public boolean send(Message<?> message, long l) {
-                return false;
+                return true;
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
@@ -122,14 +122,23 @@ public class StateControllerTest {
     }
 
     @Test
-    public void testJoinPool() throws Exception {
+    public void
+    testJoinPoolSucceedsWithNormalUserAndStartMessage() throws Exception {
 
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(MockMvcRequestBuilders.post("/joinPool")
-                .contentType(MediaType.APPLICATION_JSON).content(json)
-                .sessionAttr("channelId", "2")
-                .sessionAttr("state", "start"))
-                .andExpect(status().isOk());
+                    .contentType(MediaType.APPLICATION_JSON).content(json)
+                    .sessionAttr("channelId", "2")
+                    .sessionAttr("state", "start")
+                    .sessionAttr("userId", "4")
+                    .sessionAttr("category", "DRUGS"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("OK, please request new state now.")));
 
     }
+
+    @Test
+    public void 
 }
