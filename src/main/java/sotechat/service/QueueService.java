@@ -87,7 +87,7 @@ public class QueueService {
      */
     public final String firstOfCategory(String category){
         try {
-            QueueItem first = queue.getFirstFrom(category);
+            QueueItem first = queue.pollFirstFrom(category);
             return jsonObject(first);
         } catch (Exception e){
             return "";

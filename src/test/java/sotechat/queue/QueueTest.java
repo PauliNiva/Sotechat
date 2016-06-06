@@ -9,9 +9,6 @@ import sotechat.queue.QueueItem;
 
 import java.util.List;
 
-/**
- * Created by varkoi on 3.6.2016.
- */
 public class QueueTest {
 
     QueueImpl queue;
@@ -47,31 +44,31 @@ public class QueueTest {
     }
 
     @Test
-    public void getFirstTest(){
-        QueueItem item = queue.getFirst();
+    public void pollFirstTest(){
+        QueueItem item = queue.pollFirst();
         Assert.assertEquals("444", item.getChannelId());
     }
 
     @Test
-    public void getFirstTest2(){
-        QueueItem item = queue.getFirst();
-        QueueItem item2 = queue.getFirst();
+    public void pollFirstTest2(){
+        QueueItem item = queue.pollFirst();
+        QueueItem item2 = queue.pollFirst();
         Assert.assertNotEquals("hammashoito", item2.getCategory());
         Assert.assertEquals("eevi", item2.getUsername());
     }
 
     @Test
-    public void getFirstFromTest(){
-        QueueItem item = queue.getFirstFrom("neuvola");
+    public void pollFirstFromTest(){
+        QueueItem item = queue.pollFirstFrom("neuvola");
         Assert.assertEquals("829", item.getChannelId());
         Assert.assertEquals(1, queue.length());
         Assert.assertEquals("jesse", queue.returnQueue().get(0).getUsername());
     }
 
     @Test
-    public void getFirstFromTest2(){
+    public void pollFirstFromTest2(){
         queue.addTo("621", "neuvola", "jaana");
-        QueueItem item = queue.getFirstFrom("neuvola");
+        QueueItem item = queue.pollFirstFrom("neuvola");
         Assert.assertNotEquals("jaana", item.getUsername());
         Assert.assertEquals("829", item.getChannelId());
     }

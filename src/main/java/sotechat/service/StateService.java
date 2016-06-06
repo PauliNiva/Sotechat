@@ -193,6 +193,15 @@ public class StateService {
         System.out.println("Opening channel Id: " + channelId);
         queueService.removeFromQueue(channelId);
 
+        /** Set state of members in channel to "chat". */
+        SubscribeEventListener customClass =
+                (SubscribeEventListener) subscribeEventListener;
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+        List<HttpSession> list = customClass.getSubscribers(channelIdWithPath);
+        for (HttpSession member : list) {
+            member.setAttribute("state", "chat");
+        }
+
         return "{\"content\":\"channel activated. request new state now.\"}";
     }
 

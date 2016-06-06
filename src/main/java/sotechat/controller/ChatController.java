@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
+import sotechat.data.Mapper;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.service.ChatMessageService;
@@ -18,22 +19,9 @@ public class ChatController {
     /** Tarjoaa logiikan. */
     private final ChatMessageService chatMessageService;
 
-    /** Mapperilta voi esim. kysyä "mikä username on ID:llä x?". */
-    private final Mapper mapper;
-
-    /** Hoitaa jonon palvelut */
-    @Autowired
-    private final QueueService queueService;
-
-    /** SubScribeEventHandler. */
-    private final ApplicationListener subscribeEventHandler;
-
-    /** Spring taikoo tässä Singleton-instanssin mapperista.
-     *
-     * @param pMapper Olio johon talletetaan tiedot käyttäjien id:istä
-     * ja käyttäjänimistä, ja josta voidaan hakea esim. käyttäjänimi
-     * käyttäjä-id:n perusteella.
-     * @param queueService hoitaa jonon palvelut
+    /**
+     * Konstruktori.
+     * @param pChatService chatServ
      */
     @Autowired
     public ChatController(

@@ -30,7 +30,7 @@ public interface Queue {
      * @param category keskustelun aihealue
      * @return kategorian ensimmainen alkio jonossa
      */
-    QueueItem getFirstFrom(String category);
+    QueueItem pollFirstFrom(String category);
 
     /**
      * metodi poistaa haetun alkion jonosta

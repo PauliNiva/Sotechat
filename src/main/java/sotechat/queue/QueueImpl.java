@@ -60,18 +60,17 @@ public class QueueImpl implements Queue {
      */
     @Override
     public final synchronized QueueItem pollFirst() {
-
         return this.queue.pollFirst();
     }
 
     /**
-     * getFirstFrom -metodi palauttaa jonossa ensimmaisena olevan QueueItemin
+     * pollFirstFrom -metodi palauttaa jonossa ensimmaisena olevan QueueItemin
      * parametrina annetusta kategoriasta.
      * @param category minka aihealueen ensimmainen QueueItem halutaan
      * @return aihealueen ensimmainen QueueItem
      */
     @Override
-    public final synchronized QueueItem getFirstFrom(final String category) {
+    public final synchronized QueueItem pollFirstFrom(final String category) {
         ListIterator<QueueItem> iterator = queue.listIterator(0);
         while (iterator.hasNext()) {
             QueueItem next = iterator.next();

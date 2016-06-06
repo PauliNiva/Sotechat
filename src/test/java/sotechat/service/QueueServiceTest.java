@@ -55,7 +55,7 @@ public class QueueServiceTest {
 
     @Test
     public void queueToStringTest(){
-        String qstring = service.queueToString();
+        String qstring = service.toString();
         String json = "{\"jono\": [{\"channelId\": \"617\", \"category\": "
             + "\"paihdetyo\", \"username\": \"jaakko\"}, {\"channelId\": "
             + "\"331\", \"category\": \"terveyskeskus\", \"username\": "
@@ -66,7 +66,7 @@ public class QueueServiceTest {
     @Test
     public void queueToStringTest2(){
         service.addToQueue("224", "hammashoito", "teuvo");
-        String qstring = service.queueToString();
+        String qstring = service.toString();
         String json = "{\"jono\": [{\"channelId\": \"617\", \"category\": "
                 + "\"paihdetyo\", \"username\": \"jaakko\"}, {\"channelId\": "
                 + "\"331\", \"category\": \"terveyskeskus\", \"username\": "
