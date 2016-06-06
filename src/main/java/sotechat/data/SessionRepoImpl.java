@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import static sotechat.util.Utils.get;
 
@@ -124,7 +125,7 @@ public class SessionRepoImpl extends MapSessionRepository
             /** Case: pro user with multiple channels. */
             HashSet<String> channels = proChannels.get(session.getId());
             if (channels == null) {
-                channels = new HashSet<>();
+                channels = new LinkedHashSet<>();
                 proChannels.put(session.getId(), channels);
             }
             channels.add(channelId);
