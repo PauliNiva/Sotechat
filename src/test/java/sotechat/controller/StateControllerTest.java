@@ -1,12 +1,9 @@
 package sotechat.controller;
 
-import com.google.gson.Gson;
-import groovy.json.JsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.ApplicationListener;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -16,15 +13,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import sotechat.data.Mapper;
 import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
-import sotechat.queue.Queue;
 import sotechat.queue.QueueImpl;
-import sotechat.service.ChatMessageService;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
 
@@ -69,8 +63,8 @@ public class StateControllerTest {
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
-        StateService state = new StateService(
-                mapper, listener, qService, sessions);
+        //StateService state = new StateService(
+        //        mapper, listener, qService, chatLogger, sessions);
         //mvc = MockMvcBuilders
         //        .standaloneSetup(new StateController(state, broadcaster))
         //        .build();

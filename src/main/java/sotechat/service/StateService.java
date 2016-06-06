@@ -3,11 +3,13 @@ package sotechat.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
+import sotechat.data.ChatLogger;
+import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
 import sotechat.data.Mapper;
@@ -18,7 +20,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 import static sotechat.util.Utils.get;
 
@@ -35,6 +36,9 @@ public class StateService {
     /** QueueService. */
     private final QueueService queueService;
 
+    /** Chat Log Service. */
+    private final ChatLogger chatLogger;
+
     /** SubScribeEventHandler. */
     private final SubscribeEventListener subscribeEventListener;
 
@@ -47,12 +51,12 @@ public class StateService {
 
 
     /** Spring taikoo tassa konstruktorissa Singleton-instanssit palveluista.
-     *
-     * @param pMapper Olio, johon talletetaan tiedot kayttajien id:ista
+     *  @param pMapper Olio, johon talletetaan tiedot kayttajien id:ista
      * ja kayttajanimista, ja josta voidaan hakea esim. kayttajanimi
      * kayttaja-id:n perusteella.
-     * @param pQueueService queueService
      * @param subscribeEventListener dfojfdoidfjo
+     * @param pQueueService queueService
+     * @param chatLogger
      */
     @Autowired
     public StateService(
@@ -60,11 +64,13 @@ public class StateService {
             /* HUOM: Spring ei salli "pSubsc..." tyyppista nimentaa tuolle. */
             final SubscribeEventListener subscribeEventListener,
             final QueueService pQueueService,
+            final ChatLogger pChatLogger,
             final SessionRepo pSessionRepo
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
+        this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
     }
 
@@ -176,15 +182,23 @@ public class StateService {
 
         /** Hyvaksytaan kayttajan valitsema nimimerkki. */
         session.setAttribute("username", username);
+
         /** Mapataan nimimerkki ja kayttajatunnus. */
         String userId = get(session, "userId");
         mapperService.mapUsernameToId(userId, username);
 
         /** Asetetaan kayttaja jonoon odottamaan palvelua. */
         String category = get(session, "category");
-
         queueService.addToQueue(channelId, category, username);
         session.setAttribute("state", "queue");
+
+        /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
+         * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
+         * Kun kanavalle liittyy joku, lokit lahetetaan sille. */
+        String timeStamp = new DateTime().toString();
+        MsgToClient msg = new MsgToClient(
+                username, channelId, timeStamp, startMessage);
+        chatLogger.log(msg);
 
         /** JSON-muodossa, jotta AngularJS osaa ohjata success-metodille. */
         return "{\"content\":\"OK, please request new state now.\"}";
