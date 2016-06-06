@@ -148,7 +148,7 @@ public class WebSocketMessageTest {
     public void authenticatedRegistereUserReceivesCorrectResponse()
             throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
@@ -156,7 +156,7 @@ public class WebSocketMessageTest {
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("channelIds", "[\"DEV_CHANNEL\"]", true);
         msgUtil.add("content", "Hei!", true);
         msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
@@ -182,7 +182,7 @@ public class WebSocketMessageTest {
     public void unAuthenticatedRegisteredUserDoesNotReceiveResponse()
         throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
@@ -210,7 +210,7 @@ public class WebSocketMessageTest {
     public void serverDoesntAcceptMessageFromUserIfUserIdDoesntExist()
         throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "243", false);
@@ -245,7 +245,7 @@ public class WebSocketMessageTest {
     public StompHeaderAccessor setDefaultHeadersForChannel(String channel) {
         StompHeaderAccessor headers = StompHeaderAccessor
                 .create(StompCommand.SEND);
-        headers.setDestination("/toServer/DEV_CHANNEL");
+        headers.setDestination("/toServer/chat/DEV_CHANNEL");
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
         headers.setSessionAttributes(new HashMap<String, Object>());

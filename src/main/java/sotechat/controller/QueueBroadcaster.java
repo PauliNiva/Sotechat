@@ -29,7 +29,6 @@ public class QueueBroadcaster {
         this.brokerMessagingTemplate = pSimpMessagingTemplate;
     }
 
-
     /**
      * TODO: Protection against flooding (max 1 broadcast/second).
      */
