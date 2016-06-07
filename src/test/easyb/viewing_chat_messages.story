@@ -28,7 +28,7 @@ scenario "user can see a message that has been sent to the server", {
                 element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type='submit'][value='Sign In']")))
                 element.submit()
                 Thread.sleep(2000)
-                element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("next")))
+                element = wait2.until(ExpectedConditions.elementToBeClickable(By.name("next")))
                 element.click()
         }
         when 'a message has been written to the right text field in the chat window', {
