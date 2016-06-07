@@ -15,10 +15,10 @@ import sotechat.repo.PersonRepo;
 @Service
 public class MessageService {
 
-    @Autowired
+    //@Autowired
     private MessageRepo messageRepo;
 
-    @Autowired
+    //@Autowired
     private ConversationRepo conversationRepo;
 
     @Transactional
