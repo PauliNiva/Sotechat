@@ -26,7 +26,7 @@ before_install:
   - sleep 3 # give xvfb some time to start
 
 script:
-  - integration-test
+  - mvn integration-test
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
