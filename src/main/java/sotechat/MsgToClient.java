@@ -8,7 +8,7 @@ package sotechat;
  *  - Halutaan timeStampit serverin, ei clientin toimesta
  *  - Ei haluta vuotaa salaisia käyttäjäID:t kaikille
  */
-public class MsgToClient {
+public class  MsgToClient {
 
     /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
     private String userName;

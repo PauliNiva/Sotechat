@@ -26,12 +26,9 @@ public class ProStateResponse {
      * @param pOnline online
      * @param pChannelIds channelId
      */
-    public ProStateResponse(final String pState,
-                            final String pUsername,
-                            final String pUserId,
-                            final String pQBCC,
-                            final String pOnline,
-                             final String pChannelIds) {
+    public ProStateResponse(final String pState, final String pUsername,
+                            final String pUserId, final String pQBCC,
+                            final String pOnline, final String pChannelIds) {
         this.state = pState;
         this.username = pUsername;
         this.userId = pUserId;
