@@ -8,7 +8,7 @@ description 'As a user I want to send a message'
 scenario "user cand write a message on a text input", {
     given 'user has accessed the chat page', {
         driver = new FirefoxDriver()
-        wait = new WebDriverWait(driver, 3)
+        wait = new WebDriverWait(driver, 7)
         driver.get("http://localhost:8080")
     }
     when 'a starting message has been submitted', {
@@ -21,7 +21,7 @@ scenario "user cand write a message on a text input", {
     }
     and 'a professional has picked the user from a pool', {
         proDriver = new FirefoxDriver()
-        wait2 = new WebDriverWait(proDriver, 3)
+        wait2 = new WebDriverWait(proDriver, 7)
         proDriver.get("http://localhost:8080/proCP.html")
         element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
         element.sendKeys("Hoitaja")

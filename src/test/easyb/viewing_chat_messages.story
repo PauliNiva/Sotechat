@@ -10,7 +10,7 @@ description 'As a user I want to view the messages I have sent in the chat windo
 scenario "user can see a message that has been sent to the server", {
         given 'a chat window is accessed', {
                 driver = new FirefoxDriver()
-                wait = new WebDriverWait(driver, 3)
+                wait = new WebDriverWait(driver, 7)
                 driver.get("http://localhost:8080")
                 element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
                 element.sendKeys("Matti")
@@ -19,7 +19,7 @@ scenario "user can see a message that has been sent to the server", {
                 element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("button")))
                 element.submit()
                 prodr = new FirefoxDriver()
-                wait2 = new WebDriverWait(prodr, 3)
+                wait2 = new WebDriverWait(prodr, 7)
                 prodr.get("http://localhost:8080/proCP.html")
                 element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
                 element.sendKeys("Hoitaja")

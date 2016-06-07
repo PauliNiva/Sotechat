@@ -7,7 +7,7 @@ description 'As a user, I want to join the queue to wait my turn'
 scenario "user joins a common queue when accessing chat", {
     given 'user has accessed chat page', {
         driver = new FirefoxDriver()
-        wait = new WebDriverWait(driver, 3)
+        wait = new WebDriverWait(driver, 7)
         driver.get("http://localhost:8080")
     }
     when 'username and a starting message is submitted', {
@@ -25,7 +25,7 @@ scenario "user joins a common queue when accessing chat", {
     }
     and 'user is added to the pool of customers professionals side', {
          prodr = new FirefoxDriver()
-         wait2 = new WebDriverWait(prodr, 3)
+         wait2 = new WebDriverWait(prodr, 7)
          prodr.get("http://localhost:8080/proCP.html")
          element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
          element.sendKeys("Hoitaja")

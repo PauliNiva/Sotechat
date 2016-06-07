@@ -7,7 +7,7 @@ description 'As a user I want to access a chat window'
 scenario "User cannot see the chat window if she/he has not been picked from a pool by a healthcare professional", {
     given 'user enters the chat page', {
             driver = new FirefoxDriver()
-            wait = new WebDriverWait(driver, 3)
+            wait = new WebDriverWait(driver, 7)
             driver.get("http://localhost:8080")
     }
     when 'a starting message is submitted', {
@@ -32,7 +32,7 @@ scenario "User can see a chat window when she/he is picked from a pool of custom
         }
         and 'a professional has logged in', {
             proDriver = new FirefoxDriver()
-            waitPro = new WebDriverWait(proDriver, 3)
+            waitPro = new WebDriverWait(proDriver, 7)
             proDriver.get("http://localhost:8080/proCP.html")
             element = waitPro.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
             element.sendKeys("Hoitaja")

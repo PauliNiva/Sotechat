@@ -7,7 +7,7 @@ description 'As a professional, I want to pick a client from the visible queue'
 scenario "professional can pick the first client from a pool of chats to start a conversation", {
     given 'professional has logged in', {
          prodr = new FirefoxDriver()
-         wait = new WebDriverWait(prodr, 3)
+         wait = new WebDriverWait(prodr, 7)
          prodr.get("http://localhost:8080/proCP.html")
          element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
          element.sendKeys("Hoitaja")
@@ -18,7 +18,7 @@ scenario "professional can pick the first client from a pool of chats to start a
     }
     and 'a customer has accessed a chat window', {
         driver = new FirefoxDriver()
-        wait2 = new WebDriverWait(driver, 3)
+        wait2 = new WebDriverWait(driver, 7)
         driver.get("http://localhost:8080")
         element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
         element.sendKeys("Matti")
@@ -46,7 +46,7 @@ scenario "professional can pick a customer of her or his choosing from the chat 
     }
     and 'a customer has accessed a chat window', {
         driver = new FirefoxDriver()
-        wait = new WebDriverWait(driver, 3)
+        wait = new WebDriverWait(driver, 7)
         driver.get("http://localhost:8080")
         element = driver.findElement(By.id("username"))
         element.sendKeys("Liisa")

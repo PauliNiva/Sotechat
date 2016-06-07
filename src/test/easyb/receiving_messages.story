@@ -8,7 +8,7 @@ description 'As a user I want to see the messages other people have sent to disc
 scenario "user can view a message the other party has sent to the discussion", {
     given 'a customer and a professional have accessed the chat window', {
         custdr = new FirefoxDriver()
-        wait = new WebDriverWait(custdr, 3)
+        wait = new WebDriverWait(custdr, 7)
         custdr.get("http://localhost:8080")
         element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
         element.sendKeys("Matti")
@@ -17,7 +17,7 @@ scenario "user can view a message the other party has sent to the discussion", {
         element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("button")))
         element.submit()
         prodr = new FirefoxDriver()
-        wait2 = new WebDriverWait(prodr, 3)
+        wait2 = new WebDriverWait(prodr, 7)
         prodr.get("http://localhost:8080/proCP.html")
         element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
         element.sendKeys("Hoitaja")
