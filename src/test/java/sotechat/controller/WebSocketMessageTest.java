@@ -45,7 +45,8 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Testit WebSocket-viestien lähetykselle
+ * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
+ *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
@@ -81,48 +82,48 @@ public class WebSocketMessageTest {
             throws Exception {
         /**
          * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
-         * ChatController-luokan routeMessage-metodissa löydetään oikea
-         * käyttäjä id:n perusteella, eikä metodin suoritus siis keskeydy
-         * siihen, että mappperista ei löydy oikeaa käyttäjää.
+         * ChatController-luokan routeMessage-metodissa loydetaan oikea
+         * kayttaja id:n perusteella, eika metodin suoritus siis keskeydy
+         * siihen, etta mappperista ei loydy oikeaa kayttajaa.
          */
         mapper.mapUsernameToId("676", "Morko");
 
         /**
          * Simuloidaan normaalisti JavaScriptin avulla tapahtuvaa viestien
-         * lähetystä clientiltä palvelimelle. Asetetaan siis arvot mille
-         * kanavalle viesti lähetetään, mikä on SessionId, ja mitä StompJS:n
-         * komentoa käytetään, jotta viesti voidaan lähettää(SEND).
+         * lahetysta clientilta palvelimelle. Asetetaan siis arvot mille
+         * kanavalle viesti lahetetaan, mika on SessionId, ja mita StompJS:n
+         * komentoa kaytetaan, jotta viesti voidaan lahettaa(SEND).
          */
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
 
         /**
-         * Luodaan lähetettävä viesti, vastaa siis normaalisti JavaScriptillä
-         * Json-muodossa olevaa viestiä, joka palvelimella paketoidaan
-         * MsgToServer-luokan sisälle.
+         * Luodaan lahetettava viesti, vastaa siis normaalisti JavaScriptilla
+         * Json-muodossa olevaa viestia, joka palvelimella paketoidaan
+         * MsgToServer-luokan sisalle.
          */
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "676", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "Morko", true);
+        msgUtil.add("username", "Morko", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
         /**
-         * Rakennetaan vielä edellä muodostetusta viestistä Message-olio,
-         * joka voidaankin sitten lähettää palvelimelle.
+         * Rakennetaan viela edella muodostetusta viestista Message-olio,
+         * joka voidaankin sitten lahettaa palvelimelle.
          */
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
         Message<String> message = MessageBuilder
                 .createMessage(messageToBeSendedAsJsonString,
                 headers.getMessageHeaders());
         /**
-         * Lähetetään viesti palvelimelle.
+         * Lahetetaan viesti palvelimelle.
          */
         this.clientInboundChannel.send(message);
         /**
          * Talletetaan palvelimelta tullut vastaus Message-olioon. Eli siis
-         * mitä ChatControllerin routeMessage-metodi palauttaa(MsgToClient).
+         * mita ChatControllerin routeMessage-metodi palauttaa(MsgToClient).
          */
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
@@ -132,10 +133,10 @@ public class WebSocketMessageTest {
         JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
 
         /**
-         * Tarkistetaan, että vastauksena tullut JsonObject sisältää
-         * oikeat kentät, eli userName, timeStamp, content ja channelId,
+         * Tarkistetaan, etta vastauksena tullut JsonObject sisaltaa
+         * oikeat kentat, eli username, timeStamp, content ja channelId,
          * mutta ei userId:ta! Niiden kenttien, jotka MsgUtil-olion avulla
-         * on aiemmin asetettu falseksi ei pitäisi löytyä jsonMessagesta.
+         * on aiemmin asetettu falseksi ei pitaisi loytya jsonMessagesta.
          */
         for (Map.Entry entry : jsonMessage.entrySet()) {
             String key = entry.getKey().toString();
@@ -147,17 +148,17 @@ public class WebSocketMessageTest {
     public void authenticatedRegistereUserReceivesCorrectResponse()
             throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new TestPrincipal("hoitaja"));
+        headers.setUser(new TestPrincipal("Hoitaja"));
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -181,13 +182,13 @@ public class WebSocketMessageTest {
     public void unAuthenticatedRegisteredUserDoesNotReceiveResponse()
         throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -199,8 +200,8 @@ public class WebSocketMessageTest {
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
         /**
-         * Ei pitäisi tulla vastausta, koska rekisteröityneellä käyttäjällä
-         * eli hoitajalla ei ole Principal-statusta eli hän ei ole kirjautunut.
+         * Ei pitaisi tulla vastausta, koska rekisteroityneella kayttajalla
+         * eli hoitajalla ei ole Principal-statusta eli han ei ole kirjautunut.
          */
         assertNull(reply);
     }
@@ -209,13 +210,13 @@ public class WebSocketMessageTest {
     public void serverDoesntAcceptMessageFromUserIfUserIdDoesntExist()
         throws Exception {
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "243", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("userName", "hoitaja", true);
+        msgUtil.add("username", "Hoitaja", true);
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
@@ -227,16 +228,16 @@ public class WebSocketMessageTest {
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
         /**
-         * Ei pitäisi tulla vastausta, koska userId:tä ei löydy.
+         * Ei pitaisi tulla vastausta, koska userId:ta ei loydy.
          */
         assertNull(reply);
     }
 
     /**
-     * Asetetaan palvelimelle WebSocketin kautta lähetettävän viestin
-     * headereille oletusarvot. Apumetodi joka vähentää copy-pastea.
+     * Asetetaan palvelimelle WebSocketin kautta lahetettavan viestin
+     * headereille oletusarvot. Apumetodi joka vahentaa copy-pastea.
      *
-     * @param channel Tähän tulee se kanava, joka kontrolleri-metodissa
+     * @param channel Tahan tulee se kanava, joka kontrolleri-metodissa
      *                on merkitty MessageMapping-annotaatiolla, esim.
      *                /toServer/{channelId}
      * @return
@@ -244,7 +245,7 @@ public class WebSocketMessageTest {
     public StompHeaderAccessor setDefaultHeadersForChannel(String channel) {
         StompHeaderAccessor headers = StompHeaderAccessor
                 .create(StompCommand.SEND);
-        headers.setDestination("/toServer/DEV_CHANNEL");
+        headers.setDestination(channel);
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
         headers.setSessionAttributes(new HashMap<String, Object>());
@@ -252,7 +253,7 @@ public class WebSocketMessageTest {
     }
 
     /**
-     * Apumetodi viestien muuntamiseski helpommin käsiteltävään Json-muotoon.
+     * Apumetodi viestien muuntamiseski helpommin kasiteltavaan Json-muotoon.
      *
      * @param message Palvelimelta saatu vastausviesti
      * @return
@@ -266,7 +267,7 @@ public class WebSocketMessageTest {
     }
 
     /**
-     * Konfiguroidaan WebSocket testiympäristöön.
+     * Konfiguroidaan WebSocket testiymparistoon.
      */
     @Configuration
     @EnableScheduling

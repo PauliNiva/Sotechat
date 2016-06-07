@@ -1,18 +1,39 @@
-
 import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.support.ui.*;
 import org.openqa.selenium.Keys
 
 description 'As a user I want to send a message'
 
 scenario "user cand write a message on a text input", {
-    given 'user has chosen the right link', {
+    given 'user has accessed the chat page', {
         driver = new FirefoxDriver()
-    }
-    when 'a chat window is accessed', {
+        wait = new WebDriverWait(driver, 7)
         driver.get("http://localhost:8080")
     }
+    when 'a starting message has been submitted', {
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
+        element.sendKeys("Matti")
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("startMessage")))
+        element.sendKeys("Moikka!")
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("button")))
+        element.submit()
+    }
+    and 'a professional has picked the user from a pool', {
+        proDriver = new FirefoxDriver()
+        wait2 = new WebDriverWait(proDriver, 7)
+        proDriver.get("http://localhost:8080/proCP.html")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("username")))
+        element.sendKeys("Hoitaja")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.name("password")))
+        element.sendKeys("salasana")
+        element = wait2.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type='submit'][value='Sign In']")))
+        element.submit()
+        element = wait2.until(ExpectedConditions.elementToBeClickable(By.name("next")))
+        element.click()
+    }
     then 'text can be applied to a text field', {
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         page = driver.getPageSource()
         page.contains("textarea").shouldBe true
         page.contains("messageArea").shouldBe true
@@ -23,17 +44,18 @@ scenario "user cand write a message on a text input", {
 }
 
 scenario "user can send the message he or she has written to the server by pressing submit", {
-    given 'text is written to the right text field in a chat window', {
-        element = driver.findElement(By.name("messageArea"))
+    given 'a chat window is accessed', {
+    }
+    when 'text is written to the text field in a chat window', {
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         element.sendKeys("my first testmessage")
     }
-    when 'submit button is clicked', {
-        element = driver.findElement(By.name("send"))
+    and 'submit button is clicked', {
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("send")))
         element.submit();
     }
     then 'the text can be sent to the chat server', {
-        Thread.sleep(1000)
-        element = driver.findElement(By.name("messageArea"))
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         element.getText().equals("").shouldBe true
         page = driver.getPageSource()
         page.contains("my first testmessage").shouldBe true
@@ -42,38 +64,19 @@ scenario "user can send the message he or she has written to the server by press
 
 scenario "user can send the message he or she has written to the server by pressing enter", {
     given 'text is written to the right text field in a chat window', {
-        element = driver.findElement(By.name("messageArea"))
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         element.sendKeys("my second testmessage")
     }
     when 'enter is pressed', {
         driver.getKeyboard().pressKey(Keys.ENTER)
     }
     then 'the text can be sent to the chat server', {
-        Thread.sleep(1000)
-        element = driver.findElement(By.name("messageArea"))
+        element = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("messageArea")))
         element.getText().equals("").shouldBe true
         page = driver.getPageSource()
         page.contains("my second testmessage").shouldBe true
         driver.quit()
+        proDriver.quit()
     }
 }
 
-scenario "user can't send an empty message", {
-    given 'nothing is written to the text field', {
-            driver = new FirefoxDriver()
-            driver.get("http://localhost:8080")
-    }
-    when 'submit is clicked', {
-            element = driver.findElement(By.name("messageArea"))
-            element.sendKeys("")
-            element = driver.findElement(By.name("send"))
-            element.submit();
-    }
-    then 'no message is sent', {
-            Thread.sleep(1000)
-            page = driver.getPageSource()
-            page.contains("panel panel-default message-panel").shouldBe false
-            page.contains("messageText").shouldBe false
-            driver.quit()
-    }
-}

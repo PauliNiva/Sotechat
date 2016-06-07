@@ -23284,7 +23284,7 @@ function createDateInputType(type, regexp, parseDate, format) {
     var timezone = ctrl && ctrl.$options && ctrl.$options.timezone;
     var previousDate;
 
-    ctrl.$$parserName = type;
+    ctrl.$$parsername = type;
     ctrl.$parsers.push(function(value) {
       if (ctrl.$isEmpty(value)) return null;
       if (regexp.test(value)) {
@@ -23364,7 +23364,7 @@ function numberInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   badInputChecker(scope, element, attr, ctrl);
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
 
-  ctrl.$$parserName = 'number';
+  ctrl.$$parsername = 'number';
   ctrl.$parsers.push(function(value) {
     if (ctrl.$isEmpty(value))      return null;
     if (NUMBER_REGEXP.test(value)) return parseFloat(value);
@@ -23420,7 +23420,7 @@ function urlInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
   stringBasedInputType(ctrl);
 
-  ctrl.$$parserName = 'url';
+  ctrl.$$parsername = 'url';
   ctrl.$validators.url = function(modelValue, viewValue) {
     var value = modelValue || viewValue;
     return ctrl.$isEmpty(value) || URL_REGEXP.test(value);
@@ -23433,7 +23433,7 @@ function emailInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
   stringBasedInputType(ctrl);
 
-  ctrl.$$parserName = 'email';
+  ctrl.$$parsername = 'email';
   ctrl.$validators.email = function(modelValue, viewValue) {
     var value = modelValue || viewValue;
     return ctrl.$isEmpty(value) || EMAIL_REGEXP.test(value);
@@ -23594,10 +23594,10 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
          <form name="myForm">
            <label>
               User name:
-              <input type="text" name="userName" ng-model="user.name" required>
+              <input type="text" name="username" ng-model="user.name" required>
            </label>
            <div role="alert">
-             <span class="error" ng-show="myForm.userName.$error.required">
+             <span class="error" ng-show="myForm.username.$error.required">
               Required!</span>
            </div>
            <label>
@@ -23614,8 +23614,8 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
          </form>
          <hr>
          <tt>user = {{user}}</tt><br/>
-         <tt>myForm.userName.$valid = {{myForm.userName.$valid}}</tt><br/>
-         <tt>myForm.userName.$error = {{myForm.userName.$error}}</tt><br/>
+         <tt>myForm.username.$valid = {{myForm.username.$valid}}</tt><br/>
+         <tt>myForm.username.$error = {{myForm.username.$error}}</tt><br/>
          <tt>myForm.lastName.$valid = {{myForm.lastName.$valid}}</tt><br/>
          <tt>myForm.lastName.$error = {{myForm.lastName.$error}}</tt><br/>
          <tt>myForm.$valid = {{myForm.$valid}}</tt><br/>
@@ -23626,25 +23626,25 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
       </file>
       <file name="protractor.js" type="protractor">
         var user = element(by.exactBinding('user'));
-        var userNameValid = element(by.binding('myForm.userName.$valid'));
+        var usernameValid = element(by.binding('myForm.username.$valid'));
         var lastNameValid = element(by.binding('myForm.lastName.$valid'));
         var lastNameError = element(by.binding('myForm.lastName.$error'));
         var formValid = element(by.binding('myForm.$valid'));
-        var userNameInput = element(by.model('user.name'));
+        var usernameInput = element(by.model('user.name'));
         var userLastInput = element(by.model('user.last'));
 
         it('should initialize to model', function() {
           expect(user.getText()).toContain('{"name":"guest","last":"visitor"}');
-          expect(userNameValid.getText()).toContain('true');
+          expect(usernameValid.getText()).toContain('true');
           expect(formValid.getText()).toContain('true');
         });
 
         it('should be invalid if empty when required', function() {
-          userNameInput.clear();
-          userNameInput.sendKeys('');
+          usernameInput.clear();
+          usernameInput.sendKeys('');
 
           expect(user.getText()).toContain('{"last":"visitor"}');
-          expect(userNameValid.getText()).toContain('false');
+          expect(usernameValid.getText()).toContain('false');
           expect(formValid.getText()).toContain('false');
         });
 
@@ -26663,7 +26663,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
     processAsyncValidators();
 
     function processParseErrors() {
-      var errorKey = ctrl.$$parserName || 'parse';
+      var errorKey = ctrl.$$parsername || 'parse';
       if (isUndefined(parserValid)) {
         setValidity(errorKey, null);
       } else {
@@ -26675,7 +26675,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
             setValidity(name, null);
           });
         }
-        // Set the parse error last, to prevent unsetting it, should a $validators key == parserName
+        // Set the parse error last, to prevent unsetting it, should a $validators key == parsername
         setValidity(errorKey, parserValid);
         return parserValid;
       }
@@ -27118,7 +27118,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
        <div ng-controller="ExampleController">
          <form name="userForm">
            <label>Name:
-             <input type="text" name="userName"
+             <input type="text" name="username"
                     ng-model="user.name"
                     ng-model-options="{ getterSetter: true }" />
            </label>
@@ -27255,7 +27255,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
       <div ng-controller="ExampleController">
         <form name="userForm">
           <label>Name:
-            <input type="text" name="userName"
+            <input type="text" name="username"
                    ng-model="user.name"
                    ng-model-options="{ updateOn: 'blur' }"
                    ng-keyup="cancel($event)" />
@@ -27275,7 +27275,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
 
           $scope.cancel = function(e) {
             if (e.keyCode == 27) {
-              $scope.userForm.userName.$rollbackViewValue();
+              $scope.userForm.username.$rollbackViewValue();
             }
           };
         }]);
@@ -27312,11 +27312,11 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
       <div ng-controller="ExampleController">
         <form name="userForm">
           <label>Name:
-            <input type="text" name="userName"
+            <input type="text" name="username"
                    ng-model="user.name"
                    ng-model-options="{ debounce: 1000 }" />
           </label>
-          <button ng-click="userForm.userName.$rollbackViewValue(); user.name=''">Clear</button>
+          <button ng-click="userForm.username.$rollbackViewValue(); user.name=''">Clear</button>
           <br />
         </form>
         <pre>user.name = <span ng-bind="user.name"></span></pre>
@@ -27337,7 +27337,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
       <div ng-controller="ExampleController">
         <form name="userForm">
           <label>Name:
-            <input type="text" name="userName"
+            <input type="text" name="username"
                    ng-model="user.name"
                    ng-model-options="{ getterSetter: true }" />
           </label>
