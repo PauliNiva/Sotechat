@@ -88,25 +88,27 @@ public class StateControllerQueueTest {
             throws Exception {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
+        /**
+         * Luodaan hoitajalle sessio.
+         */
         sessionRepo.mapHttpSessionToSessionId("1234", new TestSession());
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
         headers.setUser(new TestPrincipal("Hoitaja"));
 
+        /**
+         * Simuloidaan sitä, että painaa "ota ensimmäinen jonosta" -nappia.
+         */
         MsgUtil msgUtil = new MsgUtil();
-        msgUtil.add("userId", "666", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
-        msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
+        msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
+        Message<String> messageToBeSended = MessageBuilder
                 .createMessage(messageToBeSendedAsJsonString,
                 headers.getMessageHeaders());
 
-        this.clientInboundChannel.send(message);
+        this.clientInboundChannel.send(messageToBeSended);
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
@@ -114,6 +116,34 @@ public class StateControllerQueueTest {
 
         assertEquals("channel activated. request new state now.",
                 jsonMessage.get("content").getAsString());
+    }
+
+    @Test
+    public void unAuthenticatedUserCantPopUserFromQueue() throws Exception {
+        StompHeaderAccessor headers =
+                setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
+        sessionRepo.mapHttpSessionToSessionId("1234", new TestSession());
+
+        MsgUtil msgUtil = new MsgUtil();
+        msgUtil.add("random", "random", true);
+
+        String messageToBeSendedAsJsonString = msgUtil.mapToString();
+        Message<String> messageToBeSended = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString,
+                        headers.getMessageHeaders());
+
+        this.clientInboundChannel.send(messageToBeSended);
+
+        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+
+        String replyPayload = new String((byte[]) reply.getPayload(),
+                Charset.forName("UTF-8"));
+
+        /**
+         * Tyhjä vastaus, koska kirjautumaton käyttäjä ei voi ottaa toista
+         * käyttäjää jonosta.
+         */
+        assertEquals("", replyPayload);
     }
 
     /**
