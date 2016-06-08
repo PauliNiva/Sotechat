@@ -35,17 +35,11 @@ import sotechat.util.TestChannelInterceptor;
 import sotechat.util.TestPrincipal;
 import sotechat.util.TestSession;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+
 import java.nio.charset.Charset;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
