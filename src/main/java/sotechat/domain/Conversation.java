@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -25,7 +21,8 @@ public class Conversation extends AbstractPersistable<Long> {
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Date date;
 
-    private String professional;
+    @ManyToMany(mappedBy = "conversationsOfPerson")
+    private List<Person> participantsOfConversation;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "author")
     private List<Message> messagesOfConversation;
@@ -42,16 +39,17 @@ public class Conversation extends AbstractPersistable<Long> {
         this.date = pdate;
     }
 
-    public final String getProfessional() {
-        return this.professional;
-    }
-
-    public final void setProfessional(final String pProfessional) {
-        this.professional = pProfessional;
+    public final List<Person> getParticipantsOfConversation() {
+        return this.participantsOfConversation;
     }
 
     public final List<Message> getMessagesOfConversation() {
         return this.messagesOfConversation;
+    }
+
+    public final void setParticipantsOfConversation(
+            final List<Person> pParticipantsOfConversation) {
+        this.participantsOfConversation = pParticipantsOfConversation;
     }
 
     public final void setMessagesOfConversation(
@@ -59,7 +57,11 @@ public class Conversation extends AbstractPersistable<Long> {
         this.messagesOfConversation = pMessagesOfConversation;
     }
 
-    public final void addMessageToConversation(Message pmessage) {
-        messagesOfConversation.add(pmessage);
+    public final void addPersonToConversation(final Person pPerson) {
+        participantsOfConversation.add(pPerson);
+    }
+
+    public final void addMessageToConversation(final Message pMessage) {
+        messagesOfConversation.add(pMessage);
     }
 }
