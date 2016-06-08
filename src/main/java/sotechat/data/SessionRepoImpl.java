@@ -12,6 +12,9 @@ import java.util.LinkedHashSet;
 
 import static sotechat.util.Utils.get;
 
+/** Hoitaa Session-olioihi liittyvan kasittelyn.
+ * esim. paivittaa session-attribuutteihin nimimerkin.
+ */
 @Component
 public class SessionRepoImpl extends MapSessionRepository
     implements SessionRepo {
@@ -47,10 +50,9 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param session session-olio
      */
     @Override
-    public final void
-    mapHttpSessionToSessionId(
-            String sessionId,
-            HttpSession session
+    public final synchronized void mapHttpSessionToSessionId(
+            final String sessionId,
+            final HttpSession session
     ) {
         this.httpSessions.put(sessionId, session);
         this.latestSession = session;
@@ -61,14 +63,17 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return sesson-olio
      */
     @Override
-    public final HttpSession getHttpSession(
-            String sessionId
+    public final synchronized HttpSession getHttpSession(
+            final String sessionId
     ) {
         return httpSessions.get(sessionId);
     }
 
+    /** Palauttaa viimeisimman sessio-olion testausta varten.
+     * @return sessio-olio
+     */
     @Override
-    public HttpSession getLatestHttpSession() {
+    public final synchronized HttpSession getLatestHttpSession() {
         return latestSession;
     }
 
@@ -78,7 +83,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param professional professional
      */
     @Override
-    public final void updateSessionAttributes(
+    public final synchronized void updateSessionAttributes(
             final HttpSession session,
             final Principal professional
     ) {
@@ -112,12 +117,12 @@ public class SessionRepoImpl extends MapSessionRepository
         mapperService.mapUsernameToId(userId.toString(), username.toString());
     }
 
-    /** When pro user opened a new chat.
-     * @param session session
+    /** Kun ammattilaiskayttaja avaa uuden kanavan.
+     * @param session sessio-olio
      * @param channelId channelId
      */
     @Override
-    public final void addChannel(
+    public final synchronized void addChannel(
             final HttpSession session,
             final String channelId
     ) {
@@ -136,14 +141,15 @@ public class SessionRepoImpl extends MapSessionRepository
         }
     }
 
-    /** When pro user closes a chat window.
+    /** Kun ammattilaiskayttaja sulkee kanavan.
+     * TODO: Mieti, mita muuta tassa yhteydessa pitaisi tehda.
      * @param session session
      * @param channelId closed channel Id.
      */
     @Override
-    public final void removeChannel(
-            HttpSession session,
-            String channelId
+    public final synchronized void removeChannel(
+            final HttpSession session,
+            final String channelId
     ) {
         if (session.getAttribute("channelIds") != null) {
             /** Case: pro user with multiple channels. */
@@ -159,7 +165,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * Metodi paivittaa sessionsin tiedot proChannelsin tietojen perusteella.
      * @param session session
      */
-    private final void updateSessionChannels(
+    private synchronized void updateSessionChannels(
             final HttpSession session
     ) {
         HashSet<String> channels = proChannels.get(session.getId());
@@ -171,8 +177,8 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param channels sdfdf
      * @return rrrrg
      */
-    private String getChannelsAsJsonFriendly(
-            HashSet<String> channels
+    private synchronized String getChannelsAsJsonFriendly(
+            final HashSet<String> channels
     ) {
         if (channels == null || channels.isEmpty()) {
             return "[]";

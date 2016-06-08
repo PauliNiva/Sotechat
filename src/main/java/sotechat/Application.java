@@ -25,8 +25,9 @@ public class Application {
     }
 
     /**
-     * Yritys saada testeihin nakyvyytta sessionRepoon
-     * */
+     * Yritys saada testeihin nakyvyytta sessionRepoon.
+     * @return sessionRepo.
+     */
     public SessionRepo getSessionRepo() {
         return this.sessionRepo;
     }

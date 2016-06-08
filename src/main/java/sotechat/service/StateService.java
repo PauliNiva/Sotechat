@@ -48,15 +48,12 @@ public class StateService {
     /** Channel where queue status is broadcasted. */
     public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
 
-
-
-    /** Spring taikoo tassa konstruktorissa Singleton-instanssit palveluista.
-     *  @param pMapper Olio, johon talletetaan tiedot kayttajien id:ista
-     * ja kayttajanimista, ja josta voidaan hakea esim. kayttajanimi
-     * kayttaja-id:n perusteella.
-     * @param subscribeEventListener dfojfdoidfjo
+    /** Konstruktori.
+     * @param pMapper mapper
+     * @param subscribeEventListener subscribeEventListener
      * @param pQueueService queueService
-     * @param chatLogger
+     * @param pChatLogger chatLogger
+     * @param pSessionRepo sessionRepo
      */
     @Autowired
     public StateService(
@@ -79,12 +76,12 @@ public class StateService {
      * @param professional kirjautumistiedot - kirjautumaton on null
      * @return UserStateResponse
      */
-    public final UserStateResponse respondToUserStateRequest(
+    public final synchronized UserStateResponse respondToUserStateRequest(
             final HttpServletRequest req,
             final Principal professional
     ) {
         HttpSession session = req.getSession();
-        System.out.println("     State request from customerClient " + session.getId());
+        System.out.println("State req from customer " + session.getId());
         sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
 
         /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
@@ -94,26 +91,29 @@ public class StateService {
         String state = get(session, "state");
         String username = get(session, "username");
         String userId = get(session, "userId");
-        String category = get(session, "category");
+        String categ = get(session, "category");
         String channel = get(session, "channelId");
         /** Note: state on muuttujista ainoa, joka on AINA relevantti.
          Esim. username voi aluksi olla "UNKNOWN" tms. */
 
         /** Paketoidaan muuttujat StateResponseen, joka kaannetaan JSONiksi. */
-        return new UserStateResponse(state, username, userId, category, channel);
+        return new UserStateResponse(state, username, userId, categ, channel);
     }
 
 
-    /** Logiikka miten vastataan proClientin state requestiin.
-     * @return UserStateResponse
+    /**
+     * Logiikka miten vastataan proClientin state requestiin.
+     * @param req taalta saadaan session tiedot
+     * @param professional taalta saadaan autentikaatiotiedot
+     * @return mita halutaan vastata kyselyyn
      */
-    public final ProStateResponse respondToProStateRequest(
+    public final synchronized ProStateResponse respondToProStateRequest(
             final HttpServletRequest req,
             final Principal professional
     ) {
 
         HttpSession session = req.getSession();
-        System.out.println("     State request from proClient " + session.getId());
+        System.out.println("State request from proClient " + session.getId());
         sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
 
         /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
@@ -137,11 +137,11 @@ public class StateService {
 
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
-     * @param request req
-     * @return ret
-     * @throws IOException sdfsdf
+     * @param request taalta saadaan session tiedot
+     * @return mita vastataan pyyntoon
+     * @throws IOException mika poikkeus
      */
-    public final String respondToJoinPoolRequest(
+    public final synchronized String respondToJoinPoolRequest(
             final HttpServletRequest request
             ) throws IOException {
 
@@ -154,7 +154,9 @@ public class StateService {
         String startMessage = payload.get("startMessage").getAsString();
         String channelId = get(session, "channelId");
 
-        System.out.println("     id(joinPool) = " + session.getId() + " , username = " + username);
+        /** Debug/devaus tuloste. */
+        System.out.println("id(joinPool) = " + session.getId()
+                + " , username = " + username);
 
         /** Tarkistetaan etta aiempi tila on "start". */
         if (!get(session, "state").equals("start")) {
@@ -204,20 +206,15 @@ public class StateService {
         return "{\"content\":\"OK, please request new state now.\"}";
     }
 
-    /** Popping user from queue.
-     * @param channelId sdf
-     * @param req dg
-     * @param professional dgdg
-     * @return dfgdfg
+    /** Kun meille saapuu pyynto nostaa jonosta chatti.
+     * @param channelId kanavaId
+     * @param accessor taalta autentikaatiotiedot
+     * @return mita vastataan pyyntoon
      */
-    public final String popQueue(final String channelId,
-                                 final SimpMessageHeaderAccessor accessor
+    public final synchronized String popQueue(
+            final String channelId,
+            final SimpMessageHeaderAccessor accessor
     ) {
-        /** Verify that popper is authenticated. */
-        if (accessor.getUser() == null) {
-            System.out.println("Hacking attempt?");
-            return "";
-        }
         /** Add channelId to popper's channels. */
         String sessionId =  accessor
                         .getSessionAttributes()

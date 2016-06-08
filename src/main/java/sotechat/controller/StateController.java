@@ -30,8 +30,9 @@ public class StateController {
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
-     * @param pStateService state service
+     * @param pStateService stateService
      * @param pQueueBroadcaster queue Broadcaster
+     * @param pChatLogBroadcaster chatLogBroadcaster
      */
     @Autowired
     public StateController(
@@ -109,6 +110,11 @@ public class StateController {
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
+        /** Verify that popper is authenticated. */
+        if (accessor.getUser() == null) {
+            System.out.println("Hacking attempt?");
+            return "";
+        }
         String wakeUp = stateService.popQueue(channelId, accessor);
         queueBroadcaster.broadcastQueue();
         return wakeUp;

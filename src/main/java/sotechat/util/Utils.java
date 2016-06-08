@@ -1,9 +1,6 @@
 package sotechat.util;
 
-import sotechat.data.Mapper;
-
 import javax.servlet.http.HttpSession;
-import java.security.Principal;
 
 /**
  * Yleishyodyllisia staattisia funktioita.

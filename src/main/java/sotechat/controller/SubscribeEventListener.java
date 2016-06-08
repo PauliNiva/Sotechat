@@ -48,7 +48,11 @@ public class SubscribeEventListener
         map = new HashMap<String, List<HttpSession>>();
     }
 
-    public List<HttpSession> getSubscribers(String channelId) {
+    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
+     * @param channelId kanavaId
+     * @return lista sessioita
+     */
+    public final synchronized List<HttpSession> getSubscribers(final String channelId) {
         List<HttpSession> subs = map.get(channelId);
         if (subs == null) {
             subs = new ArrayList<HttpSession>();
@@ -76,7 +80,7 @@ public class SubscribeEventListener
      * TODO: Esta subscribe kanaville, joita ei ole.
      * @param event event
      */
-    private void handleSubscribe(final SessionSubscribeEvent event) {
+    private synchronized void handleSubscribe(final SessionSubscribeEvent event) {
         //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
         String sessionId = SimpMessageHeaderAccessor
@@ -117,19 +121,19 @@ public class SubscribeEventListener
     /** TODO: Kasittelee unsubscribe -tapahtumat.
      * @param event event
      */
-    private void handleUnsubscribe(final SessionUnsubscribeEvent event) {
+    private synchronized void handleUnsubscribe(final SessionUnsubscribeEvent event) {
         System.out.println("UNSUB = " + event.toString());
     }
 
-    /** Required for dependency injection in this case.
+    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
      * @param repo repo
      */
-    private void setSessionRepo(final SessionRepo repo) {
+    private synchronized void setSessionRepo(final SessionRepo repo) {
         this.sessionRepo = repo;
     }
 
-    /** Required for dependency injection in this case. */
-    private SessionRepo getSessionRepo() {
+    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa. */
+    private synchronized SessionRepo getSessionRepo() {
         return this.sessionRepo;
     }
 }

@@ -4,13 +4,13 @@ import org.openqa.selenium.support.ui.*;
 
 description 'As a user I want to access a chat window'
 
-scenario "User cannot see the chat window if she/he has not been picked from a pool by a healthcare professional", {
+scenario "User sees the queuing view", {
     given 'user enters the chat page', {
             driver = new FirefoxDriver()
             wait = new WebDriverWait(driver, 7)
             driver.get("http://localhost:8080")
     }
-    when 'a starting message is submitted', {
+    when 'a nickname and starting message is submitted', {
             element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("username")))
             element.sendKeys("Eero")
             element = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("startMessage")))
