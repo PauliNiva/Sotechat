@@ -55,15 +55,21 @@ public class QueueBroadcaster {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                String qbcc = "/toClient/" +
-                        StateService.QUEUE_BROADCAST_CHANNEL;
-                String qAsJson = queueService.toString();
-                brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
+                syncBcQ();
             }
         }, delay);
 
     }
 
-
+    /**
+     * Yritys korjata samanaikaisuusongelmia.
+     * TODO: Refactor
+     */
+    public final synchronized void syncBcQ() {
+        String qbcc = "/toClient/" +
+                StateService.QUEUE_BROADCAST_CHANNEL;
+        String qAsJson = queueService.toString();
+        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
+    }
 
 }

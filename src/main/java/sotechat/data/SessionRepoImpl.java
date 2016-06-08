@@ -50,10 +50,9 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param session session-olio
      */
     @Override
-    public final void
-    mapHttpSessionToSessionId(
-            String sessionId,
-            HttpSession session
+    public final synchronized void mapHttpSessionToSessionId(
+            final String sessionId,
+            final HttpSession session
     ) {
         this.httpSessions.put(sessionId, session);
         this.latestSession = session;
@@ -64,8 +63,8 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return sesson-olio
      */
     @Override
-    public final HttpSession getHttpSession(
-            String sessionId
+    public final synchronized HttpSession getHttpSession(
+            final String sessionId
     ) {
         return httpSessions.get(sessionId);
     }
@@ -74,7 +73,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return sessio-olio
      */
     @Override
-    public final HttpSession getLatestHttpSession() {
+    public final synchronized HttpSession getLatestHttpSession() {
         return latestSession;
     }
 
@@ -84,7 +83,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param professional professional
      */
     @Override
-    public final void updateSessionAttributes(
+    public final synchronized void updateSessionAttributes(
             final HttpSession session,
             final Principal professional
     ) {
@@ -123,7 +122,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param channelId channelId
      */
     @Override
-    public final void addChannel(
+    public final synchronized void addChannel(
             final HttpSession session,
             final String channelId
     ) {
@@ -148,7 +147,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param channelId closed channel Id.
      */
     @Override
-    public final void removeChannel(
+    public final synchronized void removeChannel(
             final HttpSession session,
             final String channelId
     ) {
@@ -166,7 +165,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * Metodi paivittaa sessionsin tiedot proChannelsin tietojen perusteella.
      * @param session session
      */
-    private void updateSessionChannels(
+    private synchronized void updateSessionChannels(
             final HttpSession session
     ) {
         HashSet<String> channels = proChannels.get(session.getId());
@@ -178,7 +177,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param channels sdfdf
      * @return rrrrg
      */
-    private String getChannelsAsJsonFriendly(
+    private synchronized String getChannelsAsJsonFriendly(
             final HashSet<String> channels
     ) {
         if (channels == null || channels.isEmpty()) {

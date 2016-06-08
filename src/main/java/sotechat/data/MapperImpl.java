@@ -47,7 +47,10 @@ public class MapperImpl implements Mapper {
      * @param username julkinen username
      */
     @Override
-    public final void mapUsernameToId(final String id, final String username) {
+    public final synchronized void mapUsernameToId(
+            final String id,
+            final String username
+    ) {
         this.map.put(id, username);
         this.revMap.put(username, id);
     }
@@ -58,7 +61,9 @@ public class MapperImpl implements Mapper {
      * @return username
      */
     @Override
-    public final String getUsernameFromId(final String id) {
+    public final synchronized String getUsernameFromId(
+            final String id
+    ) {
         if (!map.containsKey(id)) {
             return "UNKNOWN_USERNAME";
         }
@@ -70,12 +75,16 @@ public class MapperImpl implements Mapper {
      * @return true/false
      */
     @Override
-    public final boolean isUserIdMapped(final String id) {
+    public final synchronized boolean isUserIdMapped(
+            final String id
+    ) {
         return (map.containsKey(id));
     }
 
     @Override
-    public final boolean isUserProfessional(final String id) {
+    public final synchronized boolean isUserProfessional(
+            final String id
+    ) {
         return professionalIDs.contains(id);
     }
 
@@ -89,7 +98,9 @@ public class MapperImpl implements Mapper {
      * @return id salainen id
      */
     @Override
-    public final String getIdFromRegisteredName(final String registeredName) {
+    public final synchronized String getIdFromRegisteredName(
+            final String registeredName
+    ) {
         /* Varmistetaan ensin, etta username tunnetaan. */
         if (registeredName == null
                 || registeredName.isEmpty()
@@ -104,7 +115,7 @@ public class MapperImpl implements Mapper {
      * @return userId
      */
     @Override
-    public final String generateNewId() {
+    public final synchronized String generateNewId() {
         while (true) {
             /** Tuotetaan satunnaismerkkijonoja niin kauan,
              * etta vapaa merkkijono loytyy. On erittain

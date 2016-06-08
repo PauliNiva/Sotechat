@@ -49,17 +49,27 @@ public class ChatLogBroadcaster {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("TRYING TO BROADCAST channelId " + channelId);
-                String channelIdWithPath = "/toClient/chat/" + channelId;
-                List<MsgToClient> logs = chatLogger.getLogs(channelId);
-                broker.convertAndSend(channelIdWithPath, "$CLEAR$");
-                for (MsgToClient msg : logs) {
-                    System.out.println("    broadcasting " + msg.getContent());
-                    broker.convertAndSend(channelIdWithPath, msg);
-                }
+                syncBroadcast(channelId);
             }
         }, delay);
 
+    }
+
+    /** Yritys korjata samanaikaisuusongelmia.
+     * TODO: Refactor
+     * @param channelId channelId
+     */
+    public final synchronized void syncBroadcast(
+            final String channelId
+    ) {
+        System.out.println("TRYING TO BROADCAST channelId " + channelId);
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+        List<MsgToClient> logs = chatLogger.getLogs(channelId);
+        broker.convertAndSend(channelIdWithPath, "$CLEAR$");
+        for (MsgToClient msg : logs) {
+            System.out.println("    broadcasting " + msg.getContent());
+            broker.convertAndSend(channelIdWithPath, msg);
+        }
     }
 
 }
