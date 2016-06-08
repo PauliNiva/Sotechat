@@ -1,5 +1,5 @@
 angular.module('chatApp')
-    .controller('userCtrl', ['$scope', 'userStateService',
+    .controller('userCtrl', ['$scope', 'userStateService', 'heartBeatService',
         function ($scope, userStateService) {
             $scope.pro = false;
             userStateService.getVariablesFormServer().then(function (response) {
