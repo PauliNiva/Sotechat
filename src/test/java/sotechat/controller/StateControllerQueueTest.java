@@ -129,13 +129,14 @@ public class StateControllerQueueTest {
         this.clientInboundChannel.send(messageToBeSended);
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+        System.out.println(reply);
         String replyPayload = new String((byte[]) reply.getPayload(),
                 Charset.forName("UTF-8"));
         /**
          * Tyhjä vastaus, koska kirjautumaton käyttäjä ei voi ottaa toista
          * käyttäjää jonosta.
          */
-        assertNotEquals("channel activated. request new state now.", replyPayload); //TODO:FIX
+        assertNotEquals("channel activated. request new state now.", replyPayload);
     }
 
     /**
