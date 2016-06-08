@@ -23,9 +23,8 @@ import sotechat.data.SessionRepoImpl;
 public class WebSocketConfig extends
         AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
-    /**
-     * SessionRepoImpl needs to be autowired so that WebSocket-sessions are
-     * stored in it.
+    /** SessionRepoImpl taytyy autowireaa tassa, jotta WebSocket-sessiot
+     * onnistutaan sailomaan sinne.
      */
     @Autowired
     private SessionRepoImpl repository;

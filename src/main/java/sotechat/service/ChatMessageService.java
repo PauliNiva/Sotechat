@@ -23,7 +23,8 @@ public class ChatMessageService {
 
     /**
      * Constructor autowires mapper.
-     * @param pMapper mapper.
+     * @param pMapper mapper
+     * @param pChatLogger chatLogger
      */
     @Autowired
     public ChatMessageService(
@@ -41,7 +42,7 @@ public class ChatMessageService {
      * @param accessor accessor
      * @return msgToClient eli lahteva viesti
      */
-    public MsgToClient processMessage(
+    public final MsgToClient processMessage(
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) {

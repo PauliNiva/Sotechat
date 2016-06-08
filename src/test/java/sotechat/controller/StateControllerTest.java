@@ -21,8 +21,7 @@ import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
 import sotechat.data.*;
-import sotechat.queue.Queue;
-import sotechat.queue.QueueImpl;
+import sotechat.data.QueueImpl;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
 

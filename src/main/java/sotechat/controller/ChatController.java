@@ -19,9 +19,8 @@ public class ChatController {
     /** Tarjoaa logiikan. */
     private final ChatMessageService chatMessageService;
 
-    /**
-     * Konstruktori.
-     * @param pChatService chatServ
+    /** Konstruktori.
+     * @param pChatService chatService
      */
     @Autowired
     public ChatController(
