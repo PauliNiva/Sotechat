@@ -104,8 +104,8 @@ public class StateControllerQueueTest {
         msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> messageToBeSended = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> messageToBeSended = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
 
         this.clientInboundChannel.send(messageToBeSended);
@@ -128,8 +128,8 @@ public class StateControllerQueueTest {
         msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> messageToBeSended = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> messageToBeSended = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(messageToBeSended);

@@ -162,8 +162,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
@@ -192,8 +192,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
@@ -220,8 +220,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
