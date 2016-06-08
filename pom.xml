@@ -142,6 +142,7 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>0.8.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -152,6 +153,7 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
             <version>0.8.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
