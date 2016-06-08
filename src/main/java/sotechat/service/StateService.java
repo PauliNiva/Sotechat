@@ -215,11 +215,6 @@ public class StateService {
             final String channelId,
             final SimpMessageHeaderAccessor accessor
     ) {
-        /** Verify that popper is authenticated. */
-        if (accessor.getUser() == null) {
-            System.out.println("Hacking attempt?");
-            return "";
-        }
         /** Add channelId to popper's channels. */
         String sessionId =  accessor
                         .getSessionAttributes()

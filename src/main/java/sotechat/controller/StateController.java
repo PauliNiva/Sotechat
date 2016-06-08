@@ -110,6 +110,11 @@ public class StateController {
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
+        /** Verify that popper is authenticated. */
+        if (accessor.getUser() == null) {
+            System.out.println("Hacking attempt?");
+            return "";
+        }
         String wakeUp = stateService.popQueue(channelId, accessor);
         queueBroadcaster.broadcastQueue();
         return wakeUp;
