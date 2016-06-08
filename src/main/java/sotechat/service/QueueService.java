@@ -2,31 +2,25 @@ package sotechat.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sotechat.queue.Queue;
-import sotechat.queue.QueueItem;
+import sotechat.data.Queue;
+import sotechat.data.QueueItem;
 
 import java.util.List;
 
-/**
- * QueueService luokka tarjoaa palvelut jonoon lisaamiseen, jonosta
- * poistamiseen ja jonon tarkasteluun
- * Created by varkoi on 2.6.2016.
+/** Tarjoaa palvelut jonoon lisaamiseen, jonosta
+ * poistamiseen ja jonon tarkasteluun.
  */
 @Service
 public class QueueService {
 
-    /**
-     * Jono olio, johon tallennetaan jonottajien tiedot
-     */
-
+    /** Jono-olio, johon tallennetaan jonottajien tiedot. */
     Queue queue;
 
-    /**
-     * konstruktori alustaa jonon parametrina annetulla jono oliolla
-     * @param queue jono olio, johon jonottavien kayttajien tiedot tallennetaan
+    /** Konstruktori alustaa jonon parametrina annetulla jono oliolla.
+     * @param queue jono-olio, johon jonottavien kayttajien tiedot tallennetaan
      */
     @Autowired
-    public QueueService(Queue queue){
+    public QueueService(final Queue queue) {
         this.queue = queue;
     }
 
@@ -39,22 +33,25 @@ public class QueueService {
      * @param username jonottajan kayttajanimi
      * @return true jos lisays onnitui
      */
-    public final boolean addToQueue(String channelId, String category,
-                                 String username){
+    public final boolean addToQueue(
+            final String channelId,
+            final String category,
+            final String username) {
         return queue.addTo(channelId, category, username);
     }
 
-    /**
-     * toString -metodi palauttaa JSON -muotoisen taulukko esityksen
-     * jonon alkioista
-     * @return JSON -muotoinen taulukko jonon alkioista
+    /** Palauttaa jonon Stringina, joka nayttaa JSON-ystavalliselta taulukolta.
+     * TODO: esimerkkioutput.
+     * @return string
      */
     @Override
     public final String toString() {
-        List<QueueItem> list = queue.returnQueue();
+        List<QueueItem> list = queue.getQueue();
         String json = "{\"jono\": [";
-        for(QueueItem item : list){
-            if(list.indexOf(item)!=0) json += ", ";
+        for (QueueItem item : list) {
+            if (list.indexOf(item) != 0) {
+                json += ", ";
+            }
             json += jsonObject(item);
         }
         json += "]}";
@@ -64,7 +61,7 @@ public class QueueService {
     /**
      * firstOfQueue -metodi palauttaa jonon ensimmaisen alkion JSON -olion
      * muodossa ja samalla poistaa sen jonosta tai jos jono on tyhja
-     * palautetaan tyhja String
+     * palautetaan tyhja String.
      * @return jonon ensimmainen alkio JSON oliona, jossa muuttujina kanavaid,
      * keskustelun aihealue (kategoria) seka kayttajanimi
      */
@@ -72,7 +69,7 @@ public class QueueService {
         try {
             QueueItem first = queue.pollFirst();
             return jsonObject(first);
-        } catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
@@ -80,47 +77,47 @@ public class QueueService {
     /**
      * firstOfCategory -metodi palauttaa ensimmaisen alkion jonosta parametrina
      * annetusta kategoriasta JSON olion muodossa ja samalla poistaa sen
-     * jonosta tai jos jono on tyhja palautetaan tyhja String
+     * jonosta tai jos jono on tyhja palautetaan tyhja String.
      * @param category aihealue, jonka keskusteluja haetaan
      * @return jonon ensimmainen alkio haetusta kategoriasta JSON oliona, jossa
      * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
      */
-    public final String firstOfCategory(String category){
+    public final String firstOfCategory(final String category) {
         try {
             QueueItem first = queue.pollFirstFrom(category);
             return jsonObject(first);
-        } catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
     /**
      * Poistaa jonosta alkion kanavaid:n perusteella ja palauttaa sita
-     * esittavan JSON -olion
+     * esittavan JSON -olion.
      * @param channelId kanavaid, jota vastaava alkio halutaan ottaa jonosta
      * @return haettua kanavaid:ta vastaava alkio JSON -oliona, jossa
      * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
      */
-    public final String removeFromQueue(String channelId){
+    public final String removeFromQueue(final String channelId) {
         try {
             QueueItem removed = queue.remove(channelId);
             return jsonObject(removed);
-        } catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
     /**
-     * queueLength -metodi palauttaa jonon pituuden
+     * queueLength -metodi palauttaa jonon pituuden.
      * @return jonon alkioiden maara
      */
-    public final int queueLength(){
+    public final int queueLength() {
         return queue.length();
     }
 
     /**
      * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
-     * alkiota edeltävän jonon pituuden
+     * alkiota edeltävän jonon pituuden.
      * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
      *                  halutaan selvittää
      * @return  alkioiden määrä, jotka edeltävät haettua alkiota
@@ -131,24 +128,27 @@ public class QueueService {
 
     /**
      * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
-     * alkiota edeltävän jonon pituuden parametrina annetussa kategoriassa
+     * alkiota edeltävän jonon pituuden parametrina annetussa kategoriassa.
      * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
      *                  halutaan selvittää
      * @param category aihealue, jonka alkiot otetaan laskussa mukaan
      * @return aihealueeseen kuuluvien alkioiden määrä, jotka edeltävät haettua
      * alkiota
      */
-    public final int queueLength(final String channelId, final String category){
+    public final int queueLength(
+            final String channelId,
+            final String category
+    ) {
         return queue.itemsBeforeIn(channelId, category);
     }
 
     /**
      * jsonObject -metodi luo JSON -olio muotoisen String esityksen parametrina
-     * annetusta QueueItemista
+     * annetusta QueueItemista.
      * @param item jonon alkio
      * @return JSON -olio muotoinen esitys jonon alkiosta
      */
-    private final String jsonObject(QueueItem item){
+    private String jsonObject(QueueItem item) {
         String json = "{";
         json += "\"channelId\": \"" + item.getChannelId() + "\", ";
         json += "\"category\": \"" + item.getCategory() + "\", ";

@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Broadcastaa chatin logit, kun uusi jasen liittyy kanavalle (esim. F5).
+/** Broadcastaa chatin logit, kun uusi jasen liittyy kanavalle (esim. F5).
  */
 @Component
 public class ChatLogBroadcaster {
@@ -22,6 +21,10 @@ public class ChatLogBroadcaster {
     /** Taikoo viestien lahetyksen. */
     private SimpMessagingTemplate broker;
 
+    /** Konstruktori.
+     * @param pChatLogger chatLogger
+     * @param broker broker
+     */
     @Autowired
     public ChatLogBroadcaster(
             final ChatLogger pChatLogger,
@@ -32,7 +35,9 @@ public class ChatLogBroadcaster {
     }
 
 
-    /**
+    /** Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
+     * Ennen lokeja lahetetaan erikoisviesti $CLEAR$ = tyhjenna ruutu.
+     * TODO: Broadcastaa vain sita pyytavalle tyypille, ei koko kanavalle.
      * TODO: Refactor.
      * TODO: Protection against flooding (max 1 broadcast/second).
      */

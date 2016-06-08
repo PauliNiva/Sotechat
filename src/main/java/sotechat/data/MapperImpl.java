@@ -42,7 +42,7 @@ public class MapperImpl implements Mapper {
         professionalIDs.add("666");
     }
 
-    /** Tallentaa molempiin suuntiin tiedon id<->username
+    /** Tallentaa molempiin suuntiin tiedon id<->username.
      * @param id salainen id
      * @param username julkinen username
      */

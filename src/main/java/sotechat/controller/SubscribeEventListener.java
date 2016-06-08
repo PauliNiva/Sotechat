@@ -48,7 +48,11 @@ public class SubscribeEventListener
         map = new HashMap<String, List<HttpSession>>();
     }
 
-    public List<HttpSession> getSubscribers(String channelId) {
+    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
+     * @param channelId kanavaId
+     * @return lista sessioita
+     */
+    public final List<HttpSession> getSubscribers(final String channelId) {
         List<HttpSession> subs = map.get(channelId);
         if (subs == null) {
             subs = new ArrayList<HttpSession>();
@@ -121,14 +125,14 @@ public class SubscribeEventListener
         System.out.println("UNSUB = " + event.toString());
     }
 
-    /** Required for dependency injection in this case.
+    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
      * @param repo repo
      */
     private void setSessionRepo(final SessionRepo repo) {
         this.sessionRepo = repo;
     }
 
-    /** Required for dependency injection in this case. */
+    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa. */
     private SessionRepo getSessionRepo() {
         return this.sessionRepo;
     }

@@ -3,10 +3,9 @@ package sotechat.service;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sotechat.queue.Queue;
-import sotechat.queue.QueueItem;
-import sotechat.service.QueueService;
-import sotechat.queue.QueueImpl;
+import sotechat.data.Queue;
+import sotechat.data.QueueItem;
+import sotechat.data.QueueImpl;
 
 /**
  * Created by varkoi on 3.6.2016.
@@ -31,7 +30,7 @@ public class QueueServiceTest {
         boolean success = service.addToQueue("333", "neuvola", "heli");
         Assert.assertTrue(success);
         Assert.assertEquals(3, queue.length());
-        Assert.assertEquals("333", queue.returnQueue().get(2).getChannelId());
+        Assert.assertEquals("333", queue.getQueue().get(2).getChannelId());
     }
 
     @Test
@@ -40,7 +39,7 @@ public class QueueServiceTest {
         boolean success2 = service.addToQueue("111", "neuvola", "anu");
         Assert.assertTrue(success2);
         Assert.assertEquals(4, queue.length());
-        Assert.assertEquals("anu", queue.returnQueue().get(3).getUsername());
+        Assert.assertEquals("anu", queue.getQueue().get(3).getUsername());
     }
 
     @Test

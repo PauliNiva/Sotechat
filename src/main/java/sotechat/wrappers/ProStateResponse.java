@@ -14,8 +14,11 @@ public class ProStateResponse {
     /** Salainen kayttajaID. */
     private String userId;
 
+    /** WebSocket-osoite, johon subscribaamalla saa jonon paivitykset. */
     private String QBCC;
 
+    /** Onko kayttaja merkinnyt itsensa paikallaolevaksi.
+     * "true" tai "false" Stringina JSON paketointia varten. */
     private String online;
 
     /** Salainen kanavaID. */
@@ -29,7 +32,6 @@ public class ProStateResponse {
      * @param pOnline online
      * @param pChannelIds channelId
      */
-
     public ProStateResponse(final String pState, final String pUsername,
                             final String pUserId, final String pQBCC,
                             final String pOnline, final String pChannelIds) {
@@ -69,6 +71,9 @@ public class ProStateResponse {
         return this.QBCC;
     }
 
+    /** getteri online-statukselle.
+     * @return "true" tai "false".
+     */
     public final String getOnline() {
         return this.online;
     }

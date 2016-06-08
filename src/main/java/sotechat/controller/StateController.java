@@ -30,8 +30,9 @@ public class StateController {
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
-     * @param pStateService state service
+     * @param pStateService stateService
      * @param pQueueBroadcaster queue Broadcaster
+     * @param pChatLogBroadcaster chatLogBroadcaster
      */
     @Autowired
     public StateController(

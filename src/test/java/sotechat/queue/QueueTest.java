@@ -3,9 +3,8 @@ package sotechat.queue;
 import org.junit.Before;
 import org.junit.Assert;
 import org.junit.Test;
-import sotechat.queue.Queue;
-import sotechat.queue.QueueImpl;
-import sotechat.queue.QueueItem;
+import sotechat.data.QueueImpl;
+import sotechat.data.QueueItem;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class QueueTest {
     public void addToTest(){
         queue.addTo("324", "mielenterveys", "hanna h");
         Assert.assertEquals(3, queue.length());
-        QueueItem item = queue.returnQueue().get(2);
+        QueueItem item = queue.getQueue().get(2);
         Assert.assertEquals("324", item.getChannelId());
         Assert.assertEquals("mielenterveys", item.getCategory());
         Assert.assertEquals("hanna h", item.getUsername());
@@ -37,8 +36,8 @@ public class QueueTest {
         queue.addTo("222", "hammashoito", "jokuvaan");
         queue.addTo("422", "paihdetyo", "jokutoinen");
         Assert.assertEquals(4, queue.length());
-        QueueItem item1 = queue.returnQueue().get(2);
-        QueueItem item2 = queue.returnQueue().get(3);
+        QueueItem item1 = queue.getQueue().get(2);
+        QueueItem item2 = queue.getQueue().get(3);
         Assert.assertEquals("222", item1.getChannelId());
         Assert.assertEquals("422", item2.getChannelId());
     }
@@ -62,7 +61,7 @@ public class QueueTest {
         QueueItem item = queue.pollFirstFrom("neuvola");
         Assert.assertEquals("829", item.getChannelId());
         Assert.assertEquals(1, queue.length());
-        Assert.assertEquals("jesse", queue.returnQueue().get(0).getUsername());
+        Assert.assertEquals("jesse", queue.getQueue().get(0).getUsername());
     }
 
     @Test
@@ -86,7 +85,7 @@ public class QueueTest {
         QueueItem item1 = queue.remove("444");
         QueueItem item2 = queue.remove("829");
         Assert.assertEquals(0, queue.length());
-        Assert.assertTrue(queue.returnQueue().isEmpty());
+        Assert.assertTrue(queue.getQueue().isEmpty());
     }
 
     @Test
@@ -125,7 +124,7 @@ public class QueueTest {
 
     @Test
     public void returnQueueTest(){
-        List<QueueItem> items = queue.returnQueue();
+        List<QueueItem> items = queue.getQueue();
         Assert.assertEquals(items.get(0), first);
         Assert.assertEquals(items.get(1), second);
     }
@@ -133,7 +132,7 @@ public class QueueTest {
     @Test
     public void returnQueueTest2(){
         QueueImpl sq = new QueueImpl();
-        Assert.assertTrue(sq.returnQueue().isEmpty());
+        Assert.assertTrue(sq.getQueue().isEmpty());
     }
 
 }
