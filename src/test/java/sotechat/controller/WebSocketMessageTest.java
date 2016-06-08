@@ -114,8 +114,8 @@ public class WebSocketMessageTest {
          * joka voidaankin sitten lahettaa palvelimelle.
          */
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
         /**
          * Lahetetaan viesti palvelimelle.
