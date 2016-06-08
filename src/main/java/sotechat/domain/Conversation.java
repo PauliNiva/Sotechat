@@ -20,6 +20,7 @@ public class Conversation extends AbstractPersistable<Long> {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Date date;
+    private String category;
 
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
@@ -63,5 +64,13 @@ public class Conversation extends AbstractPersistable<Long> {
 
     public final void addMessageToConversation(final Message pMessage) {
         messagesOfConversation.add(pMessage);
+    }
+
+    public final String getCategory() {
+        return category;
+    }
+
+    public final void setCategory(String category) {
+        this.category = category;
     }
 }
