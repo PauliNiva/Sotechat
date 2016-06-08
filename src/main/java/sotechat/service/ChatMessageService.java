@@ -42,7 +42,7 @@ public class ChatMessageService {
      * @param accessor accessor
      * @return msgToClient eli lahteva viesti
      */
-    public final MsgToClient processMessage(
+    public final synchronized MsgToClient processMessage(
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) {

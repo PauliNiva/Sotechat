@@ -29,7 +29,7 @@ public class ChatLogger {
     /** Kirjaa lokeihin ylos viesti.
      * @param msg msg.
      */
-    public final void log(final MsgToClient msg) {
+    public final synchronized void log(final MsgToClient msg) {
         String channelId = msg.getChannelId();
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
@@ -43,7 +43,7 @@ public class ChatLogger {
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
-    public final List<MsgToClient> getLogs(final String channelId) {
+    public final synchronized List<MsgToClient> getLogs(final String channelId) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             list = new ArrayList<>();

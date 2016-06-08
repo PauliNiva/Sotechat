@@ -76,7 +76,7 @@ public class StateService {
      * @param professional kirjautumistiedot - kirjautumaton on null
      * @return UserStateResponse
      */
-    public final UserStateResponse respondToUserStateRequest(
+    public final synchronized UserStateResponse respondToUserStateRequest(
             final HttpServletRequest req,
             final Principal professional
     ) {
@@ -107,7 +107,7 @@ public class StateService {
      * @param professional taalta saadaan autentikaatiotiedot
      * @return mita halutaan vastata kyselyyn
      */
-    public final ProStateResponse respondToProStateRequest(
+    public final synchronized ProStateResponse respondToProStateRequest(
             final HttpServletRequest req,
             final Principal professional
     ) {
@@ -141,7 +141,7 @@ public class StateService {
      * @return mita vastataan pyyntoon
      * @throws IOException mika poikkeus
      */
-    public final String respondToJoinPoolRequest(
+    public final synchronized String respondToJoinPoolRequest(
             final HttpServletRequest request
             ) throws IOException {
 
@@ -211,8 +211,9 @@ public class StateService {
      * @param accessor taalta autentikaatiotiedot
      * @return mita vastataan pyyntoon
      */
-    public final String popQueue(final String channelId,
-                                 final SimpMessageHeaderAccessor accessor
+    public final synchronized String popQueue(
+            final String channelId,
+            final SimpMessageHeaderAccessor accessor
     ) {
         /** Verify that popper is authenticated. */
         if (accessor.getUser() == null) {

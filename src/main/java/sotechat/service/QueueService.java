@@ -9,6 +9,7 @@ import java.util.List;
 
 /** Tarjoaa palvelut jonoon lisaamiseen, jonosta
  * poistamiseen ja jonon tarkasteluun.
+ * Tata Servicea ei tarvitse synkronisoida, koska queue on jo synkronisoitu.
  */
 @Service
 public class QueueService {
