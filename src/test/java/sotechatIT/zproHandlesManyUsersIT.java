@@ -16,7 +16,7 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a user I want to send a message
  */
-public class proHandlesManyUsersIT {
+public class zproHandlesManyUsersIT {
 
     private WebDriver proDriver;
     private WebDriverWait proWait;
@@ -31,7 +31,6 @@ public class proHandlesManyUsersIT {
 
     @After
     public void tearDown() throws Exception {
-
         proDriver.close();
     }
 

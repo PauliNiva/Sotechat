@@ -1,31 +1,32 @@
 package sotechat.data;
 
-/** QueueItem olioon tallennetaan jonottajan tiedot
+/**
+ * QueueItem olioon tallennetaan jonottajan tiedot.
  */
 public class QueueItem {
 
     /** Jonottavan kanavan id.  */
-    String channelId;
+    private String channelId;
 
     /** Keskustelun aihealue. */
-    String category;
+    private String category;
 
     /** Jonottavan kayttajan nimi. */
-    String username;
+    private String username;
 
     /** Konstruktori alustaa olion annetuilla parametreilla.
-     * @param channelId jonottavan henkilon kanavan id
-     * @param category keskustelun aihealue
-     * @param username jonottavan kayttajan nimi
+     * @param pChannelId jonottavan henkilon kanavan id
+     * @param pCategory keskustelun aihealue
+     * @param pUsername jonottavan kayttajan nimi
      */
     public QueueItem(
-            final String channelId,
-            final String category,
-            final String username
+            final String pChannelId,
+            final String pCategory,
+            final String pUsername
     ) {
-        this.channelId = channelId;
-        this.category = category;
-        this.username = username;
+        this.channelId = pChannelId;
+        this.category = pCategory;
+        this.username = pUsername;
     }
 
     /** Palauttaa jonottavan henkilon kanavan id:n.

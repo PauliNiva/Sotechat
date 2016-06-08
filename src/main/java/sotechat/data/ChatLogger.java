@@ -1,6 +1,5 @@
 package sotechat.data;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sotechat.wrappers.MsgToClient;
 
@@ -43,7 +42,9 @@ public class ChatLogger {
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
-    public final synchronized List<MsgToClient> getLogs(final String channelId) {
+    public final synchronized List<MsgToClient> getLogs(
+            final String channelId
+    ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             list = new ArrayList<>();

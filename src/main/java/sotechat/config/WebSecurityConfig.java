@@ -64,7 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @throws Exception mika poikkeus?
      */
     @Autowired
-     public final void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+     public final void configureGlobal(final AuthenticationManagerBuilder auth)
+            throws Exception {
         auth
                 .inMemoryAuthentication()
                 .withUser("Hoitaja")

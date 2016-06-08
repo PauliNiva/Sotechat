@@ -24,5 +24,4 @@ public class HeartBeatController {
         return "{\"heartbeat\":\"server-alive\"}";
     }
 
-    
 }
