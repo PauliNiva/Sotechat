@@ -1,4 +1,4 @@
 /**
- Tämä paketti sisältää sovelluksen konfiguraatiotiedostot.
+ Tama paketti sisaltaa sovelluksen konfiguraatiotiedostot.
  **/
 package sotechat.config;

@@ -8,15 +8,15 @@ import org.springframework.session.ExpiringSession;
 import sotechat.websocket.WebSocketConnectHandler;
 
 /**
- * Keskeneräinen.
+ * Keskenerainen.
  * @param <S>
  */
 /*@Configuration
 public class WebSocketHandlersConfig<S extends ExpiringSession> {
 
-    /** Täytetään myöhemmin.
-     * @param messagingTemplate täytetään myöhemmin
-     * @return täytetään myöhemmin
+    /** Taytetaan myohemmin.
+     * @param messagingTemplate taytetaan myohemmin
+     * @return taytetaan myohemmin
      */
    /* @Bean
     public final WebSocketConnectHandler<S> webSocketConnectHandler(
