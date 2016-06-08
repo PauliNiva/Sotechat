@@ -15,8 +15,8 @@ public class Message extends AbstractPersistable<Long> {
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    private String context;
-    private String author;
+    private String content;
+    private String sender;
 
     @ManyToOne
     private Conversation conversation;
@@ -32,20 +32,20 @@ public class Message extends AbstractPersistable<Long> {
         this.date = pdate;
     }
 
-    public final String getContext() {
-        return this.context;
+    public final String getContent() {
+        return this.content;
     }
 
-    public final void setContext(final String pcontext) {
-        this.context = pcontext;
+    public final void setContent(final String pcontent) {
+        this.content = pcontent;
     }
 
-    public final String getAuthor() {
-        return this.author;
+    public final String getSender() {
+        return this.sender;
     }
 
-    public final void setAuthor(final String pauthor) {
-        this.author = pauthor;
+    public final void setSender(final String psender) {
+        this.sender = psender;
     }
 
     public final Conversation getConversation() {
