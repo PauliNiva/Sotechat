@@ -58,13 +58,10 @@ public class ConversationService {
     }
 
     private void addConnection(Person person, Conversation conversation) throws Exception {
-        if(personRepo.exists(person.getId())) {
             conversation.addPersonToConversation(person);
             person.addConversationToPerson(conversation);
             conversationRepo.save(conversation);
             personRepo.save(person);
-        }else{
-            throw new Exception();
         }
     }
 
