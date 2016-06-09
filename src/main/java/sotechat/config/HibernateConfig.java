@@ -172,7 +172,7 @@ public class HibernateConfig {
      * kantaoperaatioista, kuten tietokantaan talletuksista, ja tietokannasta
      * hauista.
      *
-     * @param entityManagerFactory 
+     * @param entityManagerFactory
      * @return
      */
     @Bean

@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession;
  */
 public final class Utils {
 
-    /** Esim: get(session, "username") -> "Matti".
+    /** Esim: get(session, "username") = "Matti".
      * Toistoa oli niin paljon, etta eriytettiin omaksi metodiksi.
      * Palauttaa nullin sijaan tyhjan Stringin, jotta kasittely helpottuisi.
      * @param session HttpSession-objekti
