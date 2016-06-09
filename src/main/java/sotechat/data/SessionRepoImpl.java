@@ -88,8 +88,8 @@ public class SessionRepoImpl extends MapSessionRepository
             final Principal professional
     ) {
         /** Kaivetaan username ja id sessio-attribuuteista. */
-        Object username = session.getAttribute("username");
-        Object userId = session.getAttribute("userId");
+        Object username = get(session, "username");
+        Object userId = get(session, "userId");
 
         /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {
@@ -125,7 +125,7 @@ public class SessionRepoImpl extends MapSessionRepository
             final HttpSession session,
             final String channelId
     ) {
-        if (session.getAttribute("channelIds") != null) {
+        if (get(session, "channelIds") != null) {
             /** Case: pro user with multiple channels. */
             HashSet<String> channels = proChannels.get(session.getId());
             if (channels == null) {
@@ -150,7 +150,7 @@ public class SessionRepoImpl extends MapSessionRepository
             final HttpSession session,
             final String channelId
     ) {
-        if (session.getAttribute("channelIds") != null) {
+        if (get(session, "channelIds") != null) {
             /** Case: pro user with multiple channels. */
             HashSet<String> channels = proChannels.get(session.getId());
             if (channels != null) {
