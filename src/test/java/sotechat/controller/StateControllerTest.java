@@ -22,11 +22,17 @@ import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
 import sotechat.data.*;
 import sotechat.data.QueueImpl;
-import sotechat.service.QueueService;
-import sotechat.service.StateService;
+import sotechat.util.TestPrincipal;
+import sotechat.websocketService.QueueService;
+import sotechat.websocketService.StateService;
+
+import javax.annotation.Resource;
+
+import java.security.Principal;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
 
@@ -39,9 +45,6 @@ import static org.springframework.test.web.servlet.result
 @WebAppConfiguration
 public class StateControllerTest {
 
-    /**
-     * MockMvc.
-     */
     private MockMvc mvc;
 
     /**
@@ -50,6 +53,9 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
+     //   mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+       //         .addFilter(springSecurityFilterChain)
+         //       .build();
         ChatLogger chatLogger = new ChatLogger();
         Mapper mapper = new MapperImpl();
         SubscribeEventListener listener = new SubscribeEventListener();
@@ -68,11 +74,13 @@ public class StateControllerTest {
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
-        ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(chatLogger, broker);
+        ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
+                chatLogger, broker);
         StateService state = new StateService(
                 mapper, listener, qService, chatLogger, sessions);
         mvc = MockMvcBuilders
-                .standaloneSetup(new StateController(state, broadcaster, logBroadcaster))
+                .standaloneSetup(new StateController(
+                        state, broadcaster, logBroadcaster))
                 .build();
     }
 
@@ -104,28 +112,31 @@ public class StateControllerTest {
     @Test
     public void testGetProStatReturnsOK() throws Exception {
          mvc.perform(MockMvcRequestBuilders
-                .get("/proState").accept(MediaType.APPLICATION_JSON))
+                .get("/proState").accept(MediaType.APPLICATION_JSON)
+                    .principal(new TestPrincipal("hoitaja")))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testGetProStateReturnsPlausibleValues() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .get("/proState").accept(MediaType.APPLICATION_JSON))
+                    .get("/proState")
+                    .accept(MediaType.APPLICATION_JSON)
+                        .principal(new TestPrincipal("hoitaja")))
                 .andExpect(jsonPath("$.*", hasSize(6)))
-                .andExpect(jsonPath("$.state", is("start")))
-                .andExpect(jsonPath("$.username", is("Anon")))
+                .andExpect(jsonPath("$.state").isNotEmpty())
+                .andExpect(jsonPath("$.username").isNotEmpty())
                 .andExpect(jsonPath("$.userId").isNotEmpty())
-                .andExpect(jsonPath("$.online", is("true")))
+                .andExpect(jsonPath("$.online").isNotEmpty())
                 .andExpect(jsonPath("$.qbcc", is("QBCC")))
-                .andExpect(jsonPath("$.channelIds", is("")));
+                .andExpect(jsonPath("$.channelIds", is("[]")));
     }
 
     @Test
     public void
     joiningChatPoolSucceedsWithNormalUserIfStateIsStart() throws Exception {
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(MockMvcRequestBuilders.post("/joinPool")
+        mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .sessionAttr("channelId", "2")
                     .sessionAttr("state", "start")
@@ -141,32 +152,32 @@ public class StateControllerTest {
     public void
     joiningChatPoolFailsWithNormalUserIfStateIsNotStart() throws Exception {
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/joinPool")
+        mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .sessionAttr("channelId", "2")
                     .sessionAttr("state", "chat")
                     .sessionAttr("userId", "4")
                     .sessionAttr("category", "DRUGS"))
                 .andExpect(status().isOk())
-                .andReturn();
-        String content = result.getResponse().getContentAsString();
-        assertEquals("Denied join pool request due to bad state.", content);
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("Denied join pool request due to bad state.")));
     }
 
     @Test
     public void
     joiningChatPoolFailsIfUserTriesToJoinWithProfessionalIdAndUsername() throws Exception {
         String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.post("/joinPool")
+        mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .sessionAttr("channelId", "2")
                 .sessionAttr("state", "start")
                 .sessionAttr("userId", "666")
                 .sessionAttr("category", "DRUGS"))
                 .andExpect(status().isOk())
-                .andReturn();
-        String content = result.getResponse().getContentAsString();
-        assertEquals("Denied join pool request due to reserved username.", content);
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                    is("Denied join pool request due to reserved username.")));
     }
 
 }

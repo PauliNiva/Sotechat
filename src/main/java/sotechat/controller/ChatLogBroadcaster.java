@@ -40,6 +40,7 @@ public class ChatLogBroadcaster {
      * TODO: Broadcastaa vain sita pyytavalle tyypille, ei koko kanavalle.
      * TODO: Refactor.
      * TODO: Protection against flooding (max 1 broadcast/second).
+     * @param channelId channelId
      */
     public final void broadcast(
             final String channelId

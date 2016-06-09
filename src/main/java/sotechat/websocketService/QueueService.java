@@ -1,4 +1,4 @@
-package sotechat.service;
+package sotechat.websocketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ import java.util.List;
 public class QueueService {
 
     /** Jono-olio, johon tallennetaan jonottajien tiedot. */
-    Queue queue;
+    private Queue queue;
 
     /** Konstruktori alustaa jonon parametrina annetulla jono oliolla.
-     * @param queue jono-olio, johon jonottavien kayttajien tiedot tallennetaan
+     * @param pQueue jono-olio, johon jonottavien kayttajien tiedot tallennetaan
      */
     @Autowired
-    public QueueService(final Queue queue) {
-        this.queue = queue;
+    public QueueService(final Queue pQueue) {
+        this.queue = pQueue;
     }
 
     /**
@@ -149,7 +149,7 @@ public class QueueService {
      * @param item jonon alkio
      * @return JSON -olio muotoinen esitys jonon alkiosta
      */
-    private String jsonObject(QueueItem item) {
+    private String jsonObject(final QueueItem item) {
         String json = "{";
         json += "\"channelId\": \"" + item.getChannelId() + "\", ";
         json += "\"category\": \"" + item.getCategory() + "\", ";

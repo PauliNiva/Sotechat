@@ -42,13 +42,14 @@ public class Message extends AbstractPersistable<Long> {
         return this.content;
     }
 
-    public final void setContent(final String pcontent) {
-        this.content = pcontent;
+    public final void setContent(final String pContent) {
+        this.content = pContent;
     }
 
     public final String getSender() {
         return this.sender;
     }
+
 
     public final void setSender(final String psender) {
         this.sender = psender;
@@ -58,8 +59,8 @@ public class Message extends AbstractPersistable<Long> {
         return this.conversation;
     }
 
-    public final void setConversation(final Conversation pconversation) {
-        this.conversation = pconversation;
+    public final void setConversation(final Conversation pConversation) {
+        this.conversation = pConversation;
     }
 
 }

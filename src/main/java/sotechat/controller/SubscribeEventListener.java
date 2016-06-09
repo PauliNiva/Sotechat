@@ -3,22 +3,18 @@ package sotechat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.SessionRepo;
-import sotechat.service.StateService;
+import sotechat.websocketService.StateService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import static sotechat.util.Utils.get;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
@@ -52,7 +48,9 @@ public class SubscribeEventListener
      * @param channelId kanavaId
      * @return lista sessioita
      */
-    public final synchronized List<HttpSession> getSubscribers(final String channelId) {
+    public final synchronized List<HttpSession> getSubscribers(
+            final String channelId
+    ) {
         List<HttpSession> subs = map.get(channelId);
         if (subs == null) {
             subs = new ArrayList<HttpSession>();
@@ -80,7 +78,9 @@ public class SubscribeEventListener
      * TODO: Esta subscribe kanaville, joita ei ole.
      * @param event event
      */
-    private synchronized void handleSubscribe(final SessionSubscribeEvent event) {
+    private synchronized void handleSubscribe(
+            final SessionSubscribeEvent event
+    ) {
         //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
         String sessionId = SimpMessageHeaderAccessor
@@ -121,7 +121,9 @@ public class SubscribeEventListener
     /** TODO: Kasittelee unsubscribe -tapahtumat.
      * @param event event
      */
-    private synchronized void handleUnsubscribe(final SessionUnsubscribeEvent event) {
+    private synchronized void handleUnsubscribe(
+            final SessionUnsubscribeEvent event
+    ) {
         System.out.println("UNSUB = " + event.toString());
     }
 
@@ -132,7 +134,9 @@ public class SubscribeEventListener
         this.sessionRepo = repo;
     }
 
-    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa. */
+    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
+     *  @return SessionRepo sessionRepo
+     * */
     private synchronized SessionRepo getSessionRepo() {
         return this.sessionRepo;
     }

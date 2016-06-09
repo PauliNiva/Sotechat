@@ -20,7 +20,7 @@ public class ConversationTest {
     public void setUp() {
         conversation = new Conversation();
         message1 = new Message();
-        message1.setContext("Context");
+        message1.setContent("Context");
         message2 = new Message();
         date = new Date();
     }

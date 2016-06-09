@@ -114,8 +114,8 @@ public class WebSocketMessageTest {
          * joka voidaankin sitten lahettaa palvelimelle.
          */
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
         /**
          * Lahetetaan viesti palvelimelle.
@@ -162,8 +162,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
@@ -192,8 +192,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
@@ -220,8 +220,8 @@ public class WebSocketMessageTest {
         msgUtil.add("timeStamp", "Sunnuntai", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(message);
@@ -272,9 +272,11 @@ public class WebSocketMessageTest {
     @Configuration
     @EnableScheduling
     @ComponentScan(
-            basePackages="sotechat",
+            basePackages={"sotechat.controller",
+                    "sotechat.data",
+                    "sotechat.websocketService"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
-                    value = Configuration.class)
+                    value = {Configuration.class})
     )
     @EnableWebSocketMessageBroker
     static class TestWebSocketConfig

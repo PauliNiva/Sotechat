@@ -1,4 +1,4 @@
-package sotechat.service;
+package sotechat.websocketService;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;

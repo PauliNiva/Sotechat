@@ -20,6 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Maarittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http.csrf().disable();
         http
                 // "maaritellaan seuraavaksi, mitka
@@ -64,10 +65,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @throws Exception mika poikkeus?
      */
     @Autowired
-     public final void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+     public final void configureGlobal(final AuthenticationManagerBuilder auth)
+            throws Exception {
         auth
                 .inMemoryAuthentication()
                 .withUser("Hoitaja")
+                .password("salasana")
+                .roles("USER").and()
+                .withUser("Hoitaja2")
                 .password("salasana")
                 .roles("USER");
                 // TODO: selvita roolin merkitys.

@@ -28,6 +28,12 @@ public interface SessionRepo {
      * @return viimeisin sessio.
      */
     HttpSession getLatestHttpSession();
+
+    /**
+     * Päivittää session atribuutit.
+     * @param session uusi sessio
+     * @param professional kirjautumistiedot
+     */
     void updateSessionAttributes(
             HttpSession session,
             Principal professional

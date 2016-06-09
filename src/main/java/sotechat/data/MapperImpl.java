@@ -40,6 +40,8 @@ public class MapperImpl implements Mapper {
         /** Kovakoodataan yksi hoitaja devausvaiheessa. */
         mapUsernameToId("666", "Hoitaja");
         professionalIDs.add("666");
+        mapUsernameToId("667", "Hoitaja2");
+        professionalIDs.add("667");
     }
 
     /** Tallentaa molempiin suuntiin tiedon id<->username.

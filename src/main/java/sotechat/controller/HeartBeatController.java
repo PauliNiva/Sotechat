@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HeartBeatController {
 
 
-    /** Spring magicly keeps the HTTP Session alive as long as
+    /** Spring magically keeps the HTTP Session alive as long as
      * some HTTP action is going on.
      * We don't really do anything with incoming/outgoing values.
      * @return just to clear 404 from console logs, {"heartbeat":"server-alive"}
@@ -24,5 +24,4 @@ public class HeartBeatController {
         return "{\"heartbeat\":\"server-alive\"}";
     }
 
-    
 }

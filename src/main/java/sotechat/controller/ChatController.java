@@ -6,13 +6,11 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
-import sotechat.data.Mapper;
-import sotechat.service.ConversationService;
+import sotechat.domainService.ConversationService;
 import sotechat.service.MessageService;
-import sotechat.domain.Message;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-import sotechat.service.ChatMessageService;
+import sotechat.websocketService.ChatMessageService;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */

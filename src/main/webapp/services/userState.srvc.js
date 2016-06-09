@@ -38,13 +38,16 @@ angular.module('chatApp')
                 return 'queue/userInQueue.tpl.html'
             } else if (userState === 'chat') {
                 return 'chatWindow/userInChat.tpl.html'
-            } else {
+            } else if (userState === 'pro') {
+                return 'staticErrorPages/sameBrowserError.html'
+            }
+            else {
                 return 'queue/userToQueue.tpl.html';
             }
         };
 
         function getVariablesFormServer() {
-          return $http.get("/userState");
+            return $http.get("/userState");
         };
 
         function setAllVariables(response) {

@@ -1,11 +1,11 @@
 package sotechat.wrappers;
 
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
- * kun "tavalliselle kayttajalle" kerrotaan state.
+ * kun "ammattilaiskayttajalle" kerrotaan state.
  */
 public class ProStateResponse {
 
-    /** Tila ("start", "inpool", "chat"). */
+    /** Aina "pro". */
     private String state;
 
     /** Julkinen kayttajanimi. */

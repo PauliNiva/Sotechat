@@ -21,8 +21,8 @@ public class MessageTest {
 
     @Test
     public void setAndGetContextTest() {
-        message.setContext("This is a message");
-        Assert.assertEquals("This is a message", message.getContext());
+        message.setContent("This is a message");
+        Assert.assertEquals("This is a message", message.getContent());
     }
 
     @Test

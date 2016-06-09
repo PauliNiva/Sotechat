@@ -35,18 +35,12 @@ import sotechat.util.TestChannelInterceptor;
 import sotechat.util.TestPrincipal;
 import sotechat.util.TestSession;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+
 import java.nio.charset.Charset;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -104,8 +98,8 @@ public class StateControllerQueueTest {
         msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> messageToBeSended = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> messageToBeSended = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
 
         this.clientInboundChannel.send(messageToBeSended);
@@ -114,7 +108,7 @@ public class StateControllerQueueTest {
 
         JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
 
-        assertEquals("channel activated. request new state now.",
+        assertEquals("channel activated.",
                 jsonMessage.get("content").getAsString());
     }
 
@@ -128,14 +122,13 @@ public class StateControllerQueueTest {
         msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> messageToBeSended = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> messageToBeSended = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                         headers.getMessageHeaders());
 
         this.clientInboundChannel.send(messageToBeSended);
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
-
         String replyPayload = new String((byte[]) reply.getPayload(),
                 Charset.forName("UTF-8"));
 
@@ -143,7 +136,7 @@ public class StateControllerQueueTest {
          * Tyhjä vastaus, koska kirjautumaton käyttäjä ei voi ottaa toista
          * käyttäjää jonosta.
          */
-        assertEquals("", replyPayload);
+        assertEquals(replyPayload.length(), 0);
     }
 
     /**
@@ -161,7 +154,7 @@ public class StateControllerQueueTest {
         headers.setDestination(channel);
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
-        HashMap<String, Object> sessionAttributes = new HashMap();
+        HashMap<String, Object> sessionAttributes = new HashMap<>();
         sessionAttributes.put("SPRING.SESSION.ID", "1234");
         headers.setSessionAttributes(sessionAttributes);
         return headers;
@@ -187,7 +180,9 @@ public class StateControllerQueueTest {
     @Configuration
     @EnableScheduling
     @ComponentScan(
-            basePackages="sotechat",
+            basePackages={"sotechat.controller",
+                    "sotechat.data",
+                    "sotechat.websocketService"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
                     value = Configuration.class)
     )

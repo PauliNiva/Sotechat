@@ -3,8 +3,8 @@ package sotechat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import sotechat.service.QueueService;
-import sotechat.service.StateService;
+import sotechat.websocketService.QueueService;
+import sotechat.websocketService.StateService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,7 +43,7 @@ public class QueueBroadcaster {
             public void run() {
                 broadcastQueue();
             }
-        }, 1*1000, 1*1000);
+        }, 1 * 1000, 1 * 1000);
     }
 
     /** Tiedottaa jonon tilanteen kaikille QBCC subscribaajille (hoitajille).
@@ -66,8 +66,8 @@ public class QueueBroadcaster {
      * TODO: Refactor
      */
     public final synchronized void syncBcQ() {
-        String qbcc = "/toClient/" +
-                StateService.QUEUE_BROADCAST_CHANNEL;
+        String qbcc = "/toClient/"
+                + StateService.QUEUE_BROADCAST_CHANNEL;
         String qAsJson = queueService.toString();
         brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }

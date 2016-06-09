@@ -1,4 +1,4 @@
-package sotechat.service;
+package sotechat.websocketService;
 
 
 import com.google.gson.JsonObject;
@@ -72,9 +72,9 @@ public class StateService {
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
-     * @param req request
+     * @param req session tiedot saadaan taalta
      * @param professional kirjautumistiedot - kirjautumaton on null
-     * @return UserStateResponse
+     * @return JSON-muotoon paketoitu UserStateResponse
      */
     public final synchronized UserStateResponse respondToUserStateRequest(
             final HttpServletRequest req,
@@ -105,7 +105,7 @@ public class StateService {
      * Logiikka miten vastataan proClientin state requestiin.
      * @param req taalta saadaan session tiedot
      * @param professional taalta saadaan autentikaatiotiedot
-     * @return mita halutaan vastata kyselyyn
+     * @return JSON-muotoon paketoitu ProStateResponse
      */
     public final synchronized ProStateResponse respondToProStateRequest(
             final HttpServletRequest req,
@@ -138,7 +138,7 @@ public class StateService {
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
      * @param request taalta saadaan session tiedot
-     * @return mita vastataan pyyntoon
+     * @return String "Denied..." tai "OK..."
      * @throws IOException mika poikkeus
      */
     public final synchronized String respondToJoinPoolRequest(
@@ -203,24 +203,25 @@ public class StateService {
         chatLogger.log(msg);
 
         /** JSON-muodossa, jotta AngularJS osaa ohjata success-metodille. */
-        return "{\"content\":\"OK, please request new state now.\"}";
+        return "OK, please request new state now.";
     }
 
     /** Kun meille saapuu pyynto nostaa jonosta chatti.
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @return mita vastataan pyyntoon
+     * @return null jos poppaus epaonnistuu,
+     *          JSON {"content":"channel activated."} jos poppaus onnistuu.
      */
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
     ) {
-        /** Verify that popper is authenticated. */
-        if (accessor.getUser() == null) {
-            System.out.println("Hacking attempt?");
+        if (queueService.removeFromQueue(channelId) == null) {
+            /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return "";
         }
-        /** Add channelId to popper's channels. */
+
+        /** Lisataan popattu kanava poppaajan kanaviin. */
         String sessionId =  accessor
                         .getSessionAttributes()
                         .get("SPRING.SESSION.ID").
@@ -229,8 +230,8 @@ public class StateService {
         System.out.println("Getting session ID " + sessionId);
         System.out.println("Session is null ? " + (session == null));
         sessionRepo.addChannel(session, channelId);
-        queueService.removeFromQueue(channelId);
 
+        /** Muutetaan popattavan kanavan henkiloiden tilaa. */
         String channelIdWithPath = "/toClient/queue/" + channelId;
         List<HttpSession> list = subscribeEventListener.
                 getSubscribers(channelIdWithPath);
@@ -238,7 +239,8 @@ public class StateService {
             member.setAttribute("state", "chat");
         }
 
-        return "{\"content\":\"channel activated. request new state now.\"}";
+        /** Onnistui, palautetaan JSONi. */
+        return "{\"content\":\"channel activated.\"}";
     }
 
 }
