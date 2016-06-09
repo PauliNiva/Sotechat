@@ -2,7 +2,7 @@ angular.module('chatApp')
     .controller('proQueueCtrl', ['$scope', 'queueProService', 'stompSocket', 'connectToServer', 'proStateService',
         function ($scope, queueProService, stompSocket, connectToServer, proStateService) {
             var QUEUEADDRESS = '/toClient/';
-            var CLIENTQUEUE = '/toServer/queue/';
+            var CLIENTQUEUE = '/toClient/queue/';
             $scope.queue = queueProService.queue;
             $scope.queueStatus = $scope.inQueue === 0;
             $scope.inQueue = 0;
@@ -22,14 +22,12 @@ angular.module('chatApp')
                 var firstChannelID = queueProService.getFirstChannelID();
                 if (firstChannelID != null) {
                     var checkIsPopOk = connectToServer.subscribe(CLIENTQUEUE + firstChannelID, function (response) {
-                        console.log(response.body);
-                        if (response.body.content === 'channel activated.') {
-                           // queueProService.removeFirstFromQueue(firstChannelID);
-                            stompSocket.send('/toServer/queue/' + firstChannelID, {}, '');
+                        if (JSON.parse(response.body).content === 'channel activated.') {
                             $scope.addChatTab(firstChannelID);
                         }
                         checkIsPopOk.unsubscribe();
                     });
+                    stompSocket.send('/toServer/queue/' + firstChannelID, {}, '');
                 }
             };
 
@@ -39,4 +37,5 @@ angular.module('chatApp')
                     queueProService.addToQueue(key);
                 });
             };
+
         }]);

@@ -1,18 +1,8 @@
 angular.module('chatApp')
-    .factory('queueProService', ['stompSocket', function (stompSocket) {
+    .factory('queueProService', [function () {
         var queue = [];
         var length = 0;
 
-        var removeFirstFromQueue = function(channelID){
-            if (queue.length > 0 && channelID === queue[0]) {
-                var first = queue[0];
-                queue.splice(0,1);
-                length--;
-                return first;
-            }
-            return null;
-        };
-        
         var getFirstChannelID = function () {
             if (queue.length > 0) {
                 return queue[0].channelID;
@@ -20,7 +10,7 @@ angular.module('chatApp')
             return null;
         }
 
-        var addToQueue = function(key) {
+        var addToQueue = function (key) {
             var queueObject = [];
             queueObject.username = key.username;
             queueObject.channelID = key.channelId;
@@ -29,23 +19,21 @@ angular.module('chatApp')
             length++;
         };
 
-        var getLength = function() {
+        var getLength = function () {
             return length;
         };
 
         var clear = function () {
             queue.length = 0;
-            console.log("moi1");
             length = 0;
         };
 
         var queueService = {
-            removeFirstFromQueue:removeFirstFromQueue,
             getFirstChannelID: getFirstChannelID,
-            addToQueue:addToQueue,
-            clear:clear,
-            queue:queue,
-            getLength:getLength
+            addToQueue: addToQueue,
+            clear: clear,
+            queue: queue,
+            getLength: getLength
         };
         return queueService;
     }]);

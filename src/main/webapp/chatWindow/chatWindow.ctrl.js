@@ -1,11 +1,10 @@
-// Kontrolleri paivittaa tietoja molempiin suuntiin:
-// - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
-// - Kun halutaan lahettaa viesti, valitetaan se Servicelle.
-//
+/** Kontrolleri paivittaa tietoja molempiin suuntiin:
+ * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
+ *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
+*/
 angular.module('chatApp')
     .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService',
         function ($scope, stompSocket, connectToServer, userStateService) {
-            $scope.pro = false;
             // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             var sub;
@@ -29,12 +28,8 @@ angular.module('chatApp')
 
             /** Funktio parsee viestin haluttuun muotoon. */
             var getMessage = function (data) {
-                var parsed = JSON.parse(data);
-                var message = [];
-                message.content = parsed.content;
-                message.time = parsed.timeStamp;
-                message.sender = parsed.username;
-                message.I = message.sender === userStateService.getUsername();
+                var message = JSON.parse(data);
+                message.I = message.username === userStateService.getUsername();
                 return message;
             };
 

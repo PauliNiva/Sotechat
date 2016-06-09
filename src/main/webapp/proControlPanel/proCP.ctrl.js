@@ -1,9 +1,10 @@
 angular.module('chatApp')
-    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', 'queueProService', 'heartBeatService',
-        function ($scope, connectToServer, proStateService, queueProService) {
+    .controller('proCPController', ['$scope','$timeout', 'connectToServer', 'proStateService', 'queueProService', 'heartBeatService',
+        function ($scope, $timeout, connectToServer, proStateService, queueProService) {
             var tabCount = 0;
             $scope.pro = true;
             $scope.chats = [];
+            $scope.active=tabCount+1;
 
             var initQueue = function () {
                 $scope.$broadcast('connectedToQueue');
@@ -11,6 +12,9 @@ angular.module('chatApp')
 
             $scope.addChatTab = function (channelID) {
                 $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
+                $timeout(function(){
+                    $scope.active=tabCount-1;
+                });
             };
 
             var updateChannels = function () {

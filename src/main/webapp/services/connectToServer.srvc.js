@@ -1,5 +1,5 @@
 angular.module('chatApp')
-    .service('connectToServer', ['stompSocket', function (stompSocket) {
+    .service('connectToServer', ['stompSocket', '$timeout', function (stompSocket, $timeout) {
         var WEBSOCKETURL = '/toServer';
         var status = false;
         var socket = {
@@ -15,6 +15,9 @@ angular.module('chatApp')
                     answer();
                 }, function (error) {
                     status = false;
+                    $timeout(function() {
+                        connect(answer);
+                    }, 5000);
                 });
             } else {
                 answer();
