@@ -1,6 +1,7 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -8,13 +9,15 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
-import sotechat.service.StateService;
+import sotechat.websocketService.StateService;
 
 /** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
@@ -79,7 +82,6 @@ public class StateController {
             final HttpServletRequest req,
             final Principal professional
             ) throws Exception {
-
         if (professional == null) {
             /** Hacking attempt? */
             return null;
@@ -116,9 +118,9 @@ public class StateController {
     /** Hoitaja avaa jonosta chatin, JS-WebSocket subscribaa /queue/id/.
      *  (Tama metodi jostain syysta aktivoituu, vaikka kyseessa ei ole viesti.)
      *  Toimenpiteet mita tehdaan:
-     *  -> Poistetaan jonosta olio
-     *  -> Broadcastataan jonon uusi tila hoitajille
-     *  -> Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
+     *  - Poistetaan jonosta olio
+     *  - Broadcastataan jonon uusi tila hoitajille
+     *  - Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
      * @param accessor accessor
      * @return Joko tyhja String "" tai JSON {"content":"channel activated."}

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.SessionRepo;
-import sotechat.service.StateService;
+import sotechat.websocketService.StateService;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;

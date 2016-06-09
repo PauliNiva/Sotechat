@@ -20,6 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Maarittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http.csrf().disable();
         http
                 // "maaritellaan seuraavaksi, mitka

@@ -1,4 +1,4 @@
-package sotechat.service;
+package sotechat.websocketService;
 
 
 import com.google.gson.JsonObject;
