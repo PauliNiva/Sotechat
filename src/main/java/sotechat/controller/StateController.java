@@ -118,7 +118,11 @@ public class StateController {
             return "";
         }
         String wakeUp = stateService.popQueue(channelId, accessor);
-        queueBroadcaster.broadcastQueue();
+        if (!wakeUp.isEmpty()) {
+            queueBroadcaster.broadcastQueue();
+        } else {
+            /** Case: 2 professionalia poppaa samaan aikaan, toinen failaa. */
+        }
         return wakeUp;
     }
 

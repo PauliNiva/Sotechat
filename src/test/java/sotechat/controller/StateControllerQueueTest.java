@@ -108,7 +108,7 @@ public class StateControllerQueueTest {
 
         JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
 
-        assertEquals("channel activated. request new state now.",
+        assertEquals("channel activated.",
                 jsonMessage.get("content").getAsString());
     }
 
@@ -129,14 +129,14 @@ public class StateControllerQueueTest {
         this.clientInboundChannel.send(messageToBeSended);
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
-        System.out.println(reply);
         String replyPayload = new String((byte[]) reply.getPayload(),
                 Charset.forName("UTF-8"));
+
         /**
          * Tyhjä vastaus, koska kirjautumaton käyttäjä ei voi ottaa toista
          * käyttäjää jonosta.
          */
-        assertNotEquals("channel activated. request new state now.", replyPayload);
+        assertEquals(replyPayload.length(), 0);
     }
 
     /**

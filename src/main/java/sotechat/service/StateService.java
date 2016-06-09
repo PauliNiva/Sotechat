@@ -209,13 +209,19 @@ public class StateService {
     /** Kun meille saapuu pyynto nostaa jonosta chatti.
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @return mita vastataan pyyntoon
+     * @return mita vastataan pyyntoon: null jos poppaus epaonnistuu,
+     * JSON jos poppaus onnistuu.
      */
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
     ) {
-        /** Add channelId to popper's channels. */
+        if (queueService.removeFromQueue(channelId) == null) {
+            /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
+            return "";
+        }
+
+        /** Lisataan popattu kanava poppaajan kanaviin. */
         String sessionId =  accessor
                         .getSessionAttributes()
                         .get("SPRING.SESSION.ID").
@@ -223,13 +229,9 @@ public class StateService {
         HttpSession session = sessionRepo.getHttpSession(sessionId);
         System.out.println("Getting session ID " + sessionId);
         System.out.println("Session is null ? " + (session == null));
-        if (queueService.removeFromQueue(channelId) == null) {
-            /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
-            return "";
-        }
-
         sessionRepo.addChannel(session, channelId);
 
+        /** Muutetaan popattavan kanavan henkiloiden tilaa. */
         String channelIdWithPath = "/toClient/queue/" + channelId;
         List<HttpSession> list = subscribeEventListener.
                 getSubscribers(channelIdWithPath);
@@ -237,6 +239,7 @@ public class StateService {
             member.setAttribute("state", "chat");
         }
 
+        /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
     }
 
