@@ -3,8 +3,9 @@ sotechat.config
 sotechat.controller
 sotechat.data
 sotechat.domain
-sotechat.queue
-sotechat.websocketService
+sotechat.domainService
+sotechat.repo
 sotechat.util
 sotechat.websocket
+sotechat.websocketService
 sotechat.wrappers

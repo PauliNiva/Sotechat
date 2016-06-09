@@ -1,13 +1,22 @@
 <div class="panel panel-default" ng-controller="proQueueCtrl">
-    <div class="panel-heading"><h3 class="panel-title">{{inQueue}} henkilöä jonossa</h3></div>
+    <div class="panel-heading queue-heading"><span class="panel-title queue-title">{{inQueue}} henkilöä jonossa</span>
+        <div class="btn-group proQueueDrop pull-right" uib-dropdown is-open="status.isopen">
+            <button id="single-button" type="button" class="btn btn-default proQueueDropButton" uib-dropdown-toggle>
+                Kategoria <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="Kaikki">Action</li>
+            </ul>
+        </div>
+    </div>
     <div class="panel-body poolPro">
         <div class="row">
-            <button ng-disabled="queueStatus" type="button" ng-click="nextFromQueue()" class="btn btn-block btn-primary"
-                    style="margin-bottom: 15px" name="next">Seuraava jonosta
+            <button ng-disabled="queueStatus" type="button" ng-click="nextFromQueue()" class="btn btn-block btn-primary queueButton"
+                     name="next">Seuraava jonosta
             </button>
         </div>
         <div class="row">
-            <div class="panel-group" id="accordion" ng-repeat="queueObject in queue  | limitTo: 10">
+            <div class="panel-group queueGroup" id="accordion" ng-repeat="queueObject in queue  | limitTo: 10">
                 <div ng-include="'queue/queueProBlock.tpl.html'"></div>
             </div>
         </div>

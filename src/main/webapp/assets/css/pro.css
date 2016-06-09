@@ -1,0 +1,54 @@
+.queueGroup {
+    margin-bottom: 4px;
+}
+.queueButton {
+    margin-bottom: 10px;
+}
+
+.queuer-heading {
+    padding: 5px 10px;
+}
+
+.queue-heading {
+    padding: 7px 15px;
+    height: 43px;
+}
+.queue-title {
+    font-size: 20px;
+}
+
+.proQueueDrop{
+
+}
+
+.proQueueDropButton{
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+
+.pro-left{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.pro-righy{
+    padding-right: 0px;
+}
+
+.poolPro{
+    padding-top: 5px;
+    height: 100%;
+}
+
+.proContainer {
+    height: calc(100% - 10px);
+}
+.pro-chat-panel {
+    height: 100%;
+    margin-bottom: 0px;
+}
+
+.proButton{
+    margin-top: 2px;
+}

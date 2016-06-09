@@ -1,9 +1,9 @@
-<div class="panel panel-default" id="queuerBlock">
-    <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#esim1">
+<div class="panel panel-default queuerBlock" id="queuerBlock">
+    <div class="panel-heading queuer-heading" ng-click="collapsed = !collapsed">
         <span class="panel-title" name="queuerName">{{queueObject.username}}</span> <span class="pull-right">{{queueObject.category}}</span></div>
-    <div id="esim1" class="panel-collapse collapse">
+    <div class="panel-collapse collapse" uib-collapse="!collapsed">
         <div class="panel-body"><span></span>
-            <button type="button" class="btn btn-block btn-primary" name="{{queueObject.username}}"></button>
+            <button type="button" class="btn btn-block btn-primary" name="{{queueObject.username}}">Ota jonosta</button>
         </div>
     </div>
 </div>
