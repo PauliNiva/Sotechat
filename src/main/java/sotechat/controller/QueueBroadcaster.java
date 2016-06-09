@@ -3,8 +3,8 @@ package sotechat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import sotechat.service.QueueService;
-import sotechat.service.StateService;
+import sotechat.websocketService.QueueService;
+import sotechat.websocketService.StateService;
 
 import java.util.Timer;
 import java.util.TimerTask;

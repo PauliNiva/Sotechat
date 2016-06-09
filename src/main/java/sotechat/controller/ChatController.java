@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-import sotechat.service.ChatMessageService;
+import sotechat.websocketService.ChatMessageService;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */

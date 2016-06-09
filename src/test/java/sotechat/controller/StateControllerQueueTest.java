@@ -180,7 +180,9 @@ public class StateControllerQueueTest {
     @Configuration
     @EnableScheduling
     @ComponentScan(
-            basePackages="sotechat",
+            basePackages={"sotechat.controller",
+                    "sotechat.data",
+                    "sotechat.websocketService"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
                     value = Configuration.class)
     )

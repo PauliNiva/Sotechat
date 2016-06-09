@@ -24,7 +24,7 @@ public class Conversation extends AbstractPersistable<Long> {
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "author")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
     public Conversation() {
