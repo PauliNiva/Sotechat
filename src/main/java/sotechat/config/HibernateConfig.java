@@ -15,6 +15,14 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManagerFactory;
 import java.util.Properties;
 
+/**
+ * Luokassa konfiguroidaan JPA-rajapinnan toteuttava Hibernate. Hibernaten
+ * tehtävänä on luoda SQL-tietokantaan @Entity-annotaatiolla merkittyjä
+ * Java-luokkia vastaavat tietokantataulut. Lisäksi Hibernaten tehtäviin
+ * kuuluu huolehtia tietokantatransaktioista, eli, että @Entity-luokkia
+ * koskevat tietokantaoperaatiot toteutetaan myös varsinaiseen SQL-
+ * tietokantaan.
+ */
 @Configuration
 @EnableJpaRepositories(basePackages = {
         "sotechat.repo"
@@ -22,31 +30,76 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class HibernateConfig {
 
+    /**
+     * Ajuri, jolla saadaan Javasta muodostettua yhteys tietokantaan.
+     */
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
+    /**
+     * Salasana tietokantayhteyden muodostamiseksi.
+     */
     private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
+    /**
+     * Osoite, josta SQL-tietokanta löytyy.
+     */
     private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
+    /**
+     * Käyttäjänimi tietokantayhteyden muodostamiseksi.
+     */
     private static final String PROPERTY_NAME_DATABASE_USERNAME = "db.username";
 
+    /**
+     *  Mitä "dialektia" hibernate käyttää, eli arvo riippuu siitä
+     *  käytetäänkö esim. H2-tietokantaa kehitysvaiheessa vai PostgreSql-
+     *  tietokantaa tuotannossa
+     */
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT =
             "hibernate.dialect";
+    /**
+     * Mistä EntityManager-bean etsii @Entity-annotaatiolla merkittyjä
+     * luokkia.
+     */
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN =
             "entitymanager.packages.to.scan";
+    /**
+     * Miten toimitaan palvelimen käynnistys- ja sammutustilanteessa, voi olla
+     * esim. että käynnistystilanteessa tietokanta pystytetään ja sammutus-
+     * tilanteessa tietokanta tuhotaan.
+     */
     private static final String PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO =
             "hibernate.hbm2ddl.auto";
-
+    /**
+     * Mistä Hibernate löytää Entity-luokat.
+     */
     private static final String PROPERTY_NAME_PACKAGES_TO_SCAN =
             "sotechat.domain";
-
+    /**
+     * Miten SQL-tietokantataulut
+     * nimetään @Entity-luokkien nimien pohjalta.
+     */
     private static final String PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY =
             "hibernate.ejb.naming_strategy";
+    /**
+     * Näytetäänkö komentorivillä tietokantaoperaatiot.
+     */
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL =
             "hibernate.show_sql";
+    /**
+     * Missä muodossa tietokantaoperaatiot näytetään.
+     */
     private static final String PROPERTY_NAME_HIBERNATE_FORMAT_SQL =
             "hibernate.format_sql";
-
+    /**
+     * Määritellään ympäristömuuttuja, josta voidaan hakea esim. salaiset
+     * tietokanna kirjautumistiedot.
+     */
     @Resource
     private Environment env;
 
+    /**
+     * Luodaan yhteys tietokantaa. HikariDataSource vastaa tietokantayhteyksien
+     * ylläpitämisestä
+     * @return Palauttaa tietokantayhteyksien ylläpitäjäolion HikariDataSourcen
+     */
     @Bean(destroyMethod = "close")
     public HikariDataSource dataSource() {
         HikariConfig dataSourceConfig = new HikariConfig();
@@ -67,10 +120,19 @@ public class HibernateConfig {
         return new HikariDataSource(dataSourceConfig);
     }
 
+    /**
+     * Luodaan EntityManagerFactoryBean eli olio, joka alustaa @Entity-
+     * notaatiolla varustetut luokat Hibernaten käyttöön.
+     *
+     * @param dataSource Tietokantayhteyksistä huolehtiva olio
+     * @param env Ympäristömuuttuja, josta voidaan hakia sinne talletettuja
+     *            tietoja.
+     * @return Palautetaan EntityManagerFactoryBean
+     */
     @Bean
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            HikariDataSource dataSource,
-            Environment env) {
+            final HikariDataSource dataSource,
+            final Environment env) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
                 new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
@@ -81,31 +143,21 @@ public class HibernateConfig {
 
         Properties jpaProperties = new Properties();
 
-        //Configures the used database dialect. This allows Hibernate to create SQL
-        //that is optimized for the used database.
         jpaProperties.put(PROPERTY_NAME_HIBERNATE_DIALECT,
                 env.getRequiredProperty(
                     PROPERTY_NAME_HIBERNATE_DIALECT));
 
-        //Specifies the action that is invoked to the database when the Hibernate
-        //SessionFactory is created or closed.
         jpaProperties.put(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO,
                 env.getRequiredProperty(
                     PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO));
 
-        //Configures the naming strategy that is used when Hibernate creates
-        //new database objects and schema elements
         jpaProperties.put(PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY,
                 env.getRequiredProperty(
                         PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY));
 
-        //If the value of this property is true, Hibernate writes all SQL
-        //statements to the console.
         jpaProperties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL,
                 env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL));
 
-        //If the value of this property is true, Hibernate will format the SQL
-        //that is written to the console.
         jpaProperties.put(PROPERTY_NAME_HIBERNATE_FORMAT_SQL,
                 env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_FORMAT_SQL));
 
@@ -114,8 +166,18 @@ public class HibernateConfig {
         return entityManagerFactoryBean;
     }
 
+    /**
+     * Luodaan Bean, jonka tehtävänä on huolehtia transaktioista, eli domain-
+     * Service-paketista löytyvien service-luokkien avulla tehdyistä tieto-
+     * kantaoperaatioista, kuten tietokantaan talletuksista, ja tietokannasta
+     * hauista.
+     *
+     * @param entityManagerFactory 
+     * @return
+     */
     @Bean
-    JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+    JpaTransactionManager transactionManager(
+            final EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;

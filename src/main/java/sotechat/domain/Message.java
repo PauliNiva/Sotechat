@@ -32,11 +32,11 @@ public class Message extends AbstractPersistable<Long> {
         this.date = pdate;
     }
 
-    public final String getContext() {
+    public final String getContent() {
         return this.content;
     }
 
-    public final void setContext(final String pContent) {
+    public final void setContent(final String pContent) {
         this.content = pContent;
     }
 
