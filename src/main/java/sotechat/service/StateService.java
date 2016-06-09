@@ -72,9 +72,9 @@ public class StateService {
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
-     * @param req request
+     * @param req session tiedot saadaan taalta
      * @param professional kirjautumistiedot - kirjautumaton on null
-     * @return UserStateResponse
+     * @return JSON-muotoon paketoitu UserStateResponse
      */
     public final synchronized UserStateResponse respondToUserStateRequest(
             final HttpServletRequest req,
@@ -105,7 +105,7 @@ public class StateService {
      * Logiikka miten vastataan proClientin state requestiin.
      * @param req taalta saadaan session tiedot
      * @param professional taalta saadaan autentikaatiotiedot
-     * @return mita halutaan vastata kyselyyn
+     * @return JSON-muotoon paketoitu ProStateResponse
      */
     public final synchronized ProStateResponse respondToProStateRequest(
             final HttpServletRequest req,
@@ -138,7 +138,7 @@ public class StateService {
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
      * @param request taalta saadaan session tiedot
-     * @return mita vastataan pyyntoon
+     * @return Joko String "Denied..." tai JSON {"content":"OK..."}
      * @throws IOException mika poikkeus
      */
     public final synchronized String respondToJoinPoolRequest(
@@ -209,8 +209,8 @@ public class StateService {
     /** Kun meille saapuu pyynto nostaa jonosta chatti.
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @return mita vastataan pyyntoon: null jos poppaus epaonnistuu,
-     * JSON jos poppaus onnistuu.
+     * @return null jos poppaus epaonnistuu,
+     *          JSON {"content":"channel activated."} jos poppaus onnistuu.
      */
     public final synchronized String popQueue(
             final String channelId,
