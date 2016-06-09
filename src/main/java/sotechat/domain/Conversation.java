@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * Luokka
  */
 @Entity
-public class Conversation extends AbstractPersistable<Long> {
+public class Conversation extends AbstractPersistable<String> {
 
     @NotNull
     @Temporal(TemporalType.DATE)

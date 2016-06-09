@@ -22,15 +22,16 @@ public class ConversationService {
     @Autowired
     private PersonRepo personRepo;
 
-    public boolean addPerson(Long personId, String channelId) {
-        try {
+    public boolean addPerson(String personId, String channelId)
+            throws Exception {
+                Conversation conv = conversationRepo.findOne(channelId);
+                Person person = personRepo.findOne(personId);
+                addConnection(person, conv);
+    }
+
+    public void addCategory(String category, String channelId) throws Exception {
             Conversation conv = conversationRepo.findOne(channelId);
-            Person person = personRepo.findOne(personId);
-            addConnection(person, conv);
-            return true;
-        } catch(Exception e){
-            return false;
-        }
+            conv.setCategory(category);
     }
 
     public boolean addMessage(Message message, String ChannelId)

@@ -49,7 +49,7 @@ public class MessageService  {
         return this.messageRepo;
     }
 
-    public void setConversationRepo(ConversationRepo pConversationRepo) {
+    public void setConversationRepo(final ConversationRepo pConversationRepo) {
         this.conversationRepo = pConversationRepo;
     }
 

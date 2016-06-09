@@ -4,13 +4,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.util.List;
 
 @Entity
-public class Person extends AbstractPersistable<Long> {
+public class Person extends AbstractPersistable<String> {
 
     private String screenName;
 
@@ -19,6 +20,9 @@ public class Person extends AbstractPersistable<Long> {
 
     private String password;
     private String salt;
+
+    @Id
+    public String userId;
 
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
@@ -71,5 +75,13 @@ public class Person extends AbstractPersistable<Long> {
     public final void addConversationToPerson(
             final Conversation conversation) {
         this.conversationsOfPerson.add(conversation);
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

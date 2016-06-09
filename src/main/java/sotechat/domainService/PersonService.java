@@ -28,7 +28,7 @@ public class PersonService {
         }
     }
 
-    public Person findOne(Long personId) throws Exception {
+    public Person findOne(String personId) throws Exception {
         return personRepo.findOne(personId);
     }
 
@@ -36,11 +36,11 @@ public class PersonService {
         return personRepo.findAll();
     }
 
-    public void delete(Long personId) throws Exception {
+    public void delete(String personId) throws Exception {
         personRepo.delete(personId);
     }
 
-    public boolean changePassword(Long personId, String password){
+    public boolean changePassword(String personId, String password){
         try {
             Person person = personRepo.findOne(personId);
             person.setPassword(password);
@@ -51,7 +51,7 @@ public class PersonService {
         }
     }
 
-    public boolean changeScreenName(Long personId, String newName){
+    public boolean changeScreenName(String personId, String newName){
         try {
             Person person = personRepo(personId);
             person.setScreenName(newName);

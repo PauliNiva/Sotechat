@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.domainService.ConversationService;
-import sotechat.service.MessageService;
+import sotechat.domainService.MessageService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.websocketService.ChatMessageService;

@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
 import sotechat.data.ChatLogger;
+import sotechat.domainService.ConversationService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
@@ -45,6 +46,9 @@ public class StateService {
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
+    /** Conversation service */
+    private final ConversationService conversationService;
+
     /** Channel where queue status is broadcasted. */
     public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
 
@@ -62,13 +66,15 @@ public class StateService {
             final SubscribeEventListener subscribeEventListener,
             final QueueService pQueueService,
             final ChatLogger pChatLogger,
-            final SessionRepo pSessionRepo
+            final SessionRepo pSessionRepo,
+            final ConversationService pConvService
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
+        this.conversationService = pConvService;
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
@@ -215,7 +221,7 @@ public class StateService {
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
-    ) {
+    ) throws Exception {
         if (queueService.removeFromQueue(channelId) == null) {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return "";
@@ -227,6 +233,7 @@ public class StateService {
                         .get("SPRING.SESSION.ID").
                         toString();
         HttpSession session = sessionRepo.getHttpSession(sessionId);
+
         System.out.println("Getting session ID " + sessionId);
         System.out.println("Session is null ? " + (session == null));
         sessionRepo.addChannel(session, channelId);
@@ -238,9 +245,20 @@ public class StateService {
         for (HttpSession member : list) {
             member.setAttribute("state", "chat");
         }
+        /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
+        addPersonToConversation(session, channelId);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
+    }
+
+    private final void addPersonToConversation(HttpSession session,
+                                          String channelId) throws Exception {
+        String userId = get(session, "userId");
+        String category = get(session, "category");
+        conversationService.addPerson(userId, channelId);
+        conversationService.addCategory(category, channelId
+        );
     }
 
 }
