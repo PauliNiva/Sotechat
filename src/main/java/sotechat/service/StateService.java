@@ -138,7 +138,7 @@ public class StateService {
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
      * @param request taalta saadaan session tiedot
-     * @return Joko String "Denied..." tai JSON {"content":"OK..."}
+     * @return String "Denied..." tai "OK..."
      * @throws IOException mika poikkeus
      */
     public final synchronized String respondToJoinPoolRequest(
@@ -203,7 +203,7 @@ public class StateService {
         chatLogger.log(msg);
 
         /** JSON-muodossa, jotta AngularJS osaa ohjata success-metodille. */
-        return "{\"content\":\"OK, please request new state now.\"}";
+        return "OK, please request new state now.";
     }
 
     /** Kun meille saapuu pyynto nostaa jonosta chatti.

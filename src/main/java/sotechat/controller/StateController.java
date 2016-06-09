@@ -89,9 +89,9 @@ public class StateController {
 
 
     /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
-     * @param request request
+     * @param request session tiedot
      * @param professional autentikaatiotiedot
-     * @return Joko String "Denied..." tai JSON {"content":"OK..."}
+     * @return JSON {"content":"Denied..."} tai {"content":"OK..."}
      *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
      *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
      *          kayttajalle.
@@ -105,11 +105,12 @@ public class StateController {
 
         if (professional != null) {
             /** Hoitaja yrittaa liittya pooliin asiakkaana. */
-            return "Denied join pool request for professional.";
+            return "{\"content\":\"Denied join "
+                    + "pool request for professional.\"}";
         }
         String answer = stateService.respondToJoinPoolRequest(request);
         queueBroadcaster.broadcastQueue();
-        return answer;
+        return "{\"content\":\"" + answer + "\"}";
     }
 
     /** Hoitaja avaa jonosta chatin, JS-WebSocket subscribaa /queue/id/.
@@ -131,14 +132,14 @@ public class StateController {
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
 
-        /** Verify that popper is authenticated. */
+        /** Varmista, etta poppaaja on autentikoitunut. */
         if (accessor.getUser() == null) {
             System.out.println("Hacking attempt?");
             return "";
         }
         String wakeUp = stateService.popQueue(channelId, accessor);
         if (wakeUp.isEmpty()) {
-            /** Case: 2 professionalia poppaa samaan aikaan, toinen failaa. */
+            /** Case: Toinen professional ehtikin popata taman ennen meita. */
             return "";
         }
         queueBroadcaster.broadcastQueue();
