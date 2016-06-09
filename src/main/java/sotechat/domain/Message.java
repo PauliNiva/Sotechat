@@ -24,6 +24,12 @@ public class Message extends AbstractPersistable<Long> {
     public Message() {
     }
 
+    public Message(String sender, String content, Date date){
+        this.sender = sender;
+        this.content = content;
+        this.date = date;
+    }
+
     public final Date getDate() {
         return this.date;
     }

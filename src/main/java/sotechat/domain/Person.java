@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 public class Person extends AbstractPersistable<Long> {
 
-    private String name;
+    private String screenName;
 
     @Column(unique = true)
     private String username;
@@ -26,12 +26,12 @@ public class Person extends AbstractPersistable<Long> {
     public Person() {
     }
 
-    public final String getName() {
-        return name;
+    public final String getScreenName() {
+        return screenName;
     }
 
-    public final void setName(final String pname) {
-        this.name = pname;
+    public final void setScreenName(final String pname) {
+        this.screenName = pname;
     }
 
     public final String getUsername() {

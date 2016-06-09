@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
+import sotechat.service.ConversationService;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
 import sotechat.service.StateService;
@@ -28,6 +29,9 @@ public class StateController {
     /** Testi. */
     private final ChatLogBroadcaster chatLogBroadcaster;
 
+    /** Conversation service */
+    private final ConversationService conversationService;
+
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
      * @param pStateService stateService
@@ -38,11 +42,13 @@ public class StateController {
     public StateController(
             final StateService pStateService,
             final QueueBroadcaster pQueueBroadcaster,
-            final ChatLogBroadcaster pChatLogBroadcaster
+            final ChatLogBroadcaster pChatLogBroadcaster,
+            final ConversationService pConversationService
     ) {
         this.stateService = pStateService;
         this.queueBroadcaster = pQueueBroadcaster;
         this.chatLogBroadcaster = pChatLogBroadcaster;
+        this.conversationService = pConversationService;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).

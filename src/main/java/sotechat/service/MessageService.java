@@ -11,6 +11,8 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.wrappers.MsgToClient;
+import sotechat.wrappers.MsgToServer;
 
 @Service
 public class MessageService {
@@ -21,20 +23,17 @@ public class MessageService {
     //@Autowired
     private ConversationRepo conversationRepo;
 
-    @Transactional
-    public void addMessage(Message pMessage) {
-        messageRepo.save(pMessage);
-        pMessage.setDate(new Date());
-        Conversation conversation = pMessage.getConversation();
-        conversation.getMessagesOfConversation().add(pMessage);
+    private PersonRepo personRepo;
 
-        messageRepo.save(pMessage);
+    @Transactional
+    public Message addMessage(Message message) {
+        messageRepo.save(message);
     }
 
     @Transactional
     public void removeMessage(Long messageId) {
         Message message = messageRepo.findOne(messageId);
-        Long conversationId = message.getConversation().getId();
+        String conversationId = message.getConversation().getChannelId();
         conversationRepo.findOne(conversationId).getMessagesOfConversation()
                 .remove(message);
         messageRepo.delete(messageId);

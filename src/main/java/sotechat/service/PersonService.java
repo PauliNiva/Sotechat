@@ -18,21 +18,47 @@ public class PersonService {
     @Autowired
     private PersonRepo personRepo;
 
-    public void addPerson(Person person, String password){
-        person.setPassword(password);
-        personRepo.save(person);
+    public boolean addPerson(Person person, String password){
+        try {
+            person.setPassword(password);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 
-    public void findOne(Long id){
-        return personRepo.findOne(id);
+    public Person findOne(Long personId) throws Exception {
+        return personRepo.findOne(personId);
     }
 
     public List<Person> findAll(){
         return personRepo.findAll();
     }
 
-    public void delete(Long id){
-        personRepo.delete(id);
+    public void delete(Long personId) throws Exception {
+        personRepo.delete(personId);
     }
 
+    public boolean changePassword(Long personId, String password){
+        try {
+            Person person = personRepo.findOne(personId);
+            person.setPassword(password);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    public boolean changeScreenName(Long personId, String newName){
+        try {
+            Person person = personRepo(personId);
+            person.setScreenName(newName);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
 }

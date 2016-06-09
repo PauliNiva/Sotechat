@@ -7,6 +7,9 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.data.Mapper;
+import sotechat.service.ConversationService;
+import sotechat.service.MessageService;
+import sotechat.domain.Message;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.service.ChatMessageService;
@@ -19,14 +22,24 @@ public class ChatController {
     /** Tarjoaa logiikan. */
     private final ChatMessageService chatMessageService;
 
+    /** Viestien tietokantaan tallentamiseen */
+    private final MessageService messageService;
+
+    /** Viestien tallentaminen keskusteluun tietokannadssa */
+    private final ConversationService conversationService;
+
     /** Konstruktori.
      * @param pChatService chatService
      */
     @Autowired
     public ChatController(
-            final ChatMessageService pChatService
+            final ChatMessageService pChatService,
+            final MessageService pMessageService,
+            final ConversationService pConversationService
     ) {
         this.chatMessageService = pChatService;
+        this.messageService = pMessageService;
+        this.conversationService = pConversationService;
     }
 
     /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,

@@ -22,22 +22,9 @@ public class ConversationService {
     @Autowired
     private PersonRepo personRepo;
 
-    public boolean addConversation(Long personId, String category){
+    public boolean addPerson(Long personId, String channelId) {
         try {
-            Conversation conv = new Conversation();
-            conv.setDate(new Date());
-            conv.setCategory(category);
-            Person person = personRepo.findOne(personId);
-            addConnection(person, conv);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
-    }
-
-    public boolean addPerson(Long personId, Long conversationId){
-        try {
-            Conversation conv = conversationRepo.findOne(conversationId);
+            Conversation conv = conversationRepo.findOne(channelId);
             Person person = personRepo.findOne(personId);
             addConnection(person, conv);
             return true;
@@ -46,9 +33,30 @@ public class ConversationService {
         }
     }
 
-    public boolean addMessage(Message message, Long conversationId){
+    public boolean addMessage(Message message, String ChannelId)
+            throws Exception {
+        if(conversationRepo.exists(ChannelId)) {
+            Conversation conv = conversationRepo.findOne(ChannelId);
+            return addMessage(message, conv);
+        }else {
+            return addConversation(message, ChannelId);
+        }
+    }
+
+    private boolean addConversation(Message message, String channelId) {
+        try {
+            Conversation conv = new Conversation();
+            conv.setDate(new Date());
+            conv.setChannelId(channelId);
+//            conv.setCategory(category); //TODO
+            return addMessage(message, conv);
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    private boolean addMessage(Message message, Conversation conv){
         try{
-            Conversation conv = conversationRepo.findOne(conversationId);
             conv.addMessageToConversation(message);
             conversationRepo.save(conv);
             return true;
@@ -58,14 +66,14 @@ public class ConversationService {
     }
 
     private void addConnection(Person person, Conversation conversation) throws Exception {
-            conversation.addPersonToConversation(person);
-            person.addConversationToPerson(conversation);
-            conversationRepo.save(conversation);
-            personRepo.save(person);
+        conversation.addPersonToConversation(person);
+        person.addConversationToPerson(conversation);
+        conversationRepo.save(conversation);
+        personRepo.save(person);
         }
     }
 
-    public boolean delete(Long conversationId){
-            conversationRepo.delete(conversationId);
+    public void delete(String channelId) throws Exception {
+            conversationRepo.delete(channelId);
     }
 }

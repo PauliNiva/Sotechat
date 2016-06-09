@@ -21,6 +21,8 @@ public class Conversation extends AbstractPersistable<Long> {
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Date date;
     private String category;
+    @Id
+    private String channelId;
 
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
@@ -72,5 +74,13 @@ public class Conversation extends AbstractPersistable<Long> {
 
     public final void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }
