@@ -96,8 +96,7 @@ public class SessionRepoImpl extends MapSessionRepository
             /* Jos client on autentikoitunut ammattilaiseksi */
             username = professional.getName();
             userId = mapperService.getIdFromRegisteredName(username.toString());
-            session.setAttribute("state", "notRelevantForProfessional");
-            session.setAttribute("category", "notRelevantForProfessional");
+            session.setAttribute("state", "pro");
             updateSessionChannels(session);
         } else if (get(session, "username").isEmpty()) {
             /* Uusi kayttaja */

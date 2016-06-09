@@ -90,6 +90,7 @@ public class StateController {
 
     /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
      * @param request request
+     * @param professional autentikaatiotiedot
      * @return Joko String "Denied..." tai JSON {"content":"OK..."}
      *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
      *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
@@ -111,8 +112,8 @@ public class StateController {
         return answer;
     }
 
-    /** Hoitaja avaa jonosta chatin, JS-WebSocket lahettaa jotain /queue/id/
-     *  Tama metodi aktivoituu, kun kyseinen signaali saapuu palvelimelle.
+    /** Hoitaja avaa jonosta chatin, JS-WebSocket subscribaa /queue/id/.
+     *  (Tama metodi jostain syysta aktivoituu, vaikka kyseessa ei ole viesti.)
      *  Toimenpiteet mita tehdaan:
      *  -> Poistetaan jonosta olio
      *  -> Broadcastataan jonon uusi tila hoitajille

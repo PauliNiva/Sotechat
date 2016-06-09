@@ -10,7 +10,17 @@ angular.module('chatApp')
             };
 
             var errorJoinQueue = function (response) {
-                console.log("Error joining pool. Duplicate username?");
+                var err = "Tuntematon virhe";
+                if (response.data.content == "Denied join pool request due to reserved username.") {
+                    err = "Kayttajanimi on varattu. Kokeile toista nimea.";
+                } else if (response.data.content == "Denied join pool request for professional.") {
+                    err = "Olet jo kirjautunut hoitajana. Jarjestelmamme ei voi tunnistaa sinua" +
+                        "samaan aikaan seka hoitajaksi etta asiakkaaksi. Jos haluat testata" +
+                        "chatin toimintaa, kokeile avata asiakasikkuna eri selaimessa tai" +
+                        "selaimen incognito-tilassa. Siten jarjestelmamme nakisi 2 eri kayttajaa."
+                }
+                alert(err);
+                console.log(err);
             };
 
             $http.post(JOINPOOLURL, {'username': $scope.username, 'startMessage': $scope.startMessage})
