@@ -223,8 +223,12 @@ public class StateService {
         HttpSession session = sessionRepo.getHttpSession(sessionId);
         System.out.println("Getting session ID " + sessionId);
         System.out.println("Session is null ? " + (session == null));
+        if (queueService.removeFromQueue(channelId) == null) {
+            /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
+            return "";
+        }
+
         sessionRepo.addChannel(session, channelId);
-        queueService.removeFromQueue(channelId);
 
         String channelIdWithPath = "/toClient/queue/" + channelId;
         List<HttpSession> list = subscribeEventListener.
@@ -233,7 +237,7 @@ public class StateService {
             member.setAttribute("state", "chat");
         }
 
-        return "{\"content\":\"channel activated. request new state now.\"}";
+        return "{\"content\":\"channel activated.\"}";
     }
 
 }
