@@ -50,7 +50,10 @@ public class StateController {
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional autentikointitiedot
-     * @return mita vastataan customerClientin tilanpaivityspyyntoon.
+     * @return JSON-muotoon paketoitu UserStateResponse.
+     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
+     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
+     *          kayttajalle.
      * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
@@ -65,7 +68,10 @@ public class StateController {
     /** Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional kirjautumistiedot
-     * @return mita vastataan proClientin tilanpaivityspyyntoon.
+     * @return JSON-muotoon paketoitu ProStateResponse (tai null).
+     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
+     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
+     *          kayttajalle.
      * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/proState", method = RequestMethod.GET)
@@ -74,26 +80,36 @@ public class StateController {
             final Principal professional
             ) throws Exception {
 
+        if (professional == null) {
+            /** Hacking attempt? */
+            return null;
+        }
         return stateService.respondToProStateRequest(req, professional);
     }
 
 
     /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
      * @param request request
-     * @return mita vastataan clientille
+     * @return Joko String "Denied..." tai JSON {"content":"OK..."}
+     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
+     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
+     *          kayttajalle.
      * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
     public final String respondToJoinPoolRequest(
-            final HttpServletRequest request
+            final HttpServletRequest request,
+            final Principal professional
             ) throws Exception {
 
+        if (professional != null) {
+            /** Hoitaja yrittaa liittya pooliin asiakkaana. */
+            return "Denied join pool request for professional.";
+        }
         String answer = stateService.respondToJoinPoolRequest(request);
         queueBroadcaster.broadcastQueue();
         return answer;
     }
-
-
 
     /** Hoitaja avaa jonosta chatin, JS-WebSocket lahettaa jotain /queue/id/
      *  Tama metodi aktivoituu, kun kyseinen signaali saapuu palvelimelle.
@@ -103,7 +119,8 @@ public class StateController {
      *  -> Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
      * @param accessor accessor
-     * @return Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
+     * @return Joko tyhja String "" tai JSON {"content":"channel activated."}
+     *          Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
      * @throws Exception mika poikkeus
      */
     @MessageMapping("/toServer/queue/{channelId}")
@@ -112,6 +129,7 @@ public class StateController {
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
+
         /** Verify that popper is authenticated. */
         if (accessor.getUser() == null) {
             System.out.println("Hacking attempt?");
