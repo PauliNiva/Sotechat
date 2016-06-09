@@ -10,7 +10,7 @@ angular.module('chatApp')
 
         var postHeartBeat = function () {
             $http.post(HEARTBEATURL, {'heartbeat': 'client alive'});
-        }
+        };
 
         $interval(postHeartBeat, msFreq);
 
