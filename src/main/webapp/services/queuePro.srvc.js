@@ -3,16 +3,22 @@ angular.module('chatApp')
         var queue = [];
         var length = 0;
 
-        var removeFirstFromQueue = function(){
-            if (queue.length > 0) {
+        var removeFirstFromQueue = function(channelID){
+            if (queue.length > 0 && channelID === queue[0]) {
                 var first = queue[0];
                 queue.splice(0,1);
-                console.log(queue);
                 length--;
                 return first;
             }
             return null;
         };
+        
+        var getFirstChannelID = function () {
+            if (queue.length > 0) {
+                return queue[0].channelID;
+            }
+            return null;
+        }
 
         var addToQueue = function(key) {
             var queueObject = [];
@@ -20,7 +26,6 @@ angular.module('chatApp')
             queueObject.channelID = key.channelId;
             queueObject.category = key.category;
             queue.push(queueObject);
-            console.log("moi2");
             length++;
         };
 
@@ -36,6 +41,7 @@ angular.module('chatApp')
 
         var queueService = {
             removeFirstFromQueue:removeFirstFromQueue,
+            getFirstChannelID: getFirstChannelID,
             addToQueue:addToQueue,
             clear:clear,
             queue:queue,

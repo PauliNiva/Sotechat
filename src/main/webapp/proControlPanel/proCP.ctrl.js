@@ -1,29 +1,12 @@
 angular.module('chatApp')
-    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', 'queueProService',
+    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', 'queueProService', 'heartBeatService',
         function ($scope, connectToServer, proStateService, queueProService) {
-            var QUEUEADDRESS = '/toClient/';
             var tabCount = 0;
             $scope.pro = true;
-            $scope.inQueue = 0;
             $scope.chats = [];
-            $scope.queue = queueProService.queue;
-            $scope.queueStatus = $scope.inQueue === 0;
 
-
-            $scope.$watch(function () {
-                return queueProService.queue.length;
-            }, function (lenght) {
-                $scope.inQueue = lenght;
-                $scope.queueStatus = $scope.inQueue === 0;
-            }, true);
-
-            var queue = function (response) {
-                queueProService.clear();
-                angular.forEach(JSON.parse(response.body).jono, function (key) {
-                    console.log(key);
-                    queueProService.addToQueue(key);
-                    console.log(queueProService.queue);
-                });
+            var initQueue = function () {
+                $scope.$broadcast('connectedToQueue');
             };
 
             $scope.addChatTab = function (channelID) {
@@ -40,8 +23,7 @@ angular.module('chatApp')
             };
 
             var answer = function () {
-
-                connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
+                initQueue();
                 $scope.username = proStateService.getUsername();
                 updateChannels();
             };
@@ -50,10 +32,12 @@ angular.module('chatApp')
                 connectToServer.connect(answer);
             };
 
-
-            proStateService.getVariablesFormServer().then(function (response) {
-                proStateService.setAllVariables(response);
-                init();
-            });
-
+            $scope.updateProStatus = function() {
+                proStateService.getVariablesFormServer().then(function (response) {
+                    proStateService.setAllVariables(response);
+                    init();
+                });
+            };
+            
+            $scope.updateProStatus();
         }]);
