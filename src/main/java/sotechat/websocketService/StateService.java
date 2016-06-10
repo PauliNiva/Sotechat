@@ -88,12 +88,8 @@ public class StateService {
             final HttpServletRequest req,
             final Principal professional
     ) {
-        HttpSession session = req.getSession();
-        System.out.println("State req from customer " + session.getId());
-        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
-
-        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
-        sessionRepo.updateSessionAttributes(session, professional);
+        HttpSession session = mapSession("State req from customer ", req,
+                professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -120,12 +116,8 @@ public class StateService {
             final Principal professional
     ) {
 
-        HttpSession session = req.getSession();
-        System.out.println("State request from proClient " + session.getId());
-        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
-
-        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
-        sessionRepo.updateSessionAttributes(session, professional);
+        HttpSession session = mapSession("State request from proClient ", req,
+                professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -141,6 +133,30 @@ public class StateService {
         /** Paketoidaan muuttujat StateResponseen, joka kaannetaan JSONiksi. */
         return new ProStateResponse(
                 state, username, userId, qbcc, online, channelIds);
+    }
+
+    /**
+     * Mappaa Http session sessionId:hen ja varmistaa, että sessionissa on
+     * asianmukaiset attribuutit. Palauttaa kyseisen Http session.
+     * @param print Viesti joka printataan session id:n yhteydessä. Ilmaisee
+     *              onko tilapyyntö asiakkaalta vai ammattilaiselta.
+     * @param req HttpServletRequest, josta saadaan session tiedot
+     * @param professional Principalista saadaan autentikaatiotiedot
+     * @return Http sessio
+     */
+    private final HttpSession mapSession(String print, HttpServletRequest req,
+                                         Principal professional){
+
+        HttpSession session = req.getSession();
+
+        System.out.println(print + session.getId());
+
+        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
+
+        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
+        sessionRepo.updateSessionAttributes(session, professional);
+
+        return session;
     }
 
 
@@ -203,7 +219,7 @@ public class StateService {
         session.setAttribute("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu */
-        createConversation(startMessage, username, channelId, session);
+        createConversation(startMessage, username, session);
 
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
          * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
@@ -231,25 +247,16 @@ public class StateService {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return "";
         }
-
-        /** Lisataan popattu kanava poppaajan kanaviin. */
-        String sessionId =  accessor
-                        .getSessionAttributes()
-                        .get("SPRING.SESSION.ID").
-                        toString();
+        String sessionId =  accessor.getSessionAttributes()
+                .get("SPRING.SESSION.ID").toString();
         HttpSession session = sessionRepo.getHttpSession(sessionId);
 
-        System.out.println("Getting session ID " + sessionId);
-        System.out.println("Session is null ? " + (session == null));
-        sessionRepo.addChannel(session, channelId);
+        /** Lisataan popattu kanava poppaajan kanaviin. */
+        addToPopped(sessionId, session, channelId);
 
         /** Muutetaan popattavan kanavan henkiloiden tilaa. */
-        String channelIdWithPath = "/toClient/queue/" + channelId;
-        List<HttpSession> list = subscribeEventListener.
-                getSubscribers(channelIdWithPath);
-        for (HttpSession member : list) {
-            member.setAttribute("state", "chat");
-        }
+        changeParticipantsState(channelId);
+
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
         addPersonToConversation(session, channelId);
 
@@ -257,19 +264,63 @@ public class StateService {
         return "{\"content\":\"channel activated.\"}";
     }
 
-    private final void createConversation(String startMessage,
-                                          String sender, String channelId,
-                                            HttpSession session)
+    /**
+     * Lisataan popattu kanava poppaajan kanaviin
+     * @param sessionId session id
+     * @param session Http sessio
+     * @param channelId kanavan id
+     */
+    private final void addToPopped(String sessionId, HttpSession session,
+                                   String channelId) throws Exception{
+        System.out.println("Getting session ID " + sessionId);
+        System.out.println("Session is null ? " + (session == null));
+        sessionRepo.addChannel(session, channelId);
+    }
+
+    /**
+     * Muutetaan popattavan kanavan henkiloiden tilaa
+     * @param channelId kanavan id
+     */
+    private final void changeParticipantsState(String channelId)
+            throws Exception {
+        String channelIdWithPath = "/toClient/queue/" + channelId;
+
+        List<HttpSession> list = subscribeEventListener.
+                getSubscribers(channelIdWithPath);
+
+        for (HttpSession member : list) {
+            member.setAttribute("state", "chat");
+        }
+    }
+
+    /**
+     * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
+     * sekä keskustelun kategoria.
+     * @param startMessage aloitusviestin sisalto
+     * @param sender aloitusviestin lahettaja
+     * @param session Http sessio
+     * @throws Exception
+     */
+    private final void createConversation(String startMessage, String sender,
+                                          HttpSession session)
                                             throws Exception{
         Message message = new Message(sender, startMessage, new Date();
+        String channelId = get(session, "channelId");
         conversationService.addConversation(message, channelId);
         String category = get(session, "category");
         conversationService.addCategory(category, channelId);
     }
 
-    private final void addPersonToConversation(HttpSession session,
-                                          String channelId) throws Exception {
+    /**
+     * Lisätään parametrina annettuun sessioon liittyvä henkilö tietokannasta
+     * session kanava id:n perusteella löytyvään keskusteluun
+     * @param session Http sessio
+     * @throws Exception
+     */
+    private final void addPersonToConversation(HttpSession session)
+            throws Exception {
         String userId = get(session, "userId");
+        String channelId = get(session, "channelId");
         conversationService.addPerson(userId, channelId);
         );
     }

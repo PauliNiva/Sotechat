@@ -61,8 +61,6 @@ public class ChatMessageService {
             final SimpMessageHeaderAccessor accessor
     ) throws Exception {
 
-        Date time = new Date();
-
         /** Selvitetaan kayttajanimi annetun userId:n perusteella. */
         String userId = msgToServer.getUserId();
 
@@ -70,19 +68,31 @@ public class ChatMessageService {
 
         String content = msgToServer.getContent();
 
+        String username = mapper.getUsernameFromId(userId);
+
         //TODO: tarkista, etta user on subscribannut kanavalle.
 
         if (validUserId(userId, accessor)) {
-            return preparedMessage(time, userId, channelId, content);
+            return prepareMessage(username, channelId, content);
         }
         else return null;
     }
 
-    private MsgToClient preparedMessage(Date time, String userId,
+    /**
+     * Muokataan viestistä clientille sopivan muotoinen ja lisätään siihen
+     * aikaleima. Talletetaan viesti lokeihin sekä tietokanataan. Palautetaan
+     * clientille sopivan muotoinen viesti.
+     * @param username viestin lähettäjän käyttäjänimi
+     * @param channelId viestin kanavan id
+     * @param content viestin sisältö
+     * @return MsgToClient muotoinen viesti -olio
+     * @throws Exception
+     */
+    private MsgToClient prepareMessage(String username,
                                         String channelId, String content)
                                         throws Exception {
 
-        String username = mapper.getUsernameFromId(userId);
+        Date time = new Date();
 
         MsgToClient msg = new MsgToClient(username, channelId,
                 time.toString(), content);
@@ -97,6 +107,14 @@ public class ChatMessageService {
         return msg;
     }
 
+    /**
+     * Varmistetaan että kayttajan id on validi, että se kuuluu
+     * ammattilaiselle, joka on kirjautunut ja että se on sama kuin
+     * viestiin merkitty lahettajan id
+     * @param userId
+     * @param accessor
+     * @return
+     */
     private final boolean validUserId(String userId,
                                       SimpMessageHeaderAccessor accessor){
         if (!mapper.isUserIdMapped(userId)) {
@@ -120,6 +138,14 @@ public class ChatMessageService {
         }
     }
 
+    /**
+     * Tallennetaan viesti tietokantaan ja tietokannassa olevaan keskusteluun.
+     * @param username viestin lähettäjän käyttäjänimi
+     * @param content viestin sisältö
+     * @param time viestin aikaleima
+     * @param channelId viestin kanavan id
+     * @throws Exception
+     */
     private final void saveToDatabase(String username, String content,
                                      Date time, String channelId)
                                      throws Exception {
