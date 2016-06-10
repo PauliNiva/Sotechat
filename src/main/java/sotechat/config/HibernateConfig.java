@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -98,6 +99,12 @@ public class HibernateConfig {
     @Resource
     private Environment env;
 
+    /**
+     * Luodaan yhteys tuotantotietokantaan.
+     *
+     * @return Palautaa tietokantayhteyksistä vastaavaa HikariDataSourceen.
+     * @throws URISyntaxException
+     */
     @Profile("production")
     @Bean(destroyMethod = "close")
     public HikariDataSource dataSourceForProduction()
@@ -134,8 +141,8 @@ public class HibernateConfig {
         return new HikariDataSource(dataSourceConfig);
     }
     /**
-     * Luodaan yhteys tietokantaa. HikariDataSource vastaa tietokantayhteyksien
-     * ylläpitämisestä
+     * Luodaan yhteys testitietokantaan. HikariDataSource vastaa
+     * tietokantayhteyksien ylläpitämisestä
      * @return Palauttaa tietokantayhteyksien ylläpitäjäolion HikariDataSourcen
      */
     @Profile("development")
@@ -212,6 +219,7 @@ public class HibernateConfig {
      * @return
      */
     @Bean
+    @DependsOn("flyway")
     JpaTransactionManager transactionManager(
             final EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
