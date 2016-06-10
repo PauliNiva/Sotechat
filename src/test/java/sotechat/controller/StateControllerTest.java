@@ -22,6 +22,7 @@ import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
 import sotechat.data.*;
 import sotechat.data.QueueImpl;
+import sotechat.domainService.ConversationService;
 import sotechat.util.TestPrincipal;
 import sotechat.websocketService.QueueService;
 import sotechat.websocketService.StateService;
