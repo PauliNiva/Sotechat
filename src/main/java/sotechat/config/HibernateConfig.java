@@ -174,6 +174,7 @@ public class HibernateConfig {
      * @return Palautetaan EntityManagerFactoryBean
      */
     @Bean
+    @DependsOn("flyway")
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
             final HikariDataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
@@ -219,7 +220,6 @@ public class HibernateConfig {
      * @return
      */
     @Bean
-    @DependsOn("flyway")
     JpaTransactionManager transactionManager(
             final EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
