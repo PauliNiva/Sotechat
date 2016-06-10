@@ -101,6 +101,10 @@ public final class sotechatITCommands {
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
+    public static WebElement waitVisibilityOfElement(WebDriverWait wait, By by) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+    }
+
     /**
      * @param wait         Odottavaan webdriveriin kiinnitetty WebDriverWait
      * @param textToAppear Teksti jonka oletetaan ilmestyvän sivulle

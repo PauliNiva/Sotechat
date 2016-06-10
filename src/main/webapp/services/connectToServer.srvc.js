@@ -15,9 +15,9 @@ angular.module('chatApp')
                     answer();
                 }, function (error) {
                     status = false;
-                    $timeout(function() {
-                        connect(answer);
-                    }, 5000);
+                   // $timeout(function() {
+                   //     connect(answer);
+                   // }, 10000);
                 });
             } else {
                 answer();

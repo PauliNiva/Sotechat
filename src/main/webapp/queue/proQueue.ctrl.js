@@ -4,6 +4,7 @@ angular.module('chatApp')
             var QUEUEADDRESS = '/toClient/';
             var CLIENTQUEUE = '/toClient/queue/';
             $scope.queue = queueProService.queue;
+            $scope.categorys = queueProService.categorys;
             $scope.queueStatus = $scope.inQueue === 0;
             $scope.inQueue = 0;
 
@@ -20,14 +21,21 @@ angular.module('chatApp')
 
             $scope.nextFromQueue = function () {
                 var firstChannelID = queueProService.getFirstChannelID();
-                if (firstChannelID != null) {
-                    var checkIsPopOk = connectToServer.subscribe(CLIENTQUEUE + firstChannelID, function (response) {
+                $scope.pickFromQueue(firstChannelID);
+            };
+            
+            $scope.pickFromQueue = function (channelID) {
+                console.log("moi" + channelID);
+                var checkChannelID = queueProService.checkChannelID(channelID);
+                console.log( checkChannelID);
+                if (checkChannelID != null) {
+                    var checkIsPopOk = connectToServer.subscribe(CLIENTQUEUE + checkChannelID, function (response) {
                         if (JSON.parse(response.body).content === 'channel activated.') {
-                            $scope.addChatTab(firstChannelID);
+                            $scope.addChatTab(checkChannelID);
                         }
                         checkIsPopOk.unsubscribe();
                     });
-                    stompSocket.send('/toServer/queue/' + firstChannelID, {}, '');
+                    stompSocket.send('/toServer/queue/' + checkChannelID, {}, '');
                 }
             };
 

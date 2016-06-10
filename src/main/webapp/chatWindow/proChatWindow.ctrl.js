@@ -6,7 +6,7 @@ angular.module('chatApp')
             $scope.messages = [];
             var sub;
             // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
-            $scope.chatName = 'Esimerkki';
+            $scope.chatName = 'Chat';
 
             var channel = this.channel;
 
@@ -27,12 +27,11 @@ angular.module('chatApp')
 
             /** Funktio parsee viestin haluttuun muotoon. */
             var getMessage = function (data) {
-                var parsed = JSON.parse(data);
-                var message = [];
-                message.content = parsed.content;
-                message.time = parsed.timeStamp;
-                message.sender = parsed.username;
-                message.I = message.sender === proStateService.getUsername();
+                var message = JSON.parse(data);
+                message.I = message.username === proStateService.getUsername();
+                if (!message.I){
+                    $scope.chatName = message.username;
+                }
                 return message;
             };
 

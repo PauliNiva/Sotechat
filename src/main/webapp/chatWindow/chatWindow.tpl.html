@@ -10,7 +10,7 @@
     </div>
 
     <div class="panel-body chat-body" scroll-glue>
-        <div ng-repeat="message in messages | orderBy:'time':false" class="message">
+        <div ng-repeat="message in messages | orderBy:'timeStamp':false" class="message">
             <div ng-include="'chatWindow/message.tpl.html'"></div>
         </div>
     </div>

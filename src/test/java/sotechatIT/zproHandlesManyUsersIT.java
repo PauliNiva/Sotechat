@@ -31,17 +31,17 @@ public class zproHandlesManyUsersIT {
 
     @After
     public void tearDown() throws Exception {
-        proDriver.close();
+       // proDriver.close();
     }
 
     /**
      * What if we have many customer and very very effective Pro
      * Do not try this at home!
      */
-    @Test
+    
     public void KillerTest() {
         ArrayList<WebDriver> hyrr = new ArrayList<>();
-        int max = 10;
+        int max = 5;
         for (int i = 0; i < max; i++) {
             hyrr.add(new FirefoxDriver());
         }

@@ -3,6 +3,8 @@
 }
 .queueButton {
     margin-bottom: 10px;
+    width: 50%;
+    min-width: 136px;
 }
 
 .queuer-heading {
@@ -18,7 +20,13 @@
 }
 
 .proQueueDrop{
-
+    max-width: 49%;
+    height: 34px;
+    padding: 4px 4px;
+}
+.proQueueDropOption {
+    height: 24px;
+    padding: 4px 4px;
 }
 
 .proQueueDropButton{

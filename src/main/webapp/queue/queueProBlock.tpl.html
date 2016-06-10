@@ -3,7 +3,7 @@
         <span class="panel-title" name="queuerName">{{queueObject.username}}</span> <span class="pull-right">{{queueObject.category}}</span></div>
     <div class="panel-collapse collapse" uib-collapse="!collapsed">
         <div class="panel-body"><span></span>
-            <button type="button" class="btn btn-block btn-primary" name="{{queueObject.username}}">Ota jonosta</button>
+            <button type="button" class="btn btn-block btn-primary" ng-click="pickFromQueue(queueObject.channelID)" name="{{queueObject.username}}">Ota jonosta</button>
         </div>
     </div>
 </div>
