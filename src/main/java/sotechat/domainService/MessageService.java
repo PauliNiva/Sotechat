@@ -8,6 +8,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Conversation;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
+import sotechat.repo.PersonRepo;
 
 @Service
 public class MessageService  {
@@ -15,6 +16,8 @@ public class MessageService  {
     private MessageRepo messageRepo;
 
     private ConversationRepo conversationRepo;
+
+    private PersonRepo personRepo;
 
     @Autowired
     public MessageService(MessageRepo pMessageRepo,
@@ -24,25 +27,21 @@ public class MessageService  {
     }
 
     @Transactional
-    public void addMessage(Message pMessage) {
-        messageRepo.save(pMessage);
-        pMessage.setDate(new Date());
-        Conversation conversation = pMessage.getConversation();
-        conversation.getMessagesOfConversation().add(pMessage);
-
-        messageRepo.save(pMessage);
+    public Message addMessage(Message message) {
+        messageRepo.save(message);
     }
 
     @Transactional
     public void removeMessage(Long messageId) {
         Message message = messageRepo.findOne(messageId);
-        Long conversationId = message.getConversation().getId();
+        String conversationId = message.getConversation().getChannelId();
         conversationRepo.findOne(conversationId).getMessagesOfConversation()
                 .remove(message);
         messageRepo.delete(messageId);
     }
 
     public void setMessageRepo(MessageRepo pMessageRepo) {
+
         this.messageRepo = pMessageRepo;
     }
 
@@ -50,11 +49,12 @@ public class MessageService  {
         return this.messageRepo;
     }
 
-    public void setConversationRepo(ConversationRepo pConversationRepo) {
+    public void setConversationRepo(final ConversationRepo pConversationRepo) {
         this.conversationRepo = pConversationRepo;
     }
 
     public ConversationRepo getConversationRepo() {
+
         return this.conversationRepo;
     }
 }

@@ -1,7 +1,6 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -9,9 +8,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Enumeration;
 
+import sotechat.domainService.ConversationService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +31,9 @@ public class StateController {
     /** Testi. */
     private final ChatLogBroadcaster chatLogBroadcaster;
 
+    /** Conversation service */
+    private final ConversationService conversationService;
+
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
      * @param pStateService stateService
@@ -43,11 +44,13 @@ public class StateController {
     public StateController(
             final StateService pStateService,
             final QueueBroadcaster pQueueBroadcaster,
-            final ChatLogBroadcaster pChatLogBroadcaster
+            final ChatLogBroadcaster pChatLogBroadcaster,
+            final ConversationService pConversationService
     ) {
         this.stateService = pStateService;
         this.queueBroadcaster = pQueueBroadcaster;
         this.chatLogBroadcaster = pChatLogBroadcaster;
+        this.conversationService = pConversationService;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).

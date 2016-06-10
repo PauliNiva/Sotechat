@@ -16,12 +16,18 @@ public class Message extends AbstractPersistable<Long> {
     private Date date;
 
     private String content;
-    private String author;
+    private String sender;
 
     @ManyToOne
     private Conversation conversation;
 
     public Message() {
+    }
+
+    public Message(String sender, String content, Date date){
+        this.sender = sender;
+        this.content = content;
+        this.date = date;
     }
 
     public final Date getDate() {
@@ -40,12 +46,13 @@ public class Message extends AbstractPersistable<Long> {
         this.content = pContent;
     }
 
-    public final String getAuthor() {
-        return this.author;
+    public final String getSender() {
+        return this.sender;
     }
 
-    public final void setAuthor(final String pAuthor) {
-        this.author = pAuthor;
+
+    public final void setSender(final String psender) {
+        this.sender = psender;
     }
 
     public final Conversation getConversation() {

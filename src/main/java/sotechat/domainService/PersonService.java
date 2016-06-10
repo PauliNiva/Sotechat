@@ -2,34 +2,63 @@ package sotechat.domainService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sotechat.domain.Conversation;
 import sotechat.domain.Person;
+import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
+/**
+ * Created by varkoi on 8.6.2016.
+ */
 @Service
 public class PersonService {
 
-    private final PersonRepo personRepo;
-
     @Autowired
-    public PersonService(PersonRepo pPersonRepo) {
-        this.personRepo = pPersonRepo;
+    private PersonRepo personRepo;
+
+    public boolean addPerson(Person person, String password){
+        try {
+            person.setPassword(password);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 
-    @Transactional
-    public void addPerson() {
-        Person pPerson = new Person();
-        pPerson.setUsername("apina");
-        pPerson.setPassword("apina");
-        personRepo.save(pPerson);
+    public Person findOne(String personId) throws Exception {
+        return personRepo.findOne(personId);
     }
 
-    public void getPersons() {
-        List<Person> persons = personRepo.findAll();
-        for (Person p : persons) {
-            System.out.println(p.getId());
+    public List<Person> findAll(){
+        return personRepo.findAll();
+    }
+
+    public void delete(String personId) throws Exception {
+        personRepo.delete(personId);
+    }
+
+    public boolean changePassword(String personId, String password){
+        try {
+            Person person = personRepo.findOne(personId);
+            person.setPassword(password);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    public boolean changeScreenName(String personId, String newName){
+        try {
+            Person person = personRepo(personId);
+            person.setScreenName(newName);
+            personRepo.save(person);
+            return true;
+        }catch(Exception e){
+            return false;
         }
     }
 }

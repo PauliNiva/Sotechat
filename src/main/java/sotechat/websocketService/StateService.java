@@ -9,6 +9,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
 import sotechat.data.ChatLogger;
+import sotechat.domain.Message;
+import sotechat.domainService.ConversationService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 import static sotechat.util.Utils.get;
@@ -45,6 +48,9 @@ public class StateService {
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
+    /** Conversation service */
+    private final ConversationService conversationService;
+
     /** Channel where queue status is broadcasted. */
     public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
 
@@ -62,13 +68,15 @@ public class StateService {
             final SubscribeEventListener subscribeEventListener,
             final QueueService pQueueService,
             final ChatLogger pChatLogger,
-            final SessionRepo pSessionRepo
+            final SessionRepo pSessionRepo,
+            final ConversationService pConvService
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
+        this.conversationService = pConvService;
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
@@ -80,12 +88,8 @@ public class StateService {
             final HttpServletRequest req,
             final Principal professional
     ) {
-        HttpSession session = req.getSession();
-        System.out.println("State req from customer " + session.getId());
-        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
-
-        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
-        sessionRepo.updateSessionAttributes(session, professional);
+        HttpSession session = mapSession("State req from customer ", req,
+                professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -112,12 +116,8 @@ public class StateService {
             final Principal professional
     ) {
 
-        HttpSession session = req.getSession();
-        System.out.println("State request from proClient " + session.getId());
-        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
-
-        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
-        sessionRepo.updateSessionAttributes(session, professional);
+        HttpSession session = mapSession("State request from proClient ", req,
+                professional);
 
         /** Kaivetaan sessionista tiedot muuttujiin. */
         String state = get(session, "state");
@@ -135,6 +135,31 @@ public class StateService {
                 state, username, userId, qbcc, online, channelIds);
     }
 
+    /**
+     * Mappaa Http session sessionId:hen ja varmistaa, että sessionissa on
+     * asianmukaiset attribuutit päivittämällä niitä. Palauttaa parametrina
+     * annetun HttpServletRequestin Http session.
+     * @param print Viesti joka printataan session id:n yhteydessä. Ilmaisee
+     *              onko tilapyyntö asiakkaalta vai ammattilaiselta.
+     * @param req HttpServletRequest, josta saadaan session tiedot
+     * @param professional Principalista saadaan autentikaatiotiedot
+     * @return Http sessio
+     */
+    private final HttpSession mapSession(String print, HttpServletRequest req,
+                                         Principal professional){
+
+        HttpSession session = req.getSession();
+
+        System.out.println(print + session.getId());
+
+        sessionRepo.mapHttpSessionToSessionId(session.getId(), session);
+
+        /** Varmistetaan, etta sessionissa on asianmukaiset attribuutit. */
+        sessionRepo.updateSessionAttributes(session, professional);
+
+        return session;
+    }
+
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
      * @param request taalta saadaan session tiedot
@@ -143,7 +168,7 @@ public class StateService {
      */
     public final synchronized String respondToJoinPoolRequest(
             final HttpServletRequest request
-            ) throws IOException {
+            ) throws Exception {
 
         HttpSession session = request.getSession();
         /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
@@ -194,6 +219,9 @@ public class StateService {
         queueService.addToQueue(channelId, category, username);
         session.setAttribute("state", "queue");
 
+        /** Luodaan tietokantaan uusi keskustelu */
+        createConversation(startMessage, username, session);
+
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
          * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
          * Kun kanavalle liittyy joku, lokit lahetetaan sille. */
@@ -215,32 +243,87 @@ public class StateService {
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
-    ) {
+    ) throws Exception {
         if (queueService.removeFromQueue(channelId) == null) {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return "";
         }
+        String sessionId =  accessor.getSessionAttributes()
+                .get("SPRING.SESSION.ID").toString();
+        HttpSession session = sessionRepo.getHttpSession(sessionId);
 
         /** Lisataan popattu kanava poppaajan kanaviin. */
-        String sessionId =  accessor
-                        .getSessionAttributes()
-                        .get("SPRING.SESSION.ID").
-                        toString();
-        HttpSession session = sessionRepo.getHttpSession(sessionId);
-        System.out.println("Getting session ID " + sessionId);
-        System.out.println("Session is null ? " + (session == null));
-        sessionRepo.addChannel(session, channelId);
+        addToPopped(sessionId, session, channelId);
 
         /** Muutetaan popattavan kanavan henkiloiden tilaa. */
-        String channelIdWithPath = "/toClient/queue/" + channelId;
-        List<HttpSession> list = subscribeEventListener.
-                getSubscribers(channelIdWithPath);
-        for (HttpSession member : list) {
-            member.setAttribute("state", "chat");
-        }
+        changeParticipantsState(channelId);
+
+        /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
+        addPersonToConversation(session, channelId);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
+    }
+
+    /**
+     * Lisataan popattu kanava poppaajan kanaviin
+     * @param sessionId session id
+     * @param session Http sessio
+     * @param channelId kanavan id
+     */
+    private final void addToPopped(String sessionId, HttpSession session,
+                                   String channelId) throws Exception{
+        System.out.println("Getting session ID " + sessionId);
+        System.out.println("Session is null ? " + (session == null));
+        sessionRepo.addChannel(session, channelId);
+    }
+
+    /**
+     * Muutetaan popattavan kanavan henkiloiden tilaa
+     * @param channelId kanavan id
+     */
+    private final void changeParticipantsState(String channelId)
+            throws Exception {
+        String channelIdWithPath = "/toClient/queue/" + channelId;
+
+        List<HttpSession> list = subscribeEventListener.
+                getSubscribers(channelIdWithPath);
+
+        for (HttpSession member : list) {
+            member.setAttribute("state", "chat");
+        }
+    }
+
+    /**
+     * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
+     * sekä keskustelun kategoria.
+     * @param startMessage aloitusviestin sisalto
+     * @param sender aloitusviestin lahettaja
+     * @param session Http sessio
+     * @throws Exception
+     */
+    private final void createConversation(String startMessage, String sender,
+                                          HttpSession session)
+                                            throws Exception{
+        Message message = new Message(sender, startMessage, new Date();
+        String channelId = get(session, "channelId");
+        conversationService.addConversation(message, channelId);
+        String category = get(session, "category");
+        conversationService.setCategory(category, channelId);
+    }
+
+    /**
+     * Lisätään parametrina annettuun sessioon liittyvä henkilö tietokannasta
+     * session kanava id:n perusteella löytyvään keskusteluun
+     * @param session Http sessio
+     * @throws Exception
+     */
+    private final void addPersonToConversation(HttpSession session)
+            throws Exception {
+        String userId = get(session, "userId");
+        String channelId = get(session, "channelId");
+        conversationService.addPerson(userId, channelId);
+        );
     }
 
 }
