@@ -2,6 +2,7 @@ package sotechat.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -174,7 +175,6 @@ public class HibernateConfig {
      * @return Palautetaan EntityManagerFactoryBean
      */
     @Bean
-    @DependsOn("flyway")
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
             final HikariDataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
