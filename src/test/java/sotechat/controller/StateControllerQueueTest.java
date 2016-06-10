@@ -31,9 +31,9 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepoImpl;
 import sotechat.util.MsgUtil;
-import sotechat.util.TestChannelInterceptor;
-import sotechat.util.TestPrincipal;
-import sotechat.util.TestSession;
+import sotechat.util.MockChannelInterceptor;
+import sotechat.util.MockPrincipal;
+import sotechat.util.MockSession;
 
 
 import java.nio.charset.Charset;
@@ -66,14 +66,14 @@ public class StateControllerQueueTest {
     @Autowired
     private AbstractSubscribableChannel brokerChannel;
 
-    private TestChannelInterceptor brokerChannelInterceptor;
+    private MockChannelInterceptor brokerChannelInterceptor;
 
 
     @Before
     public void setUp() throws Exception {
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
         this.sessionRepo = (SessionRepoImpl) context.getBean("sessionRepoImpl");
-        this.brokerChannelInterceptor = new TestChannelInterceptor();
+        this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
@@ -85,11 +85,11 @@ public class StateControllerQueueTest {
         /**
          * Luodaan hoitajalle sessio.
          */
-        sessionRepo.mapHttpSessionToSessionId("1234", new TestSession());
+        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new TestPrincipal("Hoitaja"));
+        headers.setUser(new MockPrincipal("Hoitaja"));
 
         /**
          * Simuloidaan sitä, että painaa "ota ensimmäinen jonosta" -nappia.
@@ -116,7 +116,7 @@ public class StateControllerQueueTest {
     public void unAuthenticatedUserCantPopUserFromQueue() throws Exception {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
-        sessionRepo.mapHttpSessionToSessionId("1234", new TestSession());
+        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("random", "random", true);

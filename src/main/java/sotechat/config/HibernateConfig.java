@@ -174,7 +174,6 @@ public class HibernateConfig {
      * @return Palautetaan EntityManagerFactoryBean
      */
     @Bean
-    @DependsOn("flyway")
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
             final HikariDataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =

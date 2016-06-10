@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Luokka, joka avustaa viestien kasittelyssa WebSocket-testeissa.
  */
-public class TestChannelInterceptor extends ChannelInterceptorAdapter {
+public class MockChannelInterceptor extends ChannelInterceptorAdapter {
 
     private final BlockingQueue<Message<?>> messages = new ArrayBlockingQueue<>(100);
 

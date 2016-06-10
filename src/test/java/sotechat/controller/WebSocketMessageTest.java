@@ -32,8 +32,8 @@ import org.springframework.web.socket.config.annotation
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.util.MsgUtil;
-import sotechat.util.TestChannelInterceptor;
-import sotechat.util.TestPrincipal;
+import sotechat.util.MockChannelInterceptor;
+import sotechat.util.MockPrincipal;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -66,13 +66,13 @@ public class WebSocketMessageTest {
     @Autowired
     private AbstractSubscribableChannel brokerChannel;
 
-    private TestChannelInterceptor brokerChannelInterceptor;
+    private MockChannelInterceptor brokerChannelInterceptor;
 
 
     @Before
     public void setUp() throws Exception {
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
-        this.brokerChannelInterceptor = new TestChannelInterceptor();
+        this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
@@ -152,7 +152,7 @@ public class WebSocketMessageTest {
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new TestPrincipal("Hoitaja"));
+        headers.setUser(new MockPrincipal("Hoitaja"));
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);

@@ -6,11 +6,11 @@ import javax.servlet.http.HttpSessionContext;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-public class TestSession implements HttpSession {
+public class MockSession implements HttpSession {
 
     private HashMap<String, Object> sessionAttributes;
 
-    public TestSession() {
+    public MockSession() {
         this.sessionAttributes = new HashMap<>();
     }
 
