@@ -19,13 +19,17 @@ import java.util.Date;
 public class ConversationService {
 
     /** Keskustelujen tallentamiseen */
-    @Autowired
     private ConversationRepo conversationRepo;
 
     /** Henkiloiden tallentamiseen */
-    @Autowired
     private PersonRepo personRepo;
 
+    @Autowired
+    public ConversationService(ConversationRepo conversationRepo,
+                               PersonRepo personRepo) {
+        this.conversationRepo = conversationRepo;
+        this.personRepo = personRepo;
+    }
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
