@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -13,6 +15,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManagerFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
@@ -96,12 +100,54 @@ public class HibernateConfig {
     private Environment env;
 
     /**
-     * Luodaan yhteys tietokantaa. HikariDataSource vastaa tietokantayhteyksien
-     * ylläpitämisestä
+     * Luodaan yhteys tuotantotietokantaan.
+     *
+     * @return Palautaa tietokantayhteyksistä vastaavaa HikariDataSourceen.
+     * @throws URISyntaxException
+     */
+    @Profile("production")
+    @Bean(destroyMethod = "close")
+    public HikariDataSource dataSourceForProduction()
+            throws URISyntaxException {
+        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+        System.out.println(dbUri.toString());
+        String username = dbUri.getUserInfo().split(":")[0];
+        String password = dbUri.getUserInfo().split(":")[1];
+
+        StringBuilder dbUrl = new StringBuilder(128);
+        dbUrl.append("jdbc:postgresql://")
+                .append(dbUri.getHost())
+                .append(":")
+                .append(dbUri.getPort())
+                .append(dbUri.getPath());
+
+        String query = dbUri.getQuery();
+        if (null != query && !query.isEmpty()) {
+            dbUrl.append("?").append(query);
+        }
+
+        HikariConfig dataSourceConfig = new HikariConfig();
+        dataSourceConfig.setDriverClassName(
+                env.getRequiredProperty(
+                        PROPERTY_NAME_DATABASE_DRIVER));
+        dataSourceConfig
+                .setJdbcUrl(dbUrl.toString());
+        dataSourceConfig
+                .setUsername(username);
+        dataSourceConfig
+                .setPassword(password);
+
+        return new HikariDataSource(dataSourceConfig);
+    }
+    /**
+     * Luodaan yhteys testitietokantaan. HikariDataSource vastaa
+     * tietokantayhteyksien ylläpitämisestä
      * @return Palauttaa tietokantayhteyksien ylläpitäjäolion HikariDataSourcen
      */
+    @Profile("development")
     @Bean(destroyMethod = "close")
-    public HikariDataSource dataSource() {
+    public HikariDataSource dataSourceForDevelopment() {
         HikariConfig dataSourceConfig = new HikariConfig();
         dataSourceConfig.setDriverClassName(
                 env.getRequiredProperty(
@@ -112,7 +158,7 @@ public class HibernateConfig {
         dataSourceConfig
                 .setUsername(
                         env.getRequiredProperty(
-                                PROPERTY_NAME_DATABASE_PASSWORD));
+                                PROPERTY_NAME_DATABASE_USERNAME));
         dataSourceConfig
                 .setPassword(env.getRequiredProperty(
                         PROPERTY_NAME_DATABASE_PASSWORD));
@@ -125,14 +171,11 @@ public class HibernateConfig {
      * notaatiolla varustetut luokat Hibernaten käyttöön.
      *
      * @param dataSource Tietokantayhteyksistä huolehtiva olio
-     * @param env Ympäristömuuttuja, josta voidaan hakia sinne talletettuja
-     *            tietoja.
      * @return Palautetaan EntityManagerFactoryBean
      */
     @Bean
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            final HikariDataSource dataSource,
-            final Environment env) {
+            final HikariDataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
                 new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
@@ -176,6 +219,7 @@ public class HibernateConfig {
      * @return
      */
     @Bean
+    @DependsOn("flyway")
     JpaTransactionManager transactionManager(
             final EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
