@@ -307,6 +307,7 @@ public class StateService {
                                             throws Exception{
         Message message = new Message(sender, startMessage, new Date());
         String channelId = get(session, "channelId");
+        message.setChannelId(channelId);
         conversationService.addConversation(message, channelId);
         String category = get(session, "category");
         conversationService.setCategory(category, channelId);

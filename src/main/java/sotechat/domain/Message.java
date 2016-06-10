@@ -21,6 +21,8 @@ public class Message extends AbstractPersistable<Long> {
     @ManyToOne
     private Conversation conversation;
 
+    private String channelId;
+
     public Message() {
     }
 
@@ -60,7 +62,16 @@ public class Message extends AbstractPersistable<Long> {
     }
 
     public final void setConversation(final Conversation pConversation) {
+
         this.conversation = pConversation;
+        this.channelId = pConversation.getChannelId();
     }
 
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
 }

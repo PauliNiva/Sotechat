@@ -2,6 +2,7 @@ package sotechat.domainService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
@@ -9,6 +10,7 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
@@ -39,6 +41,7 @@ public class ConversationService {
      * @param message Message luokan olio, jossa kayttajan lahettama viesti
      * @param channelId keskustelun kanavan id
      */
+    @Transactional
     public void addConversation(Message message, String channelId)
             throws Exception {
             Conversation conv = new Conversation(new Date(), channelId);
@@ -98,6 +101,7 @@ public class ConversationService {
      *             viesti liittyy
      * @throws Exception NullPointerException
      */
+    @Transactional
     private void addMessage(Message message, Conversation conv)
             throws Exception {
             conv.addMessageToConversation(message);
@@ -115,6 +119,7 @@ public class ConversationService {
      *                     henkilo liitetaan.
      * @throws Exception NullPointerException
      */
+    @Transactional
     private void addConnection(Person person, Conversation conversation) throws Exception {
         conversation.addPersonToConversation(person);
         person.addConversationToPerson(conversation);
@@ -129,7 +134,9 @@ public class ConversationService {
      * @param channelId keskustelun kanavan id
      * @throws Exception IllegalArgumentException
      */
+    @Transactional
     public void delete(String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
+
 }

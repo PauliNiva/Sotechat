@@ -1,0 +1,2 @@
+ALTER TABLE MESSAGE
+RENAME author TO sender;
