@@ -116,7 +116,7 @@ public class ChatMessageService {
      * @return
      */
     private final boolean validUserId(String userId,
-                                      SimpMessageHeaderAccessor accessor){
+                                      SimpMessageHeaderAccessor accessor) {
         if (!mapper.isUserIdMapped(userId)) {
             /** Kelvoton ID, hylataan viesti. */
             return false;
@@ -134,8 +134,8 @@ public class ChatMessageService {
                 /** Kirjautunut ID eri kuin viestiin merkitty lahettajan ID. */
                 return false;
             }
-
         }
+        return true;
     }
 
     /**

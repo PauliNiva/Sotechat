@@ -120,7 +120,6 @@ public class ConversationService {
         person.addConversationToPerson(conversation);
         conversationRepo.save(conversation);
         personRepo.save(person);
-        }
     }
 
     /**

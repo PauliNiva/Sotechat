@@ -259,7 +259,7 @@ public class StateService {
         changeParticipantsState(channelId);
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
-        addPersonToConversation(session, channelId);
+        addPersonToConversation(session);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
@@ -305,7 +305,7 @@ public class StateService {
     private final void createConversation(String startMessage, String sender,
                                           HttpSession session)
                                             throws Exception{
-        Message message = new Message(sender, startMessage, new Date();
+        Message message = new Message(sender, startMessage, new Date());
         String channelId = get(session, "channelId");
         conversationService.addConversation(message, channelId);
         String category = get(session, "category");
@@ -323,7 +323,6 @@ public class StateService {
         String userId = get(session, "userId");
         String channelId = get(session, "channelId");
         conversationService.addPerson(userId, channelId);
-        );
     }
 
 }
