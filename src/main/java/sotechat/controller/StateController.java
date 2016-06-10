@@ -121,9 +121,9 @@ public class StateController {
     /** Hoitaja avaa jonosta chatin, JS-WebSocket subscribaa /queue/id/.
      *  (Tama metodi jostain syysta aktivoituu, vaikka kyseessa ei ole viesti.)
      *  Toimenpiteet mita tehdaan:
-     *  -> Poistetaan jonosta olio
-     *  -> Broadcastataan jonon uusi tila hoitajille
-     *  -> Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
+     *  - Poistetaan jonosta olio
+     *  - Broadcastataan jonon uusi tila hoitajille
+     *  - Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
      * @param channelId channelId
      * @param accessor accessor
      * @return Joko tyhja String "" tai JSON {"content":"channel activated."}
