@@ -164,15 +164,11 @@ public class HibernateConfig {
      * notaatiolla varustetut luokat Hibernaten käyttöön.
      *
      * @param dataSource Tietokantayhteyksistä huolehtiva olio
-     * @param env Ympäristömuuttuja, josta voidaan hakia sinne talletettuja
-     *            tietoja.
      * @return Palautetaan EntityManagerFactoryBean
      */
     @Bean
-   // @DependsOn("flyway")
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            final HikariDataSource dataSource,
-            final Environment env) {
+            final HikariDataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean =
                 new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
@@ -216,7 +212,6 @@ public class HibernateConfig {
      * @return
      */
     @Bean
-    //@DependsOn("flyway")
     JpaTransactionManager transactionManager(
             final EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
