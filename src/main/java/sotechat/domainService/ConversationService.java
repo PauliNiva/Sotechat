@@ -11,6 +11,8 @@ import sotechat.repo.PersonRepo;
 import java.util.Date;
 
 /**
+ * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
+ * (CRUD -operaatiot)
  * Created by varkoi on 8.6.2016.
  */
 @Service
@@ -32,16 +34,16 @@ public class ConversationService {
      * @param message Message luokan olio, jossa kayttajan lahettama viesti
      * @param channelId keskustelun kanavan id
      */
-    public boolean addConversation(Message message, String channelId)
+    public void addConversation(Message message, String channelId)
             throws Exception {
             Conversation conv = new Conversation(new Date(), channelId);
             conversationRepo.save(conv);
-            return addMessage(message, conv);
+            addMessage(message, conv);
     }
 
     /**
      * Lisää parametrina annettua kanavaid:tä vastaavaan keskusteluun Person
-     * luokan olion, joka haetaan repositoriosta parametrina annetun henkilön
+     * luokan olion, joka haetaan tietokannasta parametrina annetun henkilön
      * id:n perusteella. Henkilo lisataan Keskustelun henkiloihin ja keskustelu
      * lisataan henkilon keskusteluihin.
      * @param personId osallistuvan henkilon id
@@ -56,7 +58,7 @@ public class ConversationService {
     }
 
     /**
-     * Liittaa parametrina annettulla kanavaid:lla repositoriosta loytyvan
+     * Liittaa parametrina annettulla kanavaid:lla tietokannasta loytyvan
      * keskustelun kategoriaksi parametrina annetun aihealueen
      * @param category keskustelun aihealue
      * @param channelId keskustelun kanavan id
@@ -70,7 +72,7 @@ public class ConversationService {
 
     /**
      * Lisaa viestin keskusteluun, eli liittaa parametrina annetun Message
-     * -olion parametrina annetun kanavaid:n perusteella repositoriosta
+     * -olion parametrina annetun kanavaid:n perusteella tietokannasta
      * loytyvan Convertasion -olion listaan.
      * @param message Message luokan olio, jossa kayttajan lahettama viesti
      * @param ChannelId keskustelun kanavan id
@@ -98,11 +100,15 @@ public class ConversationService {
     }
 
     /**
-     * Liittaa Person luokan olion Conversation luokan olion listaan ja
-     * Conversation luokan olion Person luokan olion listaan.
-     * @param person 
-     * @param conversation
-     * @throws Exception
+     * Luo yhteyden keskustelun ja henkilon valille. Liittaa parametrina
+     * annetun Person luokan olion parametrina annetun Conversation luokan
+     * olion listaan ja parametrina annetun Conversation luokan olion
+     * parametrina annetun Person luokan olion listaan.
+     * @param person Person luokan olio, joka edustaa ammattilaista, joka on
+     *               ottanut keskustelun jonosta.
+     * @param conversation Conversation luokan olio ts. keskustelu johon
+     *                     henkilo liitetaan.
+     * @throws Exception NullPointerException
      */
     private void addConnection(Person person, Conversation conversation) throws Exception {
         conversation.addPersonToConversation(person);
@@ -112,6 +118,13 @@ public class ConversationService {
         }
     }
 
+    /**
+     * Poistaa keskustelun tietokannasta ts. poistaa parametrina annettua
+     * kanavaid:ta vastaavaa keskustelua edustavan Conversation luokan olion
+     * tietokannasta.
+     * @param channelId keskustelun kanavan id
+     * @throws Exception IllegalArgumentException
+     */
     public void delete(String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
