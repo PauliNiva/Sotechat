@@ -1,6 +1,7 @@
 package sotechat.domainService;
 
 import java.util.Date;
+import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class MessageService  {
     }
 
     @Transactional
-    public Message addMessage(Message message) {
+    public void addMessage(Message message) {
         messageRepo.save(message);
     }
 
@@ -38,6 +39,15 @@ public class MessageService  {
         conversationRepo.findOne(conversationId).getMessagesOfConversation()
                 .remove(message);
         messageRepo.delete(messageId);
+    }
+
+    public List<Message> messagesOfConversation(String channelId){
+        return messageRepo.findByConversation(channelId);
+    }
+
+    public void deleteMessagesOfConversation(String channelId){
+        List<Message> messages = messageRepo.findByConversation(channelId);
+        messageRepo.deleteInBatch(messages);
     }
 
     public void setMessageRepo(MessageRepo pMessageRepo) {

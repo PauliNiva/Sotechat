@@ -25,6 +25,7 @@ public class ConversationService {
     private PersonRepo personRepo;
 
     @Autowired
+    /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
     public ConversationService(ConversationRepo conversationRepo,
                                PersonRepo personRepo) {
         this.conversationRepo = conversationRepo;
