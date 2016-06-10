@@ -137,7 +137,8 @@ public class StateService {
 
     /**
      * Mappaa Http session sessionId:hen ja varmistaa, että sessionissa on
-     * asianmukaiset attribuutit. Palauttaa kyseisen Http session.
+     * asianmukaiset attribuutit päivittämällä niitä. Palauttaa parametrina
+     * annetun HttpServletRequestin Http session.
      * @param print Viesti joka printataan session id:n yhteydessä. Ilmaisee
      *              onko tilapyyntö asiakkaalta vai ammattilaiselta.
      * @param req HttpServletRequest, josta saadaan session tiedot
@@ -308,7 +309,7 @@ public class StateService {
         String channelId = get(session, "channelId");
         conversationService.addConversation(message, channelId);
         String category = get(session, "category");
-        conversationService.addCategory(category, channelId);
+        conversationService.setCategory(category, channelId);
     }
 
     /**
