@@ -15,8 +15,12 @@ import java.util.List;
 @Service
 public class PersonService {
 
-    @Autowired
     private PersonRepo personRepo;
+
+    @Autowired
+    public PersonService(PersonRepo personRepo){
+        this.personRepo = personRepo;
+    }
 
     public boolean addPerson(Person person, String password){
         try {
@@ -53,7 +57,7 @@ public class PersonService {
 
     public boolean changeScreenName(String personId, String newName){
         try {
-            Person person = personRepo(personId);
+            Person person = personRepo.findOne(personId);
             person.setScreenName(newName);
             personRepo.save(person);
             return true;
