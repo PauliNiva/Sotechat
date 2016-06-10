@@ -99,6 +99,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>2.4.6</version>
         </dependency>
         <!-- PostgreSQL -->
         <dependency>
@@ -205,7 +206,6 @@
             <artifactId>javax.interceptor-api</artifactId>
             <version>1.2</version>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -246,7 +246,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
