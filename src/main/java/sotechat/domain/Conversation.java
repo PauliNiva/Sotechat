@@ -34,6 +34,13 @@ public class Conversation extends AbstractPersistable<String> {
         messagesOfConversation = new ArrayList<>();
     }
 
+    public Conversation(Date date, String channelId) {
+
+        this.date = date;
+        this.channelId = channelId;
+        messagesOfConversation = new ArrayList<>();
+    }
+
     public final Date getDate() {
         return this.date;
     }

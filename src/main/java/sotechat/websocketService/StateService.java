@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
 import sotechat.data.ChatLogger;
+import sotechat.domain.Message;
 import sotechat.domainService.ConversationService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 import static sotechat.util.Utils.get;
@@ -149,7 +151,7 @@ public class StateService {
      */
     public final synchronized String respondToJoinPoolRequest(
             final HttpServletRequest request
-            ) throws IOException {
+            ) throws Exception {
 
         HttpSession session = request.getSession();
         /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
@@ -199,6 +201,9 @@ public class StateService {
         String category = get(session, "category");
         queueService.addToQueue(channelId, category, username);
         session.setAttribute("state", "queue");
+
+        /** Luodaan tietokantaan uusi keskustelu */
+        createConversation(startMessage, username, channelId, session);
 
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
          * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
@@ -252,12 +257,20 @@ public class StateService {
         return "{\"content\":\"channel activated.\"}";
     }
 
+    private final void createConversation(String startMessage,
+                                          String sender, String channelId,
+                                            HttpSession session)
+                                            throws Exception{
+        Message message = new Message(sender, startMessage, new Date();
+        conversationService.addConversation(message, channelId);
+        String category = get(session, "category");
+        conversationService.addCategory(category, channelId);
+    }
+
     private final void addPersonToConversation(HttpSession session,
                                           String channelId) throws Exception {
         String userId = get(session, "userId");
-        String category = get(session, "category");
         conversationService.addPerson(userId, channelId);
-        conversationService.addCategory(category, channelId
         );
     }
 

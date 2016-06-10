@@ -9,6 +9,8 @@ import sotechat.domain.Message;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.data.Mapper;
+import sotechat.domainService.ConversationService;
+import sotechat.domainService.MessageService;
 
 import java.util.Date;
 
@@ -95,7 +97,8 @@ public class ChatMessageService {
         return msg;
     }
 
-    private final boolean validUserId(String userId, SimpMessageHeaderAccessor accessor){
+    private final boolean validUserId(String userId,
+                                      SimpMessageHeaderAccessor accessor){
         if (!mapper.isUserIdMapped(userId)) {
             /** Kelvoton ID, hylataan viesti. */
             return false;

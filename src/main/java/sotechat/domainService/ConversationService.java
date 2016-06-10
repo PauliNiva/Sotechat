@@ -22,7 +22,18 @@ public class ConversationService {
     @Autowired
     private PersonRepo personRepo;
 
-    public boolean addPerson(String personId, String channelId)
+
+    public boolean addConversation(Message message, String channelId) {
+        try {
+            Conversation conv = new Conversation(new Date(), channelId);
+            conversationRepo.save(conv);
+            return addMessage(message, conv);
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    public void addPerson(String personId, String channelId)
             throws Exception {
                 Conversation conv = conversationRepo.findOne(channelId);
                 Person person = personRepo.findOne(personId);
@@ -32,28 +43,13 @@ public class ConversationService {
     public void addCategory(String category, String channelId) throws Exception {
             Conversation conv = conversationRepo.findOne(channelId);
             conv.setCategory(category);
+            conversationRepo.save(conv);
     }
 
     public boolean addMessage(Message message, String ChannelId)
             throws Exception {
-        if(conversationRepo.exists(ChannelId)) {
             Conversation conv = conversationRepo.findOne(ChannelId);
             return addMessage(message, conv);
-        }else {
-            return addConversation(message, ChannelId);
-        }
-    }
-
-    private boolean addConversation(Message message, String channelId) {
-        try {
-            Conversation conv = new Conversation();
-            conv.setDate(new Date());
-            conv.setChannelId(channelId);
-//            conv.setCategory(category); //TODO
-            return addMessage(message, conv);
-        }catch(Exception e){
-            return false;
-        }
     }
 
     private boolean addMessage(Message message, Conversation conv){
@@ -75,6 +71,6 @@ public class ConversationService {
     }
 
     public void delete(String channelId) throws Exception {
-            conversationRepo.delete(channelId);
+        conversationRepo.delete(channelId);
     }
 }
