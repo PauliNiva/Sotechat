@@ -2,6 +2,7 @@ package sotechat.domainService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
@@ -22,6 +23,7 @@ public class PersonService {
         this.personRepo = personRepo;
     }
 
+    @Transactional
     public boolean addPerson(Person person, String password){
         try {
             person.setPassword(password);
@@ -40,10 +42,12 @@ public class PersonService {
         return personRepo.findAll();
     }
 
+    @Transactional
     public void delete(String personId) throws Exception {
         personRepo.delete(personId);
     }
 
+    @Transactional
     public boolean changePassword(String personId, String password){
         try {
             Person person = personRepo.findOne(personId);
@@ -55,6 +59,7 @@ public class PersonService {
         }
     }
 
+    @Transactional
     public boolean changeScreenName(String personId, String newName){
         try {
             Person person = personRepo.findOne(personId);
@@ -64,5 +69,18 @@ public class PersonService {
         }catch(Exception e){
             return false;
         }
+    }
+
+    /**
+     * Palauttaa listan kaikista henkilon keskusteluista, eli listan
+     * Conversation oliota, jotka on liitetty parametrina annettua henkilon
+     * id:ta vastaavaan Person olioon
+     * @param personId henkikon id
+     * @return lista henkilon keskusteluista Conversation olioina
+     * @throws Exception IllegalArgumentException
+     */
+    public List<Conversation> personsConversations(String personId)
+            throws Exception {
+        personRepo.findOne(personId).getConversationsOfPerson();
     }
 }

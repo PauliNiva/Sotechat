@@ -150,6 +150,7 @@ public class ChatMessageService {
                                      Date time, String channelId)
                                      throws Exception {
         Message message = new Message(username, content, time);
+        message.setChannelId(channelId);
         messageService.addMessage(message);
         conversationService.addMessage(message, channelId);
     }

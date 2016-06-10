@@ -45,6 +45,12 @@ public class MessageService  {
         return messageRepo.findByConversation(channelId);
     }
 
+    public void removeConversation(String channelId){
+        List<Message> messages= messageRepo.findByConversation(channelId);
+        messageRepo.deleteInBatch(messages);
+    }
+
+    @Transactional
     public void deleteMessagesOfConversation(String channelId){
         List<Message> messages = messageRepo.findByConversation(channelId);
         messageRepo.deleteInBatch(messages);
