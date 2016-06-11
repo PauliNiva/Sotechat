@@ -226,6 +226,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <maxAttempts>60</maxAttempts>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
