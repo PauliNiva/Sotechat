@@ -1,19 +1,18 @@
 package sotechatIT;
 
-import io.github.bonigarcia.wdm.*;
-import io.github.bonigarcia.wdm.Architecture;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.MarionetteDriver;
-import static org.openqa.selenium.remote.DesiredCapabilities.*;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
+import com.github.webdriverextensions.junitrunner.annotations.*;
+
+
 import org.openqa.selenium.support.ui.*;
 
 
@@ -23,6 +22,8 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a user, I want to join the queue to wait my turn
  */
+@RunWith(WebDriverRunner.class)
+@Chrome
 public class joiningQueueIT {
 
     private WebDriver driver;
@@ -30,14 +31,15 @@ public class joiningQueueIT {
     private WebDriverWait wait;
     private WebDriverWait proWait;
 
+
     @BeforeClass
     public static void setupClass() {
-        ChromeDriverManager.getInstance().setup();
+
     }
 
     @Before
     public void setUp() throws Exception {
-       driver = new ChromeDriver();
+        driver = new ChromeDriver();
         proDriver = new ChromeDriver();
         wait = new WebDriverWait(driver, 7);
         proWait = new WebDriverWait(proDriver, 7);

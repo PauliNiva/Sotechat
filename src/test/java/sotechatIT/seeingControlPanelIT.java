@@ -1,9 +1,13 @@
 package sotechatIT;
 
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
+import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
@@ -14,6 +18,8 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a professional, I want to see control panel
  */
+@RunWith(WebDriverRunner.class)
+@Chrome
 public class seeingControlPanelIT {
 
     private WebDriver proDriver;
@@ -21,7 +27,7 @@ public class seeingControlPanelIT {
 
     @Before
     public void setUp() throws Exception {
-        proDriver = new FirefoxDriver();
+        proDriver = new ChromeDriver();
         proWait = new WebDriverWait(proDriver, 7);
         proDriver.get(PROADDRES);
     }
