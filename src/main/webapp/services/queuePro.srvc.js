@@ -1,67 +1,106 @@
+/** Palvelu huolehtii ammattilaiselle näkyvän jonon ylläpitämisestä
+ *  Sekä säilömisestä
+ */
 angular.module('chatApp')
     .factory('queueProService', [function () {
+        /** Alustetaan taulukot jonolle ja kategorioille */
         var queue = [];
-        var categorys = [];
-        categorys.push('Kaikki');
+        var categories = [];
         var length = 0;
 
+        /**
+         * Palauttaa jonon ensimmäisen kanavanId:n
+         * Jos jono tyhjä niin palauttaa null
+         * @returns {*}
+         */
         var getFirstChannelID = function () {
             if (queue.length > 0) {
                 return queue[0].channelID;
             }
             return null;
-        }
-        
+        };
+
+        /**
+         * Hakee jonosta haluttua kategoriaa vastaavat alkiot
+         * @param category kategoria joka halutaan palautettavaksi
+         * @returns {Array} Alkiot jotka kuuluvat kategoriaan.
+         * Jos kategoria tyhjä niin palautetaan koko jono
+         */
+        var makeQueueByCategory = function (category) {
+            if (category === "") return queue;
+            var subQueue = [];
+            for (var i = 0; i < categories.length; i++) {
+                if (queue[i].category === category) subQueue.push(queue[i]);
+            }
+            return subQueue;
+        };
+
+        /**
+         * Tarkastaa onko annettu kanavaID jonossa
+         * @param channelID KanavaID jonka tilanne tahdotaan tarkastaa
+         * @returns {*} palautetaan sama kanavaID jos löydetty muuten null
+         */
         var checkChannelID = function (channelID) {
-            for(var i=0; i < queue.length; i++) {
-                console.log(queue[i].channelID);
-                console.log(channelID);
-                console.log(queue[i].channelID === channelID);
-                if(queue[i].channelID === channelID) return queue[i].channelID;
+            for (var i = 0; i < queue.length; i++) {
+                if (queue[i].channelID === channelID) return queue[i].channelID;
             }
             return null;
         };
 
-        var addCategory = function(category) {
+        /**
+         * Lisätään kategoria taulukkoon, jos se ei jo ennestään sisällä sitä
+         * @param category kategorian nimi joka tahdotaan lisätä
+         */
+        var addCategory = function (category) {
             var boolean = true;
-            for(var i=0; i < categorys.length; i++) {
-                if(categorys[i] === category) boolean=  false;
+            for (var i = 0; i < categories.length; i++) {
+                if (categories[i] === category) boolean = false;
             }
             if (boolean) {
-                categorys.push(category);
+                categories.push(category);
             }
-        }
+        };
 
-        var addToQueue = function (key) {
+        /**
+         * Lisää jono taulukkoon annetun jono objectin
+         * kun se on alustettu
+         * @param object lisättävä jono objekti
+         */
+        var addToQueue = function (object) {
             var queueObject = [];
-            queueObject.username = key.username;
-            queueObject.channelID = key.channelId;
-            queueObject.category = key.category;
+            queueObject.username = object.username;
+            queueObject.channelID = object.channelId;
+            queueObject.category = object.category;
             addCategory(queueObject.category);
             queue.push(queueObject);
             length++;
         };
 
+        /**
+         * Palauttaa jonon pituuden
+         * @returns {number} jonon pituus
+         */
         var getLength = function () {
             return length;
         };
 
+        /** Tyhjentää jonon ja kategoriat kokonaan */
         var clear = function () {
             queue.length = 0;
-            categorys.length = 0;
-            categorys.push('Kaikki');
-            console.log(categorys);
+            categories.length = 0;
             length = 0;
         };
 
         var queueService = {
             getFirstChannelID: getFirstChannelID,
-            checkChannelID:checkChannelID,
+            checkChannelID: checkChannelID,
             addToQueue: addToQueue,
+            makeQueueByCategory: makeQueueByCategory,
             clear: clear,
             queue: queue,
-            categorys:categorys,
+            categories: categories,
             getLength: getLength
         };
+
         return queueService;
     }]);

@@ -14,7 +14,6 @@ angular.module('chatApp')
 
         $interval(postHeartBeat, msFreq);
 
-        var heartBeat = {
-        };
+        var heartBeat = {};
         return heartBeat;
     }]);

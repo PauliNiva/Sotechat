@@ -8,12 +8,13 @@
                     class="btn btn-primary queueButton"
                     name="next">Seuraava jonosta
             </button>
-            <select class="form-control proQueueDrop pull-right">
-                <option class="proQueueDropOption" value="{{category}}" ng-repeat="category in categorys">{{category}}</option>
+            <select class="form-control proQueueDrop pull-right" ng-model="selectedCategory" ng-change="selectedItemChanged()">
+                <option class="proQueueDropOption" value="">Kaikki</option>
+                <option class="proQueueDropOption" ng-repeat="category in categories">{{category}}</option>
             </select>
         </div>
         <div class="row">
-            <div class="panel-group queueGroup" id="accordion" ng-repeat="queueObject in queue  | limitTo: 10">
+            <div class="panel-group queueGroup" id="accordion" ng-repeat="queueObject in queue">
                 <div ng-include="'queue/queueProBlock.tpl.html'"></div>
             </div>
         </div>

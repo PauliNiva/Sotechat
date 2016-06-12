@@ -1,22 +1,29 @@
+/** Controlelri huolehtii ammattilaisen näkymän välilehtien hallinnasta
+ * Seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin
+ */
 angular.module('chatApp')
-    .controller('proCPController', ['$scope','$timeout', 'connectToServer', 'proStateService', 'queueProService', 'heartBeatService',
-        function ($scope, $timeout, connectToServer, proStateService, queueProService) {
+    .controller('proCPController', ['$scope','$timeout', 'connectToServer', 'proStateService', 'heartBeatService',
+        function ($scope, $timeout, connectToServer, proStateService) {
+            /** Alustetaan muuttuja */
             var tabCount = 0;
             $scope.pro = true;
             $scope.chats = [];
-            $scope.active=tabCount+1;
+            $scope.activeChatTab=tabCount+1;
 
+            /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
             var initQueue = function () {
                 $scope.$broadcast('connectedToQueue');
             };
 
+            /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
             $scope.addChatTab = function (channelID) {
                 $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
                 $timeout(function(){
-                    $scope.active=tabCount-1;
+                    $scope.activeChatTab=tabCount-1;
                 });
             };
 
+            /** Avaa kaikki amamttilaisen avoimet välilehdet */
             var updateChannels = function () {
                 tabCount = 1;
                 $scope.chats = [];
@@ -25,23 +32,24 @@ angular.module('chatApp')
                     tabCount++;
                 });
             };
-
+            
+            /** Kun yhteys serveriin on muodostettu alustetaan siitä riippuvat */
             var answer = function () {
                 initQueue();
                 $scope.username = proStateService.getUsername();
                 updateChannels();
             };
-
-            var init = function () {
-                connectToServer.connect(answer);
-            };
-
+            
+            /** Päivittää ammattilaisen tiedot serveriltä
+             *  Ja aloittaa alustuksen haun valmistuttua 
+             */
             $scope.updateProStatus = function() {
                 proStateService.getVariablesFormServer().then(function (response) {
                     proStateService.setAllVariables(response);
-                    init();
+                    connectToServer.connect(answer);
                 });
             };
             
+            /** Pyytää alustusta kun kontrolleri ladataan */
             $scope.updateProStatus();
         }]);
