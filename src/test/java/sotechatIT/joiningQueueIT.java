@@ -1,10 +1,18 @@
 package sotechatIT;
 
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
+import com.github.webdriverextensions.junitrunner.annotations.*;
+
+
 import org.openqa.selenium.support.ui.*;
 
 
@@ -14,6 +22,8 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a user, I want to join the queue to wait my turn
  */
+@RunWith(WebDriverRunner.class)
+@Chrome
 public class joiningQueueIT {
 
     private WebDriver driver;
@@ -21,10 +31,16 @@ public class joiningQueueIT {
     private WebDriverWait wait;
     private WebDriverWait proWait;
 
+
+    @BeforeClass
+    public static void setupClass() {
+
+    }
+
     @Before
     public void setUp() throws Exception {
-        driver = new FirefoxDriver();
-        proDriver = new FirefoxDriver();
+        driver = new ChromeDriver();
+        proDriver = new ChromeDriver();
         wait = new WebDriverWait(driver, 7);
         proWait = new WebDriverWait(proDriver, 7);
         driver.get(CUSTOMERADDRES);
@@ -34,8 +50,8 @@ public class joiningQueueIT {
 
     @After
     public void tearDown() throws Exception {
-        driver.close();
-        proDriver.close();
+        driver.quit();
+        proDriver.quit();
     }
 
     /**

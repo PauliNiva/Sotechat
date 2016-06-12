@@ -85,7 +85,7 @@ public class SubscribeEventListener
         MessageHeaders headers = event.getMessage().getHeaders();
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
-                .get("SPRING.SESSION.ID").toString();
+                .get("SPRING.SESSION.ID").toString(); //TODO: Handle NULLPointter, palauta clientille jotain?
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
         HttpSession session = sessionRepo.getHttpSession(sessionId);

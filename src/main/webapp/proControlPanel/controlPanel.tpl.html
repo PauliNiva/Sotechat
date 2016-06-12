@@ -1,4 +1,4 @@
-<div class="col-lg-3 col-md-3">
+<div class="col-lg-3 col-md-3 col-sm-3 pro-left">
     <div class="row" style="margin-top: 4px">
         <div class="form-group" style=" margin-bottom: 0px">
             <span class="username-title">{{username}}</span>
@@ -19,10 +19,10 @@
     <div class="row" style="margin-top: 4px" ng-include="'queue/queueProCP.tpl.html'"></div>
 </div>
 </div>
-<div class="col-lg-9 col-md-9 chat-container">
+<div class="col-lg-9 col-md-9 col-sm-9 chat-container">
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
-            <uib-tabset active="active">
+            <uib-tabset active="activeChatTab">
                 <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" classes="chat-container">
                     <div class="col-lg-9 col-md-9 proContainer">
                         <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>

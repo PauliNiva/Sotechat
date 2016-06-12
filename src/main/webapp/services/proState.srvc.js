@@ -1,16 +1,18 @@
+/** Palvelu säilöö ammattilaisen tilatiedot
+ *  Sekä kanavat missä ammattilainen on keskustelemassa
+ */
 angular.module('chatApp')
     .factory('proStateService', ['$http', function ($http) {
+        /** Serverin mappaukset */
         var PROSTATEURL = '/proState';
+        /** Esitellään parametrit */
         var channelIDs = [];
         var username;
         var userID;
         var online;
         var qbcc;
 
-        function addChannelID(value) {
-            channelIDs.push(value);
-        };
-
+        /** Getterit ja setterit */
         function setUsername(value) {
             username = value;
         };
@@ -47,14 +49,26 @@ angular.module('chatApp')
             return userID;
         };
 
+        /**
+         * Asettaa ammattilaisen avonaiset kanavat halutuiksi
+         * @param values lista avonaisista kanavista
+         */
         function addAllChannels(values) {
             channelIDs = JSON.parse(values);
         };
 
+        /**
+         * Hakee palvelimelta ammattilaisen tilatiedoit
+         * @returns {HttpPromise}
+         */
         function getVariablesFormServer() {
             return $http.get(PROSTATEURL);
         };
 
+        /**
+         * Alustaa tilatiedot annettun vastauksen mukaan
+         * @param response HTTP vastaus joka sisältää tilatiedot
+         */
         function setAllVariables(response) {
             setUsername(response.data.username);
             addAllChannels(response.data.channelIds);

@@ -36,11 +36,7 @@ describe("ChatController", function() {
     it('Messages empty at te begining', function() {
         expect(scope.messages).toEqual([]);
     });
-
-    it('User chatController pro varianle is false', function() {
-        expect(scope.pro).toEqual(false);
-    });
-
+    
     it("Can't sent empty message", function() {
         scope.message = "";
         scope.sendMessage();
