@@ -40,8 +40,8 @@ public class viewingChatMessagesIT {
 
     @After
     public void tearDown() throws Exception {
-        driver.close();
-        proDriver.close();
+        driver.quit();
+        proDriver.quit();
     }
 
     /**

@@ -35,7 +35,7 @@ public class seeingControlPanelIT {
 
     @After
     public void tearDown() throws Exception {
-        proDriver.close();
+        proDriver.quit();
     }
 
     /**

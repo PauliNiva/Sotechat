@@ -40,8 +40,8 @@ public class receivingMessagesIT {
 
     @After
     public void tearDown() throws Exception {
-        driver.close();
-        proDriver.close();
+        driver.quit();
+        proDriver.quit();
     }
 
     /**
