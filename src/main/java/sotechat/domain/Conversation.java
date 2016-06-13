@@ -14,21 +14,32 @@ import org.springframework.format.annotation.DateTimeFormat;
  * Luokka
  */
 @Entity
-public class Conversation extends AbstractPersistable<Long> {
+public class Conversation {
+    @Id
+    private String channelId;
 
     @NotNull
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Date date;
+    private String category;
 
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "conversation")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
     public Conversation() {
-        messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
+    }
+
+    public Conversation(Date date, String channelId) {
+        this.date = date;
+        this.channelId = channelId;
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
     }
 
     public final Date getDate() {
@@ -63,5 +74,21 @@ public class Conversation extends AbstractPersistable<Long> {
 
     public final void addMessageToConversation(final Message pMessage) {
         messagesOfConversation.add(pMessage);
+    }
+
+    public final String getCategory() {
+        return category;
+    }
+
+    public final void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }

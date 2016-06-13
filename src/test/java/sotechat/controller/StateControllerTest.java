@@ -12,7 +12,6 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,16 +21,23 @@ import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
 import sotechat.data.*;
 import sotechat.data.QueueImpl;
-import sotechat.util.TestPrincipal;
-import sotechat.websocketService.QueueService;
-import sotechat.websocketService.StateService;
-
-import javax.annotation.Resource;
-
-import java.security.Principal;
+import sotechat.domain.Conversation;
+import sotechat.domainService.ConversationService;
+import sotechat.domainService.MessageService;
+import sotechat.domainService.PersonService;
+import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
+import sotechat.repo.PersonRepo;
+import sotechat.service.DatabaseService;
+import sotechat.util.MockPrincipal;
+import sotechat.service.QueueService;
+import sotechat.service.StateService;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -53,14 +59,20 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-     //   mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-       //         .addFilter(springSecurityFilterChain)
-         //       .build();
         ChatLogger chatLogger = new ChatLogger();
         Mapper mapper = new MapperImpl();
         SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
         SessionRepo sessions = new SessionRepoImpl(mapper);
+        ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
+        MessageRepo mockMessageRepo = mock(MessageRepo.class);
+        when(mockConversationRepo.findOne(any(String.class)))
+                .thenReturn(new Conversation());
+        PersonRepo mockPersonRepo = mock(PersonRepo.class);
+        ConversationService conversationService = new ConversationService(
+                mockConversationRepo, mockPersonRepo);
+        PersonService personService = new PersonService(mockPersonRepo);
+        MessageService messageService = new MessageService(mockMessageRepo);
         SimpMessagingTemplate broker = new SimpMessagingTemplate(
                 new MessageChannel() {
             @Override
@@ -76,11 +88,19 @@ public class StateControllerTest {
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
         ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
                 chatLogger, broker);
+        DatabaseService databaseService = new DatabaseService(personService,
+                                            conversationService,
+                                            messageService);
         StateService state = new StateService(
-                mapper, listener, qService, chatLogger, sessions);
+                mapper,
+                listener,
+                qService,
+                chatLogger,
+                sessions,
+                databaseService);
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
-                        state, broadcaster, logBroadcaster))
+                        state, broadcaster, logBroadcaster, conversationService))
                 .build();
     }
 
@@ -113,7 +133,7 @@ public class StateControllerTest {
     public void testGetProStatReturnsOK() throws Exception {
          mvc.perform(MockMvcRequestBuilders
                 .get("/proState").accept(MediaType.APPLICATION_JSON)
-                    .principal(new TestPrincipal("hoitaja")))
+                    .principal(new MockPrincipal("hoitaja")))
                 .andExpect(status().isOk());
     }
 
@@ -122,7 +142,7 @@ public class StateControllerTest {
         mvc.perform(MockMvcRequestBuilders
                     .get("/proState")
                     .accept(MediaType.APPLICATION_JSON)
-                        .principal(new TestPrincipal("hoitaja")))
+                        .principal(new MockPrincipal("hoitaja")))
                 .andExpect(jsonPath("$.*", hasSize(6)))
                 .andExpect(jsonPath("$.state").isNotEmpty())
                 .andExpect(jsonPath("$.username").isNotEmpty())
