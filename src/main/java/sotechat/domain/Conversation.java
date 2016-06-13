@@ -92,27 +92,50 @@ public class Conversation {
         return this.messagesOfConversation;
     }
 
-
+    /**
+     * Lisaa parametrina annetun henkilon keskusteluun
+     * @param pPerson Person olio, joka halutaan liittaa keskusteluun
+     */
     public final void addPersonToConversation(final Person pPerson) {
         participantsOfConversation.add(pPerson);
     }
 
+    /**
+     * Lisaa parametrina annetun viestin keskusteluun
+     * @param pMessage Message olio, joka halutaan liittaa keskusteluun
+     */
     public final void addMessageToConversation(final Message pMessage) {
         messagesOfConversation.add(pMessage);
     }
 
+    /**
+     * Palauttaa keskustelun aihealueen
+     * @return keskustelun aihealue
+     */
     public final String getCategory() {
         return category;
     }
 
+    /**
+     * Asettaa keskustelun aihealueeksi parametrina annetun aihealueen
+     * @param category
+     */
     public final void setCategory(String category) {
         this.category = category;
     }
 
+    /**
+     * Palauttaa keskustelun kanavaid:n
+     * @return
+     */
     public String getChannelId() {
         return channelId;
     }
 
+    /**
+     * Asettaa keskustelun kanavaid:ksi parametrina annetun kanavaid:n
+     * @param channelId kanavaid
+     */
     public void setChannelId(String channelId) {
         this.channelId = channelId;
     }
