@@ -4,17 +4,13 @@ import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
 
 import java.util.ArrayList;
-
-import static org.junit.Assert.*;
+import java.util.List;
 import static sotechatIT.sotechatITCommands.*;
 
 /**
@@ -24,20 +20,28 @@ import static sotechatIT.sotechatITCommands.*;
 @Chrome
 public class zproHandlesManyUsersIT {
 
-    private WebDriver proDriver;
+    private static final int MAX_CUSTOMERS = 10;
+    private DriverHandler handler;
     private WebDriverWait proWait;
+    private List<WebDriver> customers;
 
     @Before
     public void setUp() throws Exception {
-        proDriver = new ChromeDriver();
-        proWait = new WebDriverWait(proDriver, 7);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("pro");
+        handler.HttpGet("pro", PROADDRESS);
+
+        /** Load max webdrivers representing customers. */
+        customers = new ArrayList<>(MAX_CUSTOMERS);
+        for (int i = 0; i < MAX_CUSTOMERS; i++) {
+            String username = "user" + i;
+            customers.add(handler.addDriver(username));
+        }
     }
 
 
     @After
     public void tearDown() throws Exception {
-       // proDriver.close();
+        handler.closeAll();
     }
 
     /**
@@ -46,33 +50,29 @@ public class zproHandlesManyUsersIT {
      */
     
     public void KillerTest() {
-        ArrayList<WebDriver> hyrr = new ArrayList<>();
-        int max = 5;
-        for (int i = 0; i < max; i++) {
-            hyrr.add(new FirefoxDriver());
-        }
 
-        for (WebDriver driver : hyrr) {
-            driver.get(CUSTOMERADDRES);
-            WebDriverWait wait = new WebDriverWait(driver, 4);
+        /** All customers join the queue. */
+        for (WebDriver customer : customers) {
+            customer.get(CUSTOMERADDRESS);
+            WebDriverWait wait = new WebDriverWait(customer, 4);
             waitAndFillInformation(wait);
         }
+
+        /** Pro logs in and for each customer: polls from queue, sends msg. */
+        proWait = handler.getWaitDriver("pro");
         proLogin(proWait);
-        for (int i = 0; i < max; i++) {
+        for (int i = 0; i < MAX_CUSTOMERS; i++) {
             waitAndPickFromQueue(proWait);
             sendMessageChatWindow(proWait, "Buhahaha");
         }
 
-        for (WebDriver driver : hyrr) {
-            WebDriverWait wait = new WebDriverWait(driver, 4);
-            for (int i = 0; i < max; i++) {
+        /** Customers send many messages. */
+        for (WebDriver customer : customers) {
+            customer.get(CUSTOMERADDRESS);
+            WebDriverWait wait = new WebDriverWait(customer, 4);
+            for (int i = 0; i < MAX_CUSTOMERS; i++) {
                 sendMessageChatWindow(wait, "Oletko okei");
             }
-        }
-
-
-        for (WebDriver driver : hyrr) {
-            driver.close();
         }
 
     }

@@ -7,8 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
 
@@ -22,20 +20,19 @@ import static sotechatIT.sotechatITCommands.*;
 @Chrome
 public class seeingControlPanelIT {
 
-    private WebDriver proDriver;
+    private DriverHandler handler;
     private WebDriverWait proWait;
 
     @Before
     public void setUp() throws Exception {
-        proDriver = new ChromeDriver();
-        proWait = new WebDriverWait(proDriver, 7);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("pro");
+        handler.HttpGet("pro", PROADDRESS);
+        proWait = handler.getWaitDriver("pro");
     }
-
 
     @After
     public void tearDown() throws Exception {
-        proDriver.quit();
+        handler.closeAll();
     }
 
     /**

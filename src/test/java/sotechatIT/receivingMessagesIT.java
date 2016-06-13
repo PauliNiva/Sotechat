@@ -6,9 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
 
@@ -22,26 +19,23 @@ import static sotechatIT.sotechatITCommands.*;
 @Chrome
 public class receivingMessagesIT {
 
-    private WebDriver driver;
-    private WebDriver proDriver;
-    private WebDriverWait wait;
+    private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
 
     @Before
     public void setUp() throws Exception {
-        driver = new ChromeDriver();
-        proDriver = new ChromeDriver();
-        wait = new WebDriverWait(driver, 7);
-        proWait = new WebDriverWait(proDriver, 7);
-        driver.get(CUSTOMERADDRES);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("user", "pro");
+        handler.HttpGet("user", CUSTOMERADDRESS);
+        handler.HttpGet("pro", PROADDRESS);
+        userWait = handler.getWaitDriver("user");
+        proWait = handler.getWaitDriver("pro");
     }
 
 
     @After
     public void tearDown() throws Exception {
-        driver.quit();
-        proDriver.quit();
+        handler.closeAll();
     }
 
     /**
@@ -50,8 +44,8 @@ public class receivingMessagesIT {
     @Test
     public void UserSeesOtherPeopleMessages() {
         // User has accessed queue
-        waitAndFillInformation(wait);
-        waitQueueWindowsAppear(wait);
+        waitAndFillInformation(userWait);
+        waitQueueWindowsAppear(userWait);
 
         // Professional has logged in & next in line button
         proLogin(proWait);
@@ -60,7 +54,7 @@ public class receivingMessagesIT {
         sendMessageChatWindow(proWait,"Can you see this message?");
 
         // User can view it in the chat window
-        assertTrue(waitForTextToAppear(wait,"Can you see this message?"));
+        assertTrue(waitForTextToAppear(userWait,"Can you see this message?"));
     }
 
 
