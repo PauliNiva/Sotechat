@@ -37,30 +37,65 @@ public class MessageService  {
         messageRepo.save(message);
     }
 
+    /**
+     * Hakee parametrina annettua id:ta vastaavan viestin tietokannasta
+     * @param messageId viestin id
+     * @return Message olio joka vastaa etsittya viestia
+     * @throws Exception IllegalArgumentException
+     */
     @Transactional
     public Message getMessage(Long messageId) throws Exception {
         return messageRepo.findOne(messageId);
     }
 
+    /**
+     * Poistaa parametrina annettua id:ta vastaavan viestin tietokannasta
+     * @param messageId viestin id
+     * @throws Exception IllegalArgumentException
+     */
     @Transactional
     public void removeMessage(Long messageId) throws Exception {
         messageRepo.delete(messageId);
     }
 
+    /**
+     * Palauttaa listan parametrina annettua id:ta vastaavan keskustelun
+     * viesteista
+     * @param channelId keskustelun kanavaid
+     * @return Lista Message oliota, jotka liittyvat haettuun Conversation olioon
+     * @throws Exception
+     */
+    @Transactional
     public List<Message> messagesOfConversation(String channelId) throws Exception {
         return messageRepo.findByConversation(channelId);
     }
 
+    /**
+     * Poistaa tietokannasta kaikki keskustelun viestit ts.kanavaid:hen
+     * liitetyt Message oliot
+     * @param channelId kanavan id
+     * @throws Exception
+     */
     @Transactional
     public void removeConversation(String channelId) throws Exception {
         List<Message> messages= messageRepo.findByConversation(channelId);
         messageRepo.deleteInBatch(messages);
     }
 
+    /**
+     * Asettaa MessageServicen repositorioksi parametrina annetun repositorion
+     * @param pMessageRepo
+     * @throws Exception
+     */
     public void setMessageRepo(MessageRepo pMessageRepo) throws Exception {
         this.messageRepo = pMessageRepo;
     }
 
+    /**
+     * Palauttaa MessageServicen repositorion
+     * @return MessageServiceen liitetty repositorio
+     * @throws Exception
+     */
     public MessageRepo getMessageRepo() throws Exception {
         return this.messageRepo;
     }
