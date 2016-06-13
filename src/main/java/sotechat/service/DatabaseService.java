@@ -51,6 +51,7 @@ public class DatabaseService {
         message.setChannelId(channelId);
         conversationService.addConversation(message, channelId);
         conversationService.setCategory(category, channelId);
+        messageService.addMessage(message);
     }
 
     /**

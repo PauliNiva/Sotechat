@@ -44,19 +44,40 @@ public class PersonService {
             personRepo.save(person);
     }
 
+    /**
+     * Palauttaa listan kaikista tietokannan henkiloista.
+     * @return lista Person olioista, jotka on tallennettu tietokantaan
+     */
     public List<Person> findAll(){
         return personRepo.findAll();
     }
 
+    /**
+     * Poistaa tietokannasta parametrina annettua id:ta vastaavan henkilon
+     * @param personId henkilon tunnus
+     * @throws Exception IllegalArgumentException
+     */
     @Transactional
     public void delete(String personId) throws Exception {
         personRepo.delete(personId);
     }
 
+    /**
+     * Palauttaa parametrina annettua tunnusta vastaavan Person -olion
+     * @param personId henkilon tunnus
+     * @return tunnusta vastaava henkilo (Person olio)
+     * @throws Exception IllegalArgumentException
+     */
     public Person getPerson(String personId) throws Exception {
         return personRepo.findOne(personId);
     }
 
+    /**
+     *
+     * @param personId
+     * @param password
+     * @return
+     */
     @Transactional
     public boolean changePassword(String personId, String password) {
         try {
