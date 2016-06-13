@@ -5,9 +5,11 @@ import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -30,6 +32,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepoImpl;
+import sotechat.domain.Conversation;
+import sotechat.domain.Person;
+import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
+import sotechat.repo.PersonRepo;
 import sotechat.util.MsgUtil;
 import sotechat.util.MockChannelInterceptor;
 import sotechat.util.MockPrincipal;
@@ -41,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -49,13 +57,20 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
         StateControllerQueueTest.TestWebSocketConfig.class,
-        StateControllerQueueTest.TestConfig.class
+        StateControllerQueueTest.TestConfig.class,
+        StateControllerQueueTest.TestRepoInitConfig.class
 })
 public class StateControllerQueueTest {
 
     private MapperImpl mapper;
 
     private SessionRepoImpl sessionRepo;
+
+    @Autowired
+    private ConversationRepo conversationRepo;
+
+    @Autowired
+    private PersonRepo personRepo;
 
     @Autowired
     ApplicationContext context;
@@ -71,6 +86,8 @@ public class StateControllerQueueTest {
 
     @Before
     public void setUp() throws Exception {
+        Mockito.when(personRepo.findOne(any(String.class))).thenReturn(new Person());
+        Mockito.when(conversationRepo.findOne(any(String.class))).thenReturn(new Conversation());
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
         this.sessionRepo = (SessionRepoImpl) context.getBean("sessionRepoImpl");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
@@ -174,6 +191,22 @@ public class StateControllerQueueTest {
         return jsonMessage;
     }
 
+    @Configuration
+    static class TestRepoInitConfig {
+        @Bean
+        public ConversationRepo conversationRepo() {
+            return Mockito.mock(ConversationRepo.class);
+        }
+        @Bean
+        public PersonRepo personRepo() {
+            return Mockito.mock(PersonRepo.class);
+        }
+        @Bean
+        public MessageRepo messageRepo() {
+            return Mockito.mock(MessageRepo.class);
+        }
+    }
+
     /**
      * Konfiguroidaan WebSocket testiymparistoon.
      */
@@ -182,7 +215,9 @@ public class StateControllerQueueTest {
     @ComponentScan(
             basePackages={"sotechat.controller",
                     "sotechat.data",
-                    "sotechat.websocketService"},
+                    "sotechat.websocketService",
+                    "sotechat.domainService",
+                    "sotechat.domain"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
                     value = Configuration.class)
     )

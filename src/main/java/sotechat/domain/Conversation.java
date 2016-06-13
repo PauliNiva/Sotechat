@@ -31,14 +31,16 @@ public class Conversation extends AbstractPersistable<String> {
     private List<Message> messagesOfConversation;
 
     public Conversation() {
-        messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
     }
 
     public Conversation(Date date, String channelId) {
 
         this.date = date;
         this.channelId = channelId;
-        messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
     }
 
     public final Date getDate() {

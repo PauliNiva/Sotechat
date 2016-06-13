@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,6 +29,7 @@ public class Person extends AbstractPersistable<String> {
     private List<Conversation> conversationsOfPerson;
 
     public Person() {
+        this.conversationsOfPerson = new ArrayList<>();
     }
 
     public final String getScreenName() {

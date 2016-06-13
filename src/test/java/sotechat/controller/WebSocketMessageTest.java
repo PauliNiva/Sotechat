@@ -4,9 +4,11 @@ import com.google.gson.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -31,6 +33,10 @@ import org.springframework.web.socket.config.annotation
         .EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
+import sotechat.domain.Conversation;
+import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
+import sotechat.repo.PersonRepo;
 import sotechat.util.MsgUtil;
 import sotechat.util.MockChannelInterceptor;
 import sotechat.util.MockPrincipal;
@@ -43,6 +49,7 @@ import java.util.Map;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -51,11 +58,21 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
         WebSocketMessageTest.TestWebSocketConfig.class,
-        WebSocketMessageTest.TestConfig.class
+        WebSocketMessageTest.TestConfig.class,
+        WebSocketMessageTest.TestRepoInitConfig.class
 })
 public class WebSocketMessageTest {
 
     private MapperImpl mapper;
+
+    @Autowired
+    private PersonRepo personRepo;
+
+    @Autowired
+    private ConversationRepo conversationRepo;
+
+    @Autowired
+    private MessageRepo messageRepo;
 
     @Autowired
     ApplicationContext context;
@@ -71,6 +88,8 @@ public class WebSocketMessageTest {
 
     @Before
     public void setUp() throws Exception {
+        Mockito.when(conversationRepo.findOne(any(String.class)))
+                .thenReturn(new Conversation());
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
@@ -266,6 +285,23 @@ public class WebSocketMessageTest {
         return jsonMessage;
     }
 
+    @Configuration
+    static class TestRepoInitConfig {
+        @Bean
+        public ConversationRepo conversationRepo() {
+            return Mockito.mock(ConversationRepo.class);
+        }
+
+        @Bean
+        public PersonRepo personRepo() {
+            return Mockito.mock(PersonRepo.class);
+        }
+
+        @Bean
+        public MessageRepo messageRepo() {
+            return Mockito.mock(MessageRepo.class);
+        }
+    }
     /**
      * Konfiguroidaan WebSocket testiymparistoon.
      */
@@ -274,7 +310,9 @@ public class WebSocketMessageTest {
     @ComponentScan(
             basePackages={"sotechat.controller",
                     "sotechat.data",
-                    "sotechat.websocketService"},
+                    "sotechat.websocketService",
+                    "sotechat.domainService",
+                    "sotechat.domain"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
                     value = {Configuration.class})
     )
