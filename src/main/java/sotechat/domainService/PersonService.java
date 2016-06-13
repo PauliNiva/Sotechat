@@ -11,7 +11,7 @@ import sotechat.repo.PersonRepo;
 import java.util.List;
 
 /**
- * Luokka tietokannassa olevien Person -olioiden talllentamiseen
+ * Luokka tietokannassa olevien Person -olioiden tallentamiseen
  * (CRUD -operaatiot)
  * Created by varkoi on 8.6.2016.
  */
@@ -48,6 +48,7 @@ public class PersonService {
      * Palauttaa listan kaikista tietokannan henkiloista.
      * @return lista Person olioista, jotka on tallennettu tietokantaan
      */
+    @Transactional
     public List<Person> findAll(){
         return personRepo.findAll();
     }
@@ -126,8 +127,7 @@ public class PersonService {
             throws Exception {
         return personRepo.findOne(personId).getConversationsOfPerson();
     }
-    
-    @Transactional
+
     /**
      * Lisaa keskustelun henkilon keskusteluihin ts. Tallentaa parametrina
      * annetun Conversation -olion parametrina annettua tunnusta vastaavan
@@ -135,6 +135,7 @@ public class PersonService {
      * @param personId henkilon id
      * @param conv lisattavaa keskustelua vastaava Conversation olio
      */
+    @Transactional
     public void addConversation(String personId, Conversation conv){
         Person person = personRepo.findOne(personId);
         person.addConversationToPerson(conv);

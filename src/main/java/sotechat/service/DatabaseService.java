@@ -16,17 +16,25 @@ import java.util.Date;
 import static sotechat.util.Utils.get;
 
 /**
+ * Luokka tietokantaoperaatioiden toteuttamiseen
  * Created by varkoi on 13.6.2016.
  */
 @Service
 public class DatabaseService {
 
+    /** Henkiloihin liittyvat palvelut */
     PersonService personService;
 
+    /** Keskusteluihin liittyvat palvelut */
     ConversationService conversationService;
 
+    /** Vietsteihin liittyvat palvelut */
     MessageService messageService;
 
+    /**
+     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
+     * keskustelujen ja viestien tallentamiseen liittyvat palvelut
+     */
     @Autowired
     public DatabaseService(PersonService personService,
                            ConversationService conversationService,
@@ -48,11 +56,9 @@ public class DatabaseService {
     public final void createConversation(String startMessage, String sender,
                                           String channelId, String category)
             throws Exception{
-        Message message = new Message(sender, startMessage, new Date());
-        message.setChannelId(channelId);
-        conversationService.addConversation(message, channelId);
+        conversationService.addConversation(channelId);
         conversationService.setCategory(category, channelId);
-        messageService.addMessage(message);
+        saveToDatabase(sender, startMessage, new Date(), channelId);
     }
 
     /**
@@ -82,9 +88,11 @@ public class DatabaseService {
                                      Date time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
+        Conversation conv = conversationService.getConversation(channelId);
         message.setChannelId(channelId);
+        message.setConversation(conv);
         messageService.addMessage(message);
-        conversationService.addMessage(message, channelId);
+        conversationService.addMessage(message, conv);
     }
 
 }

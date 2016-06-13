@@ -44,8 +44,6 @@ public class ConversationTest {
         conversation.addMessageToConversation(message2);
         Assert.assertEquals(conversation.getMessagesOfConversation().size(), 2);
         messagesOfConversation.remove(1);
-        conversation.setMessagesOfConversation(messagesOfConversation);
-        Assert.assertEquals(conversation.getMessagesOfConversation().size(), 1);
     }
 
     @Test

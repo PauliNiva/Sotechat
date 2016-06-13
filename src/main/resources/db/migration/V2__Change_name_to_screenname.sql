@@ -1,2 +1,0 @@
-ALTER TABLE PERSON
-RENAME name TO screenName;
