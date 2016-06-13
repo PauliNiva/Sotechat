@@ -24,14 +24,9 @@ public class PersonService {
     }
 
     @Transactional
-    public boolean addPerson(Person person, String password){
-        try {
+    public void addPerson(Person person, String password) throws Exception {
             person.setPassword(password);
             personRepo.save(person);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
     }
 
     public Person findOne(String personId) throws Exception {
@@ -48,19 +43,19 @@ public class PersonService {
     }
 
     @Transactional
-    public boolean changePassword(String personId, String password){
+    public boolean changePassword(String personId, String password) {
         try {
             Person person = personRepo.findOne(personId);
             person.setPassword(password);
             personRepo.save(person);
             return true;
-        }catch(Exception e){
+        } catch(Exception e){
             return false;
         }
     }
 
     @Transactional
-    public boolean changeScreenName(String personId, String newName){
+    public boolean changeScreenName(String personId, String newName) {
         try {
             Person person = personRepo.findOne(personId);
             person.setScreenName(newName);
@@ -81,6 +76,6 @@ public class PersonService {
      */
     public List<Conversation> personsConversations(String personId)
             throws Exception {
-        personRepo.findOne(personId).getConversationsOfPerson();
+        return personRepo.findOne(personId).getConversationsOfPerson();
     }
 }

@@ -15,11 +15,11 @@ public class PersonTest {
     }
 
     @Test
-    public void setAndGetNameTest() {
-        person.setName("Pauli");
-        Assert.assertEquals("Pauli", person.getName());
-        person.setName("iluaP");
-        Assert.assertEquals("iluaP", person.getName());
+    public void setAndGetScreenNameTest() {
+        person.setScreenName("Pauli");
+        Assert.assertEquals("Pauli", person.getScreenName());
+        person.setScreenName("iluaP");
+        Assert.assertEquals("iluaP", person.getScreenName());
     }
 
     @Test

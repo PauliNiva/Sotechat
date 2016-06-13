@@ -22,50 +22,46 @@ public class MessageService  {
 
     @Autowired
     public MessageService(MessageRepo pMessageRepo,
-                          ConversationRepo pConversationRepo) {
+                          ConversationRepo pConversationRepo) 
+                          throws Exception{
         this.messageRepo = pMessageRepo;
         this.conversationRepo = pConversationRepo;
     }
 
     @Transactional
-    public void addMessage(Message message) {
+    public void addMessage(Message message) throws Exception {
         messageRepo.save(message);
     }
 
     @Transactional
-    public void removeMessage(Long messageId) {
+    public void removeMessage(Long messageId) throws Exception {
         messageRepo.delete(messageId);
     }
 
-    public List<Message> messagesOfConversation(String channelId){
+    public List<Message> messagesOfConversation(String channelId) throws Exception {
         return messageRepo.findByConversation(channelId);
     }
 
-    public void removeConversation(String channelId){
+    @Transactional
+    public void removeConversation(String channelId) throws Exception {
         List<Message> messages= messageRepo.findByConversation(channelId);
         messageRepo.deleteInBatch(messages);
     }
 
-    @Transactional
-    public void deleteMessagesOfConversation(String channelId){
-        List<Message> messages = messageRepo.findByConversation(channelId);
-        messageRepo.deleteInBatch(messages);
-    }
-
-    public void setMessageRepo(MessageRepo pMessageRepo) {
+    public void setMessageRepo(MessageRepo pMessageRepo) throws Exception {
 
         this.messageRepo = pMessageRepo;
     }
 
-    public MessageRepo getMessageRepo() {
+    public MessageRepo getMessageRepo() throws Exception {
         return this.messageRepo;
     }
 
-    public void setConversationRepo(final ConversationRepo pConversationRepo) {
+    public void setConversationRepo(final ConversationRepo pConversationRepo) throws Exception {
         this.conversationRepo = pConversationRepo;
     }
 
-    public ConversationRepo getConversationRepo() {
+    public ConversationRepo getConversationRepo() throws Exception {
 
         return this.conversationRepo;
     }
