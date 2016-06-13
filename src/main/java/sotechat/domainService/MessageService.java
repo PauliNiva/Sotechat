@@ -16,21 +16,19 @@ public class MessageService  {
 
     private MessageRepo messageRepo;
 
-    private ConversationRepo conversationRepo;
-
-    private PersonRepo personRepo;
-
     @Autowired
-    public MessageService(MessageRepo pMessageRepo,
-                          ConversationRepo pConversationRepo) 
+    public MessageService(MessageRepo pMessageRepo)
                           throws Exception{
         this.messageRepo = pMessageRepo;
-        this.conversationRepo = pConversationRepo;
     }
 
     @Transactional
     public void addMessage(Message message) throws Exception {
         messageRepo.save(message);
+    }
+
+    public Message getMessage(Long messageId) throws Exception {
+        return messageRepo.findOne(messageId);
     }
 
     @Transactional
@@ -49,7 +47,6 @@ public class MessageService  {
     }
 
     public void setMessageRepo(MessageRepo pMessageRepo) throws Exception {
-
         this.messageRepo = pMessageRepo;
     }
 
@@ -57,13 +54,5 @@ public class MessageService  {
         return this.messageRepo;
     }
 
-    public void setConversationRepo(final ConversationRepo pConversationRepo) throws Exception {
-        this.conversationRepo = pConversationRepo;
-    }
-
-    public ConversationRepo getConversationRepo() throws Exception {
-
-        return this.conversationRepo;
-    }
 }
 

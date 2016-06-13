@@ -42,6 +42,10 @@ public class PersonService {
         personRepo.delete(personId);
     }
 
+    public Person getPerson(String personId){
+        return personRepo.getOne(personId);
+    }
+
     @Transactional
     public boolean changePassword(String personId, String password) {
         try {
@@ -78,4 +82,11 @@ public class PersonService {
             throws Exception {
         return personRepo.findOne(personId).getConversationsOfPerson();
     }
+
+    public void addConversation(String personId, Conversation conv){
+        Person person = personRepo.findOne(personId);
+        person.addConversationToPerson(conv);
+        personRepo.save(person);
+    }
+
 }
