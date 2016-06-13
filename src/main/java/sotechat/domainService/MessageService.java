@@ -17,8 +17,7 @@ public class MessageService  {
     private MessageRepo messageRepo;
 
     @Autowired
-    public MessageService(MessageRepo pMessageRepo)
-                          throws Exception{
+    public MessageService(MessageRepo pMessageRepo) throws Exception{
         this.messageRepo = pMessageRepo;
     }
 
