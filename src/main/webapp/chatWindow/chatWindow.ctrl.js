@@ -1,16 +1,15 @@
-// Kontrolleri paivittaa tietoja molempiin suuntiin:
-// - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
-// - Kun halutaan lahettaa viesti, valitetaan se Servicelle.
-//
+/** Kontrolleri paivittaa tietoja molempiin suuntiin:
+ * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
+ *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
+*/
 angular.module('chatApp')
     .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService',
         function ($scope, stompSocket, connectToServer, userStateService) {
-            $scope.pro = false;
             // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             var sub;
-            // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
-            $scope.chatName = 'Esimerkki';
+            // Alustetaan ChatName tyhjäksi
+            $scope.chatName = '';
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -27,19 +26,24 @@ angular.module('chatApp')
                 }
             };
 
-            /** Funktio parsee viestin haluttuun muotoon. */
+            /** Funktio muuttaa viestin haluttuun muotoon.
+             *  Lisää sille tiedon, siitä onko viesti käyttäjän
+             *  itsensä lähettämä.
+             *  Asettaa chatinNimeen vastapuolen nimimerkin
+             */
             var getMessage = function (data) {
-                var parsed = JSON.parse(data);
-                var message = [];
-                message.content = parsed.content;
-                message.time = parsed.timeStamp;
-                message.sender = parsed.username;
-                message.I = message.sender === userStateService.getUsername();
+                var message = JSON.parse(data);
+                message.I = message.username === userStateService.getUsername();
+                if (!message.I){
+                    $scope.chatName = message.username;
+                }
                 return message;
             };
 
+            /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + userStateService.getChannelID(), function (response) {
+                    // Clear pyynnöstä tyhjennetään viestit, muuten lisätään uusi viesti viesteihin
                     if (response.body != '$CLEAR$') {
                         $scope.messages.push(getMessage(response.body));
                     } else  {
@@ -49,9 +53,10 @@ angular.module('chatApp')
 
             };
 
+            /** Varmistetaan serveriltä että ollaan yhteydessä  */
             var init = function () {
                 connectToServer.connect(subscribe);
             };
-
+            /** Alustetaan yhteys kun controller ladataan */
             init();
         }]);

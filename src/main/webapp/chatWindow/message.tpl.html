@@ -3,15 +3,15 @@
         <div ng-if="message.I" class="header">
             <small class="text-muted">
                 <span class="glyphicon glyphicon-time"></span>
-                <time> {{message.time | date:'HH:mm'}}</time>
+                <time> {{message.timeStamp | date:'HH:mm'}}</time>
             </small>
-            <strong class="pull-right">{{message.sender}} </strong>
+            <strong class="pull-right">{{message.username}} </strong>
         </div>
         <div ng-if="!message.I" class="header">
-            <strong>{{message.sender}}</strong>
+            <strong>{{message.username}}</strong>
             <small class="pull-right text-muted">
                 <span class="glyphicon glyphicon-time"></span>
-                <time> {{message.time | date:'HH:mm'}}</time>
+                <time> {{message.timeStamp | date:'HH:mm'}}</time>
             </small>
         </div>
         <p name="messageText">

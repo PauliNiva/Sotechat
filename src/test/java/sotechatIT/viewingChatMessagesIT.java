@@ -1,9 +1,13 @@
 package sotechatIT;
 
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
+import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
@@ -14,6 +18,8 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a user I want to view the messages I have sent in the chat window
  */
+@RunWith(WebDriverRunner.class)
+@Chrome
 public class viewingChatMessagesIT {
 
     private WebDriver driver;
@@ -23,8 +29,8 @@ public class viewingChatMessagesIT {
 
     @Before
     public void setUp() throws Exception {
-        driver = new FirefoxDriver();
-        proDriver = new FirefoxDriver();
+        driver = new ChromeDriver();
+        proDriver = new ChromeDriver();
         wait = new WebDriverWait(driver, 7);
         proWait = new WebDriverWait(proDriver, 7);
         driver.get(CUSTOMERADDRES);
@@ -34,8 +40,8 @@ public class viewingChatMessagesIT {
 
     @After
     public void tearDown() throws Exception {
-        driver.close();
-        proDriver.close();
+        driver.quit();
+        proDriver.quit();
     }
 
     /**

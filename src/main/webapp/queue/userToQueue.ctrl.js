@@ -1,8 +1,19 @@
+/** Controlleri hallitsee käyttäjän liittämistä jonoon, 
+ *  kun käyttäjä on valinnut nimimerkin ja kirjoittanut aloitusviestin
+ */
 angular.module('chatApp')
     .controller('userToQueueCtrl', ['$http', '$scope', 'userStateService', function ($http, $scope, userStateService) {
+        /** Serverin mappaukset */
         var JOINPOOLURL = '/joinPool';
 
+        /** Kun käyttäjä painaa jonoon liittymispainiketta 
+         *  Suoritetaan post pyyntö serverille ja toimitaan
+         *  sen vastauksen mukaan.
+         */
         $scope.joinQueue = function () {
+            /** Onnistunut post pyyntö
+             *  Käyttäjä pyytää tilapäivitystä ja toimii sen mukaan
+             */
             var handleResponse = function (response) {
                 if (response.data.content == "OK, please request new state now.") {
                     userStateService.getVariablesFormServer().then(function (response) {
@@ -14,7 +25,9 @@ angular.module('chatApp')
                 }
 
             };
-
+                /** Epäonnistunut post pyyntö
+                 *  Alustetaan virheilmoitukset
+                 */
             var errorJoinQueue = function (response) {
                 var err = "Tuntematon virhe";
                 console.log("RESPONSE: " + response);
@@ -28,6 +41,10 @@ angular.module('chatApp')
                 }
             }
 
+            /** Suoritetaan post pyyntö palvelimelle
+             *  Viesti sisältää halutun käyttäjänimen 
+             *  Sekä aloutusviestin
+             */
             $http.post(JOINPOOLURL, {'username': $scope.username, 'startMessage': $scope.startMessage})
                 .then(handleResponse, errorJoinQueue);
         };

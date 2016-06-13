@@ -1,9 +1,13 @@
 package sotechatIT;
 
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
+import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
@@ -16,6 +20,8 @@ import static sotechatIT.sotechatITCommands.*;
 /**
  * As a user I want to send a message
  */
+@RunWith(WebDriverRunner.class)
+@Chrome
 public class zproHandlesManyUsersIT {
 
     private WebDriver proDriver;
@@ -23,7 +29,7 @@ public class zproHandlesManyUsersIT {
 
     @Before
     public void setUp() throws Exception {
-        proDriver = new FirefoxDriver();
+        proDriver = new ChromeDriver();
         proWait = new WebDriverWait(proDriver, 7);
         proDriver.get(PROADDRES);
     }
@@ -31,17 +37,17 @@ public class zproHandlesManyUsersIT {
 
     @After
     public void tearDown() throws Exception {
-        proDriver.close();
+       // proDriver.close();
     }
 
     /**
      * What if we have many customer and very very effective Pro
      * Do not try this at home!
      */
-    @Test
+    
     public void KillerTest() {
         ArrayList<WebDriver> hyrr = new ArrayList<>();
-        int max = 10;
+        int max = 5;
         for (int i = 0; i < max; i++) {
             hyrr.add(new FirefoxDriver());
         }

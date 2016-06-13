@@ -63,30 +63,20 @@ textarea.form-control {
     height: calc(100% - 42px);
 }
 
-.proContainer {
-    height: calc(100% - 10px);
-}
-.pro-chat-panel {
-    height: 100%;
-    margin-bottom: 0px;
-}
+
 .row {
     margin-left: 0px;
     margin-right: 0px;
 }
 
-.proButton{
-    margin-top: 2px;
-}
+
 
 .username-title {
     font-weight: bold;
     font-size: large;
 }
 
-.poolPro{
-    overflow-y: auto;
-}
+
 
 .userToPool-panel {
     max-width: 350px;

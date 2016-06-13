@@ -1,35 +1,29 @@
+/** Controlelri huolehtii ammattilaisen näkymän välilehtien hallinnasta
+ * Seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin
+ */
 angular.module('chatApp')
-    .controller('proCPController', ['$scope', 'connectToServer', 'proStateService', 'queueProService',
-        function ($scope, connectToServer, proStateService, queueProService) {
-            var QUEUEADDRESS = '/toClient/';
+    .controller('proCPController', ['$scope','$timeout', 'connectToServer', 'proStateService', 'heartBeatService',
+        function ($scope, $timeout, connectToServer, proStateService) {
+            /** Alustetaan muuttuja */
             var tabCount = 0;
             $scope.pro = true;
-            $scope.inQueue = 0;
             $scope.chats = [];
-            $scope.queue = queueProService.queue;
-            $scope.queueStatus = $scope.inQueue === 0;
+            $scope.activeChatTab=tabCount+1;
 
+            /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
+            var initQueue = function () {
+                $scope.$broadcast('connectedToQueue');
+            };
 
-            $scope.$watch(function () {
-                return queueProService.queue.length;
-            }, function (lenght) {
-                $scope.inQueue = lenght;
-                $scope.queueStatus = $scope.inQueue === 0;
-            }, true);
-
-            var queue = function (response) {
-                queueProService.clear();
-                angular.forEach(JSON.parse(response.body).jono, function (key) {
-                    console.log(key);
-                    queueProService.addToQueue(key);
-                    console.log(queueProService.queue);
+            /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
+            $scope.addChatTab = function (channelID) {
+                $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
+                $timeout(function(){
+                    $scope.activeChatTab=tabCount-1;
                 });
             };
 
-            $scope.addChatTab = function (channelID) {
-                $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
-            };
-
+            /** Avaa kaikki amamttilaisen avoimet välilehdet */
             var updateChannels = function () {
                 tabCount = 1;
                 $scope.chats = [];
@@ -38,22 +32,24 @@ angular.module('chatApp')
                     tabCount++;
                 });
             };
-
+            
+            /** Kun yhteys serveriin on muodostettu alustetaan siitä riippuvat */
             var answer = function () {
-
-                connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
+                initQueue();
                 $scope.username = proStateService.getUsername();
                 updateChannels();
             };
-
-            var init = function () {
-                connectToServer.connect(answer);
+            
+            /** Päivittää ammattilaisen tiedot serveriltä
+             *  Ja aloittaa alustuksen haun valmistuttua 
+             */
+            $scope.updateProStatus = function() {
+                proStateService.getVariablesFormServer().then(function (response) {
+                    proStateService.setAllVariables(response);
+                    connectToServer.connect(answer);
+                });
             };
-
-
-            proStateService.getVariablesFormServer().then(function (response) {
-                proStateService.setAllVariables(response);
-                init();
-            });
-
+            
+            /** Pyytää alustusta kun kontrolleri ladataan */
+            $scope.updateProStatus();
         }]);
