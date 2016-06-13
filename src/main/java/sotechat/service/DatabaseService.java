@@ -36,31 +36,28 @@ public class DatabaseService {
      * sekä keskustelun kategoria.
      * @param startMessage aloitusviestin sisalto
      * @param sender aloitusviestin lahettaja
-     * @param session Http sessio
+     * @param channelId kanavan id
+     * @param category keskustelun kategoria
      * @throws Exception
      */
-    private final void createConversation(String startMessage, String sender,
-                                          HttpSession session)
+    public final void createConversation(String startMessage, String sender,
+                                          String channelId, String category)
             throws Exception{
         Message message = new Message(sender, startMessage, new Date());
-        String channelId = get(session, "channelId");
         message.setChannelId(channelId);
         conversationService.addConversation(message, channelId);
-        String category = get(session, "category");
         conversationService.setCategory(category, channelId);
     }
 
     /**
-     * Lisätään parametrina annettuun sessioon liittyvä henkilö tietokannasta
-     * session kanava id:n perusteella löytyvään keskusteluun ja lisataan tama
-     * keskustelu henkilon keskusteluihin.
-     * @param session Http sessio
+     * Lisätään parametrina annetun kayttaja id:n omaava henkilo parametrina
+     * annettua kanavaid:ta vastaavaan keskusteluun.
+     * @param userId kayttajan id
+     * @param channelId kanavan id
      * @throws Exception
      */
-    private final void addPersonToConversation(HttpSession session)
+    public final void addPersonToConversation(String userId, String channelId)
             throws Exception {
-        String userId = get(session, "userId");
-        String channelId = get(session, "channelId");
         Person person = personService.getPerson(userId);
         conversationService.addPerson(person, channelId);
         Conversation conv = conversationService.getConversation(channelId);
@@ -75,7 +72,7 @@ public class DatabaseService {
      * @param channelId viestin kanavan id
      * @throws Exception
      */
-    private final void saveToDatabase(String username, String content,
+    public final void saveToDatabase(String username, String content,
                                       Date time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);

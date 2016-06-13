@@ -224,7 +224,8 @@ public class StateService {
         session.setAttribute("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu */
-        databaseService.createConversation(startMessage, username, session);
+        databaseService.createConversation(startMessage, username, channelId,
+                category);
 
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
          * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
@@ -263,7 +264,7 @@ public class StateService {
         changeParticipantsState(channelId);
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
-        databaseService.addPersonToConversation(session);
+        databaseService.addPersonToConversation(get(session, "username"), channelId);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
