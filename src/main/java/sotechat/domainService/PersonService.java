@@ -75,10 +75,12 @@ public class PersonService {
     }
 
     /**
-     *
-     * @param personId
-     * @param password
-     * @return
+     * Vaihtaa parametrina annettua tunnusta vastaavan henkilon salasanan
+     * parametrina annettuun uuteen salasanaan ja tallentaa muutoksen
+     * tietokantaan.
+     * @param personId henkilon id
+     * @param password uusi salasana
+     * @return true, jos salasanan vaihtaminen onnistui, false jos ei
      */
     @Transactional
     public boolean changePassword(String personId, String password) {
@@ -92,6 +94,13 @@ public class PersonService {
         }
     }
 
+    /**
+     * Vaihtaa parametrina annettua tunnusta vastaavan henkilon nimimerkin
+     * parametrina annettuun nimeen ja tallentaa muutoksen tietokantaan.
+     * @param personId henkilon id
+     * @param newName uusi nimi
+     * @return true, jos nimen vaihtaminen onnnistui, false, jos ei
+     */
     @Transactional
     public boolean changeScreenName(String personId, String newName) {
         try {
@@ -117,8 +126,15 @@ public class PersonService {
             throws Exception {
         return personRepo.findOne(personId).getConversationsOfPerson();
     }
-
+    
     @Transactional
+    /**
+     * Lisaa keskustelun henkilon keskusteluihin ts. Tallentaa parametrina
+     * annetun Conversation -olion parametrina annettua tunnusta vastaavan
+     * Person olion listaan.
+     * @param personId henkilon id
+     * @param conv lisattavaa keskustelua vastaava Conversation olio
+     */
     public void addConversation(String personId, Conversation conv){
         Person person = personRepo.findOne(personId);
         person.addConversationToPerson(conv);

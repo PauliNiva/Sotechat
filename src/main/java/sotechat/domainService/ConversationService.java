@@ -102,6 +102,7 @@ public class ConversationService {
     @Transactional
     private void addMessage(Message message, Conversation conv)
             throws Exception {
+            message.setConversation(conv);
             conv.addMessageToConversation(message);
             conversationRepo.save(conv);
     }
