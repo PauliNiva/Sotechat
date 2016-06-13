@@ -3,7 +3,6 @@ package sotechat.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
@@ -28,8 +27,8 @@ import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.util.MockPrincipal;
-import sotechat.websocketService.QueueService;
-import sotechat.websocketService.StateService;
+import sotechat.service.QueueService;
+import sotechat.service.StateService;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;

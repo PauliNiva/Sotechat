@@ -1,4 +1,4 @@
-package sotechat.websocketService;
+package sotechat.service;
 
 
 import com.google.gson.JsonObject;
@@ -14,6 +14,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
 import sotechat.domainService.PersonService;
+import sotechat.service.QueueService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
@@ -51,11 +52,8 @@ public class StateService {
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
-    /** Conversation service */
-    private final ConversationService conversationService;
-
-    /** Person service */
-    private final PersonService personService;
+    /** Database service */
+    private final DatabaseService databaseService;
 
     /** Channel where queue status is broadcasted. */
     public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
@@ -75,16 +73,14 @@ public class StateService {
             final QueueService pQueueService,
             final ChatLogger pChatLogger,
             final SessionRepo pSessionRepo,
-            final ConversationService pConvService,
-            final PersonService pPersonService
+            final DatabaseService pDatabaseService;
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
         this.queueService = pQueueService;
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
-        this.conversationService = pConvService;
-        this.personService = pPersonService;
+        this.databaseService = pDatabaseService;
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
@@ -228,7 +224,7 @@ public class StateService {
         session.setAttribute("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu */
-        createConversation(startMessage, username, session);
+        databaseService.createConversation(startMessage, username, session);
 
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
          * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
@@ -267,7 +263,7 @@ public class StateService {
         changeParticipantsState(channelId);
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
-        addPersonToConversation(session);
+        databaseService.addPersonToConversation(session);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
@@ -300,42 +296,6 @@ public class StateService {
         for (HttpSession member : list) {
             member.setAttribute("state", "chat");
         }
-    }
-
-    /**
-     * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
-     * sekä keskustelun kategoria.
-     * @param startMessage aloitusviestin sisalto
-     * @param sender aloitusviestin lahettaja
-     * @param session Http sessio
-     * @throws Exception
-     */
-    private final void createConversation(String startMessage, String sender,
-                                          HttpSession session)
-                                            throws Exception{
-        Message message = new Message(sender, startMessage, new Date());
-        String channelId = get(session, "channelId");
-        message.setChannelId(channelId);
-        conversationService.addConversation(message, channelId);
-        String category = get(session, "category");
-        conversationService.setCategory(category, channelId);
-    }
-
-    /**
-     * Lisätään parametrina annettuun sessioon liittyvä henkilö tietokannasta
-     * session kanava id:n perusteella löytyvään keskusteluun ja lisataan tama
-     * keskustelu henkilon keskusteluihin.
-     * @param session Http sessio
-     * @throws Exception
-     */
-    private final void addPersonToConversation(HttpSession session)
-            throws Exception {
-        String userId = get(session, "userId");
-        String channelId = get(session, "channelId");
-        Person person = personService.getPerson(userId);
-        conversationService.addPerson(person, channelId);
-        Conversation conv = conversationService.getConversation(channelId);
-        personService.addConversation(userId, conv);
     }
 
 }

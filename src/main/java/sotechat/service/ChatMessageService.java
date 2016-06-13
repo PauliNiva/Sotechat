@@ -1,6 +1,5 @@
-package sotechat.websocketService;
+package sotechat.service;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,7 @@ public class ChatMessageService {
     /** ChatLogger. */
     private final ChatLogger chatLogger;
 
-    private final ConversationService conversationService;
-
-    private final MessageService messageService;
+    private final DatabaseService databaseService;
 
     /**
      * Constructor autowires mapper.
@@ -39,13 +36,11 @@ public class ChatMessageService {
     public ChatMessageService(
             final Mapper pMapper,
             final ChatLogger pChatLogger,
-            final ConversationService pConvService,
-            final MessageService pMessageServ
+            final DatabaseService pDatabaseService;
     ) {
         this.mapper = pMapper;
         this.chatLogger = pChatLogger;
-        this.conversationService = pConvService;
-        this.messageService = pMessageServ;
+        this.databaseService = pDatabaseService;
     }
 
 
@@ -101,7 +96,7 @@ public class ChatMessageService {
         chatLogger.log(msg);
 
         /**tallennetaan viesti tietokanataan. */
-        saveToDatabase(username, content, time, channelId);
+        databaseService.saveToDatabase(username, content, time, channelId);
 
         /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
         return msg;
@@ -136,23 +131,6 @@ public class ChatMessageService {
             }
         }
         return true;
-    }
-
-    /**
-     * Tallennetaan viesti tietokantaan ja tietokannassa olevaan keskusteluun.
-     * @param username viestin lähettäjän käyttäjänimi
-     * @param content viestin sisältö
-     * @param time viestin aikaleima
-     * @param channelId viestin kanavan id
-     * @throws Exception
-     */
-    private final void saveToDatabase(String username, String content,
-                                     Date time, String channelId)
-                                     throws Exception {
-        Message message = new Message(username, content, time);
-        message.setChannelId(channelId);
-        messageService.addMessage(message);
-        conversationService.addMessage(message, channelId);
     }
 
 }

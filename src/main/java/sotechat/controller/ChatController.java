@@ -10,7 +10,7 @@ import sotechat.domainService.ConversationService;
 import sotechat.domainService.MessageService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-import sotechat.websocketService.ChatMessageService;
+import sotechat.service.ChatMessageService;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */

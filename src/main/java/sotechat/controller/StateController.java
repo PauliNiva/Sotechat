@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
-import sotechat.websocketService.StateService;
+import sotechat.service.StateService;
 
 /** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
