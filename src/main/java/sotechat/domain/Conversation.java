@@ -15,14 +15,14 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 public class Conversation {
+    @Id
+    private String channelId;
 
     @NotNull
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd.MM.yyyy")
     private Date date;
     private String category;
-    @Id
-    private String channelId;
 
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
