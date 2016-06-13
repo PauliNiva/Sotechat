@@ -29,7 +29,7 @@ angular.module('chatApp')
         var makeQueueByCategory = function (category) {
             if (category === "") return queue;
             var subQueue = [];
-            for (var i = 0; i < categories.length; i++) {
+            for (var i = 0; i < queue.length; i++) {
                 if (queue[i].category === category) subQueue.push(queue[i]);
             }
             return subQueue;

@@ -37,8 +37,9 @@ angular.module('chatApp')
 
             /** Pyytää jonon ensimmäisen nostoa jonosta */
             $scope.nextFromQueue = function () {
-                var firstChannelID = queueProService.getFirstChannelID();
-                $scope.pickFromQueue(firstChannelID);
+                if ($scope.queue.length > 0 ) {
+                    $scope.pickFromQueue($scope.queue[0].channelID);
+                }
             };
 
             /** Nostaa annetun kanavaID:n perusteella jonosta asikkaan käsiteltäväksi */
