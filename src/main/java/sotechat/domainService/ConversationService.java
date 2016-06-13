@@ -108,6 +108,12 @@ public class ConversationService {
             conversationRepo.save(conv);
     }
 
+    public void removeMessage(Message message){
+        String channelId = message.getConversation().getChannelId();
+        conversationRepo.findOne(channelId).getMessagesOfConversation()
+                .remove(message);
+    }
+
     /**
      * Luo yhteyden keskustelun ja henkilon valille. Liittaa parametrina
      * annetun Person luokan olion parametrina annetun Conversation luokan

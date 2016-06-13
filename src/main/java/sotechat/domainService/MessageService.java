@@ -34,10 +34,6 @@ public class MessageService  {
 
     @Transactional
     public void removeMessage(Long messageId) {
-        Message message = messageRepo.findOne(messageId);
-        String conversationId = message.getConversation().getChannelId();
-        conversationRepo.findOne(conversationId).getMessagesOfConversation()
-                .remove(message);
         messageRepo.delete(messageId);
     }
 
