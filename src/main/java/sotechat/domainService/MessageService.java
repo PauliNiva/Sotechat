@@ -23,8 +23,7 @@ public class MessageService  {
 
     /** konstruktorissa injektoidaan repositorio */
     @Autowired
-    public MessageService(MessageRepo pMessageRepo)
-                          throws Exception{
+    public MessageService(MessageRepo pMessageRepo) throws Exception{
         this.messageRepo = pMessageRepo;
     }
 
@@ -38,8 +37,9 @@ public class MessageService  {
         messageRepo.save(message);
     }
 
+    @Transactional
     public Message getMessage(Long messageId) throws Exception {
-        return messageRepo.getOne(messageId);
+        return messageRepo.findOne(messageId);
     }
 
     @Transactional

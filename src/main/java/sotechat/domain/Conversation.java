@@ -27,7 +27,7 @@ public class Conversation {
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "conversation")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
     public Conversation() {
@@ -36,7 +36,6 @@ public class Conversation {
     }
 
     public Conversation(Date date, String channelId) {
-
         this.date = date;
         this.channelId = channelId;
         this.messagesOfConversation = new ArrayList<>();

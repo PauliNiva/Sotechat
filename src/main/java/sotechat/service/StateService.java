@@ -264,7 +264,7 @@ public class StateService {
         changeParticipantsState(channelId);
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
-        databaseService.addPersonToConversation(get(session, "username"), channelId);
+        databaseService.addPersonToConversation(get(session, "userId"), channelId);
 
         /** Onnistui, palautetaan JSONi. */
         return "{\"content\":\"channel activated.\"}";
