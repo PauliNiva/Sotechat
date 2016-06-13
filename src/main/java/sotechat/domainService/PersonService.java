@@ -25,6 +25,10 @@ public class PersonService {
     @Autowired
     public PersonService(PersonRepo personRepo){
         this.personRepo = personRepo;
+        Person person = new Person("666");
+        person.setUsername("hoitaja");
+        person.setPassword("salasana");
+        this.personRepo.save(person);
     }
 
     /**
@@ -50,7 +54,7 @@ public class PersonService {
     }
 
     public Person getPerson(String personId) throws Exception {
-        return personRepo.getOne(personId);
+        return personRepo.findOne(personId);
     }
 
     @Transactional
