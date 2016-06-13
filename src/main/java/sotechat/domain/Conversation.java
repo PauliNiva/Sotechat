@@ -34,7 +34,8 @@ public class Conversation {
     private List<Person> participantsOfConversation;
 
     /** keskusteluun liittyvat viestit */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversation")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+            mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
     /**
