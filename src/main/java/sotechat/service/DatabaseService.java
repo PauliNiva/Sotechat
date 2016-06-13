@@ -1,5 +1,7 @@
 package sotechat.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
@@ -15,6 +17,7 @@ import static sotechat.util.Utils.get;
 /**
  * Created by varkoi on 13.6.2016.
  */
+@Service
 public class DatabaseService {
 
     PersonService personService;
@@ -23,6 +26,7 @@ public class DatabaseService {
 
     MessageService messageService;
 
+    @Autowired
     public DatabaseService(PersonService personService,
                            ConversationService conversationService,
                            MessageService messageService){

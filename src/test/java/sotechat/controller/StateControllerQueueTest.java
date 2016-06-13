@@ -216,7 +216,7 @@ public class StateControllerQueueTest {
     @ComponentScan(
             basePackages={"sotechat.controller",
                     "sotechat.data",
-                    "sotechat.websocketService",
+                    "sotechat.service",
                     "sotechat.domainService",
                     "sotechat.domain"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,

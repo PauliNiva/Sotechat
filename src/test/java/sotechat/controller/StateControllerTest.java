@@ -23,9 +23,12 @@ import sotechat.data.*;
 import sotechat.data.QueueImpl;
 import sotechat.domain.Conversation;
 import sotechat.domainService.ConversationService;
+import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.service.DatabaseService;
 import sotechat.util.MockPrincipal;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
@@ -62,12 +65,14 @@ public class StateControllerTest {
         QueueService qService = new QueueService(new QueueImpl());
         SessionRepo sessions = new SessionRepoImpl(mapper);
         ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
+        MessageRepo mockMessageRepo = mock(MessageRepo.class);
         when(mockConversationRepo.findOne(any(String.class)))
                 .thenReturn(new Conversation());
         PersonRepo mockPersonRepo = mock(PersonRepo.class);
         ConversationService conversationService = new ConversationService(
                 mockConversationRepo, mockPersonRepo);
         PersonService personService = new PersonService(mockPersonRepo);
+        MessageService messageService = new MessageService(mockMessageRepo);
         SimpMessagingTemplate broker = new SimpMessagingTemplate(
                 new MessageChannel() {
             @Override
@@ -83,14 +88,16 @@ public class StateControllerTest {
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
         ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
                 chatLogger, broker);
+        DatabaseService databaseService = new DatabaseService(personService,
+                                            conversationService,
+                                            messageService);
         StateService state = new StateService(
                 mapper,
                 listener,
                 qService,
                 chatLogger,
                 sessions,
-                conversationService,
-                personService);
+                databaseService);
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
                         state, broadcaster, logBroadcaster, conversationService))

@@ -36,7 +36,7 @@ public class ChatMessageService {
     public ChatMessageService(
             final Mapper pMapper,
             final ChatLogger pChatLogger,
-            final DatabaseService pDatabaseService;
+            final DatabaseService pDatabaseService
     ) {
         this.mapper = pMapper;
         this.chatLogger = pChatLogger;

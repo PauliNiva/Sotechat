@@ -73,7 +73,7 @@ public class StateService {
             final QueueService pQueueService,
             final ChatLogger pChatLogger,
             final SessionRepo pSessionRepo,
-            final DatabaseService pDatabaseService;
+            final DatabaseService pDatabaseService
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
