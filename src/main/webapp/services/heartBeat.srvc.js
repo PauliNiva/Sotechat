@@ -3,7 +3,7 @@
  * as long as the browser is open (even when data is only transmitted on WS).
  * TODO: A separate heartbeat to verify the WS channel used while queuing works.
  */
-angular.module('chatApp')
+angular.module('commonMod')
     .factory('heartBeatService', ['$http', '$interval', function ($http, $interval) {
         var HEARTBEATURL = '/toServer/heartBeat/';
         var msFreq = 1000000; // 16min

@@ -7,7 +7,7 @@ angular.module('chatApp').component('chatWindowComponent', {
     controller: 'chatController'
 });
 
-angular.module('chatApp').component('proChatWindowComponent', {
+angular.module('chatProApp').component('proChatWindowComponent', {
     templateUrl: 'chatWindow/chatWindow.tpl.html',
     controller: 'proChatController',
     bindings: {

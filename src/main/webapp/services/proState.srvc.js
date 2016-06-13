@@ -1,7 +1,7 @@
 /** Palvelu säilöö ammattilaisen tilatiedot
  *  Sekä kanavat missä ammattilainen on keskustelemassa
  */
-angular.module('chatApp')
+angular.module('chatProApp')
     .factory('proStateService', ['$http', function ($http) {
         /** Serverin mappaukset */
         var PROSTATEURL = '/proState';

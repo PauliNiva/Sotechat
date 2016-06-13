@@ -35,17 +35,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // jotenkin kai yhdistaa
                 // login-sivun session luomiseen
-                .formLogin()
+                .httpBasic();
                 // polun /login mappays
                 // loytyy tiedostosta MvcConfig
-                .loginPage("/login")
+
                 // paasy login-sivulle
                 // sallitaan kaikille
-                .permitAll()
-                .and()
-                .logout()
+
                 // logout sallitaan kaikille
-                .permitAll();
+
 
         // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
         // http.requiresChannel().anyRequest().requiresSecure();

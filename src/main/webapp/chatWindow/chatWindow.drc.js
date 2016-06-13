@@ -3,7 +3,7 @@
  * Jos painetaan SHIFT+ENTER tehdään normaali ENTER Toiminto
  * Käytetään estämään textarea kentän normaali rivin vaihto.
  */
-angular.module('chatApp')
+angular.module('commonMod')
     .directive('ngEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {
