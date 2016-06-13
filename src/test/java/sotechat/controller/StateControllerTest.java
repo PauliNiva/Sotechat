@@ -24,6 +24,7 @@ import sotechat.data.*;
 import sotechat.data.QueueImpl;
 import sotechat.domain.Conversation;
 import sotechat.domainService.ConversationService;
+import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.util.MockPrincipal;
@@ -67,6 +68,7 @@ public class StateControllerTest {
         PersonRepo mockPersonRepo = mock(PersonRepo.class);
         ConversationService conversationService = new ConversationService(
                 mockConversationRepo, mockPersonRepo);
+        PersonService personService = new PersonService(mockPersonRepo);
         SimpMessagingTemplate broker = new SimpMessagingTemplate(
                 new MessageChannel() {
             @Override
@@ -83,7 +85,13 @@ public class StateControllerTest {
         ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
                 chatLogger, broker);
         StateService state = new StateService(
-                mapper, listener, qService, chatLogger, sessions, conversationService);
+                mapper,
+                listener,
+                qService,
+                chatLogger,
+                sessions,
+                conversationService,
+                personService);
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
                         state, broadcaster, logBroadcaster, conversationService))
