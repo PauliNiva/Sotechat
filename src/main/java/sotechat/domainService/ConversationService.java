@@ -53,6 +53,7 @@ public class ConversationService {
      * @param channelId keskustelun kanavan id
      * @throws Exception IllegalArgumentException
      */
+    @Transactional
     public void addPerson(Person person, String channelId)
             throws Exception {
                 Conversation conv = conversationRepo.findOne(channelId);
@@ -67,6 +68,7 @@ public class ConversationService {
      * @param channelId keskustelun kanavan id
      * @throws Exception IllegalArgumentException
      */
+    @Transactional
     public void setCategory(String category, String channelId) throws Exception {
             Conversation conv = conversationRepo.findOne(channelId);
             conv.setCategory(category);
@@ -82,6 +84,7 @@ public class ConversationService {
      * @return true, jos vietsin lisaaminen tietokantaan onnistui, false jos ei
      * @throws Exception IllegalArgumentException
      */
+    @Transactional
     public void addMessage(Message message, String ChannelId)
             throws Exception {
             Conversation conv = conversationRepo.findOne(ChannelId);
@@ -135,6 +138,7 @@ public class ConversationService {
      * @param channelId haetun keskustelun kanavaid
      * @return Conversation olio, jolla pyydetty kanavaid
      */
+    @Transactional
     public Conversation getConversation(String channelId){
         return conversationRepo.findOne(channelId);
     }

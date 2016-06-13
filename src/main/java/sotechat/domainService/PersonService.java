@@ -68,6 +68,8 @@ public class PersonService {
      * @return tunnusta vastaava henkilo (Person olio)
      * @throws Exception IllegalArgumentException
      */
+
+    @Transactional
     public Person getPerson(String personId) throws Exception {
         return personRepo.findOne(personId);
     }
@@ -110,11 +112,13 @@ public class PersonService {
      * @return lista henkilon keskusteluista Conversation olioina
      * @throws Exception IllegalArgumentException
      */
+    @Transactional
     public List<Conversation> personsConversations(String personId)
             throws Exception {
         return personRepo.findOne(personId).getConversationsOfPerson();
     }
 
+    @Transactional
     public void addConversation(String personId, Conversation conv){
         Person person = personRepo.findOne(personId);
         person.addConversationToPerson(conv);

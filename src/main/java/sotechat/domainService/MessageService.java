@@ -27,8 +27,9 @@ public class MessageService  {
         messageRepo.save(message);
     }
 
+    @Transactional
     public Message getMessage(Long messageId) throws Exception {
-        return messageRepo.getOne(messageId);
+        return messageRepo.findOne(messageId);
     }
 
     @Transactional
