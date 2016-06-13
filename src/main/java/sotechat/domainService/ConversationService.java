@@ -23,15 +23,11 @@ public class ConversationService {
     /** Keskustelujen tallentamiseen */
     private ConversationRepo conversationRepo;
 
-    /** Henkiloiden tallentamiseen */
-    private PersonRepo personRepo;
-
     @Autowired
     /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
     public ConversationService(ConversationRepo conversationRepo,
                                PersonRepo personRepo) {
         this.conversationRepo = conversationRepo;
-        this.personRepo = personRepo;
     }
 
     /**
@@ -50,19 +46,18 @@ public class ConversationService {
     }
 
     /**
-     * Lisää parametrina annettua kanavaid:tä vastaavaan keskusteluun Person
-     * luokan olion, joka haetaan tietokannasta parametrina annetun henkilön
-     * id:n perusteella. Henkilo lisataan Keskustelun henkiloihin ja keskustelu
-     * lisataan henkilon keskusteluihin.
-     * @param personId osallistuvan henkilon id
+     * Lisää parametrina annettua kanavaid:tä vastaavaan keskusteluun
+     * parametrina annetun Person luokan olion. Henkilo lisataan Keskustelun
+     * henkiloihin.
+     * @param person Person luokan oli, joka halutaan lisata keskusteluun
      * @param channelId keskustelun kanavan id
      * @throws Exception IllegalArgumentException
      */
-    public void addPerson(String personId, String channelId)
+    public void addPerson(Person person, String channelId)
             throws Exception {
                 Conversation conv = conversationRepo.findOne(channelId);
-                Person person = personRepo.findOne(personId);
-                addConnection(person, conv);
+                conv.addPersonToConversation(person);
+                conversationRepo.save(conv);
     }
 
     /**
@@ -109,22 +104,18 @@ public class ConversationService {
     }
 
     /**
-     * Luo yhteyden keskustelun ja henkilon valille. Liittaa parametrina
-     * annetun Person luokan olion parametrina annetun Conversation luokan
-     * olion listaan ja parametrina annetun Conversation luokan olion
-     * parametrina annetun Person luokan olion listaan.
-     * @param person Person luokan olio, joka edustaa ammattilaista, joka on
-     *               ottanut keskustelun jonosta.
-     * @param conversation Conversation luokan olio ts. keskustelu johon
-     *                     henkilo liitetaan.
-     * @throws Exception NullPointerException
+     * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
+     * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
+     * muutoksen tietokantaan.
+     * @param message Viesti joka halutaan poistaa (taytyy etsia ensin
+     *                messageServicesta)
      */
     @Transactional
-    private void addConnection(Person person, Conversation conversation) throws Exception {
-        conversation.addPersonToConversation(person);
-        person.addConversationToPerson(conversation);
-        conversationRepo.save(conversation);
-        personRepo.save(person);
+    public void removeMessage(Message message){
+        String channelId = message.getConversation().getChannelId();
+        Conversation conv = conversationRepo.findOne(channelId);
+        conv.getMessagesOfConversation().remove(message);
+        conversationRepo.save(conv);
     }
 
     /**
@@ -137,6 +128,15 @@ public class ConversationService {
     @Transactional
     public void delete(String channelId) throws Exception {
         conversationRepo.delete(channelId);
+    }
+
+    /**
+     * Palauttaa parametrina annettua channel id:tä vastaavan keskustelun
+     * @param channelId haetun keskustelun kanavaid
+     * @return Conversation olio, jolla pyydetty kanavaid
+     */
+    public Conversation getConversation(String channelId){
+        return conversationRepo.findOne(channelId);
     }
 
 }

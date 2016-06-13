@@ -9,8 +9,11 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.controller.SubscribeEventListener;
 import sotechat.data.ChatLogger;
+import sotechat.domain.Conversation;
 import sotechat.domain.Message;
+import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
+import sotechat.domainService.PersonService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
@@ -51,6 +54,9 @@ public class StateService {
     /** Conversation service */
     private final ConversationService conversationService;
 
+    /** Person service */
+    private final PersonService personService;
+
     /** Channel where queue status is broadcasted. */
     public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
 
@@ -69,7 +75,8 @@ public class StateService {
             final QueueService pQueueService,
             final ChatLogger pChatLogger,
             final SessionRepo pSessionRepo,
-            final ConversationService pConvService
+            final ConversationService pConvService,
+            final PersonService pPersonService
     ) {
         this.mapperService = pMapper;
         this.subscribeEventListener = subscribeEventListener;
@@ -77,6 +84,7 @@ public class StateService {
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
         this.conversationService = pConvService;
+        this.personService = pPersonService;
     }
 
     /** Logiikka miten vastataan customerClientin state requestiin.
@@ -315,7 +323,8 @@ public class StateService {
 
     /**
      * Lisätään parametrina annettuun sessioon liittyvä henkilö tietokannasta
-     * session kanava id:n perusteella löytyvään keskusteluun
+     * session kanava id:n perusteella löytyvään keskusteluun ja lisataan tama
+     * keskustelu henkilon keskusteluihin.
      * @param session Http sessio
      * @throws Exception
      */
@@ -323,7 +332,10 @@ public class StateService {
             throws Exception {
         String userId = get(session, "userId");
         String channelId = get(session, "channelId");
-        conversationService.addPerson(userId, channelId);
+        Person person = personService.getPerson(userId);
+        conversationService.addPerson(person, channelId);
+        Conversation conv = conversationService.getConversation(channelId);
+        personService.addConversation(userId, conv);
     }
 
 }
