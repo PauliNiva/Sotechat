@@ -35,10 +35,5 @@ public class PersonTest {
         person.setPassword("0000");
         Assert.assertTrue(BCrypt.checkpw("0000", person.getPassword()));
     }
-
-    @Test
-    public void setAndGetSaltTest() {
-        person.setSalt("suola");
-        Assert.assertEquals("suola", person.getSalt());
-    }
+    
 }
