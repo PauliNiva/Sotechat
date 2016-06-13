@@ -15,17 +15,25 @@ import java.util.Date;
 import static sotechat.util.Utils.get;
 
 /**
+ * Luokka tietokantaoperaatioiden toteuttamiseen
  * Created by varkoi on 13.6.2016.
  */
 @Service
 public class DatabaseService {
 
+    /** Henkiloihin liittyvat palvelut */
     PersonService personService;
 
+    /** Keskusteluihin liittyvat palvelut */
     ConversationService conversationService;
 
+    /** Vietsteihin liittyvat palvelut */
     MessageService messageService;
 
+    /**
+     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
+     * keskustelujen ja viestien tallentamiseen liittyvat palvelut
+     */
     @Autowired
     public DatabaseService(PersonService personService,
                            ConversationService conversationService,
