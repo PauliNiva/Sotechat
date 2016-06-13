@@ -34,15 +34,13 @@ public class ConversationService {
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
      * keskusteluun parametrina annettu viesti
-     * @param message Message luokan olio, jossa kayttajan lahettama viesti
      * @param channelId keskustelun kanavan id
      */
     @Transactional
-    public void addConversation(Message message, String channelId)
+    public void addConversation(String channelId)
             throws Exception {
             Conversation conv = new Conversation(new Date(), channelId);
             conversationRepo.save(conv);
-            addMessage(message, conv);
     }
 
     /**
@@ -99,7 +97,6 @@ public class ConversationService {
     @Transactional
     private void addMessage(Message message, Conversation conv)
             throws Exception {
-            message.setConversation(conv);
             conv.addMessageToConversation(message);
             conversationRepo.save(conv);
     }

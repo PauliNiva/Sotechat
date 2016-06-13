@@ -11,7 +11,7 @@ import sotechat.repo.PersonRepo;
 import java.util.List;
 
 /**
- * Luokka tietokannassa olevien Person -olioiden talllentamiseen
+ * Luokka tietokannassa olevien Person -olioiden tallentamiseen
  * (CRUD -operaatiot)
  * Created by varkoi on 8.6.2016.
  */

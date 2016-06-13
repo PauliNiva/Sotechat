@@ -11,17 +11,28 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
+/**
+ * Luokka tietokannassa olevien Message -olioiden tallentamiseen
+ * (CRUD -operaatiot)
+ */
 @Service
 public class MessageService  {
 
+    /** repositorio */
     private MessageRepo messageRepo;
 
+    /** konstruktorissa injektoidaan repositorio */
     @Autowired
     public MessageService(MessageRepo pMessageRepo)
                           throws Exception{
         this.messageRepo = pMessageRepo;
     }
 
+    /**
+     * Tallentaa Message olion eli viestin tietokantaan
+     * @param message Message olio joka sisaltaa lahetetyn viestin tiedot
+     * @throws Exception
+     */
     @Transactional
     public void addMessage(Message message) throws Exception {
         messageRepo.save(message);

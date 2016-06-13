@@ -47,11 +47,9 @@ public class DatabaseService {
     public final void createConversation(String startMessage, String sender,
                                           String channelId, String category)
             throws Exception{
-        Message message = new Message(sender, startMessage, new Date());
-        message.setChannelId(channelId);
-        conversationService.addConversation(message, channelId);
+        conversationService.addConversation(channelId);
         conversationService.setCategory(category, channelId);
-        messageService.addMessage(message);
+        saveToDatabase(sender, startMessage, new Date(), channelId);
     }
 
     /**
@@ -82,6 +80,8 @@ public class DatabaseService {
                                         throws Exception {
         Message message = new Message(username, content, time);
         message.setChannelId(channelId);
+        Conversation conv = conversationService.getConversation(channelId);
+        message.setConversation(conv);
         messageService.addMessage(message);
         conversationService.addMessage(message, channelId);
     }
