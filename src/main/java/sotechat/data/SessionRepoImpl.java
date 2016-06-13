@@ -186,10 +186,7 @@ public class SessionRepoImpl extends MapSessionRepository
         for (String channel : channels) {
             output += "\"" + channel + "\", ";
         }
-        System.out.println("Output orig : " + output);
-        System.out.println("Length orig : " + output.length());
         output = output.substring(0, output.length() - 2);
-        System.out.println("after sub: " + output);
         output += "]";
         return output;
     }

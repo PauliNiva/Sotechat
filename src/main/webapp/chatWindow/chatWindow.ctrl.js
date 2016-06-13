@@ -43,6 +43,11 @@ angular.module('chatApp')
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + userStateService.getChannelID(), function (response) {
+
+                    //TODO: Testaa ettei allaoleva hakkerointi toimi
+                    //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
+
+
                     // Clear pyynnöstä tyhjennetään viestit, muuten lisätään uusi viesti viesteihin
                     if (response.body != '$CLEAR$') {
                         $scope.messages.push(getMessage(response.body));

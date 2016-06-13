@@ -2,6 +2,7 @@ package sotechat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.ExpiringSession;
@@ -16,7 +17,8 @@ import sotechat.data.SessionRepoImpl;
 /** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
  * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
  * Ilmeisesti tassa maaritellaan polut, joihin tulevat/menevat viestit
- * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan. */
+ * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan.
+ * Lisaksi ohjataan subscriptionien hyvaksyminen interceptorille. */
 @Configuration
 @EnableScheduling
 @EnableWebSocketMessageBroker
@@ -52,4 +54,14 @@ public class WebSocketConfig extends
     public final void configureStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
     }
+
+    /** Subscriptionien hyvaksyminen ohjataan
+     * SubscriptionInterceptor -instanssille.
+     * @param registration registration
+     */
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.setInterceptors(new SubscriptionInterceptor());
+    }
 }
+
