@@ -2,17 +2,21 @@ package sotechat.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Person extends AbstractPersistable<Long> {
+public class Person {
 
-    private String name;
+    @Id
+    public String userId;
+
+    private String screenName;
 
     @Column(unique = true)
     private String username;
@@ -24,14 +28,20 @@ public class Person extends AbstractPersistable<Long> {
     private List<Conversation> conversationsOfPerson;
 
     public Person() {
+        this.conversationsOfPerson = new ArrayList<>();
     }
 
-    public final String getName() {
-        return name;
+    public Person(String pUserId) {
+        this.userId = pUserId;
+        this.conversationsOfPerson = new ArrayList<>();
     }
 
-    public final void setName(final String pname) {
-        this.name = pname;
+    public final String getScreenName() {
+        return screenName;
+    }
+
+    public final void setScreenName(final String pname) {
+        this.screenName = pname;
     }
 
     public final String getUsername() {
@@ -71,5 +81,13 @@ public class Person extends AbstractPersistable<Long> {
     public final void addConversationToPerson(
             final Conversation conversation) {
         this.conversationsOfPerson.add(conversation);
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

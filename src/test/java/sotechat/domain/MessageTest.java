@@ -27,8 +27,8 @@ public class MessageTest {
 
     @Test
     public void setAndGetAuthorTest() {
-        message.setAuthor("Shakespeare");
-        Assert.assertEquals("Shakespeare", message.getAuthor());
+        message.setSender("Shakespeare");
+        Assert.assertEquals("Shakespeare", message.getSender());
     }
 
     @Test
