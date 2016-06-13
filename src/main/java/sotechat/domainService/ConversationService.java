@@ -72,21 +72,6 @@ public class ConversationService {
     }
 
     /**
-     * Lisaa viestin keskusteluun, eli liittaa parametrina annetun Message
-     * -olion parametrina annetun kanavaid:n perusteella tietokannasta
-     * loytyvan Convertasion -olion listaan.
-     * @param message Message luokan olio, jossa kayttajan lahettama viesti
-     * @param ChannelId keskustelun kanavan id
-     * @return true, jos vietsin lisaaminen tietokantaan onnistui, false jos ei
-     * @throws Exception IllegalArgumentException
-     */
-    public void addMessage(Message message, String ChannelId)
-            throws Exception {
-            Conversation conv = conversationRepo.findOne(ChannelId);
-            addMessage(message, conv);
-    }
-
-    /**
      * Lisaa parametrina annetun Message -luokan olion parametrina annetun
      * Conversation -olion listaan, ts liittaa viestin keskusteluun.
      * @param message Message -luokan olio, jossa on kayttajan viesti
@@ -95,7 +80,7 @@ public class ConversationService {
      * @throws Exception NullPointerException
      */
     @Transactional
-    private void addMessage(Message message, Conversation conv)
+    public void addMessage(Message message, Conversation conv)
             throws Exception {
             conv.addMessageToConversation(message);
             conversationRepo.save(conv);

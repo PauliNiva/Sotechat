@@ -79,11 +79,11 @@ public class DatabaseService {
                                       Date time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
-        message.setChannelId(channelId);
         Conversation conv = conversationService.getConversation(channelId);
+        message.setChannelId(channelId);
         message.setConversation(conv);
         messageService.addMessage(message);
-        conversationService.addMessage(message, channelId);
+        conversationService.addMessage(message, conv);
     }
 
 }
