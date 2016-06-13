@@ -1,5 +1,6 @@
 package sotechat.service;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -87,16 +88,17 @@ public class ChatMessageService {
                                         String channelId, String content)
                                         throws Exception {
 
-        Date time = new Date();
+        String timeStampForClient = new DateTime().toString();
+        Date timeForDB = new Date();
 
         MsgToClient msg = new MsgToClient(username, channelId,
-                time.toString(), content);
+                timeStampForClient, content);
 
         /** Tallennetaan viesti lokeihin. */
         chatLogger.log(msg);
 
-        /**tallennetaan viesti tietokanataan. */
-        databaseService.saveToDatabase(username, content, time, channelId);
+        /**tallennetaan viesti tietokantaan. */
+        databaseService.saveToDatabase(username, content, timeForDB, channelId);
 
         /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
         return msg;

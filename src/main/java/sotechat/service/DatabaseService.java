@@ -1,5 +1,6 @@
 package sotechat.service;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sotechat.domain.Conversation;
@@ -78,7 +79,7 @@ public class DatabaseService {
      * @throws Exception
      */
     public final void saveToDatabase(String username, String content,
-                                      Date time, String channelId)
+                                     Date time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
         message.setChannelId(channelId);
