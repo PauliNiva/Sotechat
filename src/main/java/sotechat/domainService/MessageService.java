@@ -23,7 +23,7 @@ public class MessageService  {
 
     /** konstruktorissa injektoidaan repositorio */
     @Autowired
-    public MessageService(MessageRepo pMessageRepo) throws Exception{
+    public MessageService(MessageRepo pMessageRepo) {
         this.messageRepo = pMessageRepo;
     }
 

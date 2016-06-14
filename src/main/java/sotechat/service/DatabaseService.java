@@ -53,8 +53,8 @@ public class DatabaseService {
      * @param category keskustelun kategoria
      * @throws Exception
      */
-    public final void createConversation(String startMessage, String sender,
-                                          String channelId, String category)
+    public final void createConversation(String sender, String startMessage,
+                                         String channelId, String category)
             throws Exception{
         conversationService.addConversation(channelId);
         conversationService.setCategory(category, channelId);
