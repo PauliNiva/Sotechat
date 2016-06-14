@@ -59,7 +59,7 @@ public class ConversationServiceTest {
         this.conversation.addMessageToConversation(message2);
         Assert.assertEquals(2,
                 this.conversation.getMessagesOfConversation().size());
-        conversationService.addConversation("007");
+        conversationService.addConversation("007", "2006");
         Assert.assertEquals(1, conversationRepo.count());
         conversationService.deleteConversation("007");
         Assert.assertEquals(0, conversationRepo.count());
@@ -67,7 +67,7 @@ public class ConversationServiceTest {
 
     @Test
     public void testi() throws Exception {
-        conversationService.addConversation("007");
+        conversationService.addConversation("007", "2006");
         messageService.addMessage(message1);
         messageService.addMessage(message2);
         conversationService.addMessage(message1, this.conversation);
