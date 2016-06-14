@@ -63,7 +63,7 @@ public class MessageService  {
      */
     @Transactional
     public List<Message> messagesOfConversation(String channelId) throws Exception {
-        return messageRepo.findByConversation(channelId);
+        return messageRepo.findByChannelId(channelId);
     }
 
     /**
@@ -74,7 +74,7 @@ public class MessageService  {
      */
     @Transactional
     public void removeConversation(String channelId) throws Exception {
-        List<Message> messages= messageRepo.findByConversation(channelId);
+        List<Message> messages = messageRepo.findByChannelId(channelId);
         messageRepo.deleteInBatch(messages);
     }
 

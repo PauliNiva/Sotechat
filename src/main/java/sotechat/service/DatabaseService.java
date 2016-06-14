@@ -56,10 +56,12 @@ public class DatabaseService {
     public final void createConversation(String sender, String startMessage,
                                          String channelId, String category)
             throws Exception{
+        Date time = new Date();
+        Message message = new Message(sender, startMessage, time.toString());
         conversationService.addConversation(channelId);
         conversationService.setCategory(category, channelId);
-        saveToDatabase(sender, startMessage, new DateTime().toString(),
-                channelId);
+        conversationService.addMessage(message, channelId);
+        messageService.addMessage(message);
     }
 
     /**

@@ -87,6 +87,12 @@ public class ConversationService {
             conversationRepo.save(conv);
     }
 
+    public void addMessage(Message message, String channelId){
+        Conversation conv = conversationRepo.getOne(channelId);
+        conv.addMessageToConversation(message);
+        conversationRepo.save(conv);
+    }
+
     /**
      * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
      * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
