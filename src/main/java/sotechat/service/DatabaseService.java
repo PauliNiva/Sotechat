@@ -9,11 +9,7 @@ import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
 import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
-
-import javax.servlet.http.HttpSession;
 import java.util.Date;
-
-import static sotechat.util.Utils.get;
 
 /**
  * Luokka tietokantaoperaatioiden toteuttamiseen

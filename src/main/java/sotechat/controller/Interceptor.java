@@ -1,4 +1,4 @@
-package sotechat.config;
+package sotechat.controller;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -11,7 +11,7 @@ import java.security.Principal;
 /**
  * Sallii/kieltaa subscribtionin kayttaja oikeuksista riippuen.
  */
-class SubscriptionInterceptor extends ChannelInterceptorAdapter {
+public class Interceptor extends ChannelInterceptorAdapter {
 
     /** Mitka kaikki viestit kulkevat tata kautta?
      * @param message message
@@ -24,6 +24,7 @@ class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             final MessageChannel channel
     ) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
+        System.out.println("STOMP COMMAND: " + headerAccessor.getCommand() + " :: " + message.toString());
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             Principal userPrincipal = headerAccessor.getUser();
 
@@ -33,6 +34,9 @@ class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             if (!validateSubscription(userPrincipal, sessionId, channelIdWP)) {
                 throw new IllegalArgumentException("Hacking attempt?");
             }
+        }
+        if (StompCommand.SEND.equals(headerAccessor.getCommand())) {
+
         }
         return message;
     }

@@ -9,21 +9,26 @@ import java.util.HashMap;
 public class MockSession implements HttpSession {
 
     private HashMap<String, Object> sessionAttributes;
+    private String sessionId;
 
     public MockSession() {
         this.sessionAttributes = new HashMap<>();
+    }
+
+    public MockSession(String sessionId) {
+        this.sessionAttributes = new HashMap<>();
+        this.sessionId = sessionId;
+    }
+
+    @Override
+    public String getId() {
+        return sessionId;
     }
 
     @Override
     public long getCreationTime() {
         return 0;
     }
-
-    @Override
-    public String getId() {
-        return null;
-    }
-
     @Override
     public long getLastAccessedTime() {
         return 0;

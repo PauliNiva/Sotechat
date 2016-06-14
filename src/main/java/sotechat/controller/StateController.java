@@ -9,6 +9,9 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
+import org.springframework.session.SessionRepository;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
 import sotechat.domainService.ConversationService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +27,9 @@ public class StateController {
 
     /** State Service. */
     private final StateService stateService;
+
+    /** Session Repository. */
+    private final SessionRepo sessionRepo;
 
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
@@ -43,11 +49,13 @@ public class StateController {
     @Autowired
     public StateController(
             final StateService pStateService,
+            final SessionRepo pSessionRepo,
             final QueueBroadcaster pQueueBroadcaster,
             final ChatLogBroadcaster pChatLogBroadcaster,
             final ConversationService pConversationService
     ) {
         this.stateService = pStateService;
+        this.sessionRepo = pSessionRepo;
         this.queueBroadcaster = pQueueBroadcaster;
         this.chatLogBroadcaster = pChatLogBroadcaster;
         this.conversationService = pConversationService;
@@ -68,7 +76,8 @@ public class StateController {
             final Principal professional
             ) throws Exception {
 
-        return stateService.respondToUserStateRequest(req, professional);
+        Session session = sessionRepo.updateSession(req, professional);
+        return new UserStateResponse(session);
     }
 
     /** Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
@@ -85,11 +94,13 @@ public class StateController {
             final HttpServletRequest req,
             final Principal professional
             ) throws Exception {
+
         if (professional == null) {
             /** Hacking attempt? */
             return null;
         }
-        return stateService.respondToProStateRequest(req, professional);
+        Session session = sessionRepo.updateSession(req, professional);
+        return new ProStateResponse(session);
     }
 
 
@@ -115,6 +126,7 @@ public class StateController {
         }
         String answer = stateService.respondToJoinPoolRequest(request);
         queueBroadcaster.broadcastQueue();
+        System.out.println("Returning: " + "{\"content\":\"" + answer + "\"}");
         return "{\"content\":\"" + answer + "\"}";
     }
 
@@ -142,12 +154,18 @@ public class StateController {
             System.out.println("Hacking attempt?");
             return "";
         }
+        /** Pyydetaan StateServicea suorittamaan poppaus. */
         String wakeUp = stateService.popQueue(channelId, accessor);
         if (wakeUp.isEmpty()) {
             /** Case: Toinen professional ehtikin popata taman ennen meita. */
             return "";
         }
+        /** HUOM: Kanavan viestit broadcast, kun kanavalle subscribataan. */
+
+        /** Paivitetaan jonon tila kaikille ammattilaisille. */
         queueBroadcaster.broadcastQueue();
+
+        /** Palautetaan poppaajalle tieto, etta poppaus onnistui. */
         return wakeUp;
     }
 

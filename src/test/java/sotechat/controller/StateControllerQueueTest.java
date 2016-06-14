@@ -37,13 +37,12 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
-import sotechat.util.MsgUtil;
-import sotechat.util.MockChannelInterceptor;
-import sotechat.util.MockPrincipal;
-import sotechat.util.MockSession;
+import sotechat.util.*;
 
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -102,11 +101,14 @@ public class StateControllerQueueTest {
         /**
          * Luodaan hoitajalle sessio.
          */
-        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
+        HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
+        Principal mockPrincipal = new MockPrincipal("Hoitaja");
+        sessionRepo.updateSession(mockRequest, mockPrincipal);
+
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new MockPrincipal("Hoitaja"));
+        headers.setUser(mockPrincipal);
 
         /**
          * Simuloidaan sitä, että painaa "ota ensimmäinen jonosta" -nappia.
@@ -115,11 +117,11 @@ public class StateControllerQueueTest {
         msgUtil.add("random", "random", true);
 
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<byte[]> messageToBeSended = MessageBuilder
+        Message<byte[]> messageToSend = MessageBuilder
                 .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
 
-        this.clientInboundChannel.send(messageToBeSended);
+        this.clientInboundChannel.send(messageToSend);
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
@@ -133,7 +135,10 @@ public class StateControllerQueueTest {
     public void unAuthenticatedUserCantPopUserFromQueue() throws Exception {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
-        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
+        Principal principal = null;
+        sessionRepo.updateSession(mockRequest, principal);
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("random", "random", true);
