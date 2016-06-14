@@ -8,7 +8,7 @@ sotechat.queue
 sotechat.repo
 sotechat.service
 sotechat.util
-sotechat.websocket
+sotechat.connectionEvents
 sotechat.websocketService
 sotechat.wrappers
 sotechatIT

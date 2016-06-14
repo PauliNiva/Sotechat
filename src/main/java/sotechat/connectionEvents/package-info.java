@@ -2,4 +2,4 @@
  * kohtaan ohjelman suoritusta, kun muodostetaan WebSocket-yhteys, ja siihen,
  * jossa yhteys katkaistaa.
  **/
-package sotechat.websocket;
+package sotechat.connectionEvents;
