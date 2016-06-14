@@ -134,7 +134,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void testGetProStatReturnsOK() throws Exception {
+    public void testGetProStateReturnsOK() throws Exception {
          mvc.perform(MockMvcRequestBuilders
                 .get("/proState").accept(MediaType.APPLICATION_JSON)
                     .principal(new MockPrincipal("hoitaja")))
@@ -160,6 +160,13 @@ public class StateControllerTest {
     public void
     joiningChatPoolSucceedsWithNormalUserIfStateIsStart() throws Exception {
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
+        System.out.println(mvc.perform(MockMvcRequestBuilders
+                .get("/userState")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString());
+
         mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .sessionAttr("channelId", "2")
