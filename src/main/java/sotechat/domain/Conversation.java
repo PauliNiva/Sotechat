@@ -22,9 +22,7 @@ public class Conversation {
 
     /** aikaleima */
     @NotNull
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd.MM.yyyy")
-    private Date date;
+    private String date;
 
     /** keskustelun aihealue */
     private String category;
@@ -54,7 +52,7 @@ public class Conversation {
      * @param date aikaleima
      * @param channelId kanavan id
      */
-    public Conversation(Date date, String channelId) {
+    public Conversation(String date, String channelId) {
         this.date = date;
         this.channelId = channelId;
         this.messagesOfConversation = new ArrayList<>();
@@ -65,7 +63,7 @@ public class Conversation {
      * palauttaa viestin aikaleiman
      * @return aikaleima
      */
-    public final Date getDate() {
+    public final String getDate() {
         return this.date;
     }
 
@@ -73,7 +71,7 @@ public class Conversation {
      * asettaa viestin aikaleiman parametrina annettuun aikaleimaan
      * @param pdate viestin aikaleima
      */
-    public final void setDate(final Date pdate) {
+    public final void setDate(final String pdate) {
         this.date = pdate;
     }
 
