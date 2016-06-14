@@ -98,7 +98,6 @@ public class StateService {
 
         /** Tarkistetaan etta aiempi tila on "start". */
         if (!session.get("state").equals("start")) {
-            /** String (ei JSON), jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to bad state.";
         }
 

@@ -95,7 +95,7 @@ public class ConversationService {
      * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
      *                  lisata
      */
-    public void addMessage(Message message, String channelId){
+    public void addMessage(Message message, String channelId) {
         Conversation conv = conversationRepo.getOne(channelId);
         conv.addMessageToConversation(message);
         conversationRepo.save(conv);
@@ -109,7 +109,7 @@ public class ConversationService {
      *                messageServicesta)
      */
     @Transactional
-    public void removeMessage(Message message){
+    public void removeMessage(Message message) {
         String channelId = message.getConversation().getChannelId();
         Conversation conv = conversationRepo.findOne(channelId);
         conv.getMessagesOfConversation().remove(message);
