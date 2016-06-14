@@ -48,7 +48,7 @@ public class ConversationTest {
 
     @Test
     public void getAndSetDate() {
-        conversation.setDate(date);
+        conversation.setDate(date.toString());
         Assert.assertNotNull(conversation.getDate());
     }
 

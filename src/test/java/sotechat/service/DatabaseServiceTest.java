@@ -69,22 +69,27 @@ public class DatabaseServiceTest {
     }
 
     @Test
+    @Transactional
     public void createConversationTest() throws Exception {
         dbservice.createConversation("Anon", "Moi!", "888a", "hammashoito");
         Assert.assertEquals("Conversation", cr.findAll().get(0).getClass().getSimpleName());
         Assert.assertNotNull(cr.findOne("888a"));
         Assert.assertNotNull(cr.findOne("888a").getDate());
-        Assert.assertEquals("Moi!", cr.findOne("888c").getMessagesOfConversation().get(0).getContent());
-        Assert.assertEquals("Anon", cr.findOne("888c").getMessagesOfConversation().get(0).getSender());
+        Assert.assertEquals("Moi!", cr.findOne("888a").getMessagesOfConversation().get(0).getContent());
+        Assert.assertEquals("Anon", cr.findOne("888a").getMessagesOfConversation().get(0).getSender());
+        Assert.assertEquals("888a", cr.findOne("888a").getMessagesOfConversation().get(0).getChannelId());
+        Assert.assertNotNull("Anon", cr.findOne("888a").getMessagesOfConversation().get(0).getDate());
     }
 
     @Test
+    @Transactional
     public void createConversationTest2() throws Exception {
         dbservice.createConversation("Anon", "Moi!", "888b", "hammashoito");
         Assert.assertEquals("hammashoito", cr.findOne("888b").getCategory());
     }
 
     @Test
+    @Transactional
     public void createConversationTest3() throws Exception {
         dbservice.createConversation("Anon", "Moi!", "888c", "hammashoito");
         Assert.assertEquals("Message", mr.findAll().get(0).getClass().getSimpleName());
@@ -95,6 +100,14 @@ public class DatabaseServiceTest {
     }
 
     @Test
+    @Transactional
+    public void createConversationTest4() throws Exception {
+        dbservice.createConversation("Anon", "Moi!", "888c", "hammashoito");
+        Assert.assertEquals(mr.findByChannelId("888c").get(0).getDate(), cr.findOne("888c").getDate());
+    }
+
+    @Test
+    @Transactional
     public void addPersonToConversationTest() throws Exception {
         cr.save(conversation);
         dbservice.addPersonToConversation("xxd", "xyzo");
@@ -102,11 +115,36 @@ public class DatabaseServiceTest {
    }
 
     @Test
+    @Transactional
     public void addPersonToConversationTest2() throws Exception {
         cr.save(conversation);
         dbservice.addPersonToConversation("xxd", "xyzo");
         Assert.assertEquals("xxd", cr.findOne("xyzo").getParticipantsOfConversation().get(0).getUserId());
     }
 
+    @Test
+    @Transactional
+    public void saveMsgToDatabaseTest() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("xxx");
+        cr.save(conversation);
+        dbservice.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
+        Assert.assertNotNull(mr.findByChannelId("224r"));
+        Assert.assertNotNull(cr.findOne("224r").getMessagesOfConversation().get(0));
+    }
+
+    @Test
+    @Transactional
+    public void saveMsgToDatabaseTest2() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("xxx");
+        cr.save(conversation);
+        dbservice.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
+        Assert.assertEquals("Salla", mr.findByChannelId("224r").get(0).getSender());
+        Assert.assertEquals("Hoi", mr.findByChannelId("224r").get(0).getContent());
+        Assert.assertEquals("23.4.2005", mr.findByChannelId("224r").get(0).getDate());
+        Assert.assertEquals("224r", mr.findByChannelId("224r").get(0).getConversation().getChannelId());
+        Assert.assertEquals(cr.findOne("224r").getMessagesOfConversation().get(0), mr.findByChannelId("224r").get(0).getConversation().getMessagesOfConversation().get(0));
+    }
 
 }

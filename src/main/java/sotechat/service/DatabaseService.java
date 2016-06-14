@@ -10,11 +10,6 @@ import sotechat.domainService.ConversationService;
 import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
 
-import javax.servlet.http.HttpSession;
-import java.util.Date;
-
-import static sotechat.util.Utils.get;
-
 /**
  * Luokka tietokantaoperaatioiden toteuttamiseen
  * Created by varkoi on 13.6.2016.
@@ -56,9 +51,10 @@ public class DatabaseService {
     public final void createConversation(String sender, String startMessage,
                                          String channelId, String category)
             throws Exception{
-        Date time = new Date();
+        DateTime time = new DateTime();
         Message message = new Message(sender, startMessage, time.toString());
-        conversationService.addConversation(channelId);
+        message.setChannelId(channelId);
+        conversationService.addConversation(channelId, time.toString());
         conversationService.setCategory(category, channelId);
         conversationService.addMessage(message, channelId);
         messageService.addMessage(message);
@@ -87,8 +83,8 @@ public class DatabaseService {
      * @param channelId viestin kanavan id
      * @throws Exception
      */
-    public final void saveToDatabase(String username, String content,
-                                     String time, String channelId)
+    public final void saveMsgToDatabase(String username, String content,
+                                        String time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
         Conversation conv = conversationService.getConversation(channelId);

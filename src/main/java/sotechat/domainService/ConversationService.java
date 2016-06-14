@@ -1,5 +1,6 @@
 package sotechat.domainService;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +23,8 @@ public class ConversationService {
     /** Keskustelujen tallentamiseen */
     private ConversationRepo conversationRepo;
 
-    @Autowired
     /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
+    @Autowired
     public ConversationService(ConversationRepo conversationRepo,
                                PersonRepo personRepo) {
         this.conversationRepo = conversationRepo;
@@ -36,9 +37,9 @@ public class ConversationService {
      * @param channelId keskustelun kanavan id
      */
     @Transactional
-    public void addConversation(String channelId)
+    public void addConversation(String channelId, String date)
             throws Exception {
-            Conversation conv = new Conversation(new Date(), channelId);
+            Conversation conv = new Conversation(date, channelId);
             conversationRepo.save(conv);
     }
 
