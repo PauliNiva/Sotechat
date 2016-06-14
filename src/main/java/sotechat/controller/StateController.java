@@ -76,6 +76,7 @@ public class StateController {
             final Principal professional
             ) throws Exception {
 
+        System.out.println("Session id = " + req.getSession().getId());
         Session session = sessionRepo.updateSession(req, professional);
         return new UserStateResponse(session);
     }

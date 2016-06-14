@@ -81,7 +81,11 @@ public class StateService {
             ) throws Exception {
 
         String sessionId = request.getSession().getId();
+        System.out.println("Session id = " + sessionId);
         Session session = sessionRepo.getSessionObj(sessionId);
+        if (session == null) {
+            return "Denied due to missing or invalid session ID.";
+        }
         /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
         String jsonString = request.getReader().readLine();
         JsonParser parser = new JsonParser();
@@ -89,6 +93,8 @@ public class StateService {
         String username = payload.get("username").getAsString();
         String startMessage = payload.get("startMessage").getAsString();
         String channelId = session.get("channelId");
+
+        System.out.println("REQUESTED USERNAME " + username + " with start message " + startMessage);
 
         /** Tarkistetaan etta aiempi tila on "start". */
         if (!session.get("state").equals("start")) {

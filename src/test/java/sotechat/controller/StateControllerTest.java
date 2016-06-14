@@ -1,5 +1,7 @@
 package sotechat.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,10 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,9 +33,13 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.DatabaseService;
+import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -52,6 +60,7 @@ import static org.springframework.test.web.servlet.result
 public class StateControllerTest {
 
     private MockMvc mvc;
+    private SessionRepo sessions;
 
     /**
      * Before.
@@ -63,7 +72,7 @@ public class StateControllerTest {
         Mapper mapper = new MapperImpl();
         SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
-        SessionRepo sessions = new SessionRepoImpl(mapper);
+        sessions = new SessionRepoImpl(mapper);
         ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
         MessageRepo mockMessageRepo = mock(MessageRepo.class);
         when(mockConversationRepo.findOne(any(String.class)))
@@ -156,23 +165,43 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.channelIds", is("[]")));
     }
 
-    @Test
-    public void
-    joiningChatPoolSucceedsWithNormalUserIfStateIsStart() throws Exception {
-        String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        System.out.println(mvc.perform(MockMvcRequestBuilders
-                .get("/userState")
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString());
 
+    @Test
+    public void joinPoolWithoutProperSessionFails() throws Exception {
+        String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
+        mvc.perform(post("/joinPool")
+                .contentType(MediaType.APPLICATION_JSON).content(json)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("Denied due to missing or invalid session ID.")));
+    }
+
+    @Test
+    public void joinPoolTypicalCaseWorks() throws Exception {
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
+         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+        MvcResult result = mvc
+                .perform(MockMvcRequestBuilders
+                        .get("/userState")
+                        .session(mockSession)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        /** Naita ei kayteta. Sailytetaan tulevia testeja varten!
+        String response = result.getResponse().getContentAsString();
+        JsonObject jsonObj = new JsonParser().parse(response).getAsJsonObject();
+        String channelId = jsonObj.get("channelId").toString();
+        String userId = jsonObj.get("userId").toString(); */
+
+        /** Tehdaan sitten samalta 007-sessiolta kelpo /joinPool pyynto. */
+        String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
-                    .sessionAttr("channelId", "2")
-                    .sessionAttr("state", "start")
-                    .sessionAttr("userId", "4")
-                    .sessionAttr("category", "DRUGS"))
+                    .session(mockSession)
+                    )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
@@ -180,35 +209,51 @@ public class StateControllerTest {
     }
 
     @Test
-    public void
-    joiningChatPoolFailsWithNormalUserIfStateIsNotStart() throws Exception {
+    public void joinPoolWithWrongStateFails() throws Exception {
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
+         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+        mvc.perform(MockMvcRequestBuilders
+                .get("/userState")
+                .session(mockSession)
+                .accept(MediaType.APPLICATION_JSON));
+
+        /** Asetetaan palvelimella session tilaksi "chat". */
+        sessions.getSessionObj("007").set("state", "chat");
+
+        /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila != "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
-                    .contentType(MediaType.APPLICATION_JSON).content(json)
-                    .sessionAttr("channelId", "2")
-                    .sessionAttr("state", "chat")
-                    .sessionAttr("userId", "4")
-                    .sessionAttr("category", "DRUGS"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*", hasSize(1)))
-                .andExpect(jsonPath("$.content",
+                        .contentType(MediaType.APPLICATION_JSON).content(json)
+                        .session(mockSession)
+                        )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.*", hasSize(1)))
+                    .andExpect(jsonPath("$.content",
                         is("Denied join pool request due to bad state.")));
     }
 
     @Test
-    public void
-    joiningChatPoolFailsIfUserTriesToJoinWithProfessionalIdAndUsername() throws Exception {
+    public void joinPoolWithReservedScreennameFails() throws Exception {
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
+         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+        mvc.perform(MockMvcRequestBuilders
+                        .get("/userState")
+                        .session(mockSession)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        /** Tehdaan sitten samalta 007-sessiolta /joinPool pyynto,
+         * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
-                .sessionAttr("channelId", "2")
-                .sessionAttr("state", "start")
-                .sessionAttr("userId", "666")
-                .sessionAttr("category", "DRUGS"))
+                .session(mockSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                    is("Denied join pool request due to reserved username.")));
+                        is("Denied join pool request due "
+                                + "to reserved username.")));
     }
 
 }
