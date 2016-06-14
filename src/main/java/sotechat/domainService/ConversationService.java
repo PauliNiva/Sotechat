@@ -10,7 +10,6 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen

@@ -1,15 +1,11 @@
 package sotechat.domainService;
 
-import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sotechat.domain.Message;
-import sotechat.domain.Conversation;
-import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
-import sotechat.repo.PersonRepo;
 
 /**
  * Luokka tietokannassa olevien Message -olioiden tallentamiseen
