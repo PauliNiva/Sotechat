@@ -7,6 +7,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -15,9 +16,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 public class Message extends AbstractPersistable<Long> {
 
-    /** aikaleima */
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    /**
+     * aikaleima muodossa DateTime.toString()
+     * */
+    private String date;
 
     /** viestin sisalto */
     private String content;
@@ -42,7 +44,7 @@ public class Message extends AbstractPersistable<Long> {
      * @param content viestin sisalto
      * @param date aikaleima
      */
-    public Message(String sender, String content, Date date){
+    public Message(String sender, String content, String date){
         this.sender = sender;
         this.content = content;
         this.date = date;
@@ -52,7 +54,7 @@ public class Message extends AbstractPersistable<Long> {
      * Palauttaa viestin aikaleiman
      * @return viestin aikaleima
      */
-    public final Date getDate() {
+    public final String getDate() {
         return this.date;
     }
 
@@ -60,7 +62,7 @@ public class Message extends AbstractPersistable<Long> {
      * Asettaa viestin aikaleimaksi parametrina annetun ajan
      * @param pdate viestin aikaleima
      */
-    public final void setDate(final Date pdate) {
+    public final void setDate(final String pdate) {
         this.date = pdate;
     }
 

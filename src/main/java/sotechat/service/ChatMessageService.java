@@ -88,17 +88,16 @@ public class ChatMessageService {
                                         String channelId, String content)
                                         throws Exception {
 
-        String timeStampForClient = new DateTime().toString();
-        Date timeForDB = new Date();
+        String timeStamp = new DateTime().toString();
 
         MsgToClient msg = new MsgToClient(username, channelId,
-                timeStampForClient, content);
+                timeStamp, content);
 
         /** Tallennetaan viesti lokeihin. */
         chatLogger.log(msg);
 
         /**tallennetaan viesti tietokantaan. */
-        databaseService.saveToDatabase(username, content, timeForDB, channelId);
+        databaseService.saveToDatabase(username, content, timeStamp, channelId);
 
         /** MsgToClient paketoidaan JSONiksi ja lahetetaan WebSocketilla. */
         return msg;

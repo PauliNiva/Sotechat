@@ -58,7 +58,8 @@ public class DatabaseService {
             throws Exception{
         conversationService.addConversation(channelId);
         conversationService.setCategory(category, channelId);
-        saveToDatabase(sender, startMessage, new Date(), channelId);
+        saveToDatabase(sender, startMessage, new DateTime().toString(),
+                channelId);
     }
 
     /**
@@ -85,7 +86,7 @@ public class DatabaseService {
      * @throws Exception
      */
     public final void saveToDatabase(String username, String content,
-                                     Date time, String channelId)
+                                     String time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
         Conversation conv = conversationService.getConversation(channelId);
