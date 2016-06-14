@@ -45,8 +45,7 @@ public class zproHandlesManyUsersIT {
     }
 
     /**
-     * What if we have many customer and very very effective Pro
-     * Do not try this at home!
+     * Test disabled while waiting for AngularJS changes.
      */
     
     public void KillerTest() {
