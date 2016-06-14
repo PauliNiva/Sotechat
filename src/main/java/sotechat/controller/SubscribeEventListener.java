@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
+import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
@@ -25,7 +26,7 @@ public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
     /** Key = channelIDWithPath, value = list of subscribed sessions. */
-    private HashMap<String, List<HttpSession>> map;
+    private HashMap<String, List<Session>> map;
 
     /** Session Repository. */
     @Autowired
@@ -41,19 +42,19 @@ public class SubscribeEventListener
 
     /** Vain 1 instanssi. */
     public SubscribeEventListener() {
-        map = new HashMap<String, List<HttpSession>>();
+        map = new HashMap<String, List<Session>>();
     }
 
     /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
      * @param channelId kanavaId
      * @return lista sessioita
      */
-    public final synchronized List<HttpSession> getSubscribers(
+    public final synchronized List<Session> getSubscribers(
             final String channelId
     ) {
-        List<HttpSession> subs = map.get(channelId);
+        List<Session> subs = map.get(channelId);
         if (subs == null) {
-            subs = new ArrayList<HttpSession>();
+            subs = new ArrayList<Session>();
         }
         return subs;
     }
@@ -88,7 +89,7 @@ public class SubscribeEventListener
                 .get("SPRING.SESSION.ID").toString(); //TODO: Handle NULLPointter, palauta clientille jotain?
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
-        HttpSession session = sessionRepo.getHttpSession(sessionId);
+        Session session = sessionRepo.getSession(sessionId);
 
         System.out.println("Subscribing someone to " + channelIdWithPath);
         if (channelIdWithPath.isEmpty()) {
@@ -96,7 +97,7 @@ public class SubscribeEventListener
         }
 
         /** Add session to list of subscribers to channelId. */
-        List<HttpSession> list = map.get(channelIdWithPath);
+        List<Session> list = map.get(channelIdWithPath);
         if (list == null) {
             list = new ArrayList<>();
             map.put(channelIdWithPath, list);

@@ -102,7 +102,7 @@ public class StateControllerQueueTest {
         /**
          * Luodaan hoitajalle sessio.
          */
-        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
+        sessionRepo.mapSessionToSessionId("1234", new MockSession());
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
@@ -133,7 +133,7 @@ public class StateControllerQueueTest {
     public void unAuthenticatedUserCantPopUserFromQueue() throws Exception {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
-        sessionRepo.mapHttpSessionToSessionId("1234", new MockSession());
+        sessionRepo.mapSessionToSessionId("1234", new MockSession());
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("random", "random", true);

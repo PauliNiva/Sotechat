@@ -1,5 +1,7 @@
 package sotechat.wrappers;
 
+import sotechat.data.Session;
+
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
  * kun "tavalliselle kayttajalle" kerrotaan state.
  */
@@ -17,22 +19,16 @@ public class UserStateResponse {
     private String channelId;
 
     /** Konstruktori alustaa olion.
-     * @param pState state
-     * @param pUsername username
-     * @param pUserId userId
-     * @param pCategory category
-     * @param pChannelId channelId
+     * @param session oma session-olio
      */
-    public UserStateResponse(final String pState,
-                             final String pUsername,
-                             final String pUserId,
-                             final String pCategory,
-                             final String pChannelId) {
-        this.state = pState;
-        this.username = pUsername;
-        this.userId = pUserId;
-        this.category = pCategory;
-        this.channelId = pChannelId;
+    public UserStateResponse(
+            final Session session
+    ) {
+        this.state = session.get("state");
+        this.username = session.get("username");
+        this.userId = session.get("userId");
+        this.category = session.get("category");
+        this.channelId = session.get("channelId");
     }
 
     /** Antaa tilan.

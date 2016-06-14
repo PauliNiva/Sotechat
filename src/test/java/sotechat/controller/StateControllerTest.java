@@ -100,7 +100,11 @@ public class StateControllerTest {
                 databaseService);
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
-                        state, broadcaster, logBroadcaster, conversationService))
+                        state,
+                        sessions,
+                        broadcaster,
+                        logBroadcaster,
+                        conversationService))
                 .build();
     }
 

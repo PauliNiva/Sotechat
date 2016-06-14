@@ -11,6 +11,7 @@ import org.springframework.session.web.socket.config
 import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import sotechat.controller.Interceptor;
 import sotechat.data.SessionRepoImpl;
 
 
@@ -56,12 +57,12 @@ public class WebSocketConfig extends
     }
 
     /** Subscriptionien hyvaksyminen ohjataan
-     * SubscriptionInterceptor -instanssille.
+     * Interceptor -instanssille.
      * @param registration registration
      */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(new SubscriptionInterceptor());
+        registration.setInterceptors(new Interceptor());
     }
 }
 
