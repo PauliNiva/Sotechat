@@ -25,6 +25,7 @@ import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by varkoi on 14.6.2016.
@@ -145,6 +146,21 @@ public class DatabaseServiceTest {
         Assert.assertEquals("23.4.2005", mr.findByChannelId("224r").get(0).getDate());
         Assert.assertEquals("224r", mr.findByChannelId("224r").get(0).getConversation().getChannelId());
         Assert.assertEquals(cr.findOne("224r").getMessagesOfConversation().get(0), mr.findByChannelId("224r").get(0).getConversation().getMessagesOfConversation().get(0));
+    }
+
+    @Test
+    @Transactional
+    public void saveMsgToDatabaseTest3() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("xxx");
+        cr.save(conversation);
+        dbservice.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
+        dbservice.saveMsgToDatabase("Anon", "Moi", "23.5.2005", "224r");
+        List<Message> messages = mr.findByChannelId("224r");
+        Assert.assertEquals(2, messages.size());
+        Assert.assertNotEquals(messages.get(0), messages.get(1));
+        Assert.assertEquals(messages.get(1).getConversation(), messages.get(0).getConversation());
+        Assert.assertEquals("Moi", messages.get(1).getContent());
     }
 
 }
