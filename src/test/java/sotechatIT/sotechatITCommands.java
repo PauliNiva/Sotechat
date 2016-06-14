@@ -70,7 +70,7 @@ public final class sotechatITCommands {
     public static void proLogin(WebDriverWait wait) {
         waitElementPresent(wait, By.name("username")).sendKeys("Hoitaja");
         waitElementPresent(wait, By.name("password")).sendKeys("salasana");
-        waitElementPresent(wait, By.cssSelector("input[type='submit'][value='Sign In']")).submit();
+        waitElementPresent(wait, By.name("login")).submit();
     }
 
     /**
