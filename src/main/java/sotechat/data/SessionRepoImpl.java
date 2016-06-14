@@ -1,16 +1,18 @@
 package sotechat.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 
-/** Hoitaa Session-olioihi liittyvan kasittelyn.
+/** Hoitaa Session-olioihin liittyvan kasittelyn.
  * esim. paivittaa session-attribuutteihin nimimerkin.
  */
 @Component
-public class SessionRepoImpl implements SessionRepo {
+public class SessionRepoImpl extends MapSessionRepository
+        implements SessionRepo {
 
     /** Avain sessio-ID, arvo Sessio-olio.
      * HUOM: Usea sessio-ID voi viitata samaan Session-olioon! */
@@ -40,7 +42,7 @@ public class SessionRepoImpl implements SessionRepo {
      * @return sesson-olio
      */
     @Override
-    public final synchronized Session getSession(
+    public final synchronized Session getSessionObj(
             final String sessionId
     ) {
         return sessions.get(sessionId);
@@ -85,6 +87,8 @@ public class SessionRepoImpl implements SessionRepo {
         String username = session.get("username");
         String userId = session.get("userId");
 
+        System.out.println("HEIPPA HEI " + username);
+
         /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {
             /* Jos client on autentikoitunut ammattilaiseksi */
@@ -92,7 +96,7 @@ public class SessionRepoImpl implements SessionRepo {
             userId = mapperService.getIdFromRegisteredName(username);
             session.set("state", "pro");
             session.updateChannelsAttribute();
-        } else if (session.get("username").isEmpty()) {
+        } else if (username.isEmpty()) {
             /* Uusi kayttaja */
             username = "Anon";
             userId = mapperService.generateNewId();
@@ -100,6 +104,7 @@ public class SessionRepoImpl implements SessionRepo {
             session.set("category", "Kategoria"); //TODO
             String randomNewChannel = mapperService.generateNewId();
             session.set("channelId", randomNewChannel);
+            System.out.println("   luodaan uusi " + randomNewChannel);
         }
 
         /** Liitetaan muuttujien tieto sessioon (monesti aiemman paalle). */

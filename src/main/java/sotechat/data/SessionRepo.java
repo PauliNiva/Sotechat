@@ -12,7 +12,7 @@ public interface SessionRepo {
      * @param sessionId sessioId
      * @return sessio-olio
      */
-    Session getSession(
+    Session getSessionObj(
             String sessionId
     );
 

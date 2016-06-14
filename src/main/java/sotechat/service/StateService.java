@@ -81,7 +81,7 @@ public class StateService {
             ) throws Exception {
 
         String sessionId = request.getSession().getId();
-        Session session = sessionRepo.getSession(sessionId);
+        Session session = sessionRepo.getSessionObj(sessionId);
         /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
         String jsonString = request.getReader().readLine();
         JsonParser parser = new JsonParser();
@@ -91,7 +91,7 @@ public class StateService {
         String channelId = session.get("channelId");
 
         /** Tarkistetaan etta aiempi tila on "start". */
-        if (session.get("state").equals("start")) {
+        if (!session.get("state").equals("start")) {
             /** String (ei JSON), jotta AngularJS osaa ohjata fail-metodille. */
             return "Denied join pool request due to bad state.";
         }
@@ -147,14 +147,14 @@ public class StateService {
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
-    ) throws Exception {
+            ) throws Exception {
         if (queueService.removeFromQueue(channelId) == null) {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return "";
         }
         String sessionId =  accessor.getSessionAttributes()
                 .get("SPRING.SESSION.ID").toString();
-        Session session = sessionRepo.getSession(sessionId);
+        Session session = sessionRepo.getSessionObj(sessionId);
 
         /** Lisataan popattu kanava poppaajan kanaviin. */
         session.addChannel(channelId);
@@ -170,8 +170,7 @@ public class StateService {
         return "{\"content\":\"channel activated.\"}";
     }
 
-    /**
-     * Muutetaan popattavan kanavan henkiloiden tilaa
+    /** Muokataan popattavan kanavan sessioiden tilaksi "chat".
      * @param channelId kanavan id
      */
     private final void changeParticipantsState(

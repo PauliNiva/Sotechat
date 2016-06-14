@@ -126,6 +126,7 @@ public class StateController {
         }
         String answer = stateService.respondToJoinPoolRequest(request);
         queueBroadcaster.broadcastQueue();
+        System.out.println("Returning: " + "{\"content\":\"" + answer + "\"}");
         return "{\"content\":\"" + answer + "\"}";
     }
 

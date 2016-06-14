@@ -12,7 +12,6 @@ import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +88,7 @@ public class SubscribeEventListener
                 .get("SPRING.SESSION.ID").toString(); //TODO: Handle NULLPointter, palauta clientille jotain?
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
-        Session session = sessionRepo.getSession(sessionId);
+        Session session = sessionRepo.getSessionObj(sessionId);
 
         System.out.println("Subscribing someone to " + channelIdWithPath);
         if (channelIdWithPath.isEmpty()) {
