@@ -110,7 +110,7 @@ public class ConversationService {
      * @throws Exception IllegalArgumentException
      */
     @Transactional
-    public void delete(String channelId) throws Exception {
+    public void deleteConversation(String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
 

@@ -29,8 +29,8 @@ public class MessageService  {
      * @throws Exception
      */
     @Transactional
-    public void addMessage(Message message) throws Exception {
-        messageRepo.save(message);
+    public Message addMessage(Message message) throws Exception {
+        return messageRepo.save(message);
     }
 
     /**
@@ -77,24 +77,5 @@ public class MessageService  {
         List<Message> messages= messageRepo.findByConversation(channelId);
         messageRepo.deleteInBatch(messages);
     }
-
-    /**
-     * Asettaa MessageServicen repositorioksi parametrina annetun repositorion
-     * @param pMessageRepo
-     * @throws Exception
-     */
-    public void setMessageRepo(MessageRepo pMessageRepo) throws Exception {
-        this.messageRepo = pMessageRepo;
-    }
-
-    /**
-     * Palauttaa MessageServicen repositorion
-     * @return MessageServiceen liitetty repositorio
-     * @throws Exception
-     */
-    public MessageRepo getMessageRepo() throws Exception {
-        return this.messageRepo;
-    }
-
 }
 
