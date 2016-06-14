@@ -57,11 +57,11 @@ public class seeingControlPanelIT {
     public void proCanNotSeeControlPanelWhenNotLoggedIn() {
         // Professional logs in with proper username and password
         waitElementPresent(proWait,
-                By.cssSelector("input[type='submit'][value='Sign In']"))
+                By.name("login"))
                 .submit();
 
         //Control panel is not visible to the user
-        assertTrue(waitForTextToAppear(proWait,"tunnus tai salasana."));
+        assertTrue(waitForTextToAppear(proWait,"There was a problem"));
     }
 
 
