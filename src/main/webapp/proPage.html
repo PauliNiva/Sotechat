@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1, user-scalable=no">
+    <title>Sosiaali ja terveys chat</title>
+    <script src="assets/lib/sockjs-0.3.4.js"></script>
+    <script src="assets/lib/stomp.js"></script>
+    <script src="assets/lib/angular.js"></script>
+    <script src="assets/lib/angular-animate.js"></script>
+    <script src="assets/lib/scrollglue.js"></script>
+    <script src="assets/lib/focusIf.min.js"></script>
+    <script src="assets/lib/ui-bootstrap.js"></script>
+    <script src="assets/lib/angular-route.js"></script>
+
+    <script src="app.module.js"></script>
+    <script src="pro.ctrl.js"></script>
+
+    <script src="chatWindow/chatWindow.drc.js"></script>
+    <script src="chatWindow/chatWindow.cpn.js"></script>
+    <script src="chatWindow/proChatWindow.ctrl.js"></script>
+
+    <script src="proControlPanel/proCP.ctrl.js"></script>
+    <script src="queue/proQueue.ctrl.js"></script>
+
+    <script src="login/login.ctrl.js"></script>
+    <script src="services/auth.srvc.js"></script>
+
+    <script src="services/stomp.srvc.js"></script>
+    <script src="services/proState.srvc.js"></script>
+    <script src="services/connectToServer.srvc.js"></script>
+    <script src="services/queuePro.srvc.js"></script>
+    <script src="services/heartBeat.srvc.js"></script>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/chat.css" rel="stylesheet">
+    <link href="assets/css/pro.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-switch.min.css" rel="stylesheet">
+</head>
+<body ng-app="chatProApp" >
+<div class="container app-container chat-animation" ng-controller="proCtrl" ng-include="authStatus"></div>
+</body>
+</html>

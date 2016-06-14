@@ -14,7 +14,7 @@ public class ProUrlController {
      */
     @RequestMapping(value = "/pro")
     public final String pro() {
-        return "forward:/proCP.html";
+        return "/proPage.html";
     }
 
 }

@@ -7,13 +7,13 @@ import org.springframework.web.servlet.config.annotation
 
 /** Luokka ohjaa /login pyynnot /resources/templates/login.html.
  * Tekee myos jotain Spring Security -magiaa? */
-@Configuration
+//@Configuration
 public class LoginRouteConfig extends WebMvcConfigurerAdapter {
 
     /** Thymeleaf on jotenkin osallisena tassa login-mappayksessa.
      * @param registry tayta kuvaus
      */
-    @Override
+   // @Override
     public final void addViewControllers(
             final ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login");

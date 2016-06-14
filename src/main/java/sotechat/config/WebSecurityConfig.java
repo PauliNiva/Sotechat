@@ -1,7 +1,9 @@
 package sotechat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication
         .builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /** Maarittelee mm. kirjautumisvaatimuksen sivulle /pro. */
     @Override
+    @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
     protected final void configure(final HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
         http.csrf().disable();
@@ -28,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // pyynnot polkuun /pro
                 // vaativat kirjautumisen
-                .antMatchers("/pro", "/proCP.html").authenticated()
+
                 // muut pyynnot
                 // sallitaan kaikille
                 .anyRequest().permitAll()

@@ -1,39 +1,30 @@
-angular.module('chatApp', [])
-    .controller('navigation',
-        function($rootScope, $http, $location) {
-            var self = this
+angular.module('chatProApp')
+    .controller('loginController',
+        function($route, auth) {
 
-            var authenticate = function(credentials, callback) {
+            var self = this;
 
-                var headers = credentials ? {authorization : "Basic "
-                + btoa(credentials.username + ":" + credentials.password)
-                } : {};
+            self.credentials = {};
 
-                $http.get('user', {headers : headers}).then(function(response) {
-                    if (response.data.name) {
-                        $rootScope.authenticated = true;
-                    } else {
-                        $rootScope.authenticated = false;
-                    }
-                    callback && callback();
-                }, function() {
-                    $rootScope.authenticated = false;
-                    callback && callback();
-                });
+            self.tab = function(route) {
+                return $route.current && route === $route.current.controller;
+            };
 
+            self.authenticated = function() {
+                return auth.authenticated;
             }
 
-            authenticate();
-            self.credentials = {};
             self.login = function() {
-                authenticate(self.credentials, function() {
-                    if ($rootScope.authenticated) {
-                        $location.path("/pro");
+                auth.authenticate(self.credentials, function(authenticated) {
+                    if (authenticated) {
+                        console.log("Login succeeded")
                         self.error = false;
                     } else {
-                        $location.path("/login");
+                        console.log("Login failed")
                         self.error = true;
                     }
-                });
+                })
             };
+
+            self.logout = auth.clear;
         });

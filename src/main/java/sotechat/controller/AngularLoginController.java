@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-//@RestController
+@RestController
 public class AngularLoginController {
 
-   // @RequestMapping("/user")
+    @RequestMapping("/auth")
     public Principal user(Principal user) {
         return user;
     }
