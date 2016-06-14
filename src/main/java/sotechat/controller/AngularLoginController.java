@@ -1,6 +1,8 @@
 package sotechat.controller;
 
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -9,7 +11,11 @@ import java.security.Principal;
 public class AngularLoginController {
 
     @RequestMapping("/auth")
-    public Principal user(Principal user) {
-        return user;
+    @ResponseBody
+    public String user(Principal user) {
+        if (user != null) {
+            return "{\"name\":\"" + user.getName() + "\"}";
+        }
+        return "{}";
     }
 }

@@ -1,30 +1,15 @@
 angular.module('chatProApp')
-    .controller('loginController',
-        function($route, auth) {
-
+    .controller('loginController', ['$scope', 'auth',
+        function($scope, auth) {
             var self = this;
-
             self.credentials = {};
-
-            self.tab = function(route) {
-                return $route.current && route === $route.current.controller;
-            };
-
             self.authenticated = function() {
                 return auth.authenticated;
             }
 
             self.login = function() {
-                auth.authenticate(self.credentials, function(authenticated) {
-                    if (authenticated) {
-                        console.log("Login succeeded")
-                        self.error = false;
-                    } else {
-                        console.log("Login failed")
-                        self.error = true;
-                    }
-                })
+                auth.authenticate(self.credentials, $scope.$parent.login)
             };
 
             self.logout = auth.clear;
-        });
+        }]);
