@@ -88,6 +88,13 @@ public class ConversationService {
             conversationRepo.save(conv);
     }
 
+    /**
+     * Lisaa parametrina annetun Message olion keskusteluun, joka etsitaan
+     * tietokannasta parametrina annetun kanava id:n perusteella.
+     * @param message Message lisattava viesti
+     * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
+     *                  lisata
+     */
     public void addMessage(Message message, String channelId){
         Conversation conv = conversationRepo.getOne(channelId);
         conv.addMessageToConversation(message);
