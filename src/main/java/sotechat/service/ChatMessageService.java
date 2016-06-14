@@ -79,9 +79,11 @@ public class ChatMessageService {
      * @return MsgToClient muotoinen viesti -olio
      * @throws Exception
      */
-    private MsgToClient prepareMessage(String username,
-                                        String channelId, String content)
-                                        throws Exception {
+    private MsgToClient prepareMessage(
+            String username,
+            String channelId,
+            String content
+        ) throws Exception {
 
         String timeStamp = new DateTime().toString();
 
