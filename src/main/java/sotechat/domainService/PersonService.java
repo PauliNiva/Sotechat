@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
-import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
 import java.util.List;

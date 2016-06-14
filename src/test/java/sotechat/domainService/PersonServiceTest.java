@@ -1,4 +1,4 @@
-package sotechat.repo;
+package sotechat.domainService;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -7,23 +7,24 @@ import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import sotechat.Application;
+
+import sotechat.Launcher;
+import sotechat.domain.Conversation;
 import sotechat.domain.Person;
-import sotechat.domainService.PersonService;
+import sotechat.repo.PersonRepo;
 
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
+@SpringApplicationConfiguration(classes = Launcher.class)
 @Transactional
 @ActiveProfiles("development")
-public class PersonRepoTest {
+public class PersonServiceTest {
 
     Person person;
 
@@ -80,5 +81,24 @@ public class PersonRepoTest {
         Assert.assertEquals("iluaP", person2.getScreenName());
         Assert.assertFalse(personService.changeScreenName("Idnonexistent",
                 "Trump_for_president"));
+    }
+
+    @Test
+    @Transactional
+    public void allPersonsFromRepoAreListed() throws Exception {
+        List<Person> list = personService.findAll();
+        Assert.assertEquals(1, list.size());
+        personService.addPerson(this.person, "0000");
+        list = personService.findAll();
+        Assert.assertEquals(2, list.size());
+    }
+
+    @Test
+    @Transactional
+    public void personsConverstionsAreListed() throws Exception {
+        personService.addPerson(this.person, "0000");
+        List<Conversation> list = personService
+                .personsConversations("jokustringivaansinne");
+        Assert.assertEquals(0, list.size());
     }
 }

@@ -221,7 +221,7 @@ public class StateControllerTest {
         /** Asetetaan palvelimella session tilaksi "chat". */
         sessions.getSessionObj("007").set("state", "chat");
 
-        /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila != "start". */
+        /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila eioo "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                         .contentType(MediaType.APPLICATION_JSON).content(json)

@@ -1,5 +1,6 @@
 package sotechat.domainService;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,6 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
@@ -23,8 +23,8 @@ public class ConversationService {
     /** Keskustelujen tallentamiseen */
     private ConversationRepo conversationRepo;
 
-    @Autowired
     /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
+    @Autowired
     public ConversationService(ConversationRepo conversationRepo,
                                PersonRepo personRepo) {
         this.conversationRepo = conversationRepo;
@@ -37,9 +37,9 @@ public class ConversationService {
      * @param channelId keskustelun kanavan id
      */
     @Transactional
-    public void addConversation(String channelId)
+    public void addConversation(String channelId, String date)
             throws Exception {
-            Conversation conv = new Conversation(new Date(), channelId);
+            Conversation conv = new Conversation(date, channelId);
             conversationRepo.save(conv);
     }
 
@@ -89,6 +89,19 @@ public class ConversationService {
     }
 
     /**
+     * Lisaa parametrina annetun Message olion keskusteluun, joka etsitaan
+     * tietokannasta parametrina annetun kanava id:n perusteella.
+     * @param message Message lisattava viesti
+     * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
+     *                  lisata
+     */
+    public void addMessage(Message message, String channelId){
+        Conversation conv = conversationRepo.getOne(channelId);
+        conv.addMessageToConversation(message);
+        conversationRepo.save(conv);
+    }
+
+    /**
      * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
      * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
      * muutoksen tietokantaan.
@@ -111,7 +124,7 @@ public class ConversationService {
      * @throws Exception IllegalArgumentException
      */
     @Transactional
-    public void delete(String channelId) throws Exception {
+    public void deleteConversation(String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
 

@@ -1,15 +1,11 @@
 package sotechat.domainService;
 
-import java.util.Date;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sotechat.domain.Message;
-import sotechat.domain.Conversation;
-import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
-import sotechat.repo.PersonRepo;
 
 /**
  * Luokka tietokannassa olevien Message -olioiden tallentamiseen
@@ -23,7 +19,7 @@ public class MessageService  {
 
     /** konstruktorissa injektoidaan repositorio */
     @Autowired
-    public MessageService(MessageRepo pMessageRepo) throws Exception{
+    public MessageService(MessageRepo pMessageRepo) {
         this.messageRepo = pMessageRepo;
     }
 
@@ -33,8 +29,8 @@ public class MessageService  {
      * @throws Exception
      */
     @Transactional
-    public void addMessage(Message message) throws Exception {
-        messageRepo.save(message);
+    public Message addMessage(Message message) throws Exception {
+        return messageRepo.save(message);
     }
 
     /**
@@ -67,7 +63,7 @@ public class MessageService  {
      */
     @Transactional
     public List<Message> messagesOfConversation(String channelId) throws Exception {
-        return messageRepo.findByConversation(channelId);
+        return messageRepo.findByChannelId(channelId);
     }
 
     /**
@@ -78,27 +74,8 @@ public class MessageService  {
      */
     @Transactional
     public void removeConversation(String channelId) throws Exception {
-        List<Message> messages= messageRepo.findByConversation(channelId);
+        List<Message> messages = messageRepo.findByChannelId(channelId);
         messageRepo.deleteInBatch(messages);
     }
-
-    /**
-     * Asettaa MessageServicen repositorioksi parametrina annetun repositorion
-     * @param pMessageRepo
-     * @throws Exception
-     */
-    public void setMessageRepo(MessageRepo pMessageRepo) throws Exception {
-        this.messageRepo = pMessageRepo;
-    }
-
-    /**
-     * Palauttaa MessageServicen repositorion
-     * @return MessageServiceen liitetty repositorio
-     * @throws Exception
-     */
-    public MessageRepo getMessageRepo() throws Exception {
-        return this.messageRepo;
-    }
-
 }
 
