@@ -1,30 +1,28 @@
-package sotechatIT;
+package integrationTests.userAcceptanceTests;
 
-
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
+import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.*;
-
-import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import org.openqa.selenium.support.ui.*;
 
+
 import static org.junit.Assert.*;
-import static sotechatIT.sotechatITCommands.*;
+import static integrationTests.util.sotechatITCommands.*;
 
 /**
- * As a user, I want to join the queue to wait my turn
+ * As a user I want to access a chat window
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class joiningQueueIT {
+public class accessingChatWindowIT {
 
-    private WebDriverWait userWait;
     private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
-
 
     @Before
     public void setUp() throws Exception {
@@ -35,31 +33,30 @@ public class joiningQueueIT {
         proWait = handler.getWaitDriver("pro");
     }
 
-
     @After
     public void tearDown() throws Exception {
         handler.closeAll();
     }
 
     /**
-     * User joins a common queue when accessing chat
+     * User sees the queuing view
+     * User can see a chat window when she/he is picked from a pool of customers by a healthcare professiona
      */
     @Test
-    public void UserJoinsACommonQueue() {
-        // User has accessed chat pag
-        // Username and a starting message is submitted
+    public void UserCanSeeAChatWindow() {
+        // User has entered the chat page and submitted a starting message
         waitAndFillInformation(userWait);
-
-        // A queueing view is showed to the user
+        // User sees the queuing view
         assertTrue(waitQueueWindowsAppear(userWait).isDisplayed());
-
-        // User is added to the pool of customers professionals side
+        // A professional has logged in
         proLogin(proWait);
-        assertTrue(waitElementPresent(proWait,By.id("queuerBlock")).isDisplayed());
-        waitAndPickFromQueue(proWait);
-        waitChatWindowsAppear(userWait);
-    }
 
+        // A professional chooses the started conversation from a pool
+        waitAndPickFromQueue(proWait);
+
+        // A chat window is opened for the user
+        assertTrue(waitChatWindowsAppear(userWait).isDisplayed());
+    }
 
 
 }

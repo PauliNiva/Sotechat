@@ -34,9 +34,6 @@ public class StateController {
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
-    /** Testi. */
-    private final ChatLogBroadcaster chatLogBroadcaster;
-
     /** Conversation service */
     private final ConversationService conversationService;
 
@@ -44,20 +41,17 @@ public class StateController {
     /** Spring taikoo tassa Singleton-instanssit palveluista.
      * @param pStateService stateService
      * @param pQueueBroadcaster queue Broadcaster
-     * @param pChatLogBroadcaster chatLogBroadcaster
      */
     @Autowired
     public StateController(
             final StateService pStateService,
             final SessionRepo pSessionRepo,
             final QueueBroadcaster pQueueBroadcaster,
-            final ChatLogBroadcaster pChatLogBroadcaster,
             final ConversationService pConversationService
     ) {
         this.stateService = pStateService;
         this.sessionRepo = pSessionRepo;
         this.queueBroadcaster = pQueueBroadcaster;
-        this.chatLogBroadcaster = pChatLogBroadcaster;
         this.conversationService = pConversationService;
     }
 

@@ -14,7 +14,7 @@ public class MsgToClientTest {
 
     @Before
     public void setUp() {
-        m2c = new MsgToClient("pniva", "1", "2", "cont");
+        m2c = new MsgToClient("1", "pniva", "1", "2", "cont");
     }
 
     /**

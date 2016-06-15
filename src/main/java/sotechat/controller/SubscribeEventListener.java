@@ -5,16 +5,16 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
+import sotechat.data.ChatLogger;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
@@ -35,9 +35,13 @@ public class SubscribeEventListener
     @Autowired
     private QueueBroadcaster queueBroadcaster;
 
-    /** Chat Log Broadcaster. */
+    /** Taikoo viestien lahetyksen. */
     @Autowired
-    private ChatLogBroadcaster chatLogBroadcaster;
+    private SimpMessagingTemplate broker;
+
+    /** Chat Logger (broadcastaa). */
+    @Autowired
+    private ChatLogger chatLogger;
 
     /** Vain 1 instanssi. */
     public SubscribeEventListener() {
@@ -59,11 +63,40 @@ public class SubscribeEventListener
     }
 
 
-    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille metodeil.
+    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
+     * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan
+     * suorittamaan loppuun ennen mahdollisia broadcasteja. Ilman timeria
+     * kay usein niin, etta juuri subscribannut kayttaja ei saa broadcastia.
      * @param applicationEvent kaikki applikaatioEventit aktivoivat taman.
      */
     @Override
     public final void onApplicationEvent(
+            final ApplicationEvent applicationEvent
+    ) {
+
+        /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
+        if (applicationEvent.getClass() != SessionSubscribeEvent.class
+            && applicationEvent.getClass() != SessionUnsubscribeEvent.class) {
+            return;
+        }
+
+        /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
+         * on suoritettu loppuun. */
+        Timer timer = new Timer();
+        int delay = 1; // milliseconds
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                delayedEventHandling(applicationEvent);
+            }
+        }, delay);
+    }
+
+    /** Timerin avulla kutsuttu metodi, joka vain
+     * haarauttaa sub/unsub pyynnot oikeaan metodiin.
+     * @param applicationEvent
+     */
+    private void delayedEventHandling(
             final ApplicationEvent applicationEvent
     ) {
         if (applicationEvent.getClass() == SessionSubscribeEvent.class) {
@@ -75,7 +108,6 @@ public class SubscribeEventListener
     }
 
     /** Kasittelee subscribe -tapahtumat.
-     * TODO: Esta subscribe kanaville, joita ei ole.
      * @param event event
      */
     private synchronized void handleSubscribe(
@@ -83,9 +115,12 @@ public class SubscribeEventListener
     ) {
         //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
+
+        /** Interceptor estaa subscribet, joista puuttuu sessionId. */
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
-                .get("SPRING.SESSION.ID").toString(); //TODO: Handle NULLPointter, palauta clientille jotain?
+                .get("SPRING.SESSION.ID").toString();
+
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
         Session session = sessionRepo.getSessionObj(sessionId);
@@ -114,7 +149,7 @@ public class SubscribeEventListener
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
             String channelId = channelIdWithPath.substring(chatPrefix.length());
-            chatLogBroadcaster.broadcast(channelId);
+            chatLogger.broadcast(channelId, broker);
         }
     }
 

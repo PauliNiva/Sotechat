@@ -69,7 +69,6 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        ChatLogger chatLogger = new ChatLogger();
         Mapper mapper = new MapperImpl();
         SubscribeEventListener listener = new SubscribeEventListener();
         QueueService qService = new QueueService(new QueueImpl());
@@ -98,11 +97,11 @@ public class StateControllerTest {
             }
         });
         QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
-        ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
-                chatLogger, broker);
         DatabaseService databaseService = new DatabaseService(personService,
                                             conversationService,
                                             messageService);
+        ChatLogger chatLogger = new ChatLogger(mapper, databaseService);
+
         StateService state = new StateService(
                 mapper,
                 listener,
@@ -115,7 +114,6 @@ public class StateControllerTest {
                         state,
                         sessions,
                         broadcaster,
-                        logBroadcaster,
                         conversationService))
                 .build();
     }

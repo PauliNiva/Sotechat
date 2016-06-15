@@ -1,7 +1,8 @@
-package sotechatIT;
+package integrationTests.userAcceptanceTests;
 
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
+import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,14 +11,14 @@ import org.openqa.selenium.support.ui.*;
 
 
 import static org.junit.Assert.*;
-import static sotechatIT.sotechatITCommands.*;
+import static integrationTests.util.sotechatITCommands.*;
 
 /**
- * As a user I want to view the messages I have sent in the chat window
+ * As a professional, I want to pick a client from the visible queue
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class viewingChatMessagesIT {
+public class receivingMessagesIT {
 
     private DriverHandler handler;
     private WebDriverWait userWait;
@@ -39,34 +40,23 @@ public class viewingChatMessagesIT {
     }
 
     /**
-     * User can see a message that has been sent to the server
-     * User can see a message that has been sent by other
+     * As a user I want to see the messages other people have sent to discussion
      */
     @Test
-    public void UserCanSeeAMessages() {
-        // User to queue
+    public void UserSeesOtherPeopleMessages() {
+        // User has accessed queue
         waitAndFillInformation(userWait);
-        // User from queue
+        waitQueueWindowsAppear(userWait);
+
+        // Professional has logged in & next in line button
         proLogin(proWait);
         waitAndPickFromQueue(proWait);
+        // The other person sends a message
+        sendMessageChatWindow(proWait,"Can you see this message?");
 
-        // Can send it By Pressing Submit
-        assertEquals("", waitChatWindowsAppear(userWait).getText());
-        sendMessageChatWindow(userWait, "yy kaa koo");
-        assertTrue(waitForTextToAppear(userWait, "yy kaa koo"));
-
-        // Pro sees it
-        assertTrue(waitForTextToAppear(proWait, "yy kaa koo"));
-
-        // Pro sends a message and sees it
-        sendMessageChatWindow(proWait, "kaa koo yy"); // changed to pro
-        assertTrue(waitForTextToAppear(proWait, "kaa koo yy"));
-
-        // User sees it
-        assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
-
+        // User can view it in the chat window
+        assertTrue(waitForTextToAppear(userWait,"Can you see this message?"));
     }
-
 
 
 

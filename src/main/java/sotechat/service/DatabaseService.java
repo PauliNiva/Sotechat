@@ -42,22 +42,19 @@ public class DatabaseService {
     /**
      * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
      * sekä keskustelun kategoria.
-     * @param startMessage aloitusviestin sisalto
      * @param sender aloitusviestin lahettaja
      * @param channelId kanavan id
      * @param category keskustelun kategoria
      * @throws Exception
      */
-    public final void createConversation(String sender, String startMessage,
-                                         String channelId, String category)
-            throws Exception{
+    public final void createConversation(
+            final String sender,
+            final String channelId,
+            final String category
+            ) throws Exception{
         DateTime time = new DateTime();
-        Message message = new Message(sender, startMessage, time.toString());
-        message.setChannelId(channelId);
         conversationService.addConversation(channelId, time.toString());
         conversationService.setCategory(category, channelId);
-        conversationService.addMessage(message, channelId);
-        messageService.addMessage(message);
     }
 
     /**

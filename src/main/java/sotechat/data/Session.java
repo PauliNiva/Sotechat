@@ -29,7 +29,7 @@ public class Session {
         return value;
     }
 
-    public void addChannel(final String channelId) {
+    public final void addChannel(final String channelId) {
         if (get("channelIds").isEmpty()) {
             /** Case: tavallinen kayttaja, jolla vain 1 kanava. */
             set("channelId", channelId);
@@ -50,7 +50,7 @@ public class Session {
 
     /** Sets "channels" attribute in JSON friendly format.
      * eg. set("channelIds", "["kanava85", "kanava33", "kanava89"]". */
-    public void updateChannelsAttribute() {
+    private void updateChannelsAttribute() {
         String output = "[";
         for (String channel : channels) {
             /** Lisataan kanavat lainausmerkeilla, peraan pilkku ja vali. */
@@ -64,5 +64,12 @@ public class Session {
         set("channelIds", output);
     }
 
+    /** Palauttaa true jos henkilo on kanavalla.
+     * @param channelId channelId
+     * @return true jos on kanavalla
+     */
+    public final boolean isOnChannel(final String channelId) {
+        return channels.contains(channelId);
+    }
 
 }

@@ -11,4 +11,4 @@ sotechat.util
 sotechat.websocket
 sotechat.websocketService
 sotechat.wrappers
-sotechatIT
+integrationTests

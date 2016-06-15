@@ -13,6 +13,7 @@ import sotechat.data.Session;
 import sotechat.wrappers.MsgToClient;
 import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
+import sotechat.wrappers.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -80,21 +81,22 @@ public class StateService {
             final HttpServletRequest request
             ) throws Exception {
 
+        /** Clientin session tarkistus. */
         String sessionId = request.getSession().getId();
-        System.out.println("Session id = " + sessionId);
         Session session = sessionRepo.getSessionObj(sessionId);
         if (session == null) {
             return "Denied due to missing or invalid session ID.";
         }
+
         /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
         String jsonString = request.getReader().readLine();
         JsonParser parser = new JsonParser();
         JsonObject payload = parser.parse(jsonString).getAsJsonObject();
+
+        /** Kaivetaan JSON-objektista attribuutteja muuttujiin. */
         String username = payload.get("username").getAsString();
         String startMessage = payload.get("startMessage").getAsString();
         String channelId = session.get("channelId");
-
-        System.out.println("REQUESTED USERNAME " + username + " with start message " + startMessage);
 
         /** Tarkistetaan etta aiempi tila on "start". */
         if (!session.get("state").equals("start")) {
@@ -106,8 +108,9 @@ public class StateService {
         if (!id.isEmpty() && mapperService.isUserProfessional(id)) {
             return "Denied join pool request due to reserved username.";
         }
+
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
-         * nimimerkilla (olennainen vasta vertaistukichatissa). */
+         * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
         String channelIdWithPath = "/toClient/chat/" + channelId;
         List<Session> list = subscribeEventListener
                 .getSubscribers(channelIdWithPath);
@@ -129,17 +132,21 @@ public class StateService {
         queueService.addToQueue(channelId, category, username);
         session.set("state", "queue");
 
-        /** Luodaan tietokantaan uusi keskustelu */
-        databaseService.createConversation(startMessage, username, channelId,
-                category);
+        /** Luodaan tietokantaan uusi keskustelu. */
+        databaseService.createConversation(username, channelId, category);
 
-        /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia
-         * ei tarvitse viela lahettaa, koska kanavalla ei ole ketaan.
-         * Kun kanavalle liittyy joku, lokit lahetetaan sille. */
-        String timeStamp = new DateTime().toString();
-        MsgToClient msg = new MsgToClient(
-                username, channelId, timeStamp, startMessage);
-        chatLogger.log(msg);
+        /** Luodaan aloitusviestista msgToServer-olio. */
+        MsgToServer msgToServer = new MsgToServer();
+        msgToServer.setUserId(userId);
+        msgToServer.setChannelId(channelId);
+        msgToServer.setContent(startMessage);
+
+        /** Kirjataan viesti lokeihin, mutta ei laheteta sita viela, koska
+         * kanavalla ei ole ketaan. Kun kanavalle liittyy joku,
+         * sille lahetetaan lokit. */
+        chatLogger.logNewMessage(msgToServer);
+
+        /** Palautetaan Stringi, jonka Controlleri paketoi JSONiksi. */
         return "OK, please request new state now.";
     }
 

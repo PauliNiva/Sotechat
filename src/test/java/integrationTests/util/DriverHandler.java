@@ -1,4 +1,4 @@
-package sotechatIT;
+package integrationTests.util;
 
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;

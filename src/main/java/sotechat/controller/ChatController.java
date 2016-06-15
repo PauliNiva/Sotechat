@@ -6,44 +6,37 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.MessageService;
+import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-import sotechat.service.ChatMessageService;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */
 @RestController
 public class ChatController {
 
-    /** Tarjoaa logiikan. */
-    private final ChatMessageService chatMessageService;
+    /** Chat Logger. */
+    private final ChatLogger chatLogger;
 
-    /** Viestien tietokantaan tallentamiseen */
-    private final MessageService messageService;
-
-    /** Viestien tallentaminen keskusteluun tietokannadssa */
-    private final ConversationService conversationService;
+    /** Mapperi. */
+    private final Mapper mapper;
 
     /** Konstruktori.
-     * @param pChatService chatService
+     * @param pChatLogger chatLogger
+     * @param pMapper mapper
      */
     @Autowired
     public ChatController(
-            final ChatMessageService pChatService,
-            final MessageService pMessageService,
-            final ConversationService pConversationService
+            final ChatLogger pChatLogger,
+            final Mapper pMapper
     ) {
-        this.chatMessageService = pChatService;
-        this.messageService = pMessageService;
-        this.conversationService = pConversationService;
+        this.chatLogger = pChatLogger;
+        this.mapper = pMapper;
     }
 
-    /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,
-     * joka palauttaa meille viestin kanavalle lahetettavassa muodossa
+    /** Reitittaa chattiin kirjoitetut viestit muokattuna
      * - tai null, jos viesti hylataan eika sita valiteta kanavalle.
-     * MessageMapping annotaatiossa polku *palvelimelle* saapuviin viesteihin.
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lahettama viesti,
      *                    joka on paketoitu MsgToServer-olion sisalle.
@@ -51,7 +44,8 @@ public class ChatController {
      * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
      *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
      *         Spring-magialla lahetetaan viesti kaikille kanavaan
-     *         subscribanneille clienteille JSONina.
+     *         subscribanneille clienteille JSONina. MessageMapping
+     *         annotaatiossa polku *palvelimelle* saapuviin viesteihin.
      * @throws Exception mika poikkeus?
      */
     @MessageMapping("/toServer/chat/{channelId}")
@@ -61,10 +55,51 @@ public class ChatController {
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
 
-        return chatMessageService.processMessage(
-                msgToServer,
-                accessor
-        );
+        if (fraudulentMessage(msgToServer, accessor)) {
+            /** Hakkerointiyritys? */
+            return null;
+        }
+        /** Viesti ok, kirjataan se ylos ja valitetaan eri muodossa. */
+        MsgToClient msgToChannel = chatLogger.logNewMessage(msgToServer);
+        return msgToChannel;
+    }
+
+    /** Sallitaanko viestin lahetys?.
+     * @param msgToServer msgToServer
+     * @param accessor accessor
+     * @return true jos sallitaan
+     */
+    private boolean fraudulentMessage(
+            final MsgToServer msgToServer,
+            final SimpMessageHeaderAccessor accessor
+    ) {
+        String userId = msgToServer.getUserId();
+        if (!mapper.isUserIdMapped(userId)) {
+            /** Kelvoton ID, hylataan viesti. */
+            return true;
+        }
+        if (mapper.isUserProfessional(userId)) {
+            /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
+
+            if (accessor.getUser() == null) {
+                /** Ei kirjautunut, hylataan viesti. */
+                return true;
+            }
+            String username = accessor.getUser().getName();
+            String authId = mapper.getIdFromRegisteredName(username);
+            if (!userId.equals(authId)) {
+                /** Kirjautunut ID eri kuin viestiin merkitty lahettajan ID. */
+                return true;
+            }
+        }
+
+        // TODO: tarkista subscribeEventListenerista, etta kirjoittaja
+        // on subscribannut kanavalle.
+        String channelId = msgToServer.getChannelId();
+        String chatPrefix = "/toClient/chat/";
+        String channelIdWithPath = chatPrefix + channelId;
+
+        return false;
     }
 
 }
