@@ -3,6 +3,7 @@ package sotechat.connectionEvents;
 import org.springframework.scheduling.annotation.Scheduled;
 import sotechat.controller.QueueBroadcaster;
 import sotechat.data.Queue;
+import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
 import javax.servlet.http.HttpSession;
@@ -14,7 +15,7 @@ public class ConnectionHandler {
     private Queue queue;
     private QueueBroadcaster queueBroadcaster;
     private String sessionId;
-    private final int WAIT_TIME_BEFORE_METHOD_INVOCATION = 5000;
+    private final int WAIT_TIME_BEFORE_METHOD_INVOCATION = 10000;
 
     public ConnectionHandler(ConnectionRepo pConnectionRepo,
                              SessionRepo pSessionRepo, Queue pQueue,
@@ -27,15 +28,21 @@ public class ConnectionHandler {
 
     @Scheduled(fixedRate = WAIT_TIME_BEFORE_METHOD_INVOCATION)
     public void removeInactiveUsersFromQueue() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("wololooo");
+        }
         if (this.sessionId != null) {
             if (!this.connectionRepo.getSessionConnectionStatus(sessionId)) {
-                HttpSession session = this.sessionRepo
-                        .getHttpSession(sessionId);
-                String channelId = session.getAttribute("channelId").toString();
-                if (channelId != null) {
-                    this.sessionRepo.
-                    this.queue.remove(channelId);
-                    this.queueBroadcaster.broadcastQueue();
+                Session session = null;
+                if (this.sessionRepo.getSessionObj(sessionId) != null) {
+                    session = this.sessionRepo.getSessionObj(sessionId);
+                    String channelId = null;
+                    if (session.get("channelId") != null) {
+                        channelId = session.get("channelId");
+                        this.sessionRepo.removeSession(this.sessionId);
+                        this.queue.remove(channelId);
+                        this.queueBroadcaster.broadcastQueue();
+                    }
                 }
             }
         }

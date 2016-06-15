@@ -25,4 +25,6 @@ public interface SessionRepo {
             HttpServletRequest req,
             Principal professional
     );
+
+    void removeSession(String sessionId);
 }
