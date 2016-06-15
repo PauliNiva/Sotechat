@@ -33,12 +33,11 @@ public class concurrencyIT {
 
     @After
     public void tearDown() throws Exception {
-        handler.closeAll();
     }
 
-    //@Test
-    public void UserCanSeeAMessages() throws Exception {
-        for (int i=1; i<1; i++) {
+    @Test
+    public void concurrencyTesting() throws Exception {
+        for (int i=1; i<=2; i++) {
             System.out.println("Starting i = " + i);
             repeat();
         }
