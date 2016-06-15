@@ -78,7 +78,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
-    private void updateSessionAttributes(
+    public final void updateSessionAttributes(
             final Session session,
             final Principal professional
     ) {
@@ -86,8 +86,6 @@ public class SessionRepoImpl extends MapSessionRepository
         /** Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.get("username");
         String userId = session.get("userId");
-
-        System.out.println("HEIPPA HEI " + username);
 
         /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {

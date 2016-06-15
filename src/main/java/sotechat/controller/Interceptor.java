@@ -6,6 +6,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import org.springframework.stereotype.Component;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
@@ -14,10 +15,19 @@ import java.security.Principal;
 /**
  * Sallii/kieltaa subscribtionin kayttaja oikeuksista riippuen.
  */
+@Component
 public class Interceptor extends ChannelInterceptorAdapter {
 
-    @Autowired
+    /** Session repo. */
     private SessionRepo sessionRepo;
+
+    /** Konstruktori.
+     * @param pSessionRepo session repo.
+     */
+    @Autowired
+    public Interceptor(final SessionRepo pSessionRepo) {
+        sessionRepo = pSessionRepo;
+    }
 
     /** Mitka kaikki viestit kulkevat tata kautta?
      * @param message message
@@ -56,13 +66,24 @@ public class Interceptor extends ChannelInterceptorAdapter {
         if (session == null) {
             return false;
         }
-        String[]
+
+        //TODO:
+        //String[] splitted = channelIdWithPath.split("/");
+        String channelId = "placeholder";
+
         if (principal != null) {
-            //TODO: Validate principal corresponds to correct sessionId
+            //TODO:
+            // Validate principal corresponds to correct sessionId
+
+            //TODO:
+            // Sallittu: /toClient/qbcc/
         }
 
         if (!session.isOnChannel(channelId)) {
-            return false;
+            //TODO:
+            // Sallittu: /toClient/queue/channelId
+            // Sallittu: /toClient/chat/channelId
+            //return false;
         }
 
         return true;

@@ -5,8 +5,13 @@
 angular.module('chatApp')
     .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService',
         function ($scope, stompSocket, connectToServer, userStateService) {
-            // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
+            // "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
+            // "messageIds" sisaltaa messageId:t viesteille, jotta samaa
+            // viestia ei tulostettaisi montaa kertaa.
+            // chat logien broadcastauksessa serveri saattaa lahettaa
+            // viesteja, jotka meilla jo on.
+            var messageIds = {};
             var sub;
             // Alustetaan ChatName tyhjäksi
             $scope.chatName = '';
@@ -47,12 +52,13 @@ angular.module('chatApp')
                     //TODO: Testaa ettei allaoleva hakkerointi toimi
                     //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
 
-
-                    // Clear pyynnöstä tyhjennetään viestit, muuten lisätään uusi viesti viesteihin
-                    if (response.body != '$CLEAR$') {
+                    // Lisataan viesti, jos sita ei ole jo entuudestaan.
+                    // Chat Logien broadcastauksen yhteydessa serveri saattaa
+                    // lahettaa meille viesteja, jotka meilla jo on.
+                    var message = getMessage(response.body);
+                    if (!messageIds[message.messageId]) {
+                        messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
-                    } else  {
-                        $scope.messages.length = 0;
                     }
                 });
 

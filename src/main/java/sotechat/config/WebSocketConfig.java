@@ -41,7 +41,9 @@ public class WebSocketConfig extends
      *               palvelimen ChatController-luokalta asiakasohjelmalle.
      */
     @Override
-    public final void configureMessageBroker(final MessageBrokerRegistry conf) {
+    public final void configureMessageBroker(
+            final MessageBrokerRegistry conf
+    ) {
         conf.enableSimpleBroker("/toClient");
     }
 
@@ -53,17 +55,20 @@ public class WebSocketConfig extends
      *                 asiakasohjelmien viesteille paateosoitteen.
      */
     @Override
-    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
+    public final void configureStompEndpoints(
+            final StompEndpointRegistry reg
+    ) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 
-    /** Subscriptionien hyvaksyminen ohjataan
-     * Interceptor -instanssille.
+    /** Subscriptionien hyvaksyminen ohjataan Interceptor -instanssille.
      * @param registration registration
      */
     @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(new Interceptor());
+    public void configureClientInboundChannel(
+            final ChannelRegistration registration
+    ) {
+        registration.setInterceptors(new Interceptor(repository));
     }
 }
 

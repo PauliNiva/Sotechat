@@ -8,6 +8,11 @@ angular.module('chatApp')
             $scope.pro = true;
             // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
+            // "messageIds" sisaltaa messageId:t viesteille, jotta samaa
+            // viestia ei tulostettaisi montaa kertaa.
+            // chat logien broadcastauksessa serveri saattaa lahettaa
+            // viesteja, jotka meilla jo on.
+            var messageIds = {};
             var sub;
             // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
             $scope.chatName = '';
@@ -46,10 +51,16 @@ angular.module('chatApp')
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
-                    if (response.body != '$CLEAR$') {
+                    //TODO: Testaa ettei allaoleva hakkerointi toimi
+                    //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
+
+                    // Lisataan viesti, jos sita ei ole jo entuudestaan.
+                    // Chat Logien broadcastauksen yhteydessa serveri saattaa
+                    // lahettaa meille viesteja, jotka meilla jo on.
+                    var message = getMessage(response.body);
+                    if (!messageIds[message.messageId]) {
+                        messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
-                    } else {
-                        $scope.messages.length = 0;
                     }
                 });
             };

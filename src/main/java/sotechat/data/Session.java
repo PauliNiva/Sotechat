@@ -50,7 +50,7 @@ public class Session {
 
     /** Sets "channels" attribute in JSON friendly format.
      * eg. set("channelIds", "["kanava85", "kanava33", "kanava89"]". */
-    private void updateChannelsAttribute() {
+    public final void updateChannelsAttribute() {
         String output = "[";
         for (String channel : channels) {
             /** Lisataan kanavat lainausmerkeilla, peraan pilkku ja vali. */
