@@ -8,11 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.ExpiringSession;
 import org.springframework.session.web.socket.config
         .annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import sotechat.controller.Interceptor;
+import sotechat.controller.SubscriptionInterceptor;
 import sotechat.data.SessionRepoImpl;
 
 
@@ -68,7 +67,7 @@ public class WebSocketConfig extends
     public void configureClientInboundChannel(
             final ChannelRegistration registration
     ) {
-        registration.setInterceptors(new Interceptor(repository));
+        registration.setInterceptors(new SubscriptionInterceptor(repository));
     }
 }
 

@@ -2,7 +2,7 @@ package sotechat.wrappers;
 
 import sotechat.data.Session;
 
-import static sotechat.service.StateService.QUEUE_BROADCAST_CHANNEL;
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
  * kun "ammattilaiskayttajalle" kerrotaan state.

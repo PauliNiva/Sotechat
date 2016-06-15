@@ -10,6 +10,8 @@ public class Session {
 
     private LinkedHashSet<String> channels;
 
+    private boolean isPro;
+
     public Session() {
         attributes = new HashMap<>();
         channels = new LinkedHashSet<>();
@@ -30,12 +32,12 @@ public class Session {
     }
 
     public final void addChannel(final String channelId) {
+        channels.add(channelId);
         if (get("channelIds").isEmpty()) {
             /** Case: tavallinen kayttaja, jolla vain 1 kanava. */
             set("channelId", channelId);
         } else {
             /** Case: pro-kayttaja, jolla useita kanavia. */
-            channels.add(channelId);
             updateChannelsAttribute();
         }
     }
@@ -70,6 +72,13 @@ public class Session {
      */
     public final boolean isOnChannel(final String channelId) {
         return channels.contains(channelId);
+    }
+
+    /** Liittyyko sessio ammattilaiskayttajaan?
+     * @return true jos liittyy
+     */
+    public final boolean isPro() {
+        return this.get("state").equals("pro");
     }
 
 }

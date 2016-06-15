@@ -44,9 +44,6 @@ public class StateService {
     /** Database service */
     private final DatabaseService databaseService;
 
-    /** Channel where queue status is broadcasted. */
-    public static final String QUEUE_BROADCAST_CHANNEL = "QBCC";
-
     /** Konstruktori.
      * @param pMapper mapper
      * @param subscribeEventListener subscribeEventListener
@@ -120,8 +117,14 @@ public class StateService {
             }
         }
 
-        /** Hyvaksytaan kayttajan valitsema nimimerkki. */
+        /***************** Hyvaksytaan liittyminen. *******************/
+
+        /** Muistetaan kayttajan valitsema nimimerkki. */
         session.set("username", username);
+
+        /** Kirjataan kayttajalle oikeus subscribaa kanavalle. */
+        session.addChannel(channelId);
+        System.out.println("ALLOWED CHANNEL " + channelId + " FOR SESSION ID " + sessionId);
 
         /** Mapataan nimimerkki ja kayttajatunnus. */
         String userId = session.get("userId");

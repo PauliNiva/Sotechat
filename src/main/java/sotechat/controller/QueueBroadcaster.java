@@ -8,6 +8,7 @@ import sotechat.service.StateService;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Tiedottaa jonon tilanteesta kaikille QBCC subscribanneille. */
 @Component
@@ -66,8 +67,7 @@ public class QueueBroadcaster {
      * TODO: Refactor
      */
     public final synchronized void syncBcQ() {
-        String qbcc = "/toClient/"
-                + StateService.QUEUE_BROADCAST_CHANNEL;
+        String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         String qAsJson = queueService.toString();
         brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
     }

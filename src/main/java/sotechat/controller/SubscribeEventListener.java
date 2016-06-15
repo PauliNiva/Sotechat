@@ -15,6 +15,8 @@ import sotechat.data.SessionRepo;
 import sotechat.service.StateService;
 
 import java.util.*;
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
@@ -139,7 +141,7 @@ public class SubscribeEventListener
         list.add(session);
 
         /** Jos subscribattu QBCC (jonotiedotuskanava), tiedotetaan. */
-        String qbcc = "/toClient/" + StateService.QUEUE_BROADCAST_CHANNEL;
+        String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         if (channelIdWithPath.equals(qbcc)) {
             queueBroadcaster.broadcastQueue();
         }

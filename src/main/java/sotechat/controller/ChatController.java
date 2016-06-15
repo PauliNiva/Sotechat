@@ -64,7 +64,7 @@ public class ChatController {
         return msgToChannel;
     }
 
-    /** Sallitaanko viestin lahetys?.
+    /** Onko viesti vaarennetty?
      * @param msgToServer msgToServer
      * @param accessor accessor
      * @return true jos sallitaan
@@ -93,7 +93,8 @@ public class ChatController {
             }
         }
 
-        // TODO: tarkista subscribeEventListenerista, etta kirjoittaja
+        // TODO:
+        // tarkista subscribeEventListenerista, etta kirjoittaja
         // on subscribannut kanavalle.
         String channelId = msgToServer.getChannelId();
         String chatPrefix = "/toClient/chat/";
