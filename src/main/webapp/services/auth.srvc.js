@@ -1,5 +1,5 @@
 angular.module('chatProApp')
-    .factory('auth', function ($rootScope, $http, $location) {
+    .factory('auth', function ($rootScope, $http) {
         var authenticated = false;
 
         function authenticate(credentials, callback) {
@@ -9,23 +9,6 @@ angular.module('chatProApp')
                     + credentials.password)
             } : {};
 
-            $http.get('auth', {
-                headers: headers
-            }).then(function (response) {
-                if (response.data.name) {
-                    authenticated = true;
-                } else {
-                    authenticated = false;
-                }
-                callback && callback(authenticated);
-            }, function () {
-                authenticated = false;
-                callback && callback(false);
-            });
-
-        }
-
-        function checkStatusServer(headers) {
             $http.get('auth', {
                 headers: headers
             }).then(function (response) {
@@ -56,7 +39,6 @@ angular.module('chatProApp')
 
         var auth = {
             authenticate: authenticate,
-            checkStatusServer:checkStatusServer,
             getAuthStatus: getAuthStatus,
             clear: clear
         };

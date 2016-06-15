@@ -14,12 +14,17 @@ angular.module('chatProApp')
                     $scope.error = true;
                 }
             };
+            
+            $scope.clear = function() {
+                auth.clear();
+            };
 
             var init  = function(authenticated) {
                 $scope.login(authenticated);
                 if (auth.getAuthStatus() !== false) {
                     $scope.authStatus = 'proControlPanel/controlPanel.tpl.html';
                 } else {
+                    $scope.error = false;
                     $scope.authStatus = 'login/login.tpl.html';
                 }
             };
