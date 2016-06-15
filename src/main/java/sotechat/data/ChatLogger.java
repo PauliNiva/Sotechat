@@ -108,17 +108,14 @@ public class ChatLogger {
      *      luokassa logNewMessage -metodin kanssa.
      * TODO: Protection against flooding (max 1 broadcast/second/channel).
      * @param channelId channelId
+     * @param broker broker
      */
     public final synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
             ) {
-        System.out.println("TRYING TO BROADCAST channelId " + channelId);
         String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<MsgToClient> logs = getLogs(channelId);
-        //broker.convertAndSend(channelIdWithPath, "$CLEAR$");
-        for (MsgToClient msg : logs) {
-            System.out.println("    broadcasting " + msg.getContent());
+        for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
         }
     }

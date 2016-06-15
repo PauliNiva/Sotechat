@@ -12,10 +12,8 @@ import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.ChatLogger;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-import sotechat.service.StateService;
 
 import java.util.*;
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
@@ -59,7 +57,7 @@ public class SubscribeEventListener
     ) {
         List<Session> subs = map.get(channelId);
         if (subs == null) {
-            subs = new ArrayList<Session>();
+            subs = new ArrayList<>();
         }
         return subs;
     }
@@ -96,7 +94,7 @@ public class SubscribeEventListener
 
     /** Timerin avulla kutsuttu metodi, joka vain
      * haarauttaa sub/unsub pyynnot oikeaan metodiin.
-     * @param applicationEvent
+     * @param applicationEvent appEvent
      */
     private void delayedEventHandling(
             final ApplicationEvent applicationEvent

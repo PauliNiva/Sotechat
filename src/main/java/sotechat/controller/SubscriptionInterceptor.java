@@ -37,12 +37,11 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
      * @return message if allowed, exception thrown otherwise
      */
     @Override
-    public Message<?> preSend(
+    public final Message<?> preSend(
             final Message<?> message,
             final MessageChannel channel
     ) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        //System.out.println("STOMP COMMAND: " + headerAccessor.getCommand() + " :: " + message.toString());
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             Principal userPrincipal = headerAccessor.getUser();
             String sessionId = getSessionIdFrom(headerAccessor);
@@ -57,7 +56,6 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
         /** Myos viestien lahetyksen voisi sallia/estaa taalla, mutta
          * se tehdaan ChatControllerissa. Esim:
          * if (StompCommand.SEND.equals(headerAccessor.getCommand())) ... */
-
 
         return message;
     }

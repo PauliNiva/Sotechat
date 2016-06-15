@@ -34,13 +34,15 @@ public class StateController {
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
-    /** Conversation service */
+    /** Conversation service. */
     private final ConversationService conversationService;
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
      * @param pStateService stateService
-     * @param pQueueBroadcaster queue Broadcaster
+     * @param pSessionRepo sessionRepo
+     * @param pQueueBroadcaster queueBroadCaster
+     * @param pConversationService conversationService
      */
     @Autowired
     public StateController(

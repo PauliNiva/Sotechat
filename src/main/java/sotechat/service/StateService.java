@@ -70,6 +70,7 @@ public class StateService {
     }
 
     /** Logiikka mita tehdaan, kun tulee pyynto liittya jonoon.
+     * TODO: Refactor kahdeksi metokiksi.
      * @param request taalta saadaan session tiedot
      * @return String "Denied..." tai "OK..."
      * @throws IOException mika poikkeus
@@ -124,7 +125,6 @@ public class StateService {
 
         /** Kirjataan kayttajalle oikeus subscribaa kanavalle. */
         session.addChannel(channelId);
-        System.out.println("ALLOWED CHANNEL " + channelId + " FOR SESSION ID " + sessionId);
 
         /** Mapataan nimimerkki ja kayttajatunnus. */
         String userId = session.get("userId");
@@ -192,10 +192,8 @@ public class StateService {
             String channelId
             ) throws Exception {
         String channelIdWithPath = "/toClient/queue/" + channelId;
-
         List<Session> list = subscribeEventListener.
                 getSubscribers(channelIdWithPath);
-
         for (Session member : list) {
             member.set("state", "chat");
         }

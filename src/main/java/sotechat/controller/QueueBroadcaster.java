@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import sotechat.service.QueueService;
-import sotechat.service.StateService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,7 +17,7 @@ public class QueueBroadcaster {
     private final QueueService queueService;
 
     /** Taikoo viestien lahetyksen. */
-    private SimpMessagingTemplate brokerMessagingTemplate;
+    private SimpMessagingTemplate broker;
 
     /** Konstruktori.
      * @param pQueueService queueService
@@ -30,7 +29,7 @@ public class QueueBroadcaster {
             final SimpMessagingTemplate pSimpMessagingTemplate
     ) {
         this.queueService = pQueueService;
-        this.brokerMessagingTemplate = pSimpMessagingTemplate;
+        this.broker = pSimpMessagingTemplate;
     }
 
     /** EI KAYTOSSA JUURI NYT.
@@ -48,10 +47,11 @@ public class QueueBroadcaster {
     }
 
     /** Tiedottaa jonon tilanteen kaikille QBCC subscribaajille (hoitajille).
+     * Timeria kaytetaan samanaikaisuusongelmien korjaamiseen.
      * TODO: Protection against flooding (max 1 broadcast/second).
      */
     public final void broadcastQueue() {
-        int delay = 50; // milliseconds
+        int delay = 50; // milliseconds. TODO: test 1ms, pitaisi toimia.
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -62,14 +62,13 @@ public class QueueBroadcaster {
 
     }
 
-    /**
-     * Yritys korjata samanaikaisuusongelmia.
+    /** Timerin kutsuma broadcast.
      * TODO: Refactor
      */
-    public final synchronized void syncBcQ() {
+    private synchronized void syncBcQ() {
         String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         String qAsJson = queueService.toString();
-        brokerMessagingTemplate.convertAndSend(qbcc, qAsJson);
+        broker.convertAndSend(qbcc, qAsJson);
     }
 
 }
