@@ -3,31 +3,24 @@ package sotechat.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 
-import static sotechat.util.Utils.get;
-
-/** Hoitaa Session-olioihi liittyvan kasittelyn.
+/** Hoitaa Session-olioihin liittyvan kasittelyn.
  * esim. paivittaa session-attribuutteihin nimimerkin.
  */
 @Component
 public class SessionRepoImpl extends MapSessionRepository
-    implements SessionRepo {
+        implements SessionRepo {
 
-    /** Avain sessio-ID, arvo HttpSession-olio. */
-    private HashMap<String, HttpSession> httpSessions;
+    /** Avain sessio-ID, arvo Sessio-olio.
+     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon! */
+    private HashMap<String, Session> sessions;
 
-    /** Avain = pro kayttajan sessio ID.
-     *  Arvo = Setti kanavia, joilla kayttaja on. */
-    private HashMap<String, HashSet<String>> proChannels;
-
-    /** Kaytetaan testauksessa. */
-    private HttpSession latestSession;
+    /** Avain proUsername, arvo Sessio-olio.
+     * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
+    private HashMap<String, Session> proUserSessions;
 
     /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
     private final Mapper mapperService;
@@ -39,23 +32,9 @@ public class SessionRepoImpl extends MapSessionRepository
     public SessionRepoImpl(
             final Mapper pMapper
     ) {
-        super();
+        this.sessions = new HashMap<>();
+        this.proUserSessions = new HashMap<>();
         this.mapperService = pMapper;
-        this.httpSessions = new HashMap<>();
-        this.proChannels = new HashMap<>();
-    }
-
-    /** Jotta voidaan kaivaa sessionId:lla session-olio.
-     * @param sessionId sessionID
-     * @param session session-olio
-     */
-    @Override
-    public final synchronized void mapHttpSessionToSessionId(
-            final String sessionId,
-            final HttpSession session
-    ) {
-        this.httpSessions.put(sessionId, session);
-        this.latestSession = session;
     }
 
     /** Kaivaa sessionId:lla session-olion.
@@ -63,136 +42,110 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return sesson-olio
      */
     @Override
-    public final synchronized HttpSession getHttpSession(
+    public final synchronized Session getSessionObj(
             final String sessionId
     ) {
-        return httpSessions.get(sessionId);
+        return sessions.get(sessionId);
     }
 
-    /** Palauttaa viimeisimman sessio-olion testausta varten.
-     * @return sessio-olio
+    /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
+     *      - Paivittaa mappayksia "sessioId liittyy tahan sessio-olioon" yms.
+     *      - Paivittaa sessio-olion attribuutteja
+     * @param req taalta saadaan Http Session Id
+     * @param professional taalta saadaan kirjautumistiedot, voi olla null
+     * @return Session-olio
      */
-    @Override
-    public final synchronized HttpSession getLatestHttpSession() {
-        return latestSession;
-    }
 
-    /** Metodi paivittaa tarvittaessa session-attribuuttien state,
-     * userId ja username vastaamaan ajanmukaisia arvoja.
-     * @param session session
-     * @param professional professional
-     */
     @Override
-    public final synchronized void updateSessionAttributes(
-            final HttpSession session,
+    public final synchronized Session updateSession(
+            final HttpServletRequest req,
             final Principal professional
     ) {
+        String sessionId = req.getSession().getId();
+
+        /** Paivityslogiikka jaettu kahteen metodiin, alla kutsut. */
+        Session session = updateSessionObjectMapping(sessionId, professional);
+        updateSessionAttributes(session, professional);
+
+        /** Kirjataan tietoja myos mapperiin, monesti aiemman paalle. */
+        mapperService.mapUsernameToId(
+                session.get("userId"), session.get("username"));
+
+        return session;
+    }
+
+    /** Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+     * @param session session-olio
+     * @param professional kirjautumistiedot, saa olla null
+     */
+    private void updateSessionAttributes(
+            final Session session,
+            final Principal professional
+    ) {
+
         /** Kaivetaan username ja id sessio-attribuuteista. */
-        Object username = get(session, "username");
-        Object userId = get(session, "userId");
+        String username = session.get("username");
+        String userId = session.get("userId");
+
+        System.out.println("HEIPPA HEI " + username);
 
         /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {
             /* Jos client on autentikoitunut ammattilaiseksi */
             username = professional.getName();
-            userId = mapperService.getIdFromRegisteredName(username.toString());
-            session.setAttribute("state", "pro");
-            updateSessionChannels(session);
-        } else if (get(session, "username").isEmpty()) {
+            userId = mapperService.getIdFromRegisteredName(username);
+            session.set("state", "pro");
+            session.updateChannelsAttribute();
+        } else if (username.isEmpty()) {
             /* Uusi kayttaja */
             username = "Anon";
             userId = mapperService.generateNewId();
-            session.setAttribute("state", "start");
-            session.setAttribute("category", "Kategoria"); //TODO
+            session.set("state", "start");
+            session.set("category", "Kategoria"); //TODO
             String randomNewChannel = mapperService.generateNewId();
-            session.setAttribute("channelId", randomNewChannel);
+            session.set("channelId", randomNewChannel);
+            System.out.println("   luodaan uusi " + randomNewChannel);
         }
 
         /** Liitetaan muuttujien tieto sessioon (monesti aiemman paalle). */
-        session.setAttribute("username", username);
-        session.setAttribute("userId", userId);
-
-        /** Kirjataan tiedot mapperiin (monesti aiemman paalle). */
-        mapperService.mapUsernameToId(userId.toString(), username.toString());
+        session.set("username", username);
+        session.set("userId", userId);
     }
 
-    /** Kun ammattilaiskayttaja avaa uuden kanavan.
-     * @param session sessio-olio
-     * @param channelId channelId
+    /** Paivittaa mappayksia kuten "sessioId liittyy tahan sessio-olioon".
+     * @param sessionId sessioId
+     * @param professional autentikaatiotiedot, voi olla null
+     * @return sessio-olio
      */
-    @Override
-    public final synchronized void addChannel(
-            final HttpSession session,
-            final String channelId
+    private Session updateSessionObjectMapping(
+            final String sessionId,
+            final Principal professional
     ) {
-        if (get(session, "channelIds") != null) {
-            /** Case: pro user with multiple channels. */
-            HashSet<String> channels = proChannels.get(session.getId());
-            if (channels == null) {
-                channels = new LinkedHashSet<>();
-                proChannels.put(session.getId(), channels);
-            }
-            channels.add(channelId);
-            updateSessionChannels(session);
-        } else {
-            /** Case: regular user with single channel. Never called? */
-            session.setAttribute("channelId", channelId);
+        Session session = sessions.get(sessionId);
+        if (session != null) {
+            /** Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
+            return session;
         }
-    }
 
-    /** Kun ammattilaiskayttaja sulkee kanavan.
-     * TODO: Mieti, mita muuta tassa yhteydessa pitaisi tehda.
-     * @param session session
-     * @param channelId closed channel Id.
-     */
-    @Override
-    public final synchronized void removeChannel(
-            final HttpSession session,
-            final String channelId
-    ) {
-        if (get(session, "channelIds") != null) {
-            /** Case: pro user with multiple channels. */
-            HashSet<String> channels = proChannels.get(session.getId());
-            if (channels != null) {
-                channels.remove(channelId);
-            }
-            updateSessionChannels(session);
+        if (professional != null) {
+            /** Onko hoitajalla olemassaoleva vanha sessio? */
+            String proUsername = professional.getName();
+            session = proUserSessions.get(proUsername);
         }
-    }
-
-    /** Kutsu tata metodia proChannels -paivityksen jalkeen.
-     * Metodi paivittaa sessionsin tiedot proChannelsin tietojen perusteella.
-     * @param session session
-     */
-    private synchronized void updateSessionChannels(
-            final HttpSession session
-    ) {
-        HashSet<String> channels = proChannels.get(session.getId());
-        String channelIds = getChannelsAsJsonFriendly(channels);
-        session.setAttribute("channelIds", channelIds);
-    }
-
-    /** Annettuna setti kanavia, tuottaa Stringin halutussa muotoilussa.
-     * @param channels sdfdf
-     * @return rrrrg
-     */
-    private synchronized String getChannelsAsJsonFriendly(
-            final HashSet<String> channels
-    ) {
-        if (channels == null || channels.isEmpty()) {
-            return "[]";
+        if (session == null) {
+            /** Sessio edelleen tuntematon, luodaan uusi sessio. */
+            session = new Session();
         }
-        String output = "[";
-        for (String channel : channels) {
-            output += "\"" + channel + "\", ";
-        }
-        System.out.println("Output orig : " + output);
-        System.out.println("Length orig : " + output.length());
-        output = output.substring(0, output.length() - 2);
-        System.out.println("after sub: " + output);
-        output += "]";
-        return output;
-    }
 
+        /** Muistetaan jatkossakin, etta tama sessionId liittyy sessioon. */
+        sessions.put(sessionId, session);
+
+        /** Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
+        if (professional != null) {
+            proUserSessions.put(professional.getName(), session);
+        }
+
+        return session;
+    }
 
 }

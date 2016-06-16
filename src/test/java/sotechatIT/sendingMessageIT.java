@@ -24,25 +24,23 @@ import static sotechatIT.sotechatITCommands.*;
 public class sendingMessageIT {
 
     private WebDriver driver;
-    private WebDriver proDriver;
-    private WebDriverWait wait;
+    private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
 
     @Before
     public void setUp() throws Exception {
-        driver = new ChromeDriver();
-        proDriver = new ChromeDriver();
-        wait = new WebDriverWait(driver, 7);
-        proWait = new WebDriverWait(proDriver, 7);
-        driver.get(CUSTOMERADDRES);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("user", "pro");
+        handler.HttpGet("user", CUSTOMERADDRESS);
+        handler.HttpGet("pro", PROADDRESS);
+        userWait = handler.getWaitDriver("user");
+        proWait = handler.getWaitDriver("pro");
     }
 
 
     @After
     public void tearDown() throws Exception {
-        driver.quit();
-        proDriver.quit();
+        handler.closeAll();
     }
 
     /**
@@ -53,25 +51,25 @@ public class sendingMessageIT {
     @Test
     public void UserCanWriteAndSendAMessage() {
         // User to queue
-        waitAndFillInformation(wait);
+        waitAndFillInformation(userWait);
         // User from queue
         proLogin(proWait);
         waitAndPickFromQueue(proWait);
 
         // User can write message
-        waitChatWindowsAppear(wait).sendKeys("yy kaa koo");
+        waitChatWindowsAppear(userWait).sendKeys("yy kaa koo");
 
         // Can send it By Pressing Submit
-        waitElementPresent(wait, By.name("send")).submit();
-        assertEquals("", waitChatWindowsAppear(wait).getText());
-        assertTrue(waitForTextToAppear(wait, "yy kaa koo"));
+        waitElementPresent(userWait, By.name("send")).submit();
+        assertEquals("", waitChatWindowsAppear(userWait).getText());
+        assertTrue(waitForTextToAppear(userWait, "yy kaa koo"));
 
         // Can send it By Pressing Enter
-        waitChatWindowsAppear(wait).sendKeys("kaa koo yy");
-        waitChatWindowsAppear(wait).sendKeys(Keys.ENTER);
+        waitChatWindowsAppear(userWait).sendKeys("kaa koo yy");
+        waitChatWindowsAppear(userWait).sendKeys(Keys.ENTER);
 
-        assertEquals("", waitChatWindowsAppear(wait).getText());
-        assertTrue(waitForTextToAppear(wait, "kaa koo yy"));
+        assertEquals("", waitChatWindowsAppear(userWait).getText());
+        assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
     }
 
 

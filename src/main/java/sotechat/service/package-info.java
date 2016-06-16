@@ -1,4 +1,4 @@
 /**
  * Tama paketti sisaltaa sovelluksen palvelut
  */
-package sotechat.websocketService;
+package sotechat.service;

@@ -6,11 +6,11 @@ import java.security.Principal;
  * Luokka, jonka avulla voidaan testaamisessa simuloida rekisteroityneen
  * kayttajan kirjautumista.
  */
-public class TestPrincipal implements Principal {
+public class MockPrincipal implements Principal {
 
     private String name;
 
-    public TestPrincipal(String name) {
+    public MockPrincipal(String name) {
         this.name = name;
     }
 

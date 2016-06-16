@@ -1,7 +1,6 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -9,15 +8,17 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Enumeration;
 
+import org.springframework.session.SessionRepository;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.domainService.ConversationService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
-import sotechat.websocketService.StateService;
+import sotechat.service.StateService;
 
 /** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
@@ -27,11 +28,17 @@ public class StateController {
     /** State Service. */
     private final StateService stateService;
 
+    /** Session Repository. */
+    private final SessionRepo sessionRepo;
+
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
     /** Testi. */
     private final ChatLogBroadcaster chatLogBroadcaster;
+
+    /** Conversation service */
+    private final ConversationService conversationService;
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
@@ -42,12 +49,16 @@ public class StateController {
     @Autowired
     public StateController(
             final StateService pStateService,
+            final SessionRepo pSessionRepo,
             final QueueBroadcaster pQueueBroadcaster,
-            final ChatLogBroadcaster pChatLogBroadcaster
+            final ChatLogBroadcaster pChatLogBroadcaster,
+            final ConversationService pConversationService
     ) {
         this.stateService = pStateService;
+        this.sessionRepo = pSessionRepo;
         this.queueBroadcaster = pQueueBroadcaster;
         this.chatLogBroadcaster = pChatLogBroadcaster;
+        this.conversationService = pConversationService;
     }
 
     /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
@@ -65,7 +76,9 @@ public class StateController {
             final Principal professional
             ) throws Exception {
 
-        return stateService.respondToUserStateRequest(req, professional);
+        System.out.println("Session id = " + req.getSession().getId());
+        Session session = sessionRepo.updateSession(req, professional);
+        return new UserStateResponse(session);
     }
 
     /** Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
@@ -82,11 +95,13 @@ public class StateController {
             final HttpServletRequest req,
             final Principal professional
             ) throws Exception {
+
         if (professional == null) {
             /** Hacking attempt? */
             return null;
         }
-        return stateService.respondToProStateRequest(req, professional);
+        Session session = sessionRepo.updateSession(req, professional);
+        return new ProStateResponse(session);
     }
 
 
@@ -112,6 +127,7 @@ public class StateController {
         }
         String answer = stateService.respondToJoinPoolRequest(request);
         queueBroadcaster.broadcastQueue();
+        System.out.println("Returning: " + "{\"content\":\"" + answer + "\"}");
         return "{\"content\":\"" + answer + "\"}";
     }
 
@@ -139,12 +155,18 @@ public class StateController {
             System.out.println("Hacking attempt?");
             return "";
         }
+        /** Pyydetaan StateServicea suorittamaan poppaus. */
         String wakeUp = stateService.popQueue(channelId, accessor);
         if (wakeUp.isEmpty()) {
             /** Case: Toinen professional ehtikin popata taman ennen meita. */
             return "";
         }
+        /** HUOM: Kanavan viestit broadcast, kun kanavalle subscribataan. */
+
+        /** Paivitetaan jonon tila kaikille ammattilaisille. */
         queueBroadcaster.broadcastQueue();
+
+        /** Palautetaan poppaajalle tieto, etta poppaus onnistui. */
         return wakeUp;
     }
 

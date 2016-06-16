@@ -15,11 +15,11 @@ import java.math.BigInteger;
 @Component
 public class MapperImpl implements Mapper {
 
-    /** map key=id, value=username, esim. map.get("491829813") => "Anon". */
-    private HashMap<String, String> map;
-    /** revMap key=username, value=id,
-     * esim. revMap.get("hoitaja anne") => "annenId". */
-    private HashMap<String, String> revMap;
+
+    /** esim. mapByUserId.get("4dfsior13") => "Anon". */
+    private HashMap<String, String> mapByUserId;
+    /** esim. mapByUsername.get("hoitaja anne") => "inaxsiu9eisdf". */
+    private HashMap<String, String> mapByUsername;
     /** professionalIDs:lta voi kysya, mitka ID:t ovat rekisteroity. */
     private HashSet<String> professionalIDs;
 
@@ -31,8 +31,8 @@ public class MapperImpl implements Mapper {
 
     /** Konstruktori alustaa singleton-instanssin Mapperista. */
     public MapperImpl() {
-        this.map = new HashMap<String, String>();
-        this.revMap = new HashMap<String, String>();
+        this.mapByUserId = new HashMap<String, String>();
+        this.mapByUsername = new HashMap<String, String>();
         this.random = new SecureRandom();
         this.fastGen = new FastGeneratorForRandomStrings();
         this.professionalIDs = new HashSet<>();
@@ -55,8 +55,8 @@ public class MapperImpl implements Mapper {
             final String id,
             final String username
     ) {
-        this.map.put(id, username);
-        this.revMap.put(username, id);
+        this.mapByUserId.put(id, username);
+        this.mapByUsername.put(username, id);
     }
 
     /** Getteri julkiselle kayttajanimelle,
@@ -68,10 +68,10 @@ public class MapperImpl implements Mapper {
     public final synchronized String getUsernameFromId(
             final String id
     ) {
-        if (!map.containsKey(id)) {
+        if (!mapByUserId.containsKey(id)) {
             return "UNKNOWN_USERNAME";
         }
-        return this.map.get(id);
+        return this.mapByUserId.get(id);
     }
 
     /** Kertoo, onko userId kaytossa.
@@ -82,7 +82,7 @@ public class MapperImpl implements Mapper {
     public final synchronized boolean isUserIdMapped(
             final String id
     ) {
-        return (map.containsKey(id));
+        return (mapByUserId.containsKey(id));
     }
 
     @Override
@@ -108,10 +108,10 @@ public class MapperImpl implements Mapper {
         /* Varmistetaan ensin, etta username tunnetaan. */
         if (registeredName == null
                 || registeredName.isEmpty()
-                || !revMap.containsKey(registeredName)) {
+                || !mapByUsername.containsKey(registeredName)) {
             return "UNKNOWN_ID";
         }
-        return this.revMap.get(registeredName);
+        return this.mapByUsername.get(registeredName);
     }
 
     /** Tuottaa uuden, yksilollisen, salaisen userID:n.
@@ -126,7 +126,7 @@ public class MapperImpl implements Mapper {
              * epatodennakoista, etta iteraatioita olisi
              * koskaan enempaa kuin yksi. */
             String userId = getFastRandomString();
-            if (!map.containsKey(userId)) {
+            if (!mapByUserId.containsKey(userId)) {
                 return userId;
             }
         }

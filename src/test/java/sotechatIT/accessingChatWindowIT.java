@@ -6,9 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
 
@@ -22,25 +19,22 @@ import static sotechatIT.sotechatITCommands.*;
 @Chrome
 public class accessingChatWindowIT {
 
-    private WebDriver driver;
-    private WebDriver proDriver;
-    private WebDriverWait wait;
+    private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
 
     @Before
     public void setUp() throws Exception {
-        driver = new ChromeDriver();
-        proDriver = new ChromeDriver();
-        wait = new WebDriverWait(driver, 7);
-        proWait = new WebDriverWait(proDriver, 7);
-        driver.get(CUSTOMERADDRES);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("user", "pro");
+        handler.HttpGet("user", CUSTOMERADDRESS);
+        handler.HttpGet("pro", PROADDRESS);
+        userWait = handler.getWaitDriver("user");
+        proWait = handler.getWaitDriver("pro");
     }
 
     @After
     public void tearDown() throws Exception {
-        driver.quit();
-        proDriver.quit();
+        handler.closeAll();
     }
 
     /**
@@ -50,9 +44,9 @@ public class accessingChatWindowIT {
     @Test
     public void UserCanSeeAChatWindow() {
         // User has entered the chat page and submitted a starting message
-        waitAndFillInformation(wait);
+        waitAndFillInformation(userWait);
         // User sees the queuing view
-        assertTrue(waitQueueWindowsAppear(wait).isDisplayed());
+        assertTrue(waitQueueWindowsAppear(userWait).isDisplayed());
         // A professional has logged in
         proLogin(proWait);
 
@@ -60,7 +54,7 @@ public class accessingChatWindowIT {
         waitAndPickFromQueue(proWait);
 
         // A chat window is opened for the user
-        assertTrue(waitChatWindowsAppear(wait).isDisplayed());
+        assertTrue(waitChatWindowsAppear(userWait).isDisplayed());
     }
 
 

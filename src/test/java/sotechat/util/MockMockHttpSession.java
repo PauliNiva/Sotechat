@@ -1,28 +1,35 @@
 package sotechat.util;
 
+import org.springframework.mock.web.MockHttpSession;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 import java.util.Enumeration;
-import java.util.HashMap;
 
-public class TestSession implements HttpSession {
+/** Spring Inception: Mocking a Mock Object
+ * - sometimes a level 1 mock is just not enough.
+ */
+public class MockMockHttpSession extends MockHttpSession {
 
-    private HashMap<String, Object> sessionAttributes;
+    private String id;
 
-    public TestSession() {
-        this.sessionAttributes = new HashMap<>();
+    public MockMockHttpSession(String id) {
+        this.id = id;
     }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    /** Auto generated methods below. */
 
     @Override
     public long getCreationTime() {
         return 0;
     }
 
-    @Override
-    public String getId() {
-        return null;
-    }
 
     @Override
     public long getLastAccessedTime() {
@@ -51,7 +58,7 @@ public class TestSession implements HttpSession {
 
     @Override
     public Object getAttribute(String s) {
-        return this.sessionAttributes.get(s);
+        return null;
     }
 
     @Override
@@ -71,7 +78,7 @@ public class TestSession implements HttpSession {
 
     @Override
     public void setAttribute(String s, Object o) {
-        this.sessionAttributes.put(s, o);
+
     }
 
     @Override

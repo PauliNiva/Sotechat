@@ -1,5 +1,6 @@
 package sotechat.domain;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,12 +11,12 @@ public class MessageTest {
 
     private Message message;
     private Conversation conversation;
-    private Date date;
+    private String date;
 
     @Before
     public void setUp() {
         message = new Message();
-        date = new Date();
+        date = new DateTime().toString();
         conversation = new Conversation();
     }
 
@@ -27,8 +28,8 @@ public class MessageTest {
 
     @Test
     public void setAndGetAuthorTest() {
-        message.setAuthor("Shakespeare");
-        Assert.assertEquals("Shakespeare", message.getAuthor());
+        message.setSender("Shakespeare");
+        Assert.assertEquals("Shakespeare", message.getSender());
     }
 
     @Test

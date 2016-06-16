@@ -6,7 +6,6 @@ import org.junit.Test;
 import sotechat.data.Queue;
 import sotechat.data.QueueItem;
 import sotechat.data.QueueImpl;
-import sotechat.websocketService.QueueService;
 
 /**
  * Created by varkoi on 3.6.2016.

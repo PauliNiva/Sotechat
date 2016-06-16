@@ -1,20 +1,26 @@
 package sotechat;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import sotechat.Application;
+import org.mockito.Mockito;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringApplicationConfiguration(classes = Application.class)
-//@WebAppConfiguration
+import static org.mockito.Mockito.*;
+
 public class ApplicationTest {
 
-    /** TODO: Kunnolla.
-     */
-    @Test
-    public void contextLoads() {
+    Launcher mockStarter;
+
+    @Before
+    public void setUp() {
+        mockStarter = mock(Launcher.class);
+        Application application = new Application();
     }
+
+    @Test
+    public void mainTest() throws Exception {
+        Application.setLauncher(mockStarter);
+        Application.main(new String[]{"test1", "test2"});
+        Mockito.verify(mockStarter, times(1)).launch(new String[]{"test1", "test2"});
+    }
+
 }

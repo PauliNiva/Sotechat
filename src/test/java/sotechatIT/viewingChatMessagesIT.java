@@ -6,9 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.*;
 
 
@@ -22,26 +19,23 @@ import static sotechatIT.sotechatITCommands.*;
 @Chrome
 public class viewingChatMessagesIT {
 
-    private WebDriver driver;
-    private WebDriver proDriver;
-    private WebDriverWait wait;
+    private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
 
     @Before
     public void setUp() throws Exception {
-        driver = new ChromeDriver();
-        proDriver = new ChromeDriver();
-        wait = new WebDriverWait(driver, 7);
-        proWait = new WebDriverWait(proDriver, 7);
-        driver.get(CUSTOMERADDRES);
-        proDriver.get(PROADDRES);
+        handler = new DriverHandler("user", "pro");
+        handler.HttpGet("user", CUSTOMERADDRESS);
+        handler.HttpGet("pro", PROADDRESS);
+        userWait = handler.getWaitDriver("user");
+        proWait = handler.getWaitDriver("pro");
     }
 
 
     @After
     public void tearDown() throws Exception {
-        driver.quit();
-        proDriver.quit();
+        handler.closeAll();
     }
 
     /**
@@ -51,25 +45,25 @@ public class viewingChatMessagesIT {
     @Test
     public void UserCanSeeAMessages() {
         // User to queue
-        waitAndFillInformation(wait);
+        waitAndFillInformation(userWait);
         // User from queue
         proLogin(proWait);
         waitAndPickFromQueue(proWait);
 
         // Can send it By Pressing Submit
-        sendMessageChatWindow(wait, "yy kaa koo");
-        assertEquals("", waitChatWindowsAppear(wait).getText());
-        assertTrue(waitForTextToAppear(wait, "yy kaa koo"));
+        sendMessageChatWindow(userWait, "yy kaa koo");
+        assertEquals("", waitChatWindowsAppear(userWait).getText());
+        assertTrue(waitForTextToAppear(userWait, "yy kaa koo"));
 
         // Pro sees it
         assertTrue(waitForTextToAppear(proWait, "yy kaa koo"));
 
         // Pro sends a message and sees it
-        sendMessageChatWindow(wait, "kaa koo yy");
+        sendMessageChatWindow(userWait, "kaa koo yy");
         assertTrue(waitForTextToAppear(proWait, "kaa koo yy"));
 
         // User sees it
-        assertTrue(waitForTextToAppear(wait, "kaa koo yy"));
+        assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
 
     }
 

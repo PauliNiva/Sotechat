@@ -2,74 +2,148 @@ package sotechat.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Luokka henkilon tietojen tallentamiseen
+ */
 @Entity
-public class Person extends AbstractPersistable<Long> {
+public class Person {
 
-    private String name;
+    /** henkilon id */
+    @Id
+    public String userId;
 
+    /** henkilon nimimerkki joka nakyy asiakkaille */
+    private String screenName;
+
+    /** nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan */
     @Column(unique = true)
     private String username;
 
+    /** henkilon salasana */
     private String password;
+
+    /** salasanan suola */
     private String salt;
 
+    /** henkilon keskustelut */
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
 
+    /**
+     * Konstruktori alustaa henkilon keskustelut
+     */
     public Person() {
+        this.conversationsOfPerson = new ArrayList<>();
     }
 
-    public final String getName() {
-        return name;
+    /**
+     * Konstruktori asettaa kayttajan id:ksi parametrina annetun id:n
+     * ja alustaa henkilon keskustelut
+     * @param pUserId String kayttajan id
+     */
+    public Person(String pUserId) {
+        this.userId = pUserId;
+        this.conversationsOfPerson = new ArrayList<>();
     }
 
-    public final void setName(final String pname) {
-        this.name = pname;
+    /**
+     * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille
+     * @return String nimimerkki, joka nakyy asiakkaille
+     */
+    public final String getScreenName() {
+        return screenName;
     }
 
+    /**
+     * Asettaa parametrina annetun nimimerkin kayttajan nimimerkiksi
+     * @param pname nimimerkki, joka nakyy asiakkaille
+     */
+    public final void setScreenName(final String pname) {
+        this.screenName = pname;
+    }
+
+    /**
+     * Palauttaa nimimerkin, jolla henkilo kirjautuu jarjestelmaan sisaan
+     * @return kirjautumisnimi
+     */
     public final String getUsername() {
         return username;
     }
 
+    /**
+     * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen
+     * @param pusername String kirjautumisnimi
+     */
     public final void setUsername(final String pusername) {
         this.username = pusername;
     }
 
+    /**
+     * Palauttaa salasanan hajautusarvon
+     * @return String kryptattu salasana
+     */
     public final String getPassword() {
         return password;
     }
 
+    /**
+     * Asettaa salasanaksi parametrina annetun salasanan ja lisaa siihen suolan.
+     * Tallentaa salasana muuttujaan salasanasta ja suolasta saadun
+     * hajautusarvon.
+     * @param pPassword kayttajan salasana
+     */
     public final void setPassword(final String pPassword) {
         this.salt = BCrypt.gensalt();
         this.password = BCrypt.hashpw(pPassword, this.salt);
     }
 
+    /**
+     * Palauttaa salasanan suolan
+     * @return String salasanan suola
+     */
     public final String getSalt() {
         return salt;
     }
 
-    public final void setSalt(final String psalt) {
-        this.salt = psalt;
-    }
-
+    /**
+     * Palauttaa listan henkilon keskusteluista
+     * @return List<Conversation> henkilon keskustelut
+     */
     public final List<Conversation> getConversationsOfPerson() {
         return this.conversationsOfPerson;
     }
 
-    public final void setConversationsOfPerson(
-            final List<Conversation> pConversationsOfPerson) {
-        this.conversationsOfPerson = pConversationsOfPerson;
-    }
-
+    /**
+     * Liittaa parametrina annetun keskustelun (Conversation olion)
+     * henkilon keskusteluihin
+     * @param conversation Conversation lisattava keskustelu
+     */
     public final void addConversationToPerson(
             final Conversation conversation) {
         this.conversationsOfPerson.add(conversation);
+    }
+
+    /**
+     * Palauttaa kayttajan id:n
+     * @return String henkilon id
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Asettaa henkilon id:ksi parametrina annetun id:n
+     * @param userId kayttajan id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

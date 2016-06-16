@@ -1,9 +1,5 @@
 package sotechatIT;
 
-
-import com.github.webdriverextensions.junitrunner.WebDriverRunner;
-import com.github.webdriverextensions.junitrunner.annotations.Chrome;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -17,8 +13,8 @@ public final class sotechatITCommands {
     /**
      * Osoitteet, joista löytyvät asiakkaan ja ammitlaisen näkymä
      */
-    public static final String CUSTOMERADDRES = "http://localhost:8080";
-    public static final String PROADDRES = "http://localhost:8080/pro";
+    public static final String CUSTOMERADDRESS = "http://localhost:8080";
+    public static final String PROADDRESS = "http://localhost:8080/pro";
 
     /**
      * Täyttää käyttäjänimen ja aloitusviestin ja lähettää sen serverille

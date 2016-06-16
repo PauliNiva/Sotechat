@@ -7,53 +7,128 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+/**
+ * Luokka viestien tallentamiseen
+ */
 @Entity
 public class Message extends AbstractPersistable<Long> {
 
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    /**
+     * aikaleima muodossa DateTime.toString()
+     * */
+    private String date;
 
+    /** viestin sisalto */
     private String content;
-    private String author;
 
+    /** viestin lahettaja */
+    private String sender;
+
+    /** keskustelu, johon viesti liittyy */
     @ManyToOne
     private Conversation conversation;
 
+    /** keskustelun kanavaid johon viesti liittyy */
+    private String channelId;
+
+    /** konstruktori */
     public Message() {
     }
 
-    public final Date getDate() {
+    /** Konstruktori asettaa parametreina annetut lahettajan, viestin sisallon
+     * ja aikaleiman.
+     * @param sender lahettajan nimi
+     * @param content viestin sisalto
+     * @param date aikaleima
+     */
+    public Message(String sender, String content, String date){
+        this.sender = sender;
+        this.content = content;
+        this.date = date;
+    }
+
+    /**
+     * Palauttaa viestin aikaleiman
+     * @return viestin aikaleima
+     */
+    public final String getDate() {
         return this.date;
     }
 
-    public final void setDate(final Date pdate) {
+    /**
+     * Asettaa viestin aikaleimaksi parametrina annetun ajan
+     * @param pdate viestin aikaleima
+     */
+    public final void setDate(final String pdate) {
         this.date = pdate;
     }
 
+    /**
+     * Palauttaa viestin sisallon
+     * @return viestin sisalto
+     */
     public final String getContent() {
         return this.content;
     }
 
+    /**
+     * Asettaa viestin sisalloksi parametrina annetun tekstin
+     * @param pContent viestin sisalto
+     */
     public final void setContent(final String pContent) {
         this.content = pContent;
     }
 
-    public final String getAuthor() {
-        return this.author;
+    /**
+     * Palauttaa viestin lahettajan
+     * @return viestin lahettaja
+     */
+    public final String getSender() {
+        return this.sender;
     }
 
-    public final void setAuthor(final String pAuthor) {
-        this.author = pAuthor;
+    /**
+     * Asettaa viestin lahettajaksi parametrina annetun kayttajanimen
+     * @param psender viestin lahettaja
+     */
+    public final void setSender(final String psender) {
+        this.sender = psender;
     }
 
+    /**
+     * Palauttaa viestin keskustelun
+     * @return viestiin liitetty Conversation olio
+     */
     public final Conversation getConversation() {
         return this.conversation;
     }
 
+    /**
+     * Asettaa viestin keskusteluksi parametrina annetun keskustelun
+     * @param pConversation viestiin liittyva keskustelu
+     */
     public final void setConversation(final Conversation pConversation) {
+
         this.conversation = pConversation;
+        this.channelId = pConversation.getChannelId();
     }
 
+    /**
+     * Palauttaa viestiin liittyvan kanavaid:n
+     * @return keskustelun kanavaid
+     */
+    public String getChannelId() {
+        return channelId;
+    }
+
+    /**
+     * Asettaa keskustelun kanavaid:ksi parametrina annetun id:n
+     * @param channelId keskustelun kanavaid
+     */
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
 }
