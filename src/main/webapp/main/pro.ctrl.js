@@ -15,12 +15,13 @@ angular.module('chatProApp')
                 }
             };
             
-            $scope.clear = function() {
-                auth.clear();
+            $scope.logout = function() {
+                auth.clear(function() {
+                    auth.authenticate([], init);
+                });
             };
 
             var init  = function(authenticated) {
-                $scope.login(authenticated);
                 if (auth.getAuthStatus() !== false) {
                     $scope.authStatus = 'proControlPanel/controlPanel.tpl.html';
                 } else {

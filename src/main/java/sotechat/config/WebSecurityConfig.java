@@ -12,6 +12,7 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 
@@ -55,7 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // login-sivun session luomiseen
                 .httpBasic().and().csrf()
                 .csrfTokenRepository(csrfTokenRepository()).and()
-                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);
+                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+                .logout().logoutSuccessUrl("/pro");
+
         // polun /login mappays
         // loytyy tiedostosta MvcConfig
 

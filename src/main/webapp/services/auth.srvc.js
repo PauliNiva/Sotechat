@@ -25,9 +25,9 @@ angular.module('chatProApp')
 
         }
 
-        function clear() {
+        function clear(callback) {
             auth.authenticated = false;
-            $http.post('/logout', {});
+            $http.post('/logout', {}).then(callback);
         }
 
         function init() {
