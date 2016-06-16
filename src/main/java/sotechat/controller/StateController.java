@@ -3,6 +3,7 @@ package sotechat.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -29,6 +30,9 @@ public class StateController {
     /** Validator Service. */
     private final ValidatorService validatorService;
 
+    /** Subscribe Event Listener. */
+ //   private final SubscribeEventListener subscribeEventListener;
+
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
@@ -50,11 +54,13 @@ public class StateController {
             final SessionRepo pSessionRepo,
             final QueueService pQueueService,
             final QueueBroadcaster pQueueBroadcaster
+         //   final SubscribeEventListener pSubscribeEventListener
     ) {
         this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
         this.queueService = pQueueService;
         this.queueBroadcaster = pQueueBroadcaster;
+    //    this.subscribeEventListener = pSubscribeEventListener;
     }
 
     /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).

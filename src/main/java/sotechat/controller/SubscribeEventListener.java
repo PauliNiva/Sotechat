@@ -26,42 +26,47 @@ public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
     /** Session Repository. */
+    @Autowired
     private SessionRepo sessionRepo;
 
     /** Queue Broadcaster. */
+    @Autowired
     private QueueBroadcaster queueBroadcaster;
 
     /** Taikoo viestien lahetyksen. */
+    @Autowired
     private SimpMessagingTemplate broker;
 
     /** Chat Logger (broadcastaa). */
+    @Autowired
     private ChatLogger chatLogger;
 
     /** Mapper. */
+    @Autowired
     private Mapper mapper;
 
-    /** Konstruktori.
-     *
-     * @param pSessionRepo p
-     * @param pQueueBroadcaster p
-     * @param pSimpMessagingTemplate p
-     * @param pChatLogger p
-     * @param pMapper p
-     */
-    @Autowired
-    public SubscribeEventListener(
-            final SessionRepo pSessionRepo,
-            final QueueBroadcaster pQueueBroadcaster,
-            final SimpMessagingTemplate pSimpMessagingTemplate,
-            final ChatLogger pChatLogger,
-            final Mapper pMapper
-    ) {
-        this.sessionRepo = pSessionRepo;
-        this.queueBroadcaster = pQueueBroadcaster;
-        this.broker = pSimpMessagingTemplate;
-        this.chatLogger = pChatLogger;
-        this.mapper = pMapper;
-    }
+//    /** Konstruktori.
+//     *
+//     * @param pSessionRepo p
+//     * @param pQueueBroadcaster p
+//     * @param pSimpMessagingTemplate p
+//     * @param pChatLogger p
+//     * @param pMapper p
+//     */
+//    @Autowired
+//    public SubscribeEventListener(
+//            final SessionRepo pSessionRepo,
+//            final QueueBroadcaster pQueueBroadcaster,
+//            final SimpMessagingTemplate pSimpMessagingTemplate,
+//            final ChatLogger pChatLogger,
+//            final Mapper pMapper
+//    ) {
+//        this.sessionRepo = pSessionRepo;
+//        this.queueBroadcaster = pQueueBroadcaster;
+//        this.broker = pSimpMessagingTemplate;
+//        this.chatLogger = pChatLogger;
+//        this.mapper = pMapper;
+//    }
 
     /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
      * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan

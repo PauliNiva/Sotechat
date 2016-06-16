@@ -104,13 +104,14 @@ public class StateControllerTest {
         ValidatorService validatorService = new ValidatorService(
                 mapper, sessions
         );
-        ApplicationListener listener = new SubscribeEventListener(
-                sessions,
-                broadcaster,
-                broker,
-                chatLogger,
-                mapper
-        );
+        SubscribeEventListener listener = new SubscribeEventListener();
+//        SubscribeEventListener listener = new SubscribeEventListener(
+//                sessions,
+//                broadcaster,
+//                broker,
+//                chatLogger,
+//                mapper
+//        );
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
                         validatorService,
