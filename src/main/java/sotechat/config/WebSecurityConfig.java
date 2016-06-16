@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication
         .builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration
         .WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration
         .EnableWebSecurity;
+import sotechat.auth.JpaAuthenticationProvider;
 
 /** Tama konfiguraatiotiedosto ottaa Spring Securityn kayttoon
  *  yhdessa joidenkin pom.xml -maarityksien kanssa. */
@@ -59,22 +61,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
           * TODO: Mitenkohan uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
-    /** Kovakoodataan hoitajan tunnukset siihen saakka,
-     * etta tietokanta on kaytossa.
-     * @param auth mika tama on?
-     * @throws Exception mika poikkeus?
-     */
-    @Autowired
-     public final void configureGlobal(final AuthenticationManagerBuilder auth)
-            throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("Hoitaja")
-                .password("salasana")
-                .roles("USER").and()
-                .withUser("Hoitaja2")
-                .password("salasana")
-                .roles("USER");
-                // TODO: selvita roolin merkitys.
+    @Configuration
+    protected static class AuthenticationConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
+        @Autowired
+        private JpaAuthenticationProvider jpaAuthenticationProvider;
+
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            auth.authenticationProvider(jpaAuthenticationProvider);
+        }
     }
 }

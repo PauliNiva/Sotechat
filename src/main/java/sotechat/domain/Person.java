@@ -21,11 +21,11 @@ public class Person {
     public String userId;
 
     /** henkilon nimimerkki joka nakyy asiakkaille */
-    private String screenName;
+    private String username;
 
     /** nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan */
     @Column(unique = true)
-    private String username;
+    private String loginName;
 
     /** henkilon salasana */
     private String password;
@@ -58,32 +58,32 @@ public class Person {
      * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille
      * @return String nimimerkki, joka nakyy asiakkaille
      */
-    public final String getScreenName() {
-        return screenName;
+    public final String getUserName() {
+        return username;
     }
 
     /**
      * Asettaa parametrina annetun nimimerkin kayttajan nimimerkiksi
      * @param pname nimimerkki, joka nakyy asiakkaille
      */
-    public final void setScreenName(final String pname) {
-        this.screenName = pname;
+    public final void setUserName(final String pname) {
+        this.username = pname;
     }
 
     /**
-     * Palauttaa nimimerkin, jolla henkilo kirjautuu jarjestelmaan sisaan
+     * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan
      * @return kirjautumisnimi
      */
-    public final String getUsername() {
-        return username;
+    public final String getLoginName() {
+        return loginName;
     }
 
     /**
      * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen
-     * @param pusername String kirjautumisnimi
+     * @param pLoginName String kirjautumisnimi
      */
-    public final void setUsername(final String pusername) {
-        this.username = pusername;
+    public final void setLoginName(final String pLoginName) {
+        this.loginName = pLoginName;
     }
 
     /**

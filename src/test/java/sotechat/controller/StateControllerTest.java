@@ -237,7 +237,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithReservedScreennameFails() throws Exception {
+    public void joinPoolWithReservedScreenNameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */

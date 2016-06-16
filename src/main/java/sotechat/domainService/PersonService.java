@@ -24,10 +24,6 @@ public class PersonService {
     @Autowired
     public PersonService(PersonRepo personRepo){
         this.personRepo = personRepo;
-        Person person = new Person("666");
-        person.setUsername("hoitaja");
-        person.setPassword("salasana");
-        this.personRepo.save(person);
     }
 
     /**
@@ -102,10 +98,10 @@ public class PersonService {
      * @return true, jos nimen vaihtaminen onnnistui, false, jos ei
      */
     @Transactional
-    public boolean changeScreenName(String personId, String newName) {
+    public boolean changeUserName(String personId, String newName) {
         try {
             Person person = personRepo.findOne(personId);
-            person.setScreenName(newName);
+            person.setUserName(newName);
             personRepo.save(person);
             return true;
         }catch(Exception e){
