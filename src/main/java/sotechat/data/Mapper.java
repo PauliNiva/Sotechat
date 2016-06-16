@@ -1,6 +1,7 @@
 package sotechat.data;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Jotta Springin Dependency Injection toimisi,
@@ -50,12 +51,16 @@ public interface Mapper {
      */
     boolean isUserProfessional(String id);
 
-    List<Session> getSubscribers(
+    Set<Session> getSubscribers(
             final String channelId
     );
 
     void addSessionToChannel(
             String channelIdWithPath,
             Session session
+    );
+    void removeSessionToChannel(
+            final String channelIdWithPath,
+            final Session session
     );
 }

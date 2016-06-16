@@ -14,6 +14,7 @@ import sotechat.wrappers.MsgToServer;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
@@ -32,7 +33,6 @@ public class ValidatorService {
      * Konstruktori.
      * @param pMapper mapper
      * @param pSessionRepo ses
-     * @param pSubscribeEventListener subev
      */
     @Autowired
     public ValidatorService(
@@ -52,6 +52,12 @@ public class ValidatorService {
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) {
+        String sessionId = getSessionIdFrom(accessor);
+        Session session = sessionRepo.getSessionObj(sessionId);
+        if (session == null) {
+            /** Kelvoton sessio, hylataan viesti. */
+            return true;
+        }
         String userId = msgToServer.getUserId();
         if (!mapper.isUserIdMapped(userId)) {
             /** Kelvoton ID, hylataan viesti. */
@@ -72,12 +78,13 @@ public class ValidatorService {
             }
         }
 
-        // TODO:
-        // tarkista subscribeEventListenerista, etta kirjoittaja
-        // on subscribannut kanavalle.
+        /** Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
         String chatPrefix = "/toClient/chat/";
         String channelIdWithPath = chatPrefix + channelId;
+        if (!mapper.getSubscribers(channelIdWithPath).contains(session)) {
+            return true;
+        }
 
         return false;
     }
@@ -192,7 +199,7 @@ public class ValidatorService {
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
         String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<Session> list = mapper.getSubscribers(channelIdWithPath);
+        Set<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session other : list) {
             if (other.get("username").equals(username)) {
                 return "Denied join pool request. Username already on channel.";
@@ -201,5 +208,25 @@ public class ValidatorService {
 
         /** Sallitaan pyynto. */
         return "";
+    }
+
+
+
+
+    /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.
+     * @param headerAccessor mista id kaivetaan
+     * @return sessionId String
+     */
+    private String getSessionIdFrom(
+            final SimpMessageHeaderAccessor headerAccessor
+    ) {
+        try {
+            return headerAccessor
+                    .getSessionAttributes()
+                    .get("SPRING.SESSION.ID")
+                    .toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

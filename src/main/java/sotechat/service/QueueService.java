@@ -15,6 +15,7 @@ import sotechat.wrappers.QueueItem;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /** Tarjoaa palvelut jonoon lisaamiseen, jonosta
  * poistamiseen ja jonon tarkasteluun.
@@ -172,7 +173,7 @@ public class QueueService {
             final String channelId
     ) {
         String channelIdWithPath = "/toClient/queue/" + channelId;
-        List<Session> list = mapper.getSubscribers(channelIdWithPath);
+        Set<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session member : list) {
             member.set("state", "chat");
         }

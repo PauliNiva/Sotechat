@@ -21,7 +21,7 @@ public class MapperImpl implements Mapper {
     /** professionalIDs:lta voi kysya, mitka ID:t ovat rekisteroity. */
     private HashSet<String> professionalIDs;
     /** Key = channelIDWithPath, value = list of subscribed sessions. */
-    private HashMap<String, List<Session>> mapByChannelId;
+    private HashMap<String, Set<Session>> mapByChannelId;
 
 
     /** Raskas satunnaislukugeneraattori. */
@@ -120,28 +120,51 @@ public class MapperImpl implements Mapper {
      * @return lista sessioita
      */
     @Override
-    public final synchronized List<Session> getSubscribers(
+    public final synchronized Set<Session> getSubscribers(
             final String channelId
     ) {
-        List<Session> subs = mapByChannelId.get(channelId);
+        Set<Session> subs = mapByChannelId.get(channelId);
         if (subs == null) {
-            subs = new ArrayList<>();
+            subs = new HashSet<>();
         }
         return subs;
     }
 
+    /**
+     * @param channelIdWithPath
+     * @param session
+     */
     @Override
     public final synchronized void addSessionToChannel(
             final String channelIdWithPath,
             final Session session
     ) {
-        List<Session> list = mapByChannelId.get(channelIdWithPath);
+        Set<Session> list = mapByChannelId.get(channelIdWithPath);
         if (list == null) {
-            list = new ArrayList<>();
+            list = new HashSet<>();
             mapByChannelId.put(channelIdWithPath, list);
         }
         list.add(session);
     }
+
+
+    /**
+     *
+     * @param channelIdWithPath
+     * @param session
+     */
+    @Override
+    public final synchronized void removeSessionToChannel(
+            final String channelIdWithPath,
+            final Session session
+    ) {
+        Set<Session> list = mapByChannelId.get(channelIdWithPath);
+        if (list != null) {
+            list.remove(session);
+        }
+    }
+
+
 
 
     /** Tuottaa uuden ID:n, joka on yksilollinen kanavalle/kayttajalle.
