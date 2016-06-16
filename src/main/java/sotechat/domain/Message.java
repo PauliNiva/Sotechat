@@ -25,7 +25,7 @@ public class Message extends AbstractPersistable<Long> {
     private String sender;
 
     /** keskustelu, johon viesti liittyy */
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Conversation conversation;
 
     /** keskustelun kanavaid johon viesti liittyy */

@@ -35,6 +35,7 @@ import sotechat.data.SessionRepoImpl;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.util.*;
 
@@ -69,6 +70,9 @@ public class StateControllerQueueTest {
 
     @Autowired
     private PersonRepo personRepo;
+
+    @Autowired
+    private MessageRepo messageRepo;
 
     @Autowired
     ApplicationContext context;
@@ -205,6 +209,10 @@ public class StateControllerQueueTest {
         @Bean
         public PersonRepo personRepo() {
             return Mockito.mock(PersonRepo.class);
+        }
+        @Bean
+        public MessageRepo messageRepo() {
+            return Mockito.mock(MessageRepo.class);
         }
     }
 

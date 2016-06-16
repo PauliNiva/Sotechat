@@ -31,17 +31,16 @@ public class Conversation {
     private List<Person> participantsOfConversation;
 
     /** keskusteluun liittyvat viestit */
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE},
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             mappedBy = "conversation")
-    private Set<Message> messagesOfConversation;
+    private List<Message> messagesOfConversation;
 
     /**
      * konstruktorissa alustetaan keskusteluun liittyvat viestit
      * ja henkilot
      */
     public Conversation() {
-        this.messagesOfConversation = new LinkedHashSet<>();
+        this.messagesOfConversation = new ArrayList<>();
         this.participantsOfConversation = new ArrayList<>();
     }
 
@@ -55,7 +54,7 @@ public class Conversation {
     public Conversation(String date, String channelId) {
         this.date = date;
         this.channelId = channelId;
-        this.messagesOfConversation = new LinkedHashSet<>();
+        this.messagesOfConversation = new ArrayList<>();
         this.participantsOfConversation = new ArrayList<>();
     }
 
@@ -87,7 +86,7 @@ public class Conversation {
      * Palauttaa listan keskustelun viesteista
      * @return Lista Message olioista, jotka on liitetty keskusteluun
      */
-    public final Set<Message> getMessagesOfConversation() {
+    public final List<Message> getMessagesOfConversation() {
         return this.messagesOfConversation;
     }
 

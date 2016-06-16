@@ -35,6 +35,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.domain.Conversation;
 import sotechat.repo.ConversationRepo;;
+import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.util.MsgUtil;
 import sotechat.util.MockChannelInterceptor;
@@ -49,6 +50,7 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -71,6 +73,9 @@ public class WebSocketMessageTest {
     private ConversationRepo conversationRepo;
 
     @Autowired
+    private MessageRepo messageRepo;
+
+    @Autowired
     ApplicationContext context;
 
     @Autowired
@@ -84,7 +89,7 @@ public class WebSocketMessageTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(conversationRepo.findOne(any(String.class)))
+        Mockito.when(conversationRepo.findOne(anyString()))
                 .thenReturn(new Conversation());
         this.mapper = (MapperImpl) context.getBean("mapperImpl");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
@@ -291,6 +296,11 @@ public class WebSocketMessageTest {
         @Bean
         public PersonRepo personRepo() {
             return Mockito.mock(PersonRepo.class);
+        }
+
+        @Bean
+        public MessageRepo messageRepo() {
+            return Mockito.mock(MessageRepo.class);
         }
     }
     /**
