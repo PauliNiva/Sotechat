@@ -21,24 +21,26 @@ public class ChatLogger {
     private HashMap<String, List<MsgToClient>> logs;
 
     /** Mapper. */
+    @Autowired
     private Mapper mapper;
 
     /** Database Service. */
+    @Autowired
     private DatabaseService databaseService;
 
     /** Konstruktori.
      * @param pMapper Mapper
      * @param pDatabaseService DBS
      */
-    @Autowired
-    public ChatLogger(
-        final Mapper pMapper,
-        final DatabaseService pDatabaseService
-    ) {
-        this.logs = new HashMap<>();
-        this.mapper = pMapper;
-        this.databaseService = pDatabaseService;
-    }
+//    @Autowired
+//    public ChatLogger(
+//        final Mapper pMapper,
+//        final DatabaseService pDatabaseService
+//    ) {
+//        this.logs = new HashMap<>();
+//        this.mapper = pMapper;
+//        this.databaseService = pDatabaseService;
+//    }
 
     /** Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.
      * Palauttaa viestin clienteille lahetettavassa muodossa.

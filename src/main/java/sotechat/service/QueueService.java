@@ -27,15 +27,19 @@ public class QueueService {
     private List<QueueItem> queue;
 
     /** Mapper. */
+    @Autowired
     private Mapper mapper;
 
     /** Session Repo. */
+    @Autowired
     private SessionRepo sessionRepo;
 
     /** Database Service. */
+    @Autowired
     private DatabaseService databaseService;
 
     /** Chat Logger. */
+    @Autowired
     private ChatLogger chatLogger;
 
     /** Konstruktori.
@@ -45,18 +49,18 @@ public class QueueService {
      * @param pDatabaseService p
      * @param pChatLogger p
      */
-    @Autowired
+    //@Autowired
     public QueueService(
-            final Mapper pMapper,
-            final SessionRepo pSessionRepo,
-            final DatabaseService pDatabaseService,
-            final ChatLogger pChatLogger
+//            final Mapper pMapper,
+//            final SessionRepo pSessionRepo,
+//            final DatabaseService pDatabaseService,
+//            final ChatLogger pChatLogger
     ) {
         this.queue = new ArrayList<>();
-        this.mapper = pMapper;
-        this.sessionRepo = pSessionRepo;
-        this.databaseService = pDatabaseService;
-        this.chatLogger = pChatLogger;
+//        this.mapper = pMapper;
+//        this.sessionRepo = pSessionRepo;
+//        this.databaseService = pDatabaseService;
+//        this.chatLogger = pChatLogger;
     }
 
     /** Suoritetaan kayttajan pyynto tulla jonoon (oletettavasti validoitu jo).
