@@ -8,7 +8,6 @@ import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
-import sotechat.repo.PersonRepo;
 
 import java.util.Date;
 
@@ -21,14 +20,8 @@ import java.util.Date;
 public class ConversationService {
 
     /** Keskustelujen tallentamiseen */
-    private ConversationRepo conversationRepo;
-
-    /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
     @Autowired
-    public ConversationService(ConversationRepo conversationRepo,
-                               PersonRepo personRepo) {
-        this.conversationRepo = conversationRepo;
-    }
+    private ConversationRepo conversationRepo;
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima

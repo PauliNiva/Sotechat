@@ -15,13 +15,8 @@ import sotechat.repo.MessageRepo;
 public class MessageService  {
 
     /** repositorio */
-    private MessageRepo messageRepo;
-
-    /** konstruktorissa injektoidaan repositorio */
     @Autowired
-    public MessageService(MessageRepo pMessageRepo) {
-        this.messageRepo = pMessageRepo;
-    }
+    private MessageRepo messageRepo;
 
     /**
      * Tallentaa Message olion eli viestin tietokantaan

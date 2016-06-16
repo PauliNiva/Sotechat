@@ -8,6 +8,8 @@ import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Luokka tietokannassa olevien Person -olioiden tallentamiseen
@@ -18,12 +20,12 @@ import java.util.List;
 public class PersonService {
 
     /** repositorio */
+    @Autowired
     private PersonRepo personRepo;
 
     /** konstruktoriin injektoidaan repositorio */
-    @Autowired
-    public PersonService(PersonRepo personRepo){
-        this.personRepo = personRepo;
+
+    public void insertHoitaja() {
         Person person = new Person("666");
         person.setUsername("hoitaja");
         person.setPassword("salasana");
