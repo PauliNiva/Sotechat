@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
-import sotechat.controller.SubscribeEventListener;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.data.Session;

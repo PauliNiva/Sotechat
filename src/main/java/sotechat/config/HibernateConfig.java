@@ -27,7 +27,7 @@ import java.util.Properties;
  * tietokantaan.
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "sotechat.repo")
+@EnableJpaRepositories(basePackages = {"sotechat.repo"})
 @EnableTransactionManagement
 public class HibernateConfig {
 
