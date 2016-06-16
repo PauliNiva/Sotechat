@@ -17,26 +17,29 @@ import sotechat.domainService.PersonService;
 public class DatabaseService {
 
     /** Henkiloihin liittyvat palvelut */
+    @Autowired
     PersonService personService;
 
     /** Keskusteluihin liittyvat palvelut */
+    @Autowired
     ConversationService conversationService;
 
     /** Viesteihin liittyvat palvelut */
+    @Autowired
     MessageService messageService;
 
-    /**
-     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
-     * keskustelujen ja viestien tallentamiseen liittyvat palvelut.
-     */
-    @Autowired
-    public DatabaseService(PersonService personService,
-                           ConversationService conversationService,
-                           MessageService messageService){
-        this.personService = personService;
-        this.conversationService = conversationService;
-        this.messageService = messageService;
-    }
+//    /**
+//     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
+//     * keskustelujen ja viestien tallentamiseen liittyvat palvelut.
+//     */
+//    @Autowired
+//    public DatabaseService(PersonService personService,
+//                           ConversationService conversationService,
+//                           MessageService messageService){
+//        this.personService = personService;
+//        this.conversationService = conversationService;
+//        this.messageService = messageService;
+//    }
 
     /**
      * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
