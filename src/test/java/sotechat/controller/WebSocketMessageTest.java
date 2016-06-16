@@ -96,14 +96,13 @@ public class WebSocketMessageTest {
     }
 
     @Test
-    public void
-    unAuthenticatedUserReceivesCorrectResponseAfterSendingMessage()
+    public void sendingMessageByRegularUser()
             throws Exception {
         /**
          * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
          * ChatController-luokan routeMessage-metodissa loydetaan oikea
          * kayttaja id:n perusteella, eika metodin suoritus siis keskeydy
-         * siihen, etta mappperista ei loydy oikeaa kayttajaa.
+         * siihen, etta mapperista ei loydy oikeaa kayttajaa.
          */
         mapper.mapUsernameToId("676", "Morko");
 
@@ -126,8 +125,7 @@ public class WebSocketMessageTest {
         msgUtil.add("userId", "676", false);
         msgUtil.add("channelId", "DEV_CHANNEL", true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "Morko", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
+
         /**
          * Rakennetaan viela edella muodostetusta viestista Message-olio,
          * joka voidaankin sitten lahettaa palvelimelle.
@@ -136,10 +134,12 @@ public class WebSocketMessageTest {
         Message<byte[]> message = MessageBuilder
                 .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
+
         /**
          * Lahetetaan viesti palvelimelle.
          */
         this.clientInboundChannel.send(message);
+
         /**
          * Talletetaan palvelimelta tullut vastaus Message-olioon. Eli siis
          * mita ChatControllerin routeMessage-metodi palauttaa(MsgToClient).
@@ -281,8 +281,7 @@ public class WebSocketMessageTest {
         String json = new String((byte[]) message.getPayload(),
                 Charset.forName("UTF-8"));
         JsonParser parser = new JsonParser();
-        JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
-        return jsonMessage;
+        return parser.parse(json).getAsJsonObject();
     }
 
     @Configuration

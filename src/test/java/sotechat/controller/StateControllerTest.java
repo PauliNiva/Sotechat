@@ -62,8 +62,7 @@ public class StateControllerTest {
     private MockMvc mvc;
     private SessionRepo sessions;
 
-    /**
-     * Before.
+    /** Before.
      * @throws Exception
      */
     @Before
@@ -115,16 +114,6 @@ public class StateControllerTest {
                 .build();
     }
 
-    /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.
-     * @throws Exception
-     */
-    @Test
-    public void testGetUserStateReturnsOK() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/userState").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
     /** GET polkuun /userState palauttaa uskottavat arvot.
      * @throws Exception
      */
@@ -132,6 +121,7 @@ public class StateControllerTest {
     public void testGetUserStateReturnsPlausibleValues() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .get("/userState").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(5)))
                 .andExpect(jsonPath("$.state", is("start")))
                 .andExpect(jsonPath("$.username", is("Anon")))
@@ -141,19 +131,12 @@ public class StateControllerTest {
     }
 
     @Test
-    public void testGetProStateReturnsOK() throws Exception {
-         mvc.perform(MockMvcRequestBuilders
-                .get("/proState").accept(MediaType.APPLICATION_JSON)
-                    .principal(new MockPrincipal("hoitaja")))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void testGetProStateReturnsPlausibleValues() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                     .get("/proState")
                     .accept(MediaType.APPLICATION_JSON)
                         .principal(new MockPrincipal("hoitaja")))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(6)))
                 .andExpect(jsonPath("$.state").isNotEmpty())
                 .andExpect(jsonPath("$.username").isNotEmpty())

@@ -46,35 +46,32 @@ public class ValidatorService {
     /** Onko chattiin tuleva viesti vaarennetty?
      * @param msgToServer msgToServer
      * @param accessor accessor
-     * @return true jos sallitaan
+     * @return tyhja String jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus-String.
      */
-    public final boolean isMessageFraudulent(
+    public final String isMessageFraudulent(
             final MsgToServer msgToServer,
             final SimpMessageHeaderAccessor accessor
     ) {
         String sessionId = getSessionIdFrom(accessor);
         Session session = sessionRepo.getSessionObj(sessionId);
         if (session == null) {
-            /** Kelvoton sessio, hylataan viesti. */
-            return true;
+            return "Kelvoton sessio, hylataan viesti";
         }
         String userId = msgToServer.getUserId();
         if (!mapper.isUserIdMapped(userId)) {
-            /** Kelvoton ID, hylataan viesti. */
-            return true;
+            return "Kelvoton userId, hylataan viesti";
         }
         if (mapper.isUserProfessional(userId)) {
             /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
 
             if (accessor.getUser() == null) {
-                /** Ei kirjautunut, hylataan viesti. */
-                return true;
+                return "ID kuuluu pro:lle, lahettaja ei kirjautunut, hylataan";
             }
             String username = accessor.getUser().getName();
             String authId = mapper.getIdFromRegisteredName(username);
             if (!userId.equals(authId)) {
-                /** Kirjautunut ID eri kuin viestiin merkitty lahettajan ID. */
-                return true;
+                return "Lahettajaksi merkitty ID eri kuin autentikaation ID";
             }
         }
 
@@ -83,10 +80,11 @@ public class ValidatorService {
         String chatPrefix = "/toClient/chat/";
         String channelIdWithPath = chatPrefix + channelId;
         if (!mapper.getSubscribers(channelIdWithPath).contains(session)) {
-            return true;
+            return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
-        return false;
+        /** Viesti vaikuttaa aidolta. */
+        return "";
     }
 
 

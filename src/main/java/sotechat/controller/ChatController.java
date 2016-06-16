@@ -40,7 +40,7 @@ public class ChatController {
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lahettama viesti,
      *                    joka on paketoitu MsgToServer-olion sisalle.
-     * @param accessor Haetaan session-tiedot taalta.
+     * @param acc Haetaan session-tiedot taalta.
      * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
      *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
      *         Spring-magialla lahetetaan viesti kaikille kanavaan
@@ -52,17 +52,17 @@ public class ChatController {
     @SendTo("/toClient/chat/{channelId}")
     public final MsgToClient routeMessage(
             final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor accessor
+            final SimpMessageHeaderAccessor acc
             ) throws Exception {
 
-        if (validatorService.isMessageFraudulent(msgToServer, accessor)) {
-            /** Hakkerointiyritys? */
+        String error = validatorService.isMessageFraudulent(msgToServer, acc);
+        if (!error.isEmpty()) {
+            System.out.println("Jokin viesti hylattiin syysta: " + error);
             return null;
         }
-        /** Viesti ok, kirjataan se ylos. */
-        MsgToClient msgToChannel = chatLogger.logNewMessage(msgToServer);
-        /** Lahetetaan viesti kanavalle muokatussa muodossa. */
-        return msgToChannel;
+        /** Viesti ok, kirjataan se ylos ja valitetaan muokattuna kanavalle. */
+        MsgToClient msgToClients = chatLogger.logNewMessage(msgToServer);
+        return msgToClients;
     }
 
 }

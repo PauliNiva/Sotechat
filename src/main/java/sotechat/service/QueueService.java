@@ -64,7 +64,7 @@ public class QueueService {
      * @param request req
      * @param payload payload
      */
-    public final void joinPool(
+    public final synchronized void joinPool(
             final HttpServletRequest request,
             final JsonObject payload
     ) {
@@ -110,10 +110,10 @@ public class QueueService {
         chatLogger.logNewMessage(msgToServer);
     }
 
-    /** Jonosta nostaminen on hyvaksytty, tassa metodissa suoritetaan se.
+    /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @return null jos poppaus epaonnistuu,
+     * @return tyhja String jos poppaus epaonnistuu,
      *          JSON {"content":"channel activated."} jos poppaus onnistuu.
      */
     public final synchronized String popQueue(
@@ -192,12 +192,9 @@ public class QueueService {
             final String category
     ) {
         int countItemsOfSameCategory = 1;
-        /** Etsitaan jonosta oikea alkio. */
         for (int i = 0; i < queue.size(); i++) {
             QueueItem item = queue.get(i);
             if (item.getChannelId().equals(channelId)) {
-                /** Loytyi, poistetaan. */
-                queue.remove(i);
                 return countItemsOfSameCategory;
             }
             if (item.getCategory().equals(category)) {
@@ -222,6 +219,7 @@ public class QueueService {
             output.append(item.toString());
         }
         output.append("]}");
+        System.out.println("TODO: Lisaa esimerkkioutput javadociin: " + output);
         return output.toString();
     }
 }
