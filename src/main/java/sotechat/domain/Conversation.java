@@ -1,14 +1,13 @@
 package sotechat.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.format.annotation.DateTimeFormat;
+import sun.awt.image.ImageWatched;
 
 /**
  * Luokka yksittaisen keskustelun tietojen tallentamiseen
@@ -32,16 +31,17 @@ public class Conversation {
     private List<Person> participantsOfConversation;
 
     /** keskusteluun liittyvat viestit */
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE},
             mappedBy = "conversation")
-    private List<Message> messagesOfConversation;
+    private Set<Message> messagesOfConversation;
 
     /**
      * konstruktorissa alustetaan keskusteluun liittyvat viestit
      * ja henkilot
      */
     public Conversation() {
-        this.messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new LinkedHashSet<>();
         this.participantsOfConversation = new ArrayList<>();
     }
 
@@ -55,7 +55,7 @@ public class Conversation {
     public Conversation(String date, String channelId) {
         this.date = date;
         this.channelId = channelId;
-        this.messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new LinkedHashSet<>();
         this.participantsOfConversation = new ArrayList<>();
     }
 
@@ -87,7 +87,7 @@ public class Conversation {
      * Palauttaa listan keskustelun viesteista
      * @return Lista Message olioista, jotka on liitetty keskusteluun
      */
-    public final List<Message> getMessagesOfConversation() {
+    public final Set<Message> getMessagesOfConversation() {
         return this.messagesOfConversation;
     }
 

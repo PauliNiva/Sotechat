@@ -1,17 +1,13 @@
 package sotechat.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -28,19 +24,14 @@ import sotechat.data.*;
 import sotechat.data.QueueImpl;
 import sotechat.domain.Conversation;
 import sotechat.domainService.ConversationService;
-import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
-import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.DatabaseService;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
 import sotechat.service.QueueService;
 import sotechat.service.StateService;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -75,7 +66,6 @@ public class StateControllerTest {
         QueueService qService = new QueueService(new QueueImpl());
         sessions = new SessionRepoImpl(mapper);
         ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
-        MessageRepo mockMessageRepo = mock(MessageRepo.class);
         when(mockConversationRepo.findOne(any(String.class)))
                 .thenReturn(new Conversation());
         when(mockConversationRepo.getOne(any(String.class)))
@@ -84,7 +74,6 @@ public class StateControllerTest {
         ConversationService conversationService = new ConversationService(
                 mockConversationRepo, mockPersonRepo);
         PersonService personService = new PersonService(mockPersonRepo);
-        MessageService messageService = new MessageService(mockMessageRepo);
         SimpMessagingTemplate broker = new SimpMessagingTemplate(
                 new MessageChannel() {
             @Override
@@ -101,8 +90,7 @@ public class StateControllerTest {
         ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
                 chatLogger, broker);
         DatabaseService databaseService = new DatabaseService(personService,
-                                            conversationService,
-                                            messageService);
+                                            conversationService);
         StateService state = new StateService(
                 mapper,
                 listener,

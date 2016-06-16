@@ -130,7 +130,7 @@ public class StateService {
         session.set("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu */
-        databaseService.createConversation(startMessage, username, channelId,
+        databaseService.createConversation(username, startMessage, channelId,
                 category);
 
         /** Kirjatataan aloitusviesti kanavan lokeihin. Viestia

@@ -30,24 +30,20 @@ public class ConversationServiceTest {
     ConversationService conversationService;
 
     @Autowired
-    MessageService messageService;
-
-    @Autowired
     ConversationRepo conversationRepo;
 
     @Before
     public void setUp() {
         this.conversation = new Conversation();
         this.conversation.setChannelId("007");
+        this.conversation.setDate("2006");
         this.message1 = new Message();
         this.message2 = new Message();
         this.message1.setContent("Sisältö");
         this.message1.setSender("Pauli");
-        this.message1.setChannelId("007");
         this.message1.setConversation(this.conversation);
         this.message2.setContent("Toinen sisältö");
         this.message2.setSender("Pauli");
-        this.message2.setChannelId("007");
         this.message2.setConversation(this.conversation);
     }
 
@@ -59,7 +55,7 @@ public class ConversationServiceTest {
         this.conversation.addMessageToConversation(message2);
         Assert.assertEquals(2,
                 this.conversation.getMessagesOfConversation().size());
-        conversationService.addConversation("007", "2006");
+        conversationService.addConversation(conversation);
         Assert.assertEquals(1, conversationRepo.count());
         conversationService.deleteConversation("007");
         Assert.assertEquals(0, conversationRepo.count());
@@ -67,11 +63,10 @@ public class ConversationServiceTest {
 
     @Test
     public void testi() throws Exception {
-        conversationService.addConversation("007", "2006");
-        messageService.addMessage(message1);
-        messageService.addMessage(message2);
-        conversationService.addMessage(message1, this.conversation);
-        conversationService.addMessage(message2, this.conversation);
+        conversationService.addConversation(conversation);
+        conversationService.addMessage(message1, conversation);
+        Assert.assertEquals(1, conversation.getMessagesOfConversation().size());
+        conversationService.addMessage(message2, conversation);
         Conversation conversation2 = conversationService.getConversation("007");
         Assert.assertEquals(2,
                 conversation2.getMessagesOfConversation().size());

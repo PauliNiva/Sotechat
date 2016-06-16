@@ -11,6 +11,9 @@ import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
@@ -34,12 +37,11 @@ public class ConversationService {
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
      * keskusteluun parametrina annettu viesti
-     * @param channelId keskustelun kanavan id
+     * @param conv lisättävä keskustelu
      */
     @Transactional
-    public void addConversation(String channelId, String date)
+    public void addConversation(Conversation conv)
             throws Exception {
-            Conversation conv = new Conversation(date, channelId);
             conversationRepo.save(conv);
     }
 
@@ -84,8 +86,14 @@ public class ConversationService {
     @Transactional
     public void addMessage(Message message, Conversation conv)
             throws Exception {
-            conv.addMessageToConversation(message);
+            message.setConversation(conv);
+          //  conv.addMessageToConversation(message);
             conversationRepo.save(conv);
+            Set<Message> messages = conversationRepo.findAll().get(0).getMessagesOfConversation();
+            for (Message msg : messages) {
+                System.out.println(msg.getId() + " " + msg.getContent());
+            }
+        System.out.println();
     }
 
     /**
@@ -95,8 +103,10 @@ public class ConversationService {
      * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
      *                  lisata
      */
+    @Transactional
     public void addMessage(Message message, String channelId) {
-        Conversation conv = conversationRepo.getOne(channelId);
+        Conversation conv = conversationRepo.findOne(channelId);
+        message.setConversation(conv);
         conv.addMessageToConversation(message);
         conversationRepo.save(conv);
     }

@@ -2,10 +2,7 @@ package sotechat.domain;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -28,7 +25,7 @@ public class Message extends AbstractPersistable<Long> {
     private String sender;
 
     /** keskustelu, johon viesti liittyy */
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Conversation conversation;
 
     /** keskustelun kanavaid johon viesti liittyy */

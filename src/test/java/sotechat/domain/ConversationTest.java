@@ -39,7 +39,7 @@ public class ConversationTest {
         Assert.assertEquals(conversation.getMessagesOfConversation().size(), 0);
         conversation.addMessageToConversation(message1);
         Assert.assertEquals(conversation.getMessagesOfConversation().size(), 1);
-        messagesOfConversation = conversation.getMessagesOfConversation();
+      //  messagesOfConversation = conversation.getMessagesOfConversation();
         message2 = messagesOfConversation.get(0);
         conversation.addMessageToConversation(message2);
         Assert.assertEquals(conversation.getMessagesOfConversation().size(), 2);

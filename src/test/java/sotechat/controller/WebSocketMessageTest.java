@@ -34,8 +34,7 @@ import org.springframework.web.socket.config.annotation
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
 import sotechat.domain.Conversation;
-import sotechat.repo.ConversationRepo;
-import sotechat.repo.MessageRepo;
+import sotechat.repo.ConversationRepo;;
 import sotechat.repo.PersonRepo;
 import sotechat.util.MsgUtil;
 import sotechat.util.MockChannelInterceptor;
@@ -70,9 +69,6 @@ public class WebSocketMessageTest {
 
     @Autowired
     private ConversationRepo conversationRepo;
-
-    @Autowired
-    private MessageRepo messageRepo;
 
     @Autowired
     ApplicationContext context;
@@ -295,11 +291,6 @@ public class WebSocketMessageTest {
         @Bean
         public PersonRepo personRepo() {
             return Mockito.mock(PersonRepo.class);
-        }
-
-        @Bean
-        public MessageRepo messageRepo() {
-            return Mockito.mock(MessageRepo.class);
         }
     }
     /**

@@ -7,7 +7,6 @@ import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
-import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
 
 /**
@@ -24,7 +23,7 @@ public class DatabaseService {
     ConversationService conversationService;
 
     /** Vietsteihin liittyvat palvelut */
-    MessageService messageService;
+   // MessageService messageService;
 
     /**
      * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
@@ -32,11 +31,10 @@ public class DatabaseService {
      */
     @Autowired
     public DatabaseService(PersonService personService,
-                           ConversationService conversationService,
-                           MessageService messageService){
+                           ConversationService conversationService){
         this.personService = personService;
         this.conversationService = conversationService;
-        this.messageService = messageService;
+    //    this.messageService = messageService;
     }
 
     /**
@@ -50,14 +48,17 @@ public class DatabaseService {
      */
     public final void createConversation(String sender, String startMessage,
                                          String channelId, String category)
-            throws Exception{
+            throws Exception {
         DateTime time = new DateTime();
+        Conversation conversation = new Conversation(time.toString(),
+                channelId);
         Message message = new Message(sender, startMessage, time.toString());
         message.setChannelId(channelId);
-        conversationService.addConversation(channelId, time.toString());
+        message.setConversation(conversation);
+        conversationService.addConversation(conversation);
         conversationService.setCategory(category, channelId);
+      //  messageService.addMessage(message);
         conversationService.addMessage(message, channelId);
-        messageService.addMessage(message);
     }
 
     /**
@@ -90,7 +91,7 @@ public class DatabaseService {
         Conversation conv = conversationService.getConversation(channelId);
         message.setChannelId(channelId);
         message.setConversation(conv);
-        messageService.addMessage(message);
+     //   messageService.addMessage(message);
         conversationService.addMessage(message, conv);
     }
 

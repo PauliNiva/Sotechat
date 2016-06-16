@@ -7,7 +7,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.domainService.ConversationService;
-import sotechat.domainService.MessageService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 import sotechat.service.ChatMessageService;
@@ -21,7 +20,7 @@ public class ChatController {
     private final ChatMessageService chatMessageService;
 
     /** Viestien tietokantaan tallentamiseen */
-    private final MessageService messageService;
+ //   private final MessageService messageService;
 
     /** Viestien tallentaminen keskusteluun tietokannadssa */
     private final ConversationService conversationService;
@@ -32,11 +31,10 @@ public class ChatController {
     @Autowired
     public ChatController(
             final ChatMessageService pChatService,
-            final MessageService pMessageService,
             final ConversationService pConversationService
     ) {
         this.chatMessageService = pChatService;
-        this.messageService = pMessageService;
+ //       this.messageService = pMessageService;
         this.conversationService = pConversationService;
     }
 
