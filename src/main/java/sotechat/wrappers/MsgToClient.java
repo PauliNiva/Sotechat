@@ -8,7 +8,7 @@ package sotechat.wrappers;
  *  - Halutaan timeStampit serverin, ei clientin toimesta
  *  - Ei haluta vuotaa salaisia kayttajaID:t kaikille
  */
-public class  MsgToClient {
+public class  MsgToClient implements Comparable<MsgToClient> {
 
     /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
     private String username;
@@ -60,5 +60,20 @@ public class  MsgToClient {
      */
     public final String getContent() {
         return this.content;
+    }
+
+    /**
+     * Vertaa oliota parametrina annettuun toiseen MsgToClient olioon ja
+     * palauttaa -1 jos, parametrina annetun olion timeStamp on isompi kuin
+     * taman olion, 1 jos pienempi ja 0 jos ne ovat samaa suuruiset.
+     * @param other MsgToClient olio johon verrataan
+     * @return -1, 1 tai 0
+     */
+    public final int compareTo(MsgToClient other) {
+        int thistime = Integer.parseInt(this.timeStamp);
+        int othertime = Integer.parseInt(other.getTimeStamp());
+        if(thistime<othertime) return -1;
+        else if(othertime<thistime) return 1;
+        else return 0;
     }
 }

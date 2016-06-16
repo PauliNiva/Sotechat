@@ -9,6 +9,11 @@ import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
 import sotechat.domainService.MessageService;
 import sotechat.domainService.PersonService;
+import sotechat.wrappers.MsgToClient;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Luokka tietokantaoperaatioiden toteuttamiseen
@@ -54,10 +59,10 @@ public class DatabaseService {
         DateTime time = new DateTime();
         Message message = new Message(sender, startMessage, time.toString());
         message.setChannelId(channelId);
+        messageService.addMessage(message);
         conversationService.addConversation(channelId, time.toString());
         conversationService.setCategory(category, channelId);
         conversationService.addMessage(message, channelId);
-        messageService.addMessage(message);
     }
 
     /**
@@ -92,6 +97,58 @@ public class DatabaseService {
         message.setConversation(conv);
         messageService.addMessage(message);
         conversationService.addMessage(message, conv);
+    }
+
+    /**
+     * Palauttaa listan henkiloon liittyvista channelid:sta eli henkilon
+     * kaikkien keskustelujen channelid:t listana.
+     * @param userId henkilon id
+     * @return List<String> henkiloon liittyvat channelid:t
+     * @throws Exception IllegalArgumentException
+     */
+    public final List<String> personsConversations(String userId)
+            throws Exception {
+        Person person = personService.getPerson(userId);
+        List<Conversation> convs = person.getConversationsOfPerson();
+        List<String> channelIds = new ArrayList<String>();
+        for(Conversation conv : convs){
+            channelIds.add(conv.getChannelId());
+        }
+        return channelIds;
+    }
+
+    /**
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun
+     * viestit aikaleiman mukaan jarjestettyna listana MsgToClient olioita.
+     * @param channelId keskustelun kanavan id
+     * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa
+     */
+    public final List<MsgToClient> retrieveMessages(String channelId)
+            throws Exception {
+        Conversation conv = conversationService.getConversation(channelId);
+        List<Message> messages = conv.getMessagesOfConversation();
+        List<MsgToClient> messagelist = new ArrayList<MsgToClient>();
+        for(Message message : messages){
+            MsgToClient newMsg = wrap(message);
+            messagelist.add(newMsg);
+        }
+        Collections.sort(messagelist);
+        return messagelist;
+    }
+
+    /**
+     * Luo uuden MsgToClient olion parametrina annetun Message olion tietojen
+     * pohjalta ts muuntaa Message olion MsgToClient olioksi.
+     * @param message Message luokan ilmentyma
+     * @return MsgToClient luokan ilmentyma
+     */
+    private final MsgToClient wrap(Message message) throws Exception {
+        String name = message.getSender();
+        String channelId = message.getChannelId();
+        String time = message.getDate();
+        String content = message.getContent();
+        MsgToClient msg = new MsgToClient(name, channelId, time, content);
+        return msg;
     }
 
 }
