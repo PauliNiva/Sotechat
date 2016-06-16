@@ -32,15 +32,14 @@ public class ChatLogger {
      * @param pMapper Mapper
      * @param pDatabaseService DBS
      */
-//    @Autowired
-//    public ChatLogger(
+    public ChatLogger(
 //        final Mapper pMapper,
 //        final DatabaseService pDatabaseService
-//    ) {
-//        this.logs = new HashMap<>();
+    ) {
+        this.logs = new HashMap<>();
 //        this.mapper = pMapper;
 //        this.databaseService = pDatabaseService;
-//    }
+    }
 
     /** Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.
      * Palauttaa viestin clienteille lahetettavassa muodossa.
