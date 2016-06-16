@@ -68,7 +68,6 @@ public class StateControllerTest {
     @Before
     public void setUp() throws Exception {
         Mapper mapper = new MapperImpl();
-        SubscribeEventListener listener = new SubscribeEventListener();
         sessions = new SessionRepoImpl(mapper);
         ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
         MessageRepo mockMessageRepo = mock(MessageRepo.class);
@@ -104,7 +103,13 @@ public class StateControllerTest {
         ValidatorService validatorService = new ValidatorService(
                 mapper, sessions
         );
-
+        SubscribeEventListener listener = new SubscribeEventListener(
+                sessions,
+                broadcaster,
+                broker,
+                chatLogger,
+                mapper
+        );
         mvc = MockMvcBuilders
                 .standaloneSetup(new StateController(
                         validatorService,
