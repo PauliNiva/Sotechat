@@ -59,7 +59,7 @@ public class Session {
             output += "\"" + channel + "\", ";
         }
         if (!channels.isEmpty()) {
-            /** Jos kanavia oli, poistetaan viimeinen pilkku ja vali. */
+            /** Jos kanavia oli yli 0, poistetaan viimeinen pilkku ja vali. */
             output = output.substring(0, output.length() - 2);
         }
         output += "]";
