@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
 import sotechat.data.ChatLogger;
-import sotechat.data.Mapper;
+import sotechat.service.ValidatorService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
@@ -19,20 +19,20 @@ public class ChatController {
     /** Chat Logger. */
     private final ChatLogger chatLogger;
 
-    /** Mapperi. */
-    private final Mapper mapper;
+    /** Validator Service. */
+    private final ValidatorService validatorService;
 
     /** Konstruktori.
      * @param pChatLogger chatLogger
-     * @param pMapper mapper
+     * @param pValidatorService validatorServie
      */
     @Autowired
     public ChatController(
             final ChatLogger pChatLogger,
-            final Mapper pMapper
+            final ValidatorService pValidatorService
     ) {
         this.chatLogger = pChatLogger;
-        this.mapper = pMapper;
+        this.validatorService = pValidatorService;
     }
 
     /** Reitittaa chattiin kirjoitetut viestit muokattuna
@@ -55,52 +55,14 @@ public class ChatController {
             final SimpMessageHeaderAccessor accessor
             ) throws Exception {
 
-        if (fraudulentMessage(msgToServer, accessor)) {
+        if (validatorService.isMessageFraudulent(msgToServer, accessor)) {
             /** Hakkerointiyritys? */
             return null;
         }
-        /** Viesti ok, kirjataan se ylos ja valitetaan eri muodossa. */
+        /** Viesti ok, kirjataan se ylos. */
         MsgToClient msgToChannel = chatLogger.logNewMessage(msgToServer);
+        /** Lahetetaan viesti kanavalle muokatussa muodossa. */
         return msgToChannel;
-    }
-
-    /** Onko viesti vaarennetty?
-     * @param msgToServer msgToServer
-     * @param accessor accessor
-     * @return true jos sallitaan
-     */
-    private boolean fraudulentMessage(
-            final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor accessor
-    ) {
-        String userId = msgToServer.getUserId();
-        if (!mapper.isUserIdMapped(userId)) {
-            /** Kelvoton ID, hylataan viesti. */
-            return true;
-        }
-        if (mapper.isUserProfessional(userId)) {
-            /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
-
-            if (accessor.getUser() == null) {
-                /** Ei kirjautunut, hylataan viesti. */
-                return true;
-            }
-            String username = accessor.getUser().getName();
-            String authId = mapper.getIdFromRegisteredName(username);
-            if (!userId.equals(authId)) {
-                /** Kirjautunut ID eri kuin viestiin merkitty lahettajan ID. */
-                return true;
-            }
-        }
-
-        // TODO:
-        // tarkista subscribeEventListenerista, etta kirjoittaja
-        // on subscribannut kanavalle.
-        String channelId = msgToServer.getChannelId();
-        String chatPrefix = "/toClient/chat/";
-        String channelIdWithPath = chatPrefix + channelId;
-
-        return false;
     }
 
 }

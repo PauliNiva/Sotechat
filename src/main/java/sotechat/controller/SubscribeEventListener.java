@@ -81,7 +81,7 @@ public class SubscribeEventListener
         }
 
         /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
-         * on suoritettu loppuun. */
+         * subscribe-tapahtuma on suoritettu loppuun. */
         Timer timer = new Timer();
         int delay = 1; // milliseconds
         timer.schedule(new TimerTask() {
@@ -113,10 +113,10 @@ public class SubscribeEventListener
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
     ) {
-        //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
 
-        /** Interceptor estaa subscribet, joista puuttuu sessionId. */
+        /** Interceptor estaa subscribet, joista puuttuu sessionId.
+         * Siksi allaoleva ei voi heittaa nullpointteria. */
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
                 .get("SPRING.SESSION.ID").toString();
@@ -138,14 +138,14 @@ public class SubscribeEventListener
         }
         list.add(session);
 
-        /** Jos subscribattu QBCC (jonotiedotuskanava), tiedotetaan. */
+        /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
         String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         if (channelIdWithPath.equals(qbcc)) {
             queueBroadcaster.broadcastQueue();
         }
 
-        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan viestihistoria
-         * kaikille kanavan subscribaajille (alkuun "tyhjenna naytto" spessu) */
+        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan
+         * viestihistoria kaikille kanavan subscribaajille. */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
             String channelId = channelIdWithPath.substring(chatPrefix.length());

@@ -51,7 +51,7 @@ public class DatabaseService {
             final String sender,
             final String channelId,
             final String category
-            ) throws Exception{
+    ) throws Exception {
         DateTime time = new DateTime();
         conversationService.addConversation(channelId, time.toString());
         conversationService.setCategory(category, channelId);

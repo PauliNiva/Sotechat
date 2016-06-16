@@ -7,34 +7,35 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.stereotype.Component;
-import sotechat.data.Session;
-import sotechat.data.SessionRepo;
-
+import sotechat.service.ValidatorService;
 import java.security.Principal;
 
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /**
- * Sallii/kieltaa subscribtionin kayttaja oikeuksista riippuen.
+ * Sallii/kieltaa subscriptionin kayttajaoikeuksista riippuen.
  */
 @Component
 public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
 
-    /** Session repo. */
-    private SessionRepo sessionRepo;
+    /** Validator Service suorittaa validointilogiikan. */
+    private ValidatorService validatorService;
 
     /** Konstruktori.
-     * @param pSessionRepo session repo.
+     * @param pValidatorService validatorService
      */
     @Autowired
-    public SubscriptionInterceptor(final SessionRepo pSessionRepo) {
-        sessionRepo = pSessionRepo;
+    public SubscriptionInterceptor(
+            final ValidatorService pValidatorService
+    ) {
+        validatorService = pValidatorService;
     }
 
-    /** Mitka kaikki viestit kulkevat tata kautta?
+    /** Toimii "portinvartijana" subscribe-tapahtumille.
      * @param message message
      * @param channel channel
-     * @return message if allowed, exception thrown otherwise
+     * @return message jos sallitaan subscribe. palautusarvo toimii tassa
+     * tapauksessa niin, etta subscribe-viestin kulkeminen sita kasitteleville
+     * metodeille sallitaan. Jos ei sallita, heitetaan poikkeus.
      */
     @Override
     public final Message<?> preSend(
@@ -46,7 +47,7 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             Principal userPrincipal = headerAccessor.getUser();
             String sessionId = getSessionIdFrom(headerAccessor);
             String channelIdWP = headerAccessor.getDestination();
-            String error = validateSubscription(
+            String error = validatorService.validateSubscription(
                     userPrincipal, sessionId, channelIdWP);
             if (!error.isEmpty()) {
                 throw new IllegalArgumentException("Hacking attempt? " + error);
@@ -58,71 +59,6 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
          * if (StompCommand.SEND.equals(headerAccessor.getCommand())) ... */
 
         return message;
-    }
-
-    /** Sallitaanko subscription?.
-     * Jos sallitaan, palauttaa tyhjan Stringin.
-     * Jos ei sallita, palauttaa virheilmoituksen.
-     * @param principal autentikaatiotiedot
-     * @param sessionId sessioId
-     * @param channelIdWithPath channelIdWithPath
-     * @return virheilmoitus Stringina jos ei sallita pyyntoa.
-     */
-    private String validateSubscription(
-            final Principal principal,
-            final String sessionId,
-            final String channelIdWithPath
-    ) {
-        String prefix = "Validate subscription for channel " + channelIdWithPath
-                + " by session id " + sessionId + " ### ";
-
-        /** Kelvollinen sessio? */
-        Session session = sessionRepo.getSessionObj(sessionId);
-        if (session == null) {
-            return prefix + "Session is null";
-        }
-
-        /** Ammattilaiskayttaja? */
-        if (session.isPro()) {
-            /** Loytyyko autentikaatio myos principal-oliosta? */
-            if (principal == null) {
-                return prefix + "Session belongs to pro but user not auth'd";
-            }
-            String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
-            if (channelIdWithPath.equals(qbcc)) {
-                /** Sallitaan - ammattilaiskayttaja saa kuunnella QBCC. */
-                return "";
-            }
-            if (channelIdWithPath.startsWith("/toClient/queue/")) {
-                /** Sallitaan hoitajien kuunnella kaikkia jonokanavia. */
-                return "";
-            }
-        }
-
-        /** Kielletaan subscribaus kaikkialle poislukien:
-         * /toClient/queue/channelId
-         * /toClient/chat/channelId
-         * Tarkistetaan, onko kayttajalla/pro:lla oikeutta kanavalle.
-         * TODO: Refaktoroi regexilla. */
-        String[] splitted = channelIdWithPath.split("/");
-        if (splitted.length != 4) {
-            return prefix + "Invalid channel path (1): " + channelIdWithPath;
-        }
-        if (!"toClient".equals(splitted[1])) {
-            return prefix + "Invalid channel path (2): " + channelIdWithPath;
-        }
-        if (!"queue".equals(splitted[2])
-                && !"chat".equals(splitted[2])) {
-            return prefix + "Invalid channel path (3): " + channelIdWithPath;
-        }
-        String channelId = splitted[3];
-
-        if (session.isOnChannel(channelId)) {
-            /** Sessiolla on oikeus kuunnella kanavaa. */
-            return "";
-        }
-
-        return prefix + "Ei oikeutta kuunnella kanavaa!";
     }
 
     /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.

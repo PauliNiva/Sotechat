@@ -13,11 +13,12 @@ import org.springframework.web
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.controller.SubscriptionInterceptor;
 import sotechat.data.SessionRepoImpl;
+import sotechat.service.ValidatorService;
 
 
 /** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
  * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
- * Ilmeisesti tassa maaritellaan polut, joihin tulevat/menevat viestit
+ * Maaritellaan polut, joihin tulevat/menevat viestit
  * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan.
  * Lisaksi ohjataan subscriptionien hyvaksyminen interceptorille. */
 @Configuration
@@ -27,10 +28,14 @@ public class WebSocketConfig extends
         AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
     /** SessionRepoImpl taytyy autowireaa tassa, jotta WebSocket-sessiot
-     * onnistutaan sailomaan sinne.
-     */
+     * onnistutaan sailomaan sinne. */
     @Autowired
     private SessionRepoImpl repository;
+
+    /** ValidatorService taytyy autowireaa tassa, jotta se voidaan antaa
+     * parametrina luotavalle Interceptorille, joka on pakko maaritella tassa.*/
+    @Autowired
+    private ValidatorService validatorSer;
 
 
     /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
@@ -67,7 +72,7 @@ public class WebSocketConfig extends
     public void configureClientInboundChannel(
             final ChannelRegistration registration
     ) {
-        registration.setInterceptors(new SubscriptionInterceptor(repository));
+        registration.setInterceptors(new SubscriptionInterceptor(validatorSer));
     }
 }
 
