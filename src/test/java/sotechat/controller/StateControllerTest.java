@@ -237,7 +237,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithReservedScreennameFails() throws Exception {
+    public void joinPoolWithReservedScreenNameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
@@ -248,7 +248,7 @@ public class StateControllerTest {
 
         /** Tehdaan sitten samalta 007-sessiolta /joinPool pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
-        String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
+        String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .session(mockSession))

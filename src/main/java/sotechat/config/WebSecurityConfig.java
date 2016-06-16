@@ -12,10 +12,10 @@ import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-
+import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import sotechat.auth.JpaAuthenticationProvider;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -87,8 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     HttpServletRequest request,
                     HttpServletResponse response,
                     FilterChain filterChain)
-                    throws ServletException, IOException
-            {
+                    throws ServletException, IOException {
                 CsrfToken csrf = (CsrfToken) request
                         .getAttribute(CsrfToken.class.getName());
                 if (csrf != null) {
@@ -105,28 +104,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             }
         };
     }
-        private CsrfTokenRepository csrfTokenRepository () {
-            HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-            repository.setHeaderName("X-XSRF-TOKEN");
-            return repository;
-        }
 
-        /** Kovakoodataan hoitajan tunnukset siihen saakka,
-         * etta tietokanta on kaytossa.
-         * @param auth mika tama on?
-         * @throws Exception mika poikkeus?
-         */
+    private CsrfTokenRepository csrfTokenRepository() {
+        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+        repository.setHeaderName("X-XSRF-TOKEN");
+        return repository;
+    }
+
+
+    @Configuration
+    protected static class AuthenticationConfiguration extends GlobalAuthenticationConfigurerAdapter {
+
         @Autowired
-        public final void configureGlobal ( final AuthenticationManagerBuilder auth)
-        throws Exception {
-            auth
-                    .inMemoryAuthentication()
-                    .withUser("Hoitaja")
-                    .password("salasana")
-                    .roles("USER").and()
-                    .withUser("Hoitaja2")
-                    .password("salasana")
-                    .roles("USER");
-            // TODO: selvita roolin merkitys.
+        private JpaAuthenticationProvider jpaAuthenticationProvider;
+
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            auth.authenticationProvider(jpaAuthenticationProvider);
         }
     }
+}
