@@ -48,6 +48,7 @@ public class SubscribeEventListener
      * @param pChatLogger p
      * @param pMapper p
      */
+    @Autowired
     public SubscribeEventListener(
             final SessionRepo pSessionRepo,
             final QueueBroadcaster pQueueBroadcaster,
