@@ -25,4 +25,9 @@ public interface SessionRepo {
             HttpServletRequest req,
             Principal professional
     );
+
+    void updateSessionAttributes(
+            final Session session,
+            final Principal professional
+    );
 }

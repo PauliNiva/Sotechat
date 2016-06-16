@@ -1,6 +1,8 @@
 package sotechat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -36,6 +38,9 @@ public class WebSocketConfig extends
      * parametrina luotavalle Interceptorille, joka on pakko maaritella tassa.*/
     @Autowired
     private ValidatorService validatorSer;
+
+    @Autowired
+    private ApplicationListener<ApplicationEvent> subscribeEventListener;
 
 
     /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker

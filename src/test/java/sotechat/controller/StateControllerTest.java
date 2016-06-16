@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.ApplicationListener;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -99,11 +100,11 @@ public class StateControllerTest {
         QueueService qService = new QueueService(
                 mapper, sessions, databaseService, chatLogger
         );
-        QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
+        QueueBroadcaster broadcaster = new QueueBroadcasterImpl(qService, broker);
         ValidatorService validatorService = new ValidatorService(
                 mapper, sessions
         );
-        SubscribeEventListener listener = new SubscribeEventListener(
+        ApplicationListener listener = new SubscribeEventListener(
                 sessions,
                 broadcaster,
                 broker,
