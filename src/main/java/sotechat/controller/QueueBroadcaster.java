@@ -32,20 +32,6 @@ public class QueueBroadcaster {
         this.broker = pSimpMessagingTemplate;
     }
 
-    /** EI KAYTOSSA JUURI NYT.
-     * Broadcasting every 1 second to fix subscribe+broadcast timing issues.
-     * TODO: Properly for production.
-     */
-    public final void setBroadcastEvery1Second() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                broadcastQueue();
-            }
-        }, 1 * 1000, 1 * 1000);
-    }
-
     /** Tiedottaa jonon tilanteen kaikille QBCC subscribaajille (hoitajille).
      * Timeria kaytetaan samanaikaisuusongelmien korjaamiseen.
      * TODO: Protection against flooding (max 1 broadcast/second).

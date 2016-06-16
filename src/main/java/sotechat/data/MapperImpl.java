@@ -2,9 +2,7 @@ package sotechat.data;
 
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 import java.security.SecureRandom;
 import java.math.BigInteger;
 
@@ -22,6 +20,8 @@ public class MapperImpl implements Mapper {
     private HashMap<String, String> mapByUsername;
     /** professionalIDs:lta voi kysya, mitka ID:t ovat rekisteroity. */
     private HashSet<String> professionalIDs;
+    /** Key = channelIDWithPath, value = list of subscribed sessions. */
+    private HashMap<String, List<Session>> mapByChannelId;
 
 
     /** Raskas satunnaislukugeneraattori. */
@@ -31,8 +31,9 @@ public class MapperImpl implements Mapper {
 
     /** Konstruktori alustaa singleton-instanssin Mapperista. */
     public MapperImpl() {
-        this.mapByUserId = new HashMap<String, String>();
-        this.mapByUsername = new HashMap<String, String>();
+        this.mapByUserId = new HashMap<>();
+        this.mapByUsername = new HashMap<>();
+        this.mapByChannelId = new HashMap<>();
         this.random = new SecureRandom();
         this.fastGen = new FastGeneratorForRandomStrings();
         this.professionalIDs = new HashSet<>();
@@ -114,7 +115,36 @@ public class MapperImpl implements Mapper {
         return this.mapByUsername.get(registeredName);
     }
 
-    /** Tuottaa uuden, yksilollisen, salaisen userID:n.
+    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
+     * @param channelId kanavaId
+     * @return lista sessioita
+     */
+    @Override
+    public final synchronized List<Session> getSubscribers(
+            final String channelId
+    ) {
+        List<Session> subs = mapByChannelId.get(channelId);
+        if (subs == null) {
+            subs = new ArrayList<>();
+        }
+        return subs;
+    }
+
+    @Override
+    public final synchronized void addSessionToChannel(
+            final String channelIdWithPath,
+            final Session session
+    ) {
+        List<Session> list = mapByChannelId.get(channelIdWithPath);
+        if (list == null) {
+            list = new ArrayList<>();
+            mapByChannelId.put(channelIdWithPath, list);
+        }
+        list.add(session);
+    }
+
+
+    /** Tuottaa uuden ID:n, joka on yksilollinen kanavalle/kayttajalle.
      * ID:ta ei varata tai mapata viela tassa kutsussa.
      * @return userId
      */
@@ -125,9 +155,10 @@ public class MapperImpl implements Mapper {
              * etta vapaa merkkijono loytyy. On erittain
              * epatodennakoista, etta iteraatioita olisi
              * koskaan enempaa kuin yksi. */
-            String userId = getFastRandomString();
-            if (!mapByUserId.containsKey(userId)) {
-                return userId;
+            String newId = getFastRandomString();
+            if (!mapByUserId.containsKey(newId)
+                    && !mapByChannelId.containsKey(newId)){
+                return newId;
             }
         }
     }

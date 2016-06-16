@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
@@ -23,9 +24,6 @@ import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 @Component
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
-
-    /** Key = channelIDWithPath, value = list of subscribed sessions. */
-    private HashMap<String, List<Session>> map;
 
     /** Session Repository. */
     @Autowired
@@ -43,25 +41,14 @@ public class SubscribeEventListener
     @Autowired
     private ChatLogger chatLogger;
 
-    /** Vain 1 instanssi. */
+    /** Mapper. */
+    @Autowired
+    private Mapper mapper;
+
+    /** Konstruktori. */
     public SubscribeEventListener() {
-        map = new HashMap<String, List<Session>>();
-    }
 
-    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
-     * @param channelId kanavaId
-     * @return lista sessioita
-     */
-    public final synchronized List<Session> getSubscribers(
-            final String channelId
-    ) {
-        List<Session> subs = map.get(channelId);
-        if (subs == null) {
-            subs = new ArrayList<>();
-        }
-        return subs;
     }
-
 
     /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
      * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan
@@ -131,12 +118,7 @@ public class SubscribeEventListener
         }
 
         /** Add session to list of subscribers to channelId. */
-        List<Session> list = map.get(channelIdWithPath);
-        if (list == null) {
-            list = new ArrayList<>();
-            map.put(channelIdWithPath, list);
-        }
-        list.add(session);
+        mapper.addSessionToChannel(channelIdWithPath, session);
 
         /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
         String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;

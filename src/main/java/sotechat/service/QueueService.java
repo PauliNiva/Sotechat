@@ -35,29 +35,27 @@ public class QueueService {
     /** Database Service. */
     private DatabaseService databaseService;
 
-    /** Subscribe Event Listener. */
-    private SubscribeEventListener subscribeEventListener;
-
     /** Chat Logger. */
     private ChatLogger chatLogger;
 
     /** Konstruktori.
      *
-     * @param pMapper Mapper.
+     * @param pMapper p
+     * @param pSessionRepo p
+     * @param pDatabaseService p
+     * @param pChatLogger p
      */
     @Autowired
     public QueueService(
             final Mapper pMapper,
             final SessionRepo pSessionRepo,
             final DatabaseService pDatabaseService,
-            final SubscribeEventListener pSubscribeEventListener,
             final ChatLogger pChatLogger
     ) {
         this.queue = new ArrayList<>();
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
         this.databaseService = pDatabaseService;
-        this.subscribeEventListener = pSubscribeEventListener;
         this.chatLogger = pChatLogger;
     }
 
@@ -174,8 +172,7 @@ public class QueueService {
             final String channelId
     ) {
         String channelIdWithPath = "/toClient/queue/" + channelId;
-        List<Session> list = subscribeEventListener.
-                getSubscribers(channelIdWithPath);
+        List<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session member : list) {
             member.set("state", "chat");
         }

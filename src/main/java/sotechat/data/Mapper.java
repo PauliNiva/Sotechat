@@ -1,5 +1,7 @@
 package sotechat.data;
 
+import java.util.List;
+
 /**
  * Jotta Springin Dependency Injection toimisi,
  * Mapperilla taytyy olla oma interface.
@@ -47,4 +49,13 @@ public interface Mapper {
      * @return true, jos kuuluu.
      */
     boolean isUserProfessional(String id);
+
+    List<Session> getSubscribers(
+            final String channelId
+    );
+
+    void addSessionToChannel(
+            String channelIdWithPath,
+            Session session
+    );
 }

@@ -28,9 +28,6 @@ public class ValidatorService {
     /** Session Repo. */
     private SessionRepo sessionRepo;
 
-    /** Subscribe Event Listener. */
-    private SubscribeEventListener subscribeEventListener;
-
     /**
      * Konstruktori.
      * @param pMapper mapper
@@ -40,12 +37,10 @@ public class ValidatorService {
     @Autowired
     public ValidatorService(
             final Mapper pMapper,
-            final SessionRepo pSessionRepo,
-            final SubscribeEventListener pSubscribeEventListener
+            final SessionRepo pSessionRepo
     ) {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
-        this.subscribeEventListener = pSubscribeEventListener;
     }
 
     /** Onko chattiin tuleva viesti vaarennetty?
@@ -156,6 +151,7 @@ public class ValidatorService {
 
     /** Validointi pyynnolle liittya jonoon.
      * @param request req
+     * @param payload payload
      * @param professional pro
      * @return Jos pyynto hylataan, palautetaan virheilmoitus Stringina.
      *         Jos pyynto hyvaksytaan, palautetaan payload JSON-objektina.
@@ -180,7 +176,6 @@ public class ValidatorService {
 
         /** Kaivetaan JSON-objektista attribuutteja muuttujiin. */
         String username = payload.get("username").getAsString();
-        String startMessage = payload.get("startMessage").getAsString();
         String channelId = session.get("channelId");
 
         /** Tarkistetaan etta aiempi tila on "start". */
@@ -197,8 +192,7 @@ public class ValidatorService {
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
         String channelIdWithPath = "/toClient/chat/" + channelId;
-        List<Session> list = subscribeEventListener
-                .getSubscribers(channelIdWithPath);
+        List<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session other : list) {
             if (other.get("username").equals(username)) {
                 return "Denied join pool request. Username already on channel.";
