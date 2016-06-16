@@ -4,13 +4,13 @@
 angular.module('chatProApp')
     .controller('proCtrl', ['$scope', 'auth',
         function ($scope, auth) {
+            var CPTEMPLATE = 'proControlPanel/controlPanel.tpl.html';
+            var LOGINTEMPLATE = 'login/login.tpl.html';
             $scope.login = function(authenticated) {
                 if (authenticated) {
-                    $scope.authStatus = 'proControlPanel/controlPanel.tpl.html';
-                    console.log("Login succeeded");
+                    $scope.authStatus = CPTEMPLATE;
                     $scope.error = false;
                 } else {
-                    console.log("Login failed");
                     $scope.error = true;
                 }
             };
@@ -21,12 +21,12 @@ angular.module('chatProApp')
                 });
             };
 
-            var init  = function(authenticated) {
+            var init  = function() {
                 if (auth.getAuthStatus() !== false) {
-                    $scope.authStatus = 'proControlPanel/controlPanel.tpl.html';
+                    $scope.authStatus = CPTEMPLATE;
                 } else {
                     $scope.error = false;
-                    $scope.authStatus = 'login/login.tpl.html';
+                    $scope.authStatus = LOGINTEMPLATE;
                 }
             };
             auth.authenticate([], init);

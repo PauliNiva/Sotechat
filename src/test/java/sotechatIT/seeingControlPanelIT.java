@@ -61,7 +61,7 @@ public class seeingControlPanelIT {
                 .submit();
 
         //Control panel is not visible to the user
-        assertTrue(waitForTextToAppear(proWait,"There was a problem"));
+        assertTrue(waitForTextToAppear(proWait,"tai salasana on virheellinen"));
     }
 
 

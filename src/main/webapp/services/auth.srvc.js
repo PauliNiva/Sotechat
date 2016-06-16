@@ -22,15 +22,11 @@ angular.module('chatProApp')
                 authenticated = false;
                 callback && callback(false);
             });
-
         }
 
         function clear(callback) {
             auth.authenticated = false;
             $http.post('/logout', {}).then(callback);
-        }
-
-        function init() {
         }
 
         function getAuthStatus() {
