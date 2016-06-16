@@ -18,15 +18,15 @@ public class DatabaseService {
 
     /** Henkiloihin liittyvat palvelut */
     @Autowired
-    PersonService personService;
+    private PersonService personService;
 
     /** Keskusteluihin liittyvat palvelut */
     @Autowired
-    ConversationService conversationService;
+    private ConversationService conversationService;
 
     /** Viesteihin liittyvat palvelut */
     @Autowired
-    MessageService messageService;
+    private MessageService messageService;
 
 //    /**
 //     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,

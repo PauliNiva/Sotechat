@@ -93,9 +93,7 @@ public class StateControllerTest {
                 return true;
             }
         });
-        DatabaseService databaseService = new DatabaseService(personService,
-                                            conversationService,
-                                            messageService);
+        DatabaseService databaseService = new DatabaseService();
         ChatLogger chatLogger = new ChatLogger(mapper, databaseService);
         QueueService qService = new QueueService(
                 mapper, sessions, databaseService, chatLogger
