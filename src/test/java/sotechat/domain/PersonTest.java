@@ -15,19 +15,19 @@ public class PersonTest {
     }
 
     @Test
-    public void setAndGetScreenNameTest() {
-        person.setScreenName("Pauli");
-        Assert.assertEquals("Pauli", person.getScreenName());
-        person.setScreenName("iluaP");
-        Assert.assertEquals("iluaP", person.getScreenName());
+    public void setAndGetUserNameTest() {
+        person.setUserName("Pauli");
+        Assert.assertEquals("Pauli", person.getUserName());
+        person.setUserName("iluaP");
+        Assert.assertEquals("iluaP", person.getUserName());
     }
 
     @Test
-    public void setAndGetUsernameTest() {
-        person.setUsername("Pauli");
-        Assert.assertEquals("Pauli", person.getUsername());
-        person.setUsername("iluaP");
-        Assert.assertEquals("iluaP", person.getUsername());
+    public void setAndGetLoginNameTest() {
+        person.setLoginName("Pauli");
+        Assert.assertEquals("Pauli", person.getLoginName());
+        person.setLoginName("iluaP");
+        Assert.assertEquals("iluaP", person.getLoginName());
     }
 
     @Test

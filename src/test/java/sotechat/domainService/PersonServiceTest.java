@@ -38,26 +38,26 @@ public class PersonServiceTest {
     public void setUp() {
         this.person = new Person();
         this.person.setUserId("jokustringivaansinne");
-        this.person.setScreenName("Pauli");
+        this.person.setUserName("Pauli");
     }
 
     @Test
     @Transactional
     public void personIsAddedToRepo() throws Exception {
-        Assert.assertEquals(1, personRepo.count());
-        this.person.setUsername("Pauli");
-        personService.addPerson(this.person, "0000");
         Assert.assertEquals(2, personRepo.count());
+        this.person.setLoginName("Pauli");
+        personService.addPerson(this.person, "0000");
+        Assert.assertEquals(3, personRepo.count());
     }
 
     @Test
     @Transactional
     public void personIsDeletedFromRepo() throws Exception {
-        Assert.assertEquals(1, personRepo.count());
-        personService.addPerson(this.person, "0000");
         Assert.assertEquals(2, personRepo.count());
+        personService.addPerson(this.person, "0000");
+        Assert.assertEquals(3, personRepo.count());
         personService.delete(this.person.getUserId());
-        Assert.assertEquals(1, personRepo.count());
+        Assert.assertEquals(2, personRepo.count());
     }
 
     @Test
@@ -74,12 +74,12 @@ public class PersonServiceTest {
 
     @Test
     @Transactional
-    public void personsScreenNameIsChanged() throws Exception {
+    public void personsUserNameIsChanged() throws Exception {
         personService.addPerson(this.person, "0000");
-        personService.changeScreenName("jokustringivaansinne", "iluaP");
+        personService.changeUserName("jokustringivaansinne", "iluaP");
         Person person2 = personService.getPerson("jokustringivaansinne");
-        Assert.assertEquals("iluaP", person2.getScreenName());
-        Assert.assertFalse(personService.changeScreenName("Idnonexistent",
+        Assert.assertEquals("iluaP", person2.getUserName());
+        Assert.assertFalse(personService.changeUserName("Idnonexistent",
                 "Trump_for_president"));
     }
 
@@ -87,10 +87,10 @@ public class PersonServiceTest {
     @Transactional
     public void allPersonsFromRepoAreListed() throws Exception {
         List<Person> list = personService.findAll();
-        Assert.assertEquals(1, list.size());
+        Assert.assertEquals(2, list.size());
         personService.addPerson(this.person, "0000");
         list = personService.findAll();
-        Assert.assertEquals(2, list.size());
+        Assert.assertEquals(3, list.size());
     }
 
     @Test

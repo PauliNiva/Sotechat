@@ -171,7 +171,7 @@ public class WebSocketMessageTest {
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new MockPrincipal("Hoitaja"));
+        headers.setUser(new MockPrincipal("hoitaja"));
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);
