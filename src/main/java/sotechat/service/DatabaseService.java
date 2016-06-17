@@ -31,10 +31,9 @@ public class DatabaseService {
      */
     @Autowired
     public DatabaseService(PersonService personService,
-                           ConversationService conversationService){
+                           ConversationService conversationService) {
         this.personService = personService;
         this.conversationService = conversationService;
-    //    this.messageService = messageService;
     }
 
     /**
@@ -57,7 +56,6 @@ public class DatabaseService {
         message.setConversation(conversation);
         conversationService.addConversation(conversation);
         conversationService.setCategory(category, channelId);
-      //  messageService.addMessage(message);
         conversationService.addMessage(message, channelId);
     }
 
@@ -91,7 +89,6 @@ public class DatabaseService {
         Conversation conv = conversationService.getConversation(channelId);
         message.setChannelId(channelId);
         message.setConversation(conv);
-     //   messageService.addMessage(message);
         conversationService.addMessage(message, conv);
     }
 
