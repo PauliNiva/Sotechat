@@ -1,13 +1,14 @@
 package sotechat.service;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.owasp.esapi.ESAPI;
 
 /**
  * Created by varkoi on 16.6.2016.
  */
 public class Validator {
 
-    private static String allowed = "0123456789abcdefghijklmnopqrstuvxyzåäö()*!?\"\'.,:;+-=%&#@_";
+    private static String allowed = "0123456789abcdefghijklmnopqrstuvxyzåäö()*!?\"\'.,:+-=%#@_";
 
     public static String sanitize(String input) {
 
@@ -25,18 +26,24 @@ public class Validator {
     public static String escape(String input){
 
         String output = StringEscapeUtils.escapeJava(input);
-        output = StringEscapeUtils.escapeXml(output);
 
         return output;
     }
 
     public static String unescape(String input){
 
-        String output = StringEscapeUtils.unescapeXml(input);
-        output = StringEscapeUtils.unescapeJava(output);
+        String output = StringEscapeUtils.unescapeJava(input);
 
         return output;
     }
 
+    public static String escapeForSql(String input){
+
+
+    }
+
+    public static String unescapeFromSql(String input){
+
+    }
 
 }

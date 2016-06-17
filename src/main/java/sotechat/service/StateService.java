@@ -90,8 +90,8 @@ public class StateService {
         String jsonString = request.getReader().readLine();
         JsonParser parser = new JsonParser();
         JsonObject payload = parser.parse(jsonString).getAsJsonObject();
-        String username = payload.get("username").getAsString();
-        String startMessage = payload.get("startMessage").getAsString();
+        String username = Validator.sanitize(payload.get("username").getAsString());
+        String startMessage = Validator.sanitize(payload.get("startMessage").getAsString());
         String channelId = session.get("channelId");
 
         System.out.println("REQUESTED USERNAME " + username + " with start message " + startMessage);
