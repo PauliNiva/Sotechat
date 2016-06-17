@@ -11,21 +11,23 @@ angular.module('chatProApp')
             return $http.get(PROHISTORYURL);
         };
 
-        function getConversation(channelId){
+        function getConversation(){
             return $http.get(PROHISTORYURL + '/Conversation');
         }
 
-        function getHistory(){
+        function getHistory(userId){
 
         }
 
         function getMessages(channelId){
-
+            return $http.get('/messages/' + channelId);
         }
         
         var history = {
+            getHistoryPage: getHistoryPage,
+            getConversation: getConversation,
             getHistory: getHistory,
-            getConversation: getConversation
+            getMessages: getMessages
         };
         
         return history;

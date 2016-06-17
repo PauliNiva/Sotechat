@@ -10,11 +10,21 @@ angular.module('chatApp')
                 $scope.quantity = 10;
                 /** kuinka paljon viesteja naytetaan */
                 $scope.messageQuantity = 25;
-                $scope.Conversations = proHistoryService.getHistory();
-                if($scope.Conversations.length>0){
-                    $scope.left = true;
-                }
+
+                $scope.left = true;
+                $scope.messagesLeft = true;
                 $scope.messages = [];
+                $scope.Conversations = [];
+
+                var showHistory = function(){
+                    var userId = proStateService.getUserID();
+                    $scope.Conversations = proHistoryService.getHistory(userId);
+                    if($scope.Conversations.length>0){
+                        $scope.left = true;
+                    }else{
+                        $scope.left = false;
+                    }
+                };
 
                 var addQuantity = function(){
                     if($scope.quantity<$scope.Conversations.length) {
@@ -45,7 +55,7 @@ angular.module('chatApp')
                     if($scope.messages.length>0){
                         $scope.messagesLeft = true;
                     }
-                    return proHistoryService.getConversation(channelId);
+                    return proHistoryService.getConversation();
                 };
                 
                 var backToConversations = function(){
