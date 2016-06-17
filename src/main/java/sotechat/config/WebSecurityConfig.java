@@ -33,7 +33,6 @@ import java.io.IOException;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     /**
      * Maarittelee mm. kirjautumisvaatimuksen sivulle /pro.
      */
@@ -42,38 +41,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected final void configure(final HttpSecurity http) throws Exception {
         http.headers().frameOptions().disable();
         http
-                // "maaritellaan seuraavaksi, mitka
-                // pyynnot vaativat kirjautumisen"
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
-                // pyynnot polkuun /pro
-                // vaativat kirjautumisen
-
-                // muut pyynnot
-                // sallitaan kaikille
                 .and()
-                // jotenkin kai yhdistaa
-                // login-sivun session luomiseen
                 .httpBasic().and().csrf()
                 .csrfTokenRepository(csrfTokenRepository()).and()
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
                 .logout().logoutSuccessUrl("/pro");
 
-        // polun /login mappays
-        // loytyy tiedostosta MvcConfig
-
-        // paasy login-sivulle
-        // sallitaan kaikille
-
-        // logout sallitaan kaikille
-
-
         // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
         // http.requiresChannel().anyRequest().requiresSecure();
-
-        // TODO: alla oleva csrf tokenin configurointi ei toimi
-        // http.addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(),
-        // CsrfFilter.class);
 
         /* Thymeleafilla on jokin rooli kirjautumista vaativien
          * pyyntojen uudelleenohjaamisessa login.html -sivulle.
