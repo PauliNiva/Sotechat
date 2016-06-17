@@ -8,14 +8,15 @@ import org.owasp.esapi.ESAPI;
  */
 public class Validator {
 
-    private static String allowed = "0123456789abcdefghijklmnopqrstuvxyzåäö()*!?\"\'.,:+-=%#@_";
+    private final static String allowed =
+            "0123456789abcdefghijklmnopqrstuvxyzåäö()*!?\"\'.,:+-=%#@_";
 
-    public static String sanitize(String input) {
+    public final static String sanitize(String input) {
 
         String output = "";
 
         for (int i=0; i<input.length(); i++){
-              if (allowed.indexOf(input.charAt(i))>=0){
+              if (allowed.indexOf(input.charAt(i))>=0) {
                   output += input.charAt(i);
               }
             }
@@ -23,26 +24,26 @@ public class Validator {
     }
 
 
-    public static String escape(String input){
+    public static String escape(String input) {
 
         String output = StringEscapeUtils.escapeJava(input);
 
         return output;
     }
 
-    public static String unescape(String input){
+    public static String unescape(String input) {
 
         String output = StringEscapeUtils.unescapeJava(input);
 
         return output;
     }
 
-    public static String escapeForSql(String input){
+    public static String escapeForSql(String input) {
 
 
     }
 
-    public static String unescapeFromSql(String input){
+    public static String unescapeFromSql(String input) {
 
     }
 
