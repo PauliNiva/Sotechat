@@ -44,9 +44,8 @@ public class MapperImpl implements Mapper {
         professionalIDs.add("667");
     }
 
-    /** Tallentaa sekä tiedon mikä id vastaa mitäkin usernamea että mikä
-     * username vastaa mitäkin id:tä
-     *
+    /** Tallentaa sekä tiedon mikä id vastaa mitäkin usernamea.
+     *  Sekä mikä username vastaa mitäkin id:tä.
      * @param id salainen id
      * @param username julkinen username
      */

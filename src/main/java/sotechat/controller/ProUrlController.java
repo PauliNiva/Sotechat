@@ -1,6 +1,5 @@
 package sotechat.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,7 +16,11 @@ public class ProUrlController {
         return "forward:/proCP.html";
     }
 
-   // @RequestMapping(value = "/login")
+    /**
+     * Uudelleenohjaa /login to /pro
+     * @return /pro
+     */
+    @RequestMapping(value = "/login")
     public final String login() {
         return "redirect:/pro";
     }

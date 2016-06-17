@@ -4,17 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation
+        .authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation
+        .web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation
+        .web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation
+        .authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import sotechat.auth.JpaAuthenticationProvider;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,7 +38,9 @@ import java.io.IOException;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
-     * Maarittelee mm. kirjautumisvaatimuksen sivulle /pro.
+     * Määrittelee sallitut resurssit.
+     * Csrf suojauksen, sekä sivun jolle
+     * ohjataan uloskirjautumisen jälkeen
      */
     @Override
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
@@ -49,22 +55,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
                 .logout().logoutSuccessUrl("/pro");
 
-        // TODO: allaoleva HTTP->HTTPS ohjaus ei toimi
+        // TODO: allaoleva HTTP->HTTPS ohjaus
         // http.requiresChannel().anyRequest().requiresSecure();
-
-        /* Thymeleafilla on jokin rooli kirjautumista vaativien
-         * pyyntojen uudelleenohjaamisessa login.html -sivulle.
-          * TODO: Mitenkohan uudelleenohjaus tarkalleen ottaen toimii? */
     }
 
+    /**
+     * Luo angular yhteensopivan csrf filterin.
+     * @return palauttaa csrf Filterin
+     */
     private Filter csrfHeaderFilter() {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    FilterChain filterChain)
+                    final HttpServletRequest request,
+                    final HttpServletResponse response,
+                    final FilterChain filterChain)
                     throws ServletException, IOException {
+
                 CsrfToken csrf = (CsrfToken) request
                         .getAttribute(CsrfToken.class.getName());
                 if (csrf != null) {
@@ -82,21 +89,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         };
     }
 
+    /**
+     * Luodaan uusi CsrfToken.
+     * Asetetaan sen Header nimeksi Angular yhteensopiva.
+     * @return palauttaa csrfTokenRepositorin
+     */
     private CsrfTokenRepository csrfTokenRepository() {
-        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+        HttpSessionCsrfTokenRepository repository =
+                new HttpSessionCsrfTokenRepository();
         repository.setHeaderName("X-XSRF-TOKEN");
         return repository;
     }
 
-
+    /**
+     * Yhdistää tietokannan Spring security authentikointiin.
+     */
     @Configuration
-    protected static class AuthenticationConfiguration extends GlobalAuthenticationConfigurerAdapter {
+    protected static class AuthenticationConfiguration
+            extends GlobalAuthenticationConfigurerAdapter {
 
+        /**
+         * Spring injektoi jpaAuthenticationProviderin tähän luokkaan.
+         */
         @Autowired
         private JpaAuthenticationProvider jpaAuthenticationProvider;
 
+        /**
+         * Käynnistää jpa authentikointi palvelun.
+         * @param auth AuthenticationManagerBuilder
+         * @throws Exception Liittäminen securityyn ei onnistu
+         */
         @Override
-        public void init(AuthenticationManagerBuilder auth) throws Exception {
+        public final void init(final AuthenticationManagerBuilder auth)
+                throws Exception {
             auth.authenticationProvider(jpaAuthenticationProvider);
         }
     }
