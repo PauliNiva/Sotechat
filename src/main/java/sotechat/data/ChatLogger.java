@@ -29,16 +29,9 @@ public class ChatLogger {
     private DatabaseService databaseService;
 
     /** Konstruktori.
-     * @param pMapper Mapper
-     * @param pDatabaseService DBS
      */
-    public ChatLogger(
-//        final Mapper pMapper,
-//        final DatabaseService pDatabaseService
-    ) {
+    public ChatLogger() {
         this.logs = new HashMap<>();
-//        this.mapper = pMapper;
-//        this.databaseService = pDatabaseService;
     }
 
     /** Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.

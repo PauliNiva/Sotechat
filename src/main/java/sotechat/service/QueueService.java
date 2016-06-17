@@ -43,24 +43,10 @@ public class QueueService {
     private ChatLogger chatLogger;
 
     /** Konstruktori.
-     *
-     * @param pMapper p
-     * @param pSessionRepo p
-     * @param pDatabaseService p
-     * @param pChatLogger p
      */
-    //@Autowired
-    public QueueService(
-//            final Mapper pMapper,
-//            final SessionRepo pSessionRepo,
-//            final DatabaseService pDatabaseService,
-//            final ChatLogger pChatLogger
-    ) {
+  //  @Autowired
+    public QueueService() {
         this.queue = new ArrayList<>();
-//        this.mapper = pMapper;
-//        this.sessionRepo = pSessionRepo;
-//        this.databaseService = pDatabaseService;
-//        this.chatLogger = pChatLogger;
     }
 
     /** Suoritetaan kayttajan pyynto tulla jonoon (oletettavasti validoitu jo).
@@ -73,7 +59,9 @@ public class QueueService {
     ) {
         /** Alustetaan muuttujia. */
         String sessionId = request.getSession().getId();
+
         Session session = sessionRepo.getSessionObj(sessionId);
+
         String userId = session.get("userId");
         String channelId = session.get("channelId");
         String category = session.get("category");
