@@ -5,10 +5,6 @@ import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.format.annotation.DateTimeFormat;
-import sun.awt.image.ImageWatched;
-
 /**
  * Luokka yksittaisen keskustelun tietojen tallentamiseen
  */

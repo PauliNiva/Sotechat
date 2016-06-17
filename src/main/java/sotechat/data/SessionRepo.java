@@ -1,7 +1,6 @@
 package sotechat.data;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 /** Session Repository auttaa sessioiden kasittelyssa.

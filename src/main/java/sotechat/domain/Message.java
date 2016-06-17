@@ -1,10 +1,7 @@
 package sotechat.domain;
 
-import java.util.Date;
-
 import javax.persistence.*;
 
-import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**

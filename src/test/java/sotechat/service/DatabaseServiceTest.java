@@ -12,10 +12,7 @@ import sotechat.Launcher;
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
-import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
 import javax.transaction.Transactional;
@@ -41,15 +38,6 @@ public class DatabaseServiceTest {
     ConversationRepo conversationRepo;
 
     @Autowired
-    MessageRepo messageRepo;
-
-    @Autowired
-    PersonService personService;
-
-    @Autowired
-    ConversationService conversationService;
-
-    @Autowired
     DatabaseService databaseService;
 
     @Before
@@ -68,10 +56,6 @@ public class DatabaseServiceTest {
         Assert.assertEquals("Conversation", conversationRepo.findAll().get(0).getClass().getSimpleName());
         Assert.assertNotNull(conversationRepo.findOne("888a"));
         Assert.assertNotNull(conversationRepo.findOne("888a").getDate());
-        Assert.assertEquals("Moi!", conversationRepo.findOne("888a").getMessagesOfConversation().get(0).getContent());
-        Assert.assertEquals("Anon", conversationRepo.findOne("888a").getMessagesOfConversation().get(0).getSender());
-        Assert.assertEquals("888a", conversationRepo.findOne("888a").getMessagesOfConversation().get(0).getChannelId());
-        Assert.assertNotNull("Anon", conversationRepo.findOne("888a").getMessagesOfConversation().get(0).getDate());
     }
 
     @Test
@@ -85,15 +69,7 @@ public class DatabaseServiceTest {
     @Transactional
     public void createConversationTest3() throws Exception {
         databaseService.createConversation("Anon", "888c", "hammashoito");
-        Assert.assertEquals("Message", messageRepo.findAll().get(0).getClass().getSimpleName());
-    }
-
-    @Test
-    @Transactional
-    public void createConversationTest4() throws Exception {
-        databaseService.createConversation("Anon", "888c", "hammashoito");
-        Assert.assertEquals(conversationRepo.findOne("888c").getMessagesOfConversation()
-                .get(0).getDate(), conversationRepo.findOne("888c").getDate());
+        Assert.assertEquals("888c", conversationRepo.findAll().get(0).getChannelId());
     }
 
     @Test

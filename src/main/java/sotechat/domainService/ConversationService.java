@@ -17,17 +17,13 @@ import sotechat.repo.MessageRepo;
 @Service
 public class ConversationService {
 
+    @Autowired
     private MessageRepo messageRepo;
 
+    @Autowired
     private ConversationRepo conversationRepo;
 
     /** Keskustelujen tallentamiseen */
-    @Autowired
-    public ConversationService(ConversationRepo conversationRepo,
-                               MessageRepo messageRepo) {
-        this.conversationRepo = conversationRepo;
-        this.messageRepo = messageRepo;
-    }
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima

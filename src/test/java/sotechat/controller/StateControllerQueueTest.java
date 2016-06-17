@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,12 +32,14 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.MapperImpl;
+import sotechat.data.SessionRepo;
 import sotechat.data.SessionRepoImpl;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.service.ValidatorService;
 import sotechat.util.*;
 
 
@@ -96,8 +99,10 @@ public class StateControllerQueueTest {
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
+    // TODO: testi onnistuneelle popqueuelle
+
     @Test
-    public void professionalCanPopUserFromQueue()
+    public void professionalCantPopUserFromQueueIfQueueIsEmpty()
             throws Exception {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
@@ -128,10 +133,12 @@ public class StateControllerQueueTest {
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
-        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
-
-        assertEquals("channel activated.",
-                jsonMessage.get("content").getAsString());
+//        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
+        String json = new String((byte[]) reply.getPayload(),
+                Charset.forName("UTF-8"));
+        assertEquals("", json);
+       // assertEquals("channel activated.",
+     //           jsonMessage.get("content").getAsString());
     }
 
     @Test

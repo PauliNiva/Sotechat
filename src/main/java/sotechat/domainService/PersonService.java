@@ -22,10 +22,6 @@ public class PersonService {
     private PersonRepo personRepo;
 
     /** konstruktoriin injektoidaan repositorio */
-    @Autowired
-    public PersonService(PersonRepo personRepo){
-        this.personRepo = personRepo;
-    }
 
     /**
      * Lisaa tietokantaan uuden Person -olion ja asettaa talle parametrina

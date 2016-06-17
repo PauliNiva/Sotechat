@@ -1,7 +1,6 @@
 package sotechat.service;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import sotechat.wrappers.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.List;
 import java.util.Set;
 
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
@@ -54,6 +52,7 @@ public class ValidatorService {
     ) {
         String sessionId = getSessionIdFrom(accessor);
         Session session = sessionRepo.getSessionObj(sessionId);
+
         if (session == null) {
             return "Kelvoton sessio, hylataan viesti";
         }
