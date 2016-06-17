@@ -14,6 +14,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.wrappers.MsgToClient;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -130,6 +131,77 @@ public class DatabaseServiceTest {
         Assert.assertNotEquals(messages.get(0), messages.get(1));
         Assert.assertEquals(messages.get(1).getConversation(), messages.get(0).getConversation());
         Assert.assertEquals("Moi", messages.get(1).getContent());
+    }
+
+    @Test
+    @Transactional
+    public void personsConversationsTest() throws Exception {
+        Assert.assertTrue(dbservice.personsConversations("xxd").isEmpty());
+        cr.save(new Conversation("1", "22xx"));
+        dbservice.addPersonToConversation("xxd", "22xx");
+        Assert.assertFalse(dbservice.personsConversations("xxd").isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void personsConversationsTest2() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("2");
+        cr.save(conversation);
+        Conversation c2 = new Conversation("1", "333f");
+        cr.save(c2);
+        dbservice.addPersonToConversation("xxd", "224r");
+        dbservice.addPersonToConversation("xxd", "333f");
+        List<String> channelIds = dbservice.personsConversations("xxd");
+        Assert.assertEquals(2, channelIds.size());
+        Assert.assertEquals("224r", channelIds.get(0));
+        Assert.assertEquals("333f", channelIds.get(1));
+    }
+
+    @Test
+    @Transactional
+    public void retrieveMessagesTest() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("2");
+        cr.save(conversation);
+        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
+        dbservice.saveMsgToDatabase("Anon", "Moikka!", "1", "224r");
+        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
+        Assert.assertEquals(2, msgs.size());
+        Assert.assertEquals("Moi", msgs.get(1).getContent());
+        Assert.assertEquals("Moikka!", msgs.get(0).getContent());
+    }
+
+    @Test
+    @Transactional
+    public void retrieveMessagesTest2() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("2");
+        cr.save(conversation);
+        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
+        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
+        Assert.assertEquals(1, msgs.size());
+        MsgToClient msg = msgs.get(0);
+        Assert.assertEquals("Moi", msg.getContent());
+        Assert.assertEquals("Salla", msg.getUsername());
+        Assert.assertEquals("2", msg.getTimeStamp());
+        Assert.assertEquals("224r", msg.getChannelId());
+    }
+
+    @Test
+    @Transactional
+    public void retrieveMessagesTest3() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("2");
+        cr.save(conversation);
+        cr.save(new Conversation("3", "1xxx"));
+        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
+        dbservice.saveMsgToDatabase("Anon", "Hello", "2", "1xxx");
+        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
+        List<MsgToClient> msgs2 = dbservice.retrieveMessages("1xxx");
+        Assert.assertEquals(1, msgs.size());
+        Assert.assertEquals(1, msgs2.size());
+        Assert.assertNotEquals(msgs.get(0).getContent(), msgs2.get(0).getContent());
     }
 
 }
