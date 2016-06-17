@@ -12,9 +12,9 @@ import sotechat.Launcher;
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
@@ -30,54 +30,67 @@ public class ConversationServiceTest {
     ConversationService conversationService;
 
     @Autowired
-    MessageService messageService;
+    ConversationRepo conversationRepo;
 
     @Autowired
-    ConversationRepo conversationRepo;
+    MessageRepo messageRepo;
 
     @Before
     public void setUp() {
         this.conversation = new Conversation();
         this.conversation.setChannelId("007");
+        this.conversation.setDate("2006");
         this.message1 = new Message();
         this.message2 = new Message();
         this.message1.setContent("Sisältö");
         this.message1.setSender("Pauli");
-        this.message1.setChannelId("007");
         this.message1.setConversation(this.conversation);
         this.message2.setContent("Toinen sisältö");
         this.message2.setSender("Pauli");
-        this.message2.setChannelId("007");
         this.message2.setConversation(this.conversation);
     }
 
     @Test
-    public void conversationsAreRemovedFromRepo() throws Exception {
+    public void conversationsAreRemovedFromConversationRepo() throws Exception {
         Assert.assertEquals(0,
                 this.conversation.getMessagesOfConversation().size());
         this.conversation.addMessageToConversation(message1);
         this.conversation.addMessageToConversation(message2);
         Assert.assertEquals(2,
                 this.conversation.getMessagesOfConversation().size());
-        conversationService.addConversation("007", "2006");
+        conversationService.addConversation(conversation);
         Assert.assertEquals(1, conversationRepo.count());
-        conversationService.deleteConversation("007");
+        conversationService.removeConversation("007");
         Assert.assertEquals(0, conversationRepo.count());
     }
 
     @Test
+    public void messagesAreRemovedFromMessageRepoIfConversationIsRemoved()
+        throws Exception {
+        conversationService.addConversation(conversation);
+        conversationService.addMessage(message1, conversation);
+        Assert.assertEquals(1, conversation.getMessagesOfConversation().size());
+        conversationService.addMessage(message2, conversation);
+        Assert.assertEquals(2, conversation.getMessagesOfConversation().size());
+        conversationService.removeConversation(conversation.getChannelId());
+        Assert.assertEquals(0, conversationRepo.count());
+        Assert.assertEquals(0, messageRepo.count());
+    }
+
+    @Test
     public void testi() throws Exception {
-        conversationService.addConversation("007", "2006");
-        messageService.addMessage(message1);
-        messageService.addMessage(message2);
-        conversationService.addMessage(message1, this.conversation);
-        conversationService.addMessage(message2, this.conversation);
+        conversationService.addConversation(conversation);
+        Message msg1 = conversationService.addMessage(message1, conversation);
+        Assert.assertEquals(1, conversation.getMessagesOfConversation().size());
+        Message msg2 = conversationService.addMessage(message2, conversation);
         Conversation conversation2 = conversationService.getConversation("007");
         Assert.assertEquals(2,
                 conversation2.getMessagesOfConversation().size());
-        conversationService.removeMessage(message1);
+        conversationService.removeMessage(msg1);
         Conversation conversation3 = conversationService.getConversation("007");
         Assert.assertEquals(1,
                 conversation3.getMessagesOfConversation().size());
+        conversationService.removeMessage(msg2);
+        Assert.assertEquals(0, conversation3.getMessagesOfConversation().size());
     }
 }

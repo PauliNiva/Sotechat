@@ -1,14 +1,9 @@
 package sotechat.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Luokka yksittaisen keskustelun tietojen tallentamiseen
@@ -32,7 +27,7 @@ public class Conversation {
     private List<Person> participantsOfConversation;
 
     /** keskusteluun liittyvat viestit */
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
@@ -52,7 +47,7 @@ public class Conversation {
      * @param date aikaleima
      * @param channelId kanavan id
      */
-    public Conversation(String date, String channelId) {
+    public Conversation(String channelId, String date) {
         this.date = date;
         this.channelId = channelId;
         this.messagesOfConversation = new ArrayList<>();

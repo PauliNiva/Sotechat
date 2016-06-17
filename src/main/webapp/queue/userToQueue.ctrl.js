@@ -29,16 +29,18 @@ angular.module('chatApp')
                  *  Alustetaan virheilmoitukset
                  */
             var errorJoinQueue = function (response) {
-                var err = "Tuntematon virhe";
-                console.log("RESPONSE: " + response);
-                if (response.data.content == "Denied join pool request due to reserved username.") {
-                    err = "Kayttajanimi on varattu. Kokeile toista nimea.";
-                } else if (response.data.content == "Denied join pool request. Username already on channel.") {
-                    err = "Kanavalla on jo kayttaja samalla kayttajanimella. Kokeile toista nimea.";
-                } else if (response.data.content == "Denied join pool request for professional.") {
-                    // Tässä casessa userState vaihtuu "pro":ksi ja kayttajan nakyma
-                    // heitetaan staattiselle virhesivulle. Siksi tyhja blokki.
-                }
+                    var err = "Tuntematon virhe";
+                    if (response.data.content == "Denied join pool request for professional.") {
+                        // Tässä casessa userState vaihtuu "pro":ksi ja kayttajan nakyma
+                        // heitetaan staattiselle virhesivulle. Siksi tyhja blokki.
+                    } else {
+                        if (response.data.content == "Denied join pool request due to reserved username.") {
+                            err = "Kayttajanimi on varattu. Kokeile toista nimea.";
+                        } else if (response.data.content == "Denied join pool request. Username already on channel.") {
+                            err = "Kanavalla on jo kayttaja samalla kayttajanimella. Kokeile toista nimea.";
+                        }
+                        alert(err);
+                    }
             }
 
             /** Suoritetaan post pyyntö palvelimelle

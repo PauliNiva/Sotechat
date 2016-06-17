@@ -1,6 +1,5 @@
 package sotechat.domainService;
 
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,9 +7,7 @@ import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
-import sotechat.repo.PersonRepo;
-
-import java.util.Date;
+import sotechat.repo.MessageRepo;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
@@ -20,26 +17,23 @@ import java.util.Date;
 @Service
 public class ConversationService {
 
-    /** Keskustelujen tallentamiseen */
+    @Autowired
+    private MessageRepo messageRepo;
+
+    @Autowired
     private ConversationRepo conversationRepo;
 
-    /** Konstruktorissa injektoidaan ConversationRepo ja Personrepo */
-    @Autowired
-    public ConversationService(ConversationRepo conversationRepo,
-                               PersonRepo personRepo) {
-        this.conversationRepo = conversationRepo;
-    }
+    /** Keskustelujen tallentamiseen */
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
      * keskusteluun parametrina annettu viesti
-     * @param channelId keskustelun kanavan id
+     * @param conv lisättävä keskustelu
      */
     @Transactional
-    public void addConversation(String channelId, String date)
+    public void addConversation(Conversation conv)
             throws Exception {
-            Conversation conv = new Conversation(date, channelId);
             conversationRepo.save(conv);
     }
 
@@ -76,29 +70,42 @@ public class ConversationService {
     /**
      * Lisaa parametrina annetun Message -luokan olion parametrina annetun
      * Conversation -olion listaan, ts liittaa viestin keskusteluun.
+     * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
+     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
+     * kertaan.
      * @param message Message -luokan olio, jossa on kayttajan viesti
      * @param conv Conversation -luokan oli, joka edustaa keskustelua, johon
      *             viesti liittyy
      * @throws Exception NullPointerException
      */
     @Transactional
-    public void addMessage(Message message, Conversation conv)
+    public Message addMessage(Message message, Conversation conv)
             throws Exception {
-            conv.addMessageToConversation(message);
+            message.setConversation(conv);
+            Message messageToBeAddedToConversation = messageRepo.save(message);
+            conv.addMessageToConversation(messageToBeAddedToConversation);
             conversationRepo.save(conv);
+            return messageToBeAddedToConversation;
     }
 
     /**
      * Lisaa parametrina annetun Message olion keskusteluun, joka etsitaan
      * tietokannasta parametrina annetun kanava id:n perusteella.
+     * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
+     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
+     * kertaan.
      * @param message Message lisattava viesti
      * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
      *                  lisata
      */
-    public void addMessage(Message message, String channelId) {
-        Conversation conv = conversationRepo.getOne(channelId);
+    @Transactional
+    public Message addMessage(Message message, String channelId) {
+        Conversation conv = conversationRepo.findOne(channelId);
+        message.setConversation(conv);
+        Message messageToBeAddedToConversation = messageRepo.save(message);
         conv.addMessageToConversation(message);
         conversationRepo.save(conv);
+        return messageToBeAddedToConversation;
     }
 
     /**
@@ -124,7 +131,7 @@ public class ConversationService {
      * @throws Exception IllegalArgumentException
      */
     @Transactional
-    public void deleteConversation(String channelId) throws Exception {
+    public void removeConversation(String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
 
@@ -134,7 +141,7 @@ public class ConversationService {
      * @return Conversation olio, jolla pyydetty kanavaid
      */
     @Transactional
-    public Conversation getConversation(String channelId){
+    public Conversation getConversation(String channelId) throws Exception {
         return conversationRepo.findOne(channelId);
     }
 

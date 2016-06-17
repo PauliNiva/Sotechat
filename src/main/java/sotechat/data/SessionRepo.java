@@ -1,7 +1,6 @@
 package sotechat.data;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 /** Session Repository auttaa sessioiden kasittelyssa.
@@ -24,5 +23,10 @@ public interface SessionRepo {
     Session updateSession(
             HttpServletRequest req,
             Principal professional
+    );
+
+    void updateSessionAttributes(
+            final Session session,
+            final Principal professional
     );
 }

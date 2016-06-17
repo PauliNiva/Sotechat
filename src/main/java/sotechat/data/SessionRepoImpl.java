@@ -16,7 +16,10 @@ public class SessionRepoImpl extends MapSessionRepository
 
     /** Avain sessio-ID, arvo Sessio-olio.
      * HUOM: Usea sessio-ID voi viitata samaan Session-olioon! */
-    private HashMap<String, Session> sessions;
+    private HashMap<String, Session> sessionsBySessionId;
+
+    /** Avain userId, arvo Sessio-olio. */
+    private HashMap<String, Session> sessionsByUserId;
 
     /** Avain proUsername, arvo Sessio-olio.
      * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
@@ -32,7 +35,7 @@ public class SessionRepoImpl extends MapSessionRepository
     public SessionRepoImpl(
             final Mapper pMapper
     ) {
-        this.sessions = new HashMap<>();
+        this.sessionsBySessionId = new HashMap<>();
         this.proUserSessions = new HashMap<>();
         this.mapperService = pMapper;
     }
@@ -45,7 +48,7 @@ public class SessionRepoImpl extends MapSessionRepository
     public final synchronized Session getSessionObj(
             final String sessionId
     ) {
-        return sessions.get(sessionId);
+        return sessionsBySessionId.get(sessionId);
     }
 
     /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
@@ -78,7 +81,7 @@ public class SessionRepoImpl extends MapSessionRepository
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
-    private void updateSessionAttributes(
+    public final void updateSessionAttributes(
             final Session session,
             final Principal professional
     ) {
@@ -86,8 +89,6 @@ public class SessionRepoImpl extends MapSessionRepository
         /** Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.get("username");
         String userId = session.get("userId");
-
-        System.out.println("HEIPPA HEI " + username);
 
         /** Paivitetaan muuttujat, jos tarpeellista. */
         if (professional != null) {
@@ -121,7 +122,7 @@ public class SessionRepoImpl extends MapSessionRepository
             final String sessionId,
             final Principal professional
     ) {
-        Session session = sessions.get(sessionId);
+        Session session = sessionsBySessionId.get(sessionId);
         if (session != null) {
             /** Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
             return session;
@@ -138,7 +139,7 @@ public class SessionRepoImpl extends MapSessionRepository
         }
 
         /** Muistetaan jatkossakin, etta tama sessionId liittyy sessioon. */
-        sessions.put(sessionId, session);
+        sessionsBySessionId.put(sessionId, session);
 
         /** Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
         if (professional != null) {
@@ -147,5 +148,4 @@ public class SessionRepoImpl extends MapSessionRepository
 
         return session;
     }
-
 }

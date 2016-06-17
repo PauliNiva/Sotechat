@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * HTTP Heartbeat HTTP Session yllapitamista varten:
  * Client lahettaa aina valilla jotain HTTP POST:lla, jotta Sessio elaisi.
- * Tama luokka on olemassa, jotta clientin konsolilogissa ei nakyisi 404.
+ * Toimisi myos ilman palvelimen vastauksia, eli tata luokka ei ole
+ * valttamaton - saadaan kuitenkin konsolilogista 404't pois taman avulla.
  * TODO: WS Heartbeat jotta client voi huomata kun yhteys katkeaa.
  */
 @RestController

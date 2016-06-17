@@ -5,5 +5,4 @@ import sotechat.domain.Conversation;
 
 public interface ConversationRepo extends JpaRepository<Conversation, String> {
 
-
 }

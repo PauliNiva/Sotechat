@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat historia</title>
+</head>
+<body>
+
+<div ng-controller="proHistoriesController">
+    <h1>Menneet keskustelut:</h1>
+
+    <button onclick="addQuantity();">Näytä lisää</button>
+    <div ng-repeat="conversation in Conversations | orderBy:'date':true | limitTo:quantity" >
+        <a onclick="showConversation({{ conversation.channelId }});" > {{ conversation.info }} </a>
+    </div>
+
+</div>
+
+</body>
+</html>
