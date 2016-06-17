@@ -24,6 +24,7 @@ public class DevProfile {
         admin.setPassword("0000");
         admin.setLoginName("admin");
         admin.setUserId("admin");
+        admin.setRole("ROLE_ADMIN");
         personRepo.save(admin);
 
         Person hoitaja = new Person("666");
@@ -31,6 +32,7 @@ public class DevProfile {
         hoitaja.setPassword("salasana");
         hoitaja.setLoginName("hoitaja");
         hoitaja.setUserId("666");
+        hoitaja.setRole("ROLE_USER");
         personRepo.save(hoitaja);
     }
 }

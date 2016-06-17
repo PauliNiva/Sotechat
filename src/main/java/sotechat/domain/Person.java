@@ -37,6 +37,8 @@ public class Person {
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
 
+    private String role;
+
     /**
      * Konstruktori alustaa henkilon keskustelut
      */
@@ -145,5 +147,13 @@ public class Person {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public final String getRole() {
+        return this.role;
+    }
+
+    public final void setRole(String pRole) {
+        this.role = pRole;
     }
 }
