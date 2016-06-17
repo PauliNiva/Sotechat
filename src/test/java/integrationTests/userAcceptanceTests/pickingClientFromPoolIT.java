@@ -1,7 +1,8 @@
-package sotechatIT;
+package integrationTests.userAcceptanceTests;
 
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
+import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,14 +11,14 @@ import org.openqa.selenium.support.ui.*;
 
 
 import static org.junit.Assert.*;
-import static sotechatIT.sotechatITCommands.*;
+import static integrationTests.util.sotechatITCommands.*;
 
 /**
- * As a user I want to access a chat window
+ * As a professional, I want to pick a client from the visible queue
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class accessingChatWindowIT {
+public class pickingClientFromPoolIT {
 
     private DriverHandler handler;
     private WebDriverWait userWait;
@@ -32,31 +33,37 @@ public class accessingChatWindowIT {
         proWait = handler.getWaitDriver("pro");
     }
 
+
     @After
     public void tearDown() throws Exception {
         handler.closeAll();
     }
 
     /**
-     * User sees the queuing view
-     * User can see a chat window when she/he is picked from a pool of customers by a healthcare professiona
+     * Professional can pick the first client from a pool of chats to start a conversation
      */
     @Test
-    public void UserCanSeeAChatWindow() {
-        // User has entered the chat page and submitted a starting message
+    public void ProPickFirstFromQueue() {
+        // User has accessed queue
         waitAndFillInformation(userWait);
-        // User sees the queuing view
-        assertTrue(waitQueueWindowsAppear(userWait).isDisplayed());
-        // A professional has logged in
+        waitQueueWindowsAppear(userWait);
+
+        // Professional has logged in
         proLogin(proWait);
 
-        // A professional chooses the started conversation from a pool
+        // Professional click´s next in line button
         waitAndPickFromQueue(proWait);
 
-        // A chat window is opened for the user
-        assertTrue(waitChatWindowsAppear(userWait).isDisplayed());
+        // a chat window is opened that has a connection to the customer
+        assertTrue(waitChatWindowsAppear(proWait).isDisplayed());
+        waitChatWindowsAppear(userWait);
     }
 
+    /**
+     * TODO: Professional can pick a customer of her or his choosing
+     *  from the chat pool to start a conversation
+     * WHEN its implemented
+     */
 
 }
 

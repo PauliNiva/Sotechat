@@ -1,7 +1,8 @@
-package sotechatIT;
+package integrationTests.userAcceptanceTests;
 
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
+import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.openqa.selenium.support.ui.*;
 
 
 import static org.junit.Assert.*;
-import static sotechatIT.sotechatITCommands.*;
+import static integrationTests.util.sotechatITCommands.*;
 
 /**
  * As a professional, I want to see control panel

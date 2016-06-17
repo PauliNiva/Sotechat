@@ -11,24 +11,17 @@ import sotechat.domainService.PersonService;
 
 /**
  * Luokka tietokantaoperaatioiden toteuttamiseen
- * Created by varkoi on 13.6.2016.
  */
 @Service
 public class DatabaseService {
 
     /** Henkiloihin liittyvat palvelut */
-    PersonService personService;
+    private PersonService personService;
 
     /** Keskusteluihin liittyvat palvelut */
-    ConversationService conversationService;
+    private ConversationService conversationService;
 
-    /** Vietsteihin liittyvat palvelut */
-   // MessageService messageService;
-
-    /**
-     * Konstruktoriin injektoidaan palveluluokat, jotka tarjoavat henkiloiden,
-     * keskustelujen ja viestien tallentamiseen liittyvat palvelut
-     */
+    /** Viesteihin liittyvat palvelut */
     @Autowired
     public DatabaseService(PersonService personService,
                            ConversationService conversationService) {
@@ -39,24 +32,18 @@ public class DatabaseService {
     /**
      * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
      * sekä keskustelun kategoria.
-     * @param startMessage aloitusviestin sisalto
      * @param sender aloitusviestin lahettaja
      * @param channelId kanavan id
      * @param category keskustelun kategoria
      * @throws Exception
      */
-    public final void createConversation(String sender, String startMessage,
-                                         String channelId, String category)
-            throws Exception {
-        DateTime time = new DateTime();
-        Conversation conversation = new Conversation(time.toString(),
-                channelId);
-        Message message = new Message(sender, startMessage, time.toString());
-        message.setChannelId(channelId);
-        message.setConversation(conversation);
-        conversationService.addConversation(conversation);
-        conversationService.setCategory(category, channelId);
-        conversationService.addMessage(message, channelId);
+    public final void createConversation(final String sender,
+        final String channelId, final String category) throws Exception {
+            DateTime time = new DateTime();
+            Conversation conversation = new Conversation(channelId,
+                    time.toString());
+            conversationService.addConversation(conversation);
+            conversationService.setCategory(category, channelId);
     }
 
     /**

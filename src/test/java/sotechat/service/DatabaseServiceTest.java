@@ -64,7 +64,7 @@ public class DatabaseServiceTest {
     @Test
     @Transactional
     public void createConversationTest() throws Exception {
-        databaseService.createConversation("Anon", "Moi!", "888a", "hammashoito");
+        databaseService.createConversation("Anon", "888a", "hammashoito");
         Assert.assertEquals("Conversation", conversationRepo.findAll().get(0).getClass().getSimpleName());
         Assert.assertNotNull(conversationRepo.findOne("888a"));
         Assert.assertNotNull(conversationRepo.findOne("888a").getDate());
@@ -77,21 +77,21 @@ public class DatabaseServiceTest {
     @Test
     @Transactional
     public void createConversationTest2() throws Exception {
-        databaseService.createConversation("Anon", "Moi!", "888b", "hammashoito");
+        databaseService.createConversation("Anon", "888b", "hammashoito");
         Assert.assertEquals("hammashoito", conversationRepo.findOne("888b").getCategory());
     }
 
     @Test
     @Transactional
     public void createConversationTest3() throws Exception {
-        databaseService.createConversation("Anon", "Moi!", "888c", "hammashoito");
+        databaseService.createConversation("Anon", "888c", "hammashoito");
         Assert.assertEquals("Message", messageRepo.findAll().get(0).getClass().getSimpleName());
     }
 
     @Test
     @Transactional
     public void createConversationTest4() throws Exception {
-        databaseService.createConversation("Anon", "Moi!", "888c", "hammashoito");
+        databaseService.createConversation("Anon", "888c", "hammashoito");
         Assert.assertEquals(conversationRepo.findOne("888c").getMessagesOfConversation()
                 .get(0).getDate(), conversationRepo.findOne("888c").getDate());
     }

@@ -6,63 +6,63 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.RestController;
 
-import sotechat.domainService.ConversationService;
+import sotechat.data.ChatLogger;
+import sotechat.service.ValidatorService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-import sotechat.service.ChatMessageService;
 
 /** Reitittaa chattiin kirjoitetut viestit.
  */
 @RestController
 public class ChatController {
 
-    /** Tarjoaa logiikan. */
-    private final ChatMessageService chatMessageService;
+    /** Chat Logger. */
+    private final ChatLogger chatLogger;
 
-    /** Viestien tietokantaan tallentamiseen */
- //   private final MessageService messageService;
-
-    /** Viestien tallentaminen keskusteluun tietokannadssa */
-    private final ConversationService conversationService;
+    /** Validator Service. */
+    private final ValidatorService validatorService;
 
     /** Konstruktori.
-     * @param pChatService chatService
+     * @param pChatLogger chatLogger
+     * @param pValidatorService validatorServie
      */
     @Autowired
     public ChatController(
-            final ChatMessageService pChatService,
-            final ConversationService pConversationService
+            final ChatLogger pChatLogger,
+            final ValidatorService pValidatorService
     ) {
-        this.chatMessageService = pChatService;
- //       this.messageService = pMessageService;
-        this.conversationService = pConversationService;
+        this.chatLogger = pChatLogger;
+        this.validatorService = pValidatorService;
     }
 
-    /** Reitittaa chattiin kirjoitetut viestit ChatMessageServicelle,
-     * joka palauttaa meille viestin kanavalle lahetettavassa muodossa
+    /** Reitittaa chattiin kirjoitetut viestit muokattuna
      * - tai null, jos viesti hylataan eika sita valiteta kanavalle.
-     * MessageMapping annotaatiossa polku *palvelimelle* saapuviin viesteihin.
      *
      * @param msgToServer Asiakasohjelman JSON-muodossa lahettama viesti,
      *                    joka on paketoitu MsgToServer-olion sisalle.
-     * @param accessor Haetaan session-tiedot taalta.
+     * @param acc Haetaan session-tiedot taalta.
      * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
      *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
      *         Spring-magialla lahetetaan viesti kaikille kanavaan
-     *         subscribanneille clienteille JSONina.
+     *         subscribanneille clienteille JSONina. MessageMapping
+     *         annotaatiossa polku *palvelimelle* saapuviin viesteihin.
      * @throws Exception mika poikkeus?
      */
     @MessageMapping("/toServer/chat/{channelId}")
     @SendTo("/toClient/chat/{channelId}")
     public final MsgToClient routeMessage(
             final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor accessor
+            final SimpMessageHeaderAccessor acc
             ) throws Exception {
 
-        return chatMessageService.processMessage(
-                msgToServer,
-                accessor
-        );
+        String error = validatorService.isMessageFraudulent(msgToServer, acc);
+        if (!error.isEmpty()) {
+            System.out.println("Jokin viesti hylattiin syysta: " + error);
+            return null;
+        }
+        /** Viesti ok, kirjataan se ylos ja valitetaan muokattuna kanavalle. */
+        MsgToClient msgToClients = chatLogger.logNewMessage(msgToServer);
+        return msgToClients;
     }
 
 }

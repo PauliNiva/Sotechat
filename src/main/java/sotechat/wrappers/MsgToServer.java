@@ -38,4 +38,27 @@ public class MsgToServer {
     public final String getContent() {
         return this.content;
     }
+
+    /** Setter.
+     * @param pUserId userId
+     */
+    public final void setUserId(final String pUserId) {
+        this.userId = pUserId;
+    }
+
+    /** Setter.
+     * @param pChannelId channelId
+     */
+    public final void setChannelId(final String pChannelId) {
+        this.channelId = pChannelId;
+    }
+
+    /** Setter.
+     * @param pContent content
+     */
+    public final void setContent(final String pContent) {
+        this.content = pContent;
+    }
+
+
 }

@@ -18,6 +18,7 @@ import java.util.List;
 public class PersonService {
 
     /** repositorio */
+    @Autowired
     private PersonRepo personRepo;
 
     /** konstruktoriin injektoidaan repositorio */
@@ -44,7 +45,7 @@ public class PersonService {
      * @return lista Person olioista, jotka on tallennettu tietokantaan
      */
     @Transactional
-    public List<Person> findAll(){
+    public List<Person> findAll() {
         return personRepo.findAll();
     }
 
@@ -85,7 +86,7 @@ public class PersonService {
             person.setPassword(password);
             personRepo.save(person);
             return true;
-        } catch(Exception e){
+        } catch(Exception e) {
             return false;
         }
     }
@@ -104,7 +105,7 @@ public class PersonService {
             person.setUserName(newName);
             personRepo.save(person);
             return true;
-        }catch(Exception e){
+        }catch(Exception e) {
             return false;
         }
     }
@@ -131,7 +132,7 @@ public class PersonService {
      * @param conv lisattavaa keskustelua vastaava Conversation olio
      */
     @Transactional
-    public void addConversation(String personId, Conversation conv){
+    public void addConversation(String personId, Conversation conv) {
         Person person = personRepo.findOne(personId);
         person.addConversationToPerson(conv);
         personRepo.save(person);

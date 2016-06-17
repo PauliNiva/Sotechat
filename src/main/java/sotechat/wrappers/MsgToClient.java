@@ -10,6 +10,8 @@ package sotechat.wrappers;
  */
 public class  MsgToClient {
 
+    /** Viestin ID. */
+    private String messageId;
     /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
     private String username;
     /** Salainen avain kanavan kuunteluun ja viestien lahettamiseen. */
@@ -21,17 +23,31 @@ public class  MsgToClient {
     private String content;
 
     /** Konstruktori alustaa olion annetuilla parametreilla.
+     * @param pMessageId messageId
      * @param pUsername username
      * @param pChannelId channelId
      * @param pTimeStamp timeStamp
      * @param pContent content
      */
-    public MsgToClient(final String pUsername, final String pChannelId,
-                       final String pTimeStamp, final String pContent) {
+    public MsgToClient(
+            final String pMessageId,
+            final String pUsername,
+            final String pChannelId,
+            final String pTimeStamp,
+            final String pContent
+    ) {
+        this.messageId = pMessageId;
         this.username = pUsername;
         this.channelId = pChannelId;
         this.timeStamp = pTimeStamp;
         this.content = pContent;
+    }
+
+    /** Palauttaa viestin Id:n.
+     * @return Palauttaa viestin id:n.
+     */
+    public final String getMessageId() {
+        return this.messageId;
     }
 
     /** Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".

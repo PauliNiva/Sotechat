@@ -4,7 +4,7 @@ package sotechat.queue;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sotechat.data.QueueItem;
+import sotechat.wrappers.QueueItem;
 
 public class QueueItemTest {
 

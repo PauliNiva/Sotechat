@@ -51,7 +51,7 @@ public class Conversation {
      * @param date aikaleima
      * @param channelId kanavan id
      */
-    public Conversation(String date, String channelId) {
+    public Conversation(String channelId, String date) {
         this.date = date;
         this.channelId = channelId;
         this.messagesOfConversation = new ArrayList<>();

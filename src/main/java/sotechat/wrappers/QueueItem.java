@@ -1,7 +1,7 @@
-package sotechat.data;
+package sotechat.wrappers;
 
 /**
- * QueueItem olioon tallennetaan jonottajan tiedot.
+ * Wrapperi jonottajalle.
  */
 public class QueueItem {
 
@@ -48,6 +48,18 @@ public class QueueItem {
      */
     public final String getUsername() {
         return username;
+    }
+
+    /** Palauttaa Stringin, joka on JSON-muotoon muotoiltu.
+     * @return JSON as String
+     */
+    @Override
+    public final String toString() {
+        String json = "{";
+        json += "\"channelId\": \"" + getChannelId() + "\", ";
+        json += "\"category\": \"" + getCategory() + "\", ";
+        json += "\"username\": \"" + getUsername() + "\"}";
+        return json;
     }
 
 }

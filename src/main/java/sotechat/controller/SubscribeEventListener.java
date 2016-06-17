@@ -5,16 +5,17 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
+import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-import sotechat.service.StateService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
@@ -24,9 +25,6 @@ import java.util.List;
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
-    /** Key = channelIDWithPath, value = list of subscribed sessions. */
-    private HashMap<String, List<Session>> map;
-
     /** Session Repository. */
     @Autowired
     private SessionRepo sessionRepo;
@@ -35,35 +33,75 @@ public class SubscribeEventListener
     @Autowired
     private QueueBroadcaster queueBroadcaster;
 
-    /** Chat Log Broadcaster. */
+    /** Taikoo viestien lahetyksen. */
     @Autowired
-    private ChatLogBroadcaster chatLogBroadcaster;
+    private SimpMessagingTemplate broker;
 
-    /** Vain 1 instanssi. */
-    public SubscribeEventListener() {
-        map = new HashMap<String, List<Session>>();
-    }
+    /** Chat Logger (broadcastaa). */
+    @Autowired
+    private ChatLogger chatLogger;
 
-    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
-     * @param channelId kanavaId
-     * @return lista sessioita
-     */
-    public final synchronized List<Session> getSubscribers(
-            final String channelId
-    ) {
-        List<Session> subs = map.get(channelId);
-        if (subs == null) {
-            subs = new ArrayList<Session>();
-        }
-        return subs;
-    }
+    /** Mapper. */
+    @Autowired
+    private Mapper mapper;
 
+//    /** Konstruktori.
+//     *
+//     * @param pSessionRepo p
+//     * @param pQueueBroadcaster p
+//     * @param pSimpMessagingTemplate p
+//     * @param pChatLogger p
+//     * @param pMapper p
+//     */
+//    @Autowired
+//    public SubscribeEventListener(
+//            final SessionRepo pSessionRepo,
+//            final QueueBroadcaster pQueueBroadcaster,
+//            final SimpMessagingTemplate pSimpMessagingTemplate,
+//            final ChatLogger pChatLogger,
+//            final Mapper pMapper
+//    ) {
+//        this.sessionRepo = pSessionRepo;
+//        this.queueBroadcaster = pQueueBroadcaster;
+//        this.broker = pSimpMessagingTemplate;
+//        this.chatLogger = pChatLogger;
+//        this.mapper = pMapper;
+//    }
 
-    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille metodeil.
+    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
+     * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan
+     * suorittamaan loppuun ennen mahdollisia broadcasteja. Ilman timeria
+     * kay usein niin, etta juuri subscribannut kayttaja ei saa broadcastia.
      * @param applicationEvent kaikki applikaatioEventit aktivoivat taman.
      */
     @Override
     public final void onApplicationEvent(
+            final ApplicationEvent applicationEvent
+    ) {
+
+        /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
+        if (applicationEvent.getClass() != SessionSubscribeEvent.class
+            && applicationEvent.getClass() != SessionUnsubscribeEvent.class) {
+            return;
+        }
+
+        /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
+         * subscribe-tapahtuma on suoritettu loppuun. */
+        Timer timer = new Timer();
+        int delay = 1; // milliseconds
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                delayedEventHandling(applicationEvent);
+            }
+        }, delay);
+    }
+
+    /** Timerin avulla kutsuttu metodi, joka vain
+     * haarauttaa sub/unsub pyynnot oikeaan metodiin.
+     * @param applicationEvent appEvent
+     */
+    private void delayedEventHandling(
             final ApplicationEvent applicationEvent
     ) {
         if (applicationEvent.getClass() == SessionSubscribeEvent.class) {
@@ -75,17 +113,19 @@ public class SubscribeEventListener
     }
 
     /** Kasittelee subscribe -tapahtumat.
-     * TODO: Esta subscribe kanaville, joita ei ole.
      * @param event event
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
     ) {
-        //System.out.println("SUB = " + event.toString());
         MessageHeaders headers = event.getMessage().getHeaders();
+
+        /** Interceptor estaa subscribet, joista puuttuu sessionId.
+         * Siksi allaoleva ei voi heittaa nullpointteria. */
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
-                .get("SPRING.SESSION.ID").toString(); //TODO: Handle NULLPointter, palauta clientille jotain?
+                .get("SPRING.SESSION.ID").toString();
+
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
         Session session = sessionRepo.getSessionObj(sessionId);
@@ -96,25 +136,20 @@ public class SubscribeEventListener
         }
 
         /** Add session to list of subscribers to channelId. */
-        List<Session> list = map.get(channelIdWithPath);
-        if (list == null) {
-            list = new ArrayList<>();
-            map.put(channelIdWithPath, list);
-        }
-        list.add(session);
+        mapper.addSessionToChannel(channelIdWithPath, session);
 
-        /** Jos subscribattu QBCC (jonotiedotuskanava), tiedotetaan. */
-        String qbcc = "/toClient/" + StateService.QUEUE_BROADCAST_CHANNEL;
+        /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
+        String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         if (channelIdWithPath.equals(qbcc)) {
             queueBroadcaster.broadcastQueue();
         }
 
-        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan viestihistoria
-         * kaikille kanavan subscribaajille (alkuun "tyhjenna naytto" spessu) */
+        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan
+         * viestihistoria kaikille kanavan subscribaajille. */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
             String channelId = channelIdWithPath.substring(chatPrefix.length());
-            chatLogBroadcaster.broadcast(channelId);
+            chatLogger.broadcast(channelId, broker);
         }
     }
 

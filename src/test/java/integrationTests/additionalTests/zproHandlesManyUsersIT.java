@@ -1,7 +1,8 @@
-package sotechatIT;
+package integrationTests.additionalTests;
 
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
+import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -11,7 +12,7 @@ import org.openqa.selenium.support.ui.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import static sotechatIT.sotechatITCommands.*;
+import static integrationTests.util.sotechatITCommands.*;
 
 /**
  * As a user I want to send a message
@@ -45,8 +46,7 @@ public class zproHandlesManyUsersIT {
     }
 
     /**
-     * What if we have many customer and very very effective Pro
-     * Do not try this at home!
+     * Test disabled while waiting for AngularJS changes.
      */
     
     public void KillerTest() {
