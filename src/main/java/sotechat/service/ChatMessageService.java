@@ -57,9 +57,9 @@ public class ChatMessageService {
 
         String channelId = msgToServer.getChannelId();
 
-        String content = msgToServer.getContent();
+        String content = Validator.sanitize(msgToServer.getContent());
 
-        String username = mapper.getUsernameFromId(userId);
+        String username = Validator.sanitize(mapper.getUsernameFromId(userId));
 
         //TODO: tarkista, etta user on subscribannut kanavalle.
 
