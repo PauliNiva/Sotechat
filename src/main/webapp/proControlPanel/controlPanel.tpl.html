@@ -31,7 +31,7 @@
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
             <uib-tabset active="activeChatTab">
-                <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" classes="chat-container">
+                <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" name="{{chat.title}}" classes="chat-container">
                     <div class="col-lg-9 col-md-8 col-sm-8 proContainer">
                         <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>
                     </div>

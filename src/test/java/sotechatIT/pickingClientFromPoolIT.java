@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.support.ui.*;
 
 
+import static com.github.webdriverextensions.Bot.waitFor;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static sotechatIT.sotechatITCommands.*;
 
@@ -54,6 +56,7 @@ public class pickingClientFromPoolIT {
         waitAndPickFromQueue(proWait);
 
         // a chat window is opened that has a connection to the customer
+        waitFor(2, SECONDS);
         assertTrue(waitChatWindowsAppear(proWait).isDisplayed());
         waitChatWindowsAppear(userWait);
     }
