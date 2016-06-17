@@ -12,7 +12,8 @@
     <script src="assets/lib/focusIf.min.js"></script>
     <script src="assets/lib/ui-bootstrap.js"></script>
 
-    <script src="app.module.js"></script>
+    <script src="main/app.module.js"></script>
+    <script src="main/pro.ctrl.js"></script>
 
     <script src="chatWindow/chatWindow.drc.js"></script>
     <script src="chatWindow/chatWindow.cpn.js"></script>
@@ -20,6 +21,9 @@
 
     <script src="proControlPanel/proCP.ctrl.js"></script>
     <script src="queue/proQueue.ctrl.js"></script>
+
+    <script src="login/login.ctrl.js"></script>
+    <script src="services/auth.srvc.js"></script>
 
     <script src="services/stomp.srvc.js"></script>
     <script src="services/proState.srvc.js"></script>
@@ -32,9 +36,7 @@
     <link href="assets/css/pro.css" rel="stylesheet">
     <link href="assets/css/bootstrap-switch.min.css" rel="stylesheet">
 </head>
-<body ng-app="chatApp" >
-<div class="ng-cloak container-fluid proContainer" ng-controller="proCPController">
-    <div class="chat-container" ng-include="'proControlPanel/controlPanel.tpl.html'"></div>
-</div>
+<body ng-app="chatProApp">
+<div class="ng-cloak container-fluid proContainer chat-animation" ng-controller="proCtrl" ng-include="authStatus"></div>
 </body>
 </html>

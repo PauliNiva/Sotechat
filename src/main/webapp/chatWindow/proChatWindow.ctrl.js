@@ -2,7 +2,7 @@
  * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
-angular.module('chatApp')
+angular.module('chatProApp')
     .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
         function ($scope, stompSocket, connectToServer, proStateService) {
             $scope.pro = true;

@@ -1,6 +1,6 @@
 describe('proStateService tests', function () {
     var proStateService;
-    beforeEach(module('chatApp'));
+    beforeEach(module('chatProApp'));
     beforeEach(function () {
 
         inject(function (_$httpBackend_, _proStateService_) {

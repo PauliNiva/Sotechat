@@ -2,7 +2,7 @@
  *  palvelimeen ja pitää yhteyden elossa 
  *  kontrollerien välillä liikkuessa
  */
-angular.module('chatApp')
+angular.module('commonMod')
     .service('connectToServer', ['stompSocket', '$timeout', function (stompSocket, $timeout) {
         /** Serverin mappaukset */
         var WEBSOCKETURL = '/toServer';

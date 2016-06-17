@@ -373,6 +373,7 @@
                     <jsSrcDir>${project.basedir}</jsSrcDir>
                     <sourceIncludes>
                         <include>src/main/webapp/*.js</include>
+                        <include>src/main/webapp/main/*.js</include>
                         <include>src/main/webapp/services/*.js</include>
                         <include>src/main/webapp/assets/lib/*.js</include>
                         <include>src/main/webapp/chatWindow/*.js</include>

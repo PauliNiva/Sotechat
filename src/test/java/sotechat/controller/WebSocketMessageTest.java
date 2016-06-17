@@ -48,8 +48,6 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 
 /**
@@ -172,7 +170,7 @@ public class WebSocketMessageTest {
         /**
          * Simuloidaan hoitajan kirjautumista.
          */
-        headers.setUser(new MockPrincipal("Hoitaja"));
+        headers.setUser(new MockPrincipal("hoitaja"));
 
         MsgUtil msgUtil = new MsgUtil();
         msgUtil.add("userId", "666", false);

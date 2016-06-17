@@ -17,4 +17,9 @@ public class ProUrlController {
         return "forward:/proCP.html";
     }
 
+   // @RequestMapping(value = "/login")
+    public final String login() {
+        return "redirect:/pro";
+    }
+
 }

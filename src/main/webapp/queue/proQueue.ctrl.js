@@ -1,7 +1,7 @@
 /** Controlleri huolehtii ammattilaisen jonon tilasta 
  *  sekä siihen liittyvistä tapahtumista
  */
-angular.module('chatApp')
+angular.module('chatProApp')
     .controller('proQueueCtrl', ['$scope', 'queueProService', 'stompSocket', 'connectToServer', 'proStateService',
         function ($scope, queueProService, stompSocket, connectToServer, proStateService) {
             /** Serverin mappaukset */

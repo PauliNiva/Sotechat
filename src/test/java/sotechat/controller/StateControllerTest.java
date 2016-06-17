@@ -36,7 +36,6 @@ import sotechat.service.QueueService;
 import sotechat.service.StateService;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -247,7 +246,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithReservedScreennameFails() throws Exception {
+    public void joinPoolWithReservedScreenNameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
 
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007

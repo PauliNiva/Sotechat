@@ -1,7 +1,7 @@
 /** Controlelri huolehtii ammattilaisen näkymän välilehtien hallinnasta
  * Seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin
  */
-angular.module('chatApp')
+angular.module('chatProApp')
     .controller('proCPController', ['$scope','$timeout', 'connectToServer', 'proStateService', 'heartBeatService',
         function ($scope, $timeout, connectToServer, proStateService) {
             /** Alustetaan muuttuja */

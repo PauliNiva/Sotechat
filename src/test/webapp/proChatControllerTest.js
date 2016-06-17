@@ -7,7 +7,7 @@ describe("ProChatController", function() {
     beforeEach(function() {
         stompSocket = jasmine.createSpyObj('stompSocket', ['subscribe', 'connect', 'send']);
         connectToServer = jasmine.createSpyObj('connectToServer', ['subscribe', 'connect']);
-        module('chatApp');
+        module('chatProApp');
         inject(function ($rootScope, $controller, $compile, $httpBackend, $http) {
             element = angular.element(
                 '<form name="messageForm">' +

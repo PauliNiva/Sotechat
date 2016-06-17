@@ -1,7 +1,7 @@
 /** Palvelu huolehtii ammattilaiselle näkyvän jonon ylläpitämisestä
  *  Sekä säilömisestä
  */
-angular.module('chatApp')
+angular.module('chatProApp')
     .factory('queueProService', [function () {
         /** Alustetaan taulukot jonolle ja kategorioille */
         var queue = [];
