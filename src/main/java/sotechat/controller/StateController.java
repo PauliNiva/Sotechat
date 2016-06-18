@@ -29,9 +29,6 @@ public class StateController {
     /** Validator Service. */
     private final ValidatorService validatorService;
 
-    /** Subscribe Event Listener. */
- //   private final SubscribeEventListener subscribeEventListener;
-
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
@@ -53,13 +50,11 @@ public class StateController {
             final SessionRepo pSessionRepo,
             final QueueService pQueueService,
             final QueueBroadcaster pQueueBroadcaster
-         //   final SubscribeEventListener pSubscribeEventListener
     ) {
         this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
         this.queueService = pQueueService;
         this.queueBroadcaster = pQueueBroadcaster;
-    //    this.subscribeEventListener = pSubscribeEventListener;
     }
 
     /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).

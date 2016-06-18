@@ -20,6 +20,7 @@ import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
  *  - kun joku subscribaa QBCC kanavalle, pyytaa QueueBroadcasteria castaamaan.
+ *  HUOM: Spring hajoaa, jos kaytetaan Autowired konstruktoria tassa luokassa!
  */
 @Component
 public class SubscribeEventListener
@@ -44,29 +45,6 @@ public class SubscribeEventListener
     /** Mapper. */
     @Autowired
     private Mapper mapper;
-
-//    /** Konstruktori.
-//     *
-//     * @param pSessionRepo p
-//     * @param pQueueBroadcaster p
-//     * @param pSimpMessagingTemplate p
-//     * @param pChatLogger p
-//     * @param pMapper p
-//     */
-//    @Autowired
-//    public SubscribeEventListener(
-//            final SessionRepo pSessionRepo,
-//            final QueueBroadcaster pQueueBroadcaster,
-//            final SimpMessagingTemplate pSimpMessagingTemplate,
-//            final ChatLogger pChatLogger,
-//            final Mapper pMapper
-//    ) {
-//        this.sessionRepo = pSessionRepo;
-//        this.queueBroadcaster = pQueueBroadcaster;
-//        this.broker = pSimpMessagingTemplate;
-//        this.chatLogger = pChatLogger;
-//        this.mapper = pMapper;
-//    }
 
     /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
      * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan

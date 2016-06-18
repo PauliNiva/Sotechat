@@ -88,8 +88,7 @@ public class ChatLogger {
         String timeStamp = msgToClient.getTimeStamp();
         String channelId = msgToClient.getChannelId();
         try {
-            databaseService.saveMsgToDatabase(
-                    username, content, timeStamp, channelId);
+            databaseService.saveMsg(username, content, timeStamp, channelId);
         } catch (Exception e) {
             System.out.println("Database exception! " + e.toString());
             /* Do not throw this exception! Even if saving message to db
@@ -107,14 +106,21 @@ public class ChatLogger {
     public final synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
-            ) {
+    ) {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
         }
     }
 
+    private synchronized List<String> getChannelsByUserId(
+            final String userId
+    ) {
+        return null;
+    }
+
     /** Getteri kanavan lokeille.
+     * Yrittaa hakea ensin muistista, sitten tietokannasta.
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
@@ -123,12 +129,13 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
+            //TODO: hae tietokannasta!
             list = new ArrayList<>();
         }
         return list;
     }
 
-    /** Antaa seuraavan vapaan ID:n viestille.
+    /** Antaa seuraavan vapaan ID:n viestille AngularJS varten.
      * Joka kanavan viestit saapumisjarjestyksessa: 1,2,3...
      * @param channelId channelId
      * @return messageId

@@ -69,8 +69,8 @@ public class DatabaseService {
      * @param channelId viestin kanavan id
      * @throws Exception
      */
-    public final void saveMsgToDatabase(String username, String content,
-                                        String time, String channelId)
+    public final void saveMsg(String username, String content,
+                              String time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
         Conversation conv = conversationService.getConversation(channelId);
