@@ -8,6 +8,10 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
 import sotechat.domainService.PersonService;
+import sotechat.wrappers.MsgToClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Luokka tietokantaoperaatioiden toteuttamiseen
@@ -79,4 +83,11 @@ public class DatabaseService {
         conversationService.addMessage(message, conv);
     }
 
+    public List<String> personsConversations(String userId) {
+        return new ArrayList<>();
+    }
+
+    public List<MsgToClient> retrieveMessages(String channelId) {
+        return new ArrayList<>();
+    }
 }

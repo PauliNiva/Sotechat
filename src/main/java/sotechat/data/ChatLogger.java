@@ -113,13 +113,30 @@ public class ChatLogger {
         }
     }
 
-    private synchronized List<String> getChannelsByUserId(
+    /** Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
+     * joilla kayttaja on ollut.
+     *
+     * @param userId userId
+     * @return String muotoa ["kanava1", "kanava2"]
+     */
+    public final synchronized String getChannelsByUserId(
             final String userId
     ) {
-        return null;
+        List<String> list = databaseService.personsConversations(userId);
+        StringBuilder sb = new StringBuilder();
+        for (String channelId : list) {
+            sb.append("\"" + channelId + "\", ");
+        }
+        if (!list.isEmpty()) {
+            /** Jos kanavia oli yli 0, poistetaan viimeinen pilkku ja vali. */
+            sb.deleteCharAt(sb.length() - 1);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
-    /** Getteri kanavan lokeille.
+    /** Getteri halutun kanavan logeille.
      * Yrittaa hakea ensin muistista, sitten tietokannasta.
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
@@ -129,8 +146,9 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
-            //TODO: hae tietokannasta!
-            list = new ArrayList<>();
+            /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */
+            list = databaseService.retrieveMessages(channelId);
+            logs.put(channelId, list);
         }
         return list;
     }
