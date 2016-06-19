@@ -1,12 +1,8 @@
 <div class="panel panel-default chat-panel">
     <div class="panel-heading chat-heading">
-        <div class="col-lg-6 col-md-6 col-sm-10 col-xs-8" style="padding-right: 0px">
-            <h4 class="panel-title">Keskustelu käyttäjän <strong>{{chatName}}</strong> kanssa</h4>
-        </div>
-        <div class="col-lg-4 col-md-4 hidden-sm hidden-xs" style="padding-right: 0px" ng-hide="pro"></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4" ng-hide="pro">
-            <button class="btn btn-danger center-block" type="button">Poistu</button>
-        </div>
+            <h4 class="panel-title pull-left chatTitle">{{chatText}}</h4>
+            <button class="btn btn-danger pull-right" type="button" ng-click="userLeave()" ng-hide="pro || chatClosed">Lopeta keskustelu</button>
+        <div class="clearfix"></div>
     </div>
 
     <div class="panel-body chat-body" scroll-glue>
@@ -18,11 +14,11 @@
         <form ng-submit="sendMessage()" name="messageForm">
             <div class="input-group">
                 <textarea ng-model="message" ng-enter="sendMessage();" rows="1" class="form-control chat-text"
-                          required focus-if name="messageArea"></textarea>
+                          required focus-if name="messageArea" ng-disabled="chatClosed"></textarea>
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button"><span
-                            class="glyphicon glyphicon-file"></span></button>
-                    <button class="btn btn-default" type="submit" name="send">Laheta</button>
+                    <button class="btn btn-default" type="button" ng-disabled="chatClosed"><span
+                            class="glyphicon glyphicon-file" ></span></button>
+                    <button class="btn btn-default" type="submit" name="send" ng-disabled="chatClosed">Laheta</button>
                 </span>
             </div>
         </form>

@@ -18,6 +18,7 @@
                         <span class="glyphicon glyphicon-cog"></span>
                     </button>
                     <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+
                         <li role="menuitem"><a href="#" ng-click="logout()">Kirjaudu ulos</a></li>
                     </ul>
                 </div>
@@ -39,12 +40,9 @@
                         <div class="panel panel-default">
                             <div class="row">
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-block btn-primary proButton">Pyyda
-                                        tunnistautumista
-                                    </button>
                                     <button type="button" class="btn btn-block btn-primary proButton">Kutsu toinen
                                     </button>
-                                    <button type="button" class="btn btn-block btn-danger proButton">Lopeta keskustelu
+                                    <button type="button" class="btn btn-block btn-danger proButton" ng-click="removeChatTab(chat.channel)">Lopeta keskustelu
                                     </button>
                                 </div>
                             </div>

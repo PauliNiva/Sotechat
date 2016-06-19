@@ -32,7 +32,9 @@ textarea.chat-text {
 }
 
 .chat-heading {
-    height: 50px;
+   padding-top: 5px;
+    padding-bottom: 5px;
+    height: 45px;
 }
 
 
@@ -69,7 +71,14 @@ textarea.form-control {
     margin-right: 0px;
 }
 
-
+.chatTitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: normal;
+    width: 75%;
+    padding-top: 8px;
+}
 
 .username-title {
     font-weight: bold;

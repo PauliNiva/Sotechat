@@ -3,8 +3,8 @@
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
 */
 angular.module('chatApp')
-    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService',
-        function ($scope, stompSocket, connectToServer, userStateService) {
+    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService', '$http',
+        function ($scope, stompSocket, connectToServer, userStateService, $http) {
             // "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             // "messageIds" sisaltaa messageId:t viesteille, jotta samaa
@@ -14,7 +14,14 @@ angular.module('chatApp')
             var messageIds = {};
             var sub;
             // Alustetaan ChatName tyhjäksi
-            $scope.chatName = '';
+            $scope.chatText = '';
+
+
+            $scope.userLeave = function() {
+                sub.unsubscribe();
+                $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
+                $scope.chatClosed = true;
+            };
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -40,7 +47,7 @@ angular.module('chatApp')
                 var message = JSON.parse(data);
                 message.I = message.username === userStateService.getUsername();
                 if (!message.I){
-                    $scope.chatName = message.username;
+                    $scope.chatText = 'Keskustelu käyttäjän '+ message.username + ' kanssa';
                 }
                 return message;
             };

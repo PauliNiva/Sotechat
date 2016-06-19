@@ -22,6 +22,22 @@ angular.module('chatProApp')
                     $scope.activeChatTab=tabCount-1;
                 });
             };
+            
+            $scope.removeChatTab = function(channelID) {
+                $scope.$broadcast('unSubscribeChat', {'channelID' : channelID});
+                var chatTabIndex =  arrayObjectIndexOf($scope.chats, channelID, 'channel')
+                if (chatTabIndex > -1) {
+                    $scope.chats.splice(chatTabIndex, 1);
+                }
+            };
+
+            var arrayObjectIndexOf = function(myArray, searchTerm, property) {
+                for(var i = 0, len = myArray.length; i < len; i++) {
+                    if (myArray[i][property] === searchTerm) return i;
+                }
+                return -1;
+            }
+
 
             /** Avaa kaikki amamttilaisen avoimet välilehdet */
             var updateChannels = function () {

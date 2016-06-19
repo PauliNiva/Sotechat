@@ -15,9 +15,15 @@ angular.module('chatProApp')
             var messageIds = {};
             var sub;
             // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
-            $scope.chatName = '';
+            $scope.chatText = '';
 
             var channel = this.channel;
+
+            $scope.$on('unSubscribeChat', function (event, args) {
+                if (args.channelID === channel) {
+                    sub.unsubscribe();
+                }
+            });
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -34,16 +40,16 @@ angular.module('chatProApp')
                 }
             };
 
-            /** Funktio muuttaa viestin haluttuun muotoon. 
+            /** Funktio muuttaa viestin haluttuun muotoon.
              *  Lisää sille tiedon, siitä onko viesti käyttäjän
-             *  itsensä lähettämä. 
+             *  itsensä lähettämä.
              *  Asettaa chatinNimeen vastapuolen nimimerkin
              */
             var getMessage = function (data) {
                 var message = JSON.parse(data);
                 message.I = message.username === proStateService.getUsername();
                 if (!message.I) {
-                    $scope.chatName = message.username;
+                    $scope.chatText = 'Keskustelu käyttäjän '+ message.username + ' kanssa';
                 }
                 return message;
             };
