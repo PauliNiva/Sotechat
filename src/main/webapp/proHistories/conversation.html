@@ -7,7 +7,9 @@
 <body>
 
 <div ng-controller="proHistoriesController">
+    <a onclick="backToConversations();" >Takaisin</a>
     <button onclick="addQuantity();">Näytä lisää</button>
+    <div ng-hide="messagesLeft" >Ei enempää viestejä</div>
     <div ng-repeat="message in messages | orderBy:'timeStamp':false | limitTo:messageQuantity">
         <p> {{ message.timeStamp | date }} {{ message.username }} </p>
         <p> {{ message.content }}</p>

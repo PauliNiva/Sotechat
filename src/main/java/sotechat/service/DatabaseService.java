@@ -8,6 +8,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.domainService.ConversationService;
 import sotechat.domainService.PersonService;
+import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 
 import java.util.ArrayList;
@@ -114,11 +115,32 @@ public class DatabaseService {
         List<Message> messages = conv.getMessagesOfConversation();
         List<MsgToClient> messagelist = new ArrayList<MsgToClient>();
         for(Message message : messages){
-            MsgToClient newMsg = wrap(message);
+            MsgToClient newMsg = wrapMessage(message);
             messagelist.add(newMsg);
         }
         Collections.sort(messagelist);
         return messagelist;
+    }
+
+    public final List<ConvInfo> retrieveConversationInfo(String userId)
+            throws Exception {
+        Person person = personService.getPerson(userId);
+        List<Conversation> convs = person.getConversationsOfPerson();
+        List<ConvInfo> info = new ArrayList<ConvInfo>();
+        for (Conversation conversation : convs){
+            info.add(wrapConversation(conversation));
+        }
+        return info;
+    }
+
+    private final ConvInfo wrapConversation(Conversation conv)
+            throws Exception {
+        String channelId = conv.getChannelId();
+        String date = conv.getDate();
+        /** ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
+        String person = conv.getMessagesOfConversation().get(0).getSender();
+        String category = conv.getCategory();
+        return new ConvInfo(channelId, date, person, category);
     }
 
     /**
@@ -127,12 +149,13 @@ public class DatabaseService {
      * @param message Message luokan ilmentyma
      * @return MsgToClient luokan ilmentyma
      */
-    private final MsgToClient wrap(Message message) throws Exception {
+    private final MsgToClient wrapMessage(Message message) throws Exception {
+        String id = "" + message.getId();
         String name = message.getSender();
         String channelId = message.getChannelId();
         String time = message.getDate();
         String content = message.getContent();
-        MsgToClient msg = new MsgToClient(name, channelId, time, content);
+        MsgToClient msg = new MsgToClient(id, name, channelId, time, content);
         return msg;
     }
 

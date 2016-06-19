@@ -1,7 +1,7 @@
 package sotechat.service;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.owasp.esapi.ESAPI;
+//import org.owasp.esapi.ESAPI;
 
 /**
  * Created by varkoi on 16.6.2016.

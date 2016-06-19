@@ -53,6 +53,7 @@ public class ChatMessageService {
     ) throws Exception {
 
         /** Selvitetaan kayttajanimi annetun userId:n perusteella. */
+
         String userId = msgToServer.getUserId();
 
         String channelId = msgToServer.getChannelId();
