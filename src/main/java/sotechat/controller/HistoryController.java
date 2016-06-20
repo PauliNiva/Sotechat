@@ -48,6 +48,7 @@ public class HistoryController {
     public final List<MsgToClient> getMessages(@PathVariable("channelId")
                                                    final String channelId)
                                                     throws Exception {
+        System.out.println("Retrieving channel " + channelId + " ##########");
         return databaseService.retrieveMessages(channelId);
     }
 
@@ -58,6 +59,7 @@ public class HistoryController {
         if (professional == null) {
             return null;
         }
+        System.out.println("REQUESTING HISTORY ##########");
         String username = professional.getName();
         String userId = mapper.getIdFromRegisteredName(username);
         return databaseService.retrieveConversationInfo(userId);
