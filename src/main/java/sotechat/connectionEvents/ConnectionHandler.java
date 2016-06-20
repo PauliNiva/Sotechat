@@ -1,54 +1,77 @@
 package sotechat.connectionEvents;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.beans.factory.annotation.Autowired;
 import sotechat.controller.QueueBroadcaster;
-import sotechat.data.Queue;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
+import sotechat.service.QueueService;
 
-import javax.servlet.http.HttpSession;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConnectionHandler {
 
+    @Autowired
     private ConnectionRepo connectionRepo;
-    private SessionRepo sessionRepo;
-    private Queue queue;
-    private QueueBroadcaster queueBroadcaster;
-    private String sessionId;
-    private final int WAIT_TIME_BEFORE_METHOD_INVOCATION = 10000;
 
-    public ConnectionHandler(ConnectionRepo pConnectionRepo,
-                             SessionRepo pSessionRepo, Queue pQueue,
-                             QueueBroadcaster pQueueBroadcaster) {
-        this.connectionRepo = pConnectionRepo;
-        this.sessionRepo = pSessionRepo;
-        this.queue = pQueue;
-        this.queueBroadcaster = pQueueBroadcaster;
+    @Autowired
+    private SessionRepo sessionRepo;
+
+    @Autowired
+    private QueueService queueService;
+
+    @Autowired
+    private QueueBroadcaster queueBroadcaster;
+  //  private String sessionId;
+    private final int WAIT_TIME_BEFORE_SCANNING_USER_ACTIVITY = 2000;
+    private final int WAIT_TIME_BEFORE_SCANNING_PRO_ACTIVITY = 2000;
+
+    public ConnectionHandler() {
     }
 
-    @Scheduled(fixedRate = WAIT_TIME_BEFORE_METHOD_INVOCATION)
-    public void removeInactiveUsersFromQueue() {
-        for (int i = 0; i < 10; i++) {
-            System.out.println("wololooo");
-        }
-        if (this.sessionId != null) {
-            if (!this.connectionRepo.getSessionConnectionStatus(sessionId)) {
-                Session session = null;
-                if (this.sessionRepo.getSessionObj(sessionId) != null) {
-                    session = this.sessionRepo.getSessionObj(sessionId);
-                    String channelId = null;
-                    if (session.get("channelId") != null) {
-                        channelId = session.get("channelId");
-                        this.sessionRepo.removeSession(this.sessionId);
-                        this.queue.remove(channelId);
-                        this.queueBroadcaster.broadcastQueue();
-                    }
+    public void initiateWaitBeforeScanningForInactiveUsers(final String sessionId) {
+        int delay = WAIT_TIME_BEFORE_SCANNING_USER_ACTIVITY; // milliseconds. TODO: test 1ms, pitaisi toimia.
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeInactiveUsersFromQueue(sessionId);
+            }
+        }, delay);
+    }
+
+    public void initiateWaitBeforeScanningForInactiveProfessional(final String sessionId) {
+        int delay = WAIT_TIME_BEFORE_SCANNING_PRO_ACTIVITY;
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeProSession(sessionId);
+            }
+        }, delay);
+    }
+
+    public void removeInactiveUsersFromQueue(String sessionId) {
+        if (!this.connectionRepo.getSessionConnectionStatus(sessionId)) {
+            for (int i = 0; i < 10; i++) {
+                System.out.println("Removing user from queue");
+            }
+            if (this.sessionRepo.getSessionObj(sessionId) != null) {
+                Session session = this.sessionRepo.getSessionObj(sessionId);
+                if (session.get("channelId") != null) {
+                    String channelId = session.get("channelId");
+                    this.sessionRepo.removeSession(sessionId);
+                    this.queueService.removeFromQueue(channelId);
+                    this.queueBroadcaster.broadcastQueue();
                 }
             }
         }
     }
 
-    public void setSessionId(String id) {
-        this.sessionId = id;
+    public void removeProSession(String sessionId) {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Removing pro session");
+        }
+       // this.sessionRepo.removeSession(sessionId);
     }
 }

@@ -29,4 +29,6 @@ public interface SessionRepo {
             final Session session,
             final Principal professional
     );
+
+    void removeSession(final String sessionId);
 }

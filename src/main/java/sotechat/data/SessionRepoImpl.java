@@ -79,7 +79,7 @@ public class SessionRepoImpl extends MapSessionRepository
 
     @Override
     public void removeSession(final String sessionId) {
-        this.sessions.remove(sessionId);
+        this.sessionsBySessionId.remove(sessionId);
     }
 
     /** Paivittaa tarpeen vaatiessa session-olion attribuutteja.

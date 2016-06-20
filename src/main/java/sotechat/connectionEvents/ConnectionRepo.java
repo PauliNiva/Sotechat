@@ -22,12 +22,6 @@ public class ConnectionRepo {
     }
 
     public boolean getSessionConnectionStatus(String id) {
-        if (!this.connectedSessions.containsKey(id)) {
-            this.connectedSessions.put(id, false);
-        }
-        if (this.connectedSessions.get(id) == null) {
-            this.connectedSessions.put(id, false);
-        }
         return this.connectedSessions.get(id);
     }
 }
