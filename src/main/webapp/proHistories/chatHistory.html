@@ -1,12 +1,22 @@
 <div ng-controller="proHistoriesController">
-    <h1>Menneet keskustelut:</h1>
-    <button ng-click="$parent.backToPanel()">Takaisin</button>
-    <button ng-click="addQuantity()">Näytä lisää</button>
-    <div ng-hide="left">Ei enempää keskusteluja</div>
-    <div ng-show="empty">Ei keskusteluja</div>
-    <div ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity" >
-        <a ng-click="showConversation(conversation.channelId)" >
-            {{conversation.date }} {{ conversation.person }} {{ conversation.category }} </a>
+    <h1 class="page-header">Menneet keskustelut</h1>
+    <div class="col-md-2">
+        <button class="btn btn-default" ng-click="$parent.backToPanel()">
+            Takaisin
+        </button>
+        <button class="btn btn-success" ng-click="addQuantity()">Näytä lisää
+        </button>
     </div>
-
+    <div class="col-md-10">
+        <div ng-hide="left">Ei enempää keskusteluja</div>
+        <div ng-show="empty">Ei keskusteluja</div>
+    <div class="panel"
+         ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
+        <div class="panel-heading"
+             ng-click="showConversation(conversation.channelId)">
+            {{conversation.date }} {{ conversation.person }} {{
+            conversation.category }} </a>
+        </div>
+    </div>
+    </div>
 </div>

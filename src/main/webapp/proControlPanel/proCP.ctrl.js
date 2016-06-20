@@ -16,9 +16,7 @@ angular.module('chatProApp')
             };
 
             $scope.backToPanel = function() {
-                console.log("moi");
-                $scope.proview = 'proControlPanel/userHandlingArea.tpl.html';
-                console.log($scope.proview);
+                $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
             }
 
             /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
