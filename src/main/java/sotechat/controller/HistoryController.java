@@ -49,9 +49,9 @@ public class HistoryController {
     @ResponseBody
     public final List<ConvInfo> getConversations(final Principal professional)
                                                     throws Exception {
-        if (professional == null){
+        if (professional == null) {
             return null;
-
+        }
         String username = professional.getName();
         String userId = mapper.getIdFromRegisteredName(username);
         return databaseService.retrieveConversationInfo(userId);
