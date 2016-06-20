@@ -95,7 +95,7 @@ public class DatabaseServiceTest {
         conversation.setChannelId("224r");
         conversation.setDate("xxx");
         conversationRepo.save(conversation);
-        databaseService.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
+        databaseService.saveMsg("Salla", "Hoi", "23.4.2005", "224r");
         Assert.assertNotNull(conversationRepo.findOne("224r"));
         Assert.assertNotNull(conversationRepo.findOne("224r").getMessagesOfConversation().get(0));
     }
@@ -106,7 +106,7 @@ public class DatabaseServiceTest {
         conversation.setChannelId("224r");
         conversation.setDate("xxx");
         conversationRepo.save(conversation);
-        databaseService.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
+        databaseService.saveMsg("Salla", "Hoi", "23.4.2005", "224r");
         Assert.assertEquals("Salla", conversationRepo.findOne("224r").getMessagesOfConversation()
                 .get(0).getSender());
         Assert.assertEquals("Hoi", conversationRepo.findOne("224r")
@@ -123,8 +123,8 @@ public class DatabaseServiceTest {
         conversation.setChannelId("224r");
         conversation.setDate("xxx");
         conversationRepo.save(conversation);
-        databaseService.saveMsgToDatabase("Salla", "Hoi", "23.4.2005", "224r");
-        databaseService.saveMsgToDatabase("Anon", "Moi", "23.5.2005", "224r");
+        databaseService.saveMsg("Salla", "Hoi", "23.4.2005", "224r");
+        databaseService.saveMsg("Anon", "Moi", "23.5.2005", "224r");
         List<Message> messages = conversationRepo.findOne("224r")
                 .getMessagesOfConversation();
         Assert.assertEquals(2, messages.size());

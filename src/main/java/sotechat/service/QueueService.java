@@ -196,7 +196,7 @@ public class QueueService {
     }
 
     /** Palauttaa jonon Stringina, joka nayttaa JSON-ystavalliselta taulukolta.
-     * TODO: esimerkkioutput kommenttiin.
+     * Esim: {"jono": [{"channelId": "xyz", "category": "1", "username": "Ra"}]}
      * @return string
      */
     @Override

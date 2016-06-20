@@ -10,7 +10,6 @@ import sotechat.domainService.ConversationService;
 import sotechat.domainService.PersonService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,8 +74,8 @@ public class DatabaseService {
      * @param channelId viestin kanavan id
      * @throws Exception
      */
-    public final void saveMsgToDatabase(String username, String content,
-                                        String time, String channelId)
+    public final void saveMsg(String username, String content,
+                              String time, String channelId)
                                         throws Exception {
         Message message = new Message(username, content, time);
         Conversation conv = conversationService.getConversation(channelId);
