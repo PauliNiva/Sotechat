@@ -28,8 +28,10 @@ public class DatabaseService {
 
     /** Viesteihin liittyvat palvelut */
     @Autowired
-    public DatabaseService(PersonService personService,
-                           ConversationService conversationService) {
+    public DatabaseService(
+            final PersonService personService,
+            final ConversationService conversationService
+    ) {
         this.personService = personService;
         this.conversationService = conversationService;
     }
@@ -40,10 +42,12 @@ public class DatabaseService {
      * @param sender aloitusviestin lahettaja
      * @param channelId kanavan id
      * @param category keskustelun kategoria
-     * @throws Exception
      */
-    public final void createConversation(final String sender,
-        final String channelId, final String category) {
+    public final void createConversation(
+            final String sender,
+            final String channelId,
+            final String category
+    ) {
         try {
             DateTime time = new DateTime();
             Conversation conversation = new Conversation(channelId,
@@ -51,7 +55,7 @@ public class DatabaseService {
             conversationService.addConversation(conversation);
             conversationService.setCategory(category, channelId);
         } catch (Exception e) {
-
+            System.out.println("DBE on createConversation! " + e.toString());
         }
 
     }
@@ -61,18 +65,19 @@ public class DatabaseService {
      * annettua kanavaid:ta vastaavaan keskusteluun.
      * @param userId kayttajan id
      * @param channelId kanavan id
-     * @throws Exception
      */
-    public final void addPersonToConversation(String userId, String channelId)
-            {
-                try {
-                    Person person = personService.getPerson(userId);
-                    conversationService.addPerson(person, channelId);
-                    Conversation conv = conversationService.getConversation(channelId);
-                    personService.addConversation(userId, conv);
-                } catch (Exception e) {
-
-                }
+    public final void addPersonToConversation(
+            final String userId,
+            final String channelId
+    ) {
+        try {
+            Person person = personService.getPerson(userId);
+            conversationService.addPerson(person, channelId);
+            Conversation conv = conversationService.getConversation(channelId);
+            personService.addConversation(userId, conv);
+        } catch (Exception e) {
+            System.out.println("DBE on addPersonToConversati! " + e.toString());
+        }
 
     }
 
@@ -82,10 +87,13 @@ public class DatabaseService {
      * @param content viestin sisältö
      * @param time viestin aikaleima
      * @param channelId viestin kanavan id
-     * @throws Exception
      */
-    public final void saveMsg(String username, String content,
-                              String time, String channelId) {
+    public final void saveMsg(
+            final String username,
+            final String content,
+            final String time,
+            final String channelId
+    ) {
         try {
             Message message = new Message(username, content, time);
             Conversation conv = conversationService.getConversation(channelId);
@@ -93,7 +101,7 @@ public class DatabaseService {
             message.setConversation(conv);
             conversationService.addMessage(message, conv);
         } catch (Exception e) {
-
+            System.out.println("DBE on saveMsg! " + e.toString());
         }
 
     }
@@ -104,51 +112,60 @@ public class DatabaseService {
      * @param channelId keskustelun kanavan id
      * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa
      */
-    public final List<MsgToClient> retrieveMessages(String channelId) {
+    public final List<MsgToClient> retrieveMessages(
+            final String channelId
+    ) {
         try {
             Conversation conv = conversationService.getConversation(channelId);
             List<Message> messages = conv.getMessagesOfConversation();
-            List<MsgToClient> messagelist = new ArrayList<MsgToClient>();
-            for(Message message : messages){
+            List<MsgToClient> messageList = new ArrayList<>();
+            for (Message message : messages) {
                 MsgToClient newMsg = wrapMessage(message);
-                messagelist.add(newMsg);
+                messageList.add(newMsg);
             }
-            return messagelist;
+            return messageList;
         } catch (Exception e) {
+            System.out.println("DBE on retrieveMessages! " + e.toString());
             return new ArrayList<>();
         }
 
     }
 
-    public final List<ConvInfo> getConvInfoListOfUserId(String userId)
-            {
-                try {
-                    Person person = personService.getPerson(userId);
-                    List<Conversation> convs = person.getConversationsOfPerson();
-                    List<ConvInfo> info = new ArrayList<ConvInfo>();
-                    for (Conversation conversation : convs){
-                        info.add(wrapConversation(conversation));
-                    }
-                    return info;
-                } catch (Exception e) {
-                    return new ArrayList<>();
-                }
+    /** Palauttaa listan ConvInfo-olioita.
+     * @param userId userId
+     * @return lista convInfo-olioita
+     */
+    public final List<ConvInfo> getConvInfoListOfUserId(
+            final String userId
+    ) {
+        try {
+            Person person = personService.getPerson(userId);
+            List<Conversation> convs = person.getConversationsOfPerson();
+            List<ConvInfo> info = new ArrayList<>();
+            for (Conversation conversation : convs) {
+                info.add(wrapConversation(conversation));
+            }
+            return info;
+        } catch (Exception e) {
+            System.out.println("DBE on getConvInfoListOfUser! " + e.toString());
+            return new ArrayList<>();
+        }
 
     }
 
-    private final ConvInfo wrapConversation(Conversation conv)
-           {
-               try {
-                   String channelId = conv.getChannelId();
-                   String date = conv.getDate();
-                   /** ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
-                   String person = conv.getMessagesOfConversation().get(0).getSender();
-                   String category = conv.getCategory();
-                   return new ConvInfo(channelId, date, person, category);
-               } catch (Exception e) {
-                    return null;
-               }
-
+    /** Wraps conversation into a ConvInfo object.
+     * @param conv conv
+     * @return ConvInfo wrapper
+     */
+    private ConvInfo wrapConversation(
+            final Conversation conv
+    ) {
+       String channelId = conv.getChannelId();
+       String date = conv.getDate();
+       /** ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
+       String person = conv.getMessagesOfConversation().get(0).getSender();
+       String category = conv.getCategory();
+       return new ConvInfo(channelId, date, person, category);
     }
 
     /**
@@ -157,7 +174,7 @@ public class DatabaseService {
      * @param message Message luokan ilmentyma
      * @return MsgToClient luokan ilmentyma
      */
-    private final MsgToClient wrapMessage(Message message) {
+    private MsgToClient wrapMessage(Message message) {
         String id = "" + message.getId();
         String name = message.getSender();
         String channelId = message.getChannelId();
