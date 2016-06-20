@@ -49,7 +49,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
         List<GrantedAuthority> grantedAuths = grantAuthority(person);
         mapAuthenticatedPerson(person);
-        return new UsernamePasswordAuthenticationToken(person.getLoginName(),
+        return new UsernamePasswordAuthenticationToken(person.getUserName(),
                 password, grantedAuths);
     }
 
