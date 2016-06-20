@@ -24,7 +24,7 @@ public class SessionRepo extends MapSessionRepository {
      * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
     private HashMap<String, Session> proUserSessions;
 
-    /** Mapperilta voi esim. kysya "mika username on ID:lla x?". */
+    /** Mapper. */
     private final Mapper mapper;
 
     /** Konstruktori.
@@ -56,14 +56,6 @@ public class SessionRepo extends MapSessionRepository {
         return sessionsByUserId.get(userId);
     }
 
-    public final synchronized void joinChannel(
-            final Session session,
-            final String channelId
-    ) {
-
-    }
-
-
     /** Kanavalta poistuminen. Kutsutaan tapauksissa:
      * - Kun keskustelija painaa nappia "Poistu"
      * - Kun keskustelija on kadonnut eika tule takaisin pian (timeout)
@@ -79,6 +71,17 @@ public class SessionRepo extends MapSessionRepository {
         Channel channel = mapper.getChannel(channelId);
         channel.removeSubscriber(session);
         channel.removeActiveUserId(session.get("userId"));
+        for (String someUserId : channel.getActiveUserIds()) {
+            Session someSession = getSessionFromUserId(someUserId);
+            String someSessionId = someSession.get("sessionId");
+            if (!someSession.isPro()) {
+                /** Jos kukaan lahtee kanavalta, jolla on normikayttajia,
+                 * unohdetaan normikayttajien sessiot. */
+                sessionsByUserId.remove(someUserId);
+                sessionsBySessionId.remove(someSessionId);
+            }
+        }
+
     }
 
     /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
@@ -97,6 +100,7 @@ public class SessionRepo extends MapSessionRepository {
         /** Paivityslogiikka jaettu kahteen metodiin, alla kutsut. */
         Session session = updateSessionObjectMapping(sessionId, professional);
         updateSessionAttributes(session, professional);
+        session.set("sessionId", sessionId);
 
         return session;
     }
@@ -132,7 +136,6 @@ public class SessionRepo extends MapSessionRepository {
             session.set("category", "Kategoria"); //TODO
             Channel channel = mapper.createChannel();
             channel.allowParticipation(session);
-            String channelId = channel.getId();
         }
 
         /** Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */

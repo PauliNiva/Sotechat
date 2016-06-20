@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -39,23 +40,29 @@ public class StateController {
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
+    /** Message Broker. */
+    private final SimpMessagingTemplate broker;
+
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
      * @param pSessionRepo sessionRepo
      * @param pQueueService queueService
      * @param pQueueBroadcaster queueBroadCaster
+     * @param pBroker broker
      */
     @Autowired
     public StateController(
             final ValidatorService pValidatorService,
             final SessionRepo pSessionRepo,
             final QueueService pQueueService,
-            final QueueBroadcaster pQueueBroadcaster
+            final QueueBroadcaster pQueueBroadcaster,
+            final SimpMessagingTemplate pBroker
     ) {
         this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
         this.queueService = pQueueService;
         this.queueBroadcaster = pQueueBroadcaster;
+        this.broker = pBroker;
     }
 
     /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
@@ -202,11 +209,14 @@ public class StateController {
             return;
         }
         sessionRepo.leaveChannel(channelId, sessionId);
-        Session session = sessionRepo.getSessionFromSessionId(sessionId);
-        if (!session.isPro()) {
-            //TODO: sessionRepo.forgetSessionId(sessionId);
-            //TODO: kerro taviskayttajalle etta chatti on kii
-        }
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+
+        String closedChannelNotice = "{\"leave\":\"" + "Hoitaja" + "\"}";
+        //TODO: Vaihda ilmoitus.
+        // {"leave":"Atte"} tulee myos kun hoitaja tilapaisesti tippuu yms.
+        // halutaan erityyppinen ilmoitus kun chatti suljetaan.
+
+        broker.convertAndSend(channelIdWithPath, closedChannelNotice);
     }
 
 }

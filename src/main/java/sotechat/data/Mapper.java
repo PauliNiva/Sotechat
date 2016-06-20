@@ -31,23 +31,19 @@ public class Mapper {
         this.fastGen = new FastGeneratorForRandomStrings();
         this.reservedIds = new HashSet<>();
         this.mapRegisteredUsers = new HashMap<>();
-        //TODO: Lataa tietokannasta varatut.
+        /* TODO: Lataa tietokannasta reservedIds & usernames. */
     }
 
-    /** Palauttaa channel-olion. Yrittaa ensin muistista, sitten db,
-     * jos ei vielakaan loydy niin luo uuden kanavan.
+    /** Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
      * @param channelId channelId
-     * @return channel-olio
+     * @return channel-olio tai null jos ei loydy.
      */
     public Channel getChannel(
-            String channelId
+            final String channelId
     ) {
-        // TODO: Old channels from db?
         Channel channel = channels.get(channelId);
         if (channel == null) {
-            channel = new Channel(channelId);
-            channels.put(channelId, channel);
-            //TODO: Put to db as well.
+            //TODO: try loading from db.
         }
         return channel;
     }
@@ -63,7 +59,6 @@ public class Mapper {
     }
 
     /** Puts key userId, value username.
-     *
      * @param username p
      * @param userId p
      */
