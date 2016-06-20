@@ -9,10 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import sotechat.data.ChatLogger;
-import sotechat.data.Mapper;
-import sotechat.data.Session;
-import sotechat.data.SessionRepo;
+import sotechat.data.*;
 
 import java.util.*;
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
@@ -50,18 +47,18 @@ public class SubscribeEventListener
      * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan
      * suorittamaan loppuun ennen mahdollisia broadcasteja. Ilman timeria
      * kay usein niin, etta juuri subscribannut kayttaja ei saa broadcastia.
-     * @param applicationEvent kaikki applikaatioEventit aktivoivat taman.
+     * @param event kaikki applikaatioEventit aktivoivat taman.
      */
     @Override
     public final void onApplicationEvent(
-            final ApplicationEvent applicationEvent
+            final ApplicationEvent event
     ) {
-        if (SessionDisconnectEvent.class == applicationEvent.getClass()) {
-            //TODO: Ilmoitus "left channel" kaikille kanaville
+        if (SessionDisconnectEvent.class == event.getClass()) {
+            handleDisconnect((SessionDisconnectEvent) event);
         }
 
         /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
-        if (applicationEvent.getClass() != SessionSubscribeEvent.class) {
+        if (event.getClass() != SessionSubscribeEvent.class) {
             return;
         }
 
@@ -76,21 +73,17 @@ public class SubscribeEventListener
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    handleSubscribe((SessionSubscribeEvent) applicationEvent);
-                } catch (Exception e) {
-                    //TODO:Better?
-                }
+                handleSubscribe((SessionSubscribeEvent) event);
             }
         }, delay);
     }
 
     /** Kasittelee subscribe -tapahtumat.
-     * @param event applicationEvent
+     * @param event event
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
-    ) throws Exception {
+    ) {
         MessageHeaders headers = event.getMessage().getHeaders();
 
         /** Interceptor estaa subscribet, joista puuttuu sessionId.
@@ -101,32 +94,48 @@ public class SubscribeEventListener
 
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         System.out.println("Subscribing someone to " + channelIdWithPath);
         if (channelIdWithPath.isEmpty()) {
             return;
         }
 
-        /** Add session to list of subscribers to channelId. */
-        mapper.addSessionToChannel(channelIdWithPath, session);
-
         /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
         String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         if (channelIdWithPath.equals(qbcc)) {
             queueBroadcaster.broadcastQueue();
+            return;
         }
+
+        /** Add session to list of subscribers to channel.
+         * HUOM: Aktivoituu seka /queue/ etta /chat/ subscribesta. */
+        String channelId = channelIdWithPath.split("/")[3];
+        Channel channel = mapper.getChannel(channelId);
+        channel.addSubscriber(session);
 
         /** Jos subscribattu /chat/kanavalle */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
-            String channelId = channelIdWithPath.substring(chatPrefix.length());
             /** Lahetetaan kanavan chat-historia kaikille subscribaajille. */
             chatLogger.broadcast(channelId, broker);
             /** Lahetetaan tieto "uusi keskustelija liittynyt kanavalle". */
             String joinInfo = "{\"join\":\"" + session.get("username") + "\"}";
             broker.convertAndSend(channelIdWithPath, joinInfo);
         }
+    }
+
+    /** Disconnect eventin kasittely.
+     * @param event disconnect event
+     */
+    private synchronized void handleDisconnect(
+            final SessionDisconnectEvent event
+    ) {
+        System.out.println("DISCONNECT EVENT STRING: " + event.toString());
+        System.out.println("          ja id: " + event.getSessionId());
+        //TODO: yhdista WS Session Id:t HTTP Session Id:hen
+        //TODO: Ilmoitus "left channel" kaikille kanaville
+        //TODO: remove subscribe
     }
 
     /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.

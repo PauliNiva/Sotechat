@@ -1,18 +1,11 @@
 package sotechat.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.security.web.savedrequest.Enumerator;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,33 +15,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sotechat.Launcher;
-import sotechat.data.Mapper;
-import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
-import sotechat.data.SessionRepoImpl;
-import sotechat.data.*;
-import sotechat.domain.Conversation;
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.PersonService;
 
 
-import sotechat.repo.ConversationRepo;
-import sotechat.repo.MessageRepo;
-import sotechat.repo.PersonRepo;
-import sotechat.service.DatabaseService;
-import sotechat.service.ValidatorService;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
-import sotechat.service.QueueService;
-
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -73,7 +48,7 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        sessions = (SessionRepoImpl)webApplicationContext
+        sessions = (SessionRepo)webApplicationContext
                 .getBean("sessionRepoImpl");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
@@ -143,7 +118,7 @@ public class StateControllerTest {
         String userId = jsonObj.get("userId").toString();*/
 
         // UserStateResponsen state on chat??? Pitää asettaa tila tässä keinotekoisesti.
-        sessions.getSessionObj("007").set("state", "start");
+        sessions.getSessionFromSessionId("007").set("state", "start");
 
         /** Tehdaan sitten samalta 007-sessiolta kelpo /joinPool pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
@@ -168,7 +143,7 @@ public class StateControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
 
         /** Asetetaan palvelimella session tilaksi "chat". */
-        sessions.getSessionObj("007").set("state", "chat");
+        sessions.getSessionFromSessionId("007").set("state", "chat");
 
         /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila eioo "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
@@ -193,7 +168,7 @@ public class StateControllerTest {
                         .accept(MediaType.APPLICATION_JSON));
 
         // Tässä kanssa jotain hämärää, userstateresponse palauttaa väärän tilan.
-        sessions.getSessionObj("007").set("state", "start");
+        sessions.getSessionFromSessionId("007").set("state", "start");
 
         /** Tehdaan sitten samalta 007-sessiolta /joinPool pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */

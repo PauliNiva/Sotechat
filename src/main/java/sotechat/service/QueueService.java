@@ -4,10 +4,7 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
-import sotechat.data.ChatLogger;
-import sotechat.data.Mapper;
-import sotechat.data.Session;
-import sotechat.data.SessionRepo;
+import sotechat.data.*;
 import sotechat.wrappers.MsgToServer;
 import sotechat.wrappers.QueueItem;
 
@@ -60,7 +57,7 @@ public class QueueService {
         /** Alustetaan muuttujia. */
         String sessionId = request.getSession().getId();
 
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         String userId = session.get("userId");
         String channelId = session.get("channelId");
@@ -72,10 +69,8 @@ public class QueueService {
         session.set("username", username);
 
         /** Kirjataan kayttajalle oikeus kuunnella kanavaa. */
-        session.addChannel(channelId);
-
-        /** Mapataan nimimerkki ja userId. */
-        mapper.mapUsernameToId(userId, username);
+        Channel channel = mapper.getChannel(channelId);
+        channel.allowParticipation(session);
 
         /** Asetetaan kayttaja jonoon odottamaan palvelua. */
         QueueItem item = new QueueItem(channelId, category, username);
@@ -117,10 +112,11 @@ public class QueueService {
         }
         String sessionId =  accessor.getSessionAttributes()
                 .get("SPRING.SESSION.ID").toString();
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         /** Lisataan popattu kanava poppaajan kanaviin. */
-        session.addChannel(channelId);
+        Channel channel = mapper.getChannel(channelId);
+        channel.allowParticipation(session);
 
         /** Muutetaan popattavan kanavan henkiloiden tilaa. */
         changeParticipantsState(channelId);
@@ -157,15 +153,14 @@ public class QueueService {
         return false;
     }
 
-    /** Muokataan popattavan kanavan sessioiden tilaksi "chat".
+    /** Muokataan popattavan kanavan normikayttajien sessioiden tilaksi "chat".
      * @param channelId kanavan id
      */
     private void changeParticipantsState(
             final String channelId
     ) {
-        String channelIdWithPath = "/toClient/queue/" + channelId;
-        Set<Session> list = mapper.getSubscribers(channelIdWithPath);
-        for (Session member : list) {
+        Channel channel = mapper.getChannel(channelId);
+        for (Session member : channel.getCurrentSubscribers()) {
             /** Hoitajan tilan kuuluu aina olla "pro". */
             if (!member.get("state").equals("pro")) {
                 member.set("state", "chat");

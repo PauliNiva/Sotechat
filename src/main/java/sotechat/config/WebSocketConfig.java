@@ -14,7 +14,7 @@ import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.controller.SubscriptionInterceptor;
-import sotechat.data.SessionRepoImpl;
+import sotechat.data.SessionRepo;
 import sotechat.service.ValidatorService;
 
 
@@ -32,7 +32,7 @@ public class WebSocketConfig extends
     /** SessionRepoImpl taytyy autowireaa tassa, jotta WebSocket-sessiot
      * onnistutaan sailomaan sinne. */
     @Autowired
-    private SessionRepoImpl repository;
+    private SessionRepo repository;
 
     /** ValidatorService taytyy autowireaa tassa, jotta se voidaan antaa
      * parametrina luotavalle Interceptorille, joka on pakko maaritella tassa.*/

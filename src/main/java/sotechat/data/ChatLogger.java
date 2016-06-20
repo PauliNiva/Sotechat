@@ -25,6 +25,10 @@ public class ChatLogger {
     @Autowired
     private Mapper mapper;
 
+    /** Session Repository. */
+    @Autowired
+    private SessionRepo sessionRepo;
+
     /** Database Service. */
     @Autowired
     private DatabaseService databaseService;
@@ -47,7 +51,8 @@ public class ChatLogger {
         String channelId = msgToServer.getChannelId();
         String messageId = pollNextFreeMessageIdFor(channelId);
         String userId = msgToServer.getUserId();
-        String username = mapper.getUsernameFromId(userId);
+        Session session = sessionRepo.getSessionFromUserId(userId);
+        String username = session.get("username");
         String timeStamp = new DateTime().toString();
         String content = msgToServer.getContent();
         MsgToClient msgToClient = new MsgToClient(

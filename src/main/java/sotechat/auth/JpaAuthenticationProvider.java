@@ -48,7 +48,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
         }
 
         List<GrantedAuthority> grantedAuths = grantAuthority(person);
-        mapAuthenticatedPerson(person);
+        mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());
         return new UsernamePasswordAuthenticationToken(person.getUserName(),
                 password, grantedAuths);
     }
@@ -61,11 +61,6 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
         return grantedAuths;
-    }
-
-    private void mapAuthenticatedPerson(Person person) {
-        mapper.mapUsernameToId(person.getUserId(), person.getUserName());
-        mapper.addProfessionalIds(person.getUserId());
     }
 
     @Override
