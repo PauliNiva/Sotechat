@@ -32,7 +32,6 @@ public class Session {
     }
 
     public final void addChannel(final String channelId) {
-        System.out.println("Sallitaan userId:lle " + get("userId") + " kanava " + channelId);
         channels.add(channelId);
         if (get("channelIds").isEmpty()) {
             /** Case: tavallinen kayttaja, jolla vain 1 kanava. */

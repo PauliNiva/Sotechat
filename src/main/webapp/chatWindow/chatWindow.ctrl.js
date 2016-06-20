@@ -16,7 +16,6 @@ angular.module('chatApp')
             // Alustetaan ChatName tyhjäksi
             $scope.chatText = '';
 
-
             $scope.userLeave = function() {
                 var modalInstance = $uibModal.open({
                     animation: true,
@@ -24,13 +23,15 @@ angular.module('chatApp')
                     controller: 'AreUSureModalController'
                 });
 
-                modalInstance.result.then(function(result) {
-                    userStateService.leaveChat();
-                    sub.unsubscribe();
-                    $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
-                    $scope.chatClosed = true;
-                });
+                modalInstance.result.then(closeChat());
             };
+
+            var closeChat = function() {
+                userStateService.leaveChat();
+                sub.unsubscribe();
+                $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
+                $scope.chatClosed = true;
+            }
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -77,6 +78,8 @@ angular.module('chatApp')
                     if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
+                    } else if (message.notice == "chat closed") {
+                        closeChat();
                     }
                 });
 

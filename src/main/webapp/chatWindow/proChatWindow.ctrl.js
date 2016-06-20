@@ -69,6 +69,8 @@ angular.module('chatProApp')
                     if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
+                    } else if (message.notice == "chat closed") {
+                        //$scope.closeTab();
                     }
                 });
             };

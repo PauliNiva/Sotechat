@@ -39,7 +39,7 @@ angular.module('chatProApp')
                 return index === $scope.activeChatTab;
             }
 
-            $scope.removeChatTab = function (channelID) {
+            $scope.removeChatTab = function(channelID) {
                 var modalInstance = $uibModal.open({
                     animation: true,
                     templateUrl: 'common/areUSureModal.tpl.html',
@@ -54,9 +54,9 @@ angular.module('chatProApp')
                         $scope.chats.splice(chatTabIndex, 1);
                     }
 
-                   if($scope.chats.length > 0) {
-                       $scope.activeChatTab = $scope.chats[0].index;
-                   }
+                    if($scope.chats.length > 0) {
+                        $scope.activeChatTab = $scope.chats[0].index;
+                    }
                 });
             };
 

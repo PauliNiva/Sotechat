@@ -209,13 +209,11 @@ public class StateController {
             return;
         }
         sessionRepo.leaveChannel(channelId, sessionId);
+
+        /** Suljetaan kanava, kun kuka tahansa lahtee.
+         * Jatetaan se kuitenkin auki hoitajan valilehtiin. */
         String channelIdWithPath = "/toClient/chat/" + channelId;
-
-        String closedChannelNotice = "{\"leave\":\"" + "Hoitaja" + "\"}";
-        //TODO: Vaihda ilmoitus.
-        // {"leave":"Atte"} tulee myos kun hoitaja tilapaisesti tippuu yms.
-        // halutaan erityyppinen ilmoitus kun chatti suljetaan.
-
+        String closedChannelNotice = "{\"notice\":\"chat closed\"}";
         broker.convertAndSend(channelIdWithPath, closedChannelNotice);
     }
 
