@@ -2,8 +2,8 @@
  * Seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin
  */
 angular.module('chatProApp')
-    .controller('proCPController', ['$scope','$timeout', '$uibModal', 'connectToServer', 'proStateService', 'heartBeatService',
-        function ($scope, $timeout,$uibModal, connectToServer, proStateService) {
+    .controller('proCPController', ['$scope','$timeout','$http', '$uibModal', 'connectToServer', 'proStateService', 'heartBeatService',
+        function ($scope, $timeout, $http, $uibModal, connectToServer, proStateService) {
             /** Alustetaan muuttuja */
             var tabCount = 0;
             $scope.pro = true;
@@ -32,6 +32,7 @@ angular.module('chatProApp')
 
                 modalInstance.result.then(function(result) {
                     $scope.$broadcast('unSubscribeChat', {'channelID' : channelID});
+                    $http.post("/leave/" + channelID);
                     var chatTabIndex =  arrayObjectIndexOf($scope.chats, channelID, 'channel');
                     if (chatTabIndex > -1) {
                         $scope.chats.splice(chatTabIndex, 1);

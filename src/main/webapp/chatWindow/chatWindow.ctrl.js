@@ -25,6 +25,7 @@ angular.module('chatApp')
                 });
 
                 modalInstance.result.then(function(result) {
+                    userStateService.leaveChat();
                     sub.unsubscribe();
                     $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
                     $scope.chatClosed = true;

@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -192,12 +193,15 @@ public class StateController {
      */
     @RequestMapping(value = "/leave/{channelId}", method = RequestMethod.POST)
     public final void leaveChat(
+            final @PathVariable String channelId,
             final HttpServletRequest req,
-            final Principal pro,
-            final @DestinationVariable String channelId
+            final Principal pro
     ) {
+        System.out.println(channelId);
         String sessionId = req.getSession().getId();
+        System.out.println(validatorService.validateLeave(sessionId, pro, channelId));
         if (validatorService.validateLeave(sessionId, pro, channelId)) {
+
             sessionRepo.leaveChannel(channelId, sessionId);
         }
     }
