@@ -77,6 +77,11 @@ public class SessionRepoImpl extends MapSessionRepository
         return session;
     }
 
+    @Override
+    public void removeSession(final String sessionId) {
+        this.sessions.remove(sessionId);
+    }
+
     /** Paivittaa tarpeen vaatiessa session-olion attribuutteja.
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
