@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Keskustelu</title>
-</head>
-<body>
 
 <div ng-controller="proHistoriesController">
-    <a onclick="backToConversations();" >Takaisin</a>
+    <a ng-click="backToConversations()" href="#">Takaisin</a>
     <button onclick="addQuantity();">Näytä lisää</button>
     <div ng-hide="messagesLeft" >Ei enempää viestejä</div>
     <div ng-repeat="message in messages | orderBy:'timeStamp':false | limitTo:messageQuantity">
@@ -15,6 +8,3 @@
         <p> {{ message.content }}</p>
     </div>
 </div>
-
-</body>
-</html>

@@ -136,10 +136,10 @@ public class DatabaseServiceTest {
     @Test
     @Transactional
     public void personsConversationsTest() throws Exception {
-        Assert.assertTrue(dbservice.personsConversations("xxd").isEmpty());
-        cr.save(new Conversation("1", "22xx"));
-        dbservice.addPersonToConversation("xxd", "22xx");
-        Assert.assertFalse(dbservice.personsConversations("xxd").isEmpty());
+        Assert.assertTrue(databaseService.personsConversations("xxd").isEmpty());
+        conversationRepo.save(new Conversation("1", "22xx"));
+        databaseService.addPersonToConversation("xxd", "22xx");
+        Assert.assertFalse(databaseService.personsConversations("xxd").isEmpty());
     }
 
     @Test
@@ -147,12 +147,12 @@ public class DatabaseServiceTest {
     public void personsConversationsTest2() throws Exception {
         conversation.setChannelId("224r");
         conversation.setDate("2");
-        cr.save(conversation);
+        conversationRepo.save(conversation);
         Conversation c2 = new Conversation("1", "333f");
-        cr.save(c2);
-        dbservice.addPersonToConversation("xxd", "224r");
-        dbservice.addPersonToConversation("xxd", "333f");
-        List<String> channelIds = dbservice.personsConversations("xxd");
+        conversationRepo.save(c2);
+        databaseService.addPersonToConversation("xxd", "224r");
+        databaseService.addPersonToConversation("xxd", "333f");
+        List<String> channelIds = databaseService.personsConversations("xxd");
         Assert.assertEquals(2, channelIds.size());
         Assert.assertEquals("224r", channelIds.get(0));
         Assert.assertEquals("333f", channelIds.get(1));
@@ -163,10 +163,10 @@ public class DatabaseServiceTest {
     public void retrieveMessagesTest() throws Exception {
         conversation.setChannelId("224r");
         conversation.setDate("2");
-        cr.save(conversation);
-        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
-        dbservice.saveMsgToDatabase("Anon", "Moikka!", "1", "224r");
-        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
+        conversationRepo.save(conversation);
+        databaseService.saveMsg("Salla", "Moi", "2", "224r");
+        databaseService.saveMsg("Anon", "Moikka!", "1", "224r");
+        List<MsgToClient> msgs = databaseService.retrieveMessages("224r");
         Assert.assertEquals(2, msgs.size());
         Assert.assertEquals("Moi", msgs.get(1).getContent());
         Assert.assertEquals("Moikka!", msgs.get(0).getContent());
@@ -177,9 +177,9 @@ public class DatabaseServiceTest {
     public void retrieveMessagesTest2() throws Exception {
         conversation.setChannelId("224r");
         conversation.setDate("2");
-        cr.save(conversation);
-        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
-        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
+        conversationRepo.save(conversation);
+        databaseService.saveMsg("Salla", "Moi", "2", "224r");
+        List<MsgToClient> msgs = databaseService.retrieveMessages("224r");
         Assert.assertEquals(1, msgs.size());
         MsgToClient msg = msgs.get(0);
         Assert.assertEquals("Moi", msg.getContent());
@@ -193,12 +193,12 @@ public class DatabaseServiceTest {
     public void retrieveMessagesTest3() throws Exception {
         conversation.setChannelId("224r");
         conversation.setDate("2");
-        cr.save(conversation);
-        cr.save(new Conversation("3", "1xxx"));
-        dbservice.saveMsgToDatabase("Salla", "Moi", "2", "224r");
-        dbservice.saveMsgToDatabase("Anon", "Hello", "2", "1xxx");
-        List<MsgToClient> msgs = dbservice.retrieveMessages("224r");
-        List<MsgToClient> msgs2 = dbservice.retrieveMessages("1xxx");
+        conversationRepo.save(conversation);
+        conversationRepo.save(new Conversation("3", "1xxx"));
+        databaseService.saveMsg("Salla", "Moi", "2", "224r");
+        databaseService.saveMsg("Anon", "Hello", "2", "1xxx");
+        List<MsgToClient> msgs = databaseService.retrieveMessages("224r");
+        List<MsgToClient> msgs2 = databaseService.retrieveMessages("1xxx");
         Assert.assertEquals(1, msgs.size());
         Assert.assertEquals(1, msgs2.size());
         Assert.assertNotEquals(msgs.get(0).getContent(), msgs2.get(0).getContent());

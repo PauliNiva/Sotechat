@@ -2,8 +2,8 @@
  * Created by varkoi on 17.6.2016.
  */
 
-angular.module('chatApp')
-        .controller('proHistoriesController', [$scope, 'proStateService','proHistoryService',
+angular.module('chatProApp')
+        .controller('proHistoriesController', ['$scope', 'proStateService','proHistoryService',
             function($scope, proStateService, proHistoryService) {
 
                 /** kuinka paljon keskusteluja naytetaan */
@@ -21,10 +21,15 @@ angular.module('chatApp')
                 /** onko tietokannassa keskusteluja vai ei */
                 $scope.empty = false;
 
+
+
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
                     var userId = proStateService.getUserID();
                     $scope.Conversations = proHistoryService.getHistory(userId);
+                    if($scope.Conversations.empty){
+                        $scope.Conversations = [];
+                    }
                     if ($scope.Conversations.length > 0) {
                         $scope.empty = false;
                     } else {
@@ -33,7 +38,7 @@ angular.module('chatApp')
                 };
 
                 /** lisataan naytettavien keskustelujen maaraa */
-                var addQuantity = function () {
+                $scope.addQuantity = function () {
                     if ((-$scope.quantity) < $scope.Conversations.length) {
                         $scope.quantity -= 10;
                     } else {
@@ -74,7 +79,7 @@ angular.module('chatApp')
                 };
 
                 /** siirrytaan takaisin keskustelut -sivulle */
-                var backToConversations = function () {
+                $scope.backToConversations = function () {
                     resetQuantity();
                     resetMessageQuantity();
                     $scope.left = true;

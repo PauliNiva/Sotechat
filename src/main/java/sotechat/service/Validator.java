@@ -37,7 +37,7 @@ public class Validator {
 
         return output;
     }
-
+/**
     public static String escapeForSql(String input) {
 
 
@@ -46,5 +46,5 @@ public class Validator {
     public static String unescapeFromSql(String input) {
 
     }
-
+*/
 }

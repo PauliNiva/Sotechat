@@ -57,22 +57,25 @@ public class SubscribeEventListener
             final ApplicationEvent applicationEvent
     ) {
 
-        /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
-        if (applicationEvent.getClass() != SessionSubscribeEvent.class
-            && applicationEvent.getClass() != SessionUnsubscribeEvent.class) {
-            return;
-        }
-
-        /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
-         * subscribe-tapahtuma on suoritettu loppuun. */
-        Timer timer = new Timer();
-        int delay = 1; // milliseconds
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                delayedEventHandling(applicationEvent);
+            /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
+            if (applicationEvent.getClass() != SessionSubscribeEvent.class
+                    && applicationEvent.getClass() != SessionUnsubscribeEvent.class) {
+                return;
             }
-        }, delay);
+
+            /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
+             * subscribe-tapahtuma on suoritettu loppuun. */
+            Timer timer = new Timer();
+            int delay = 1; // milliseconds
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {        try {
+                    delayedEventHandling(applicationEvent);
+                }catch(Exception e){
+
+                }
+                }
+            }, delay);
     }
 
     /** Timerin avulla kutsuttu metodi, joka vain
@@ -81,7 +84,7 @@ public class SubscribeEventListener
      */
     private void delayedEventHandling(
             final ApplicationEvent applicationEvent
-    ) {
+    ) throws Exception {
         if (applicationEvent.getClass() == SessionSubscribeEvent.class) {
             handleSubscribe((SessionSubscribeEvent) applicationEvent);
         } else if
@@ -95,7 +98,7 @@ public class SubscribeEventListener
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
-    ) {
+    ) throws Exception {
         MessageHeaders headers = event.getMessage().getHeaders();
 
         /** Interceptor estaa subscribet, joista puuttuu sessionId.
