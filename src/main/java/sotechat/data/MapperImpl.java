@@ -159,7 +159,7 @@ public class MapperImpl implements Mapper {
      * @param session
      */
     @Override
-    public final synchronized void removeSessionToChannel(
+    public final synchronized void removeSessionFromChannel(
             final String channelIdWithPath,
             final Session session
     ) {
@@ -185,7 +185,7 @@ public class MapperImpl implements Mapper {
              * koskaan enempaa kuin yksi. */
             String newId = getFastRandomString();
             if (!mapByUserId.containsKey(newId)
-                    && !mapByChannelId.containsKey(newId)){
+                    && !mapByChannelId.containsKey(newId)) {
                 return newId;
             }
         }

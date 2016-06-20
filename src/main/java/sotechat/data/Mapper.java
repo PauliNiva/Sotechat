@@ -58,7 +58,7 @@ public interface Mapper {
             String channelIdWithPath,
             Session session
     );
-    void removeSessionToChannel(
+    void removeSessionFromChannel(
             final String channelIdWithPath,
             final Session session
     );

@@ -156,7 +156,6 @@ public class StateController {
      * @return Joko tyhja String "" tai JSON {"content":"channel activated."}
      *          Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle
      *          seka hoitajalle tiedoksi, etta poppaus onnistui.
-     * @throws Exception mika poikkeus
      */
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
@@ -186,7 +185,21 @@ public class StateController {
         return wakeUp;
     }
 
-
-
+    /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
+     * @param req req
+     * @param pro pro
+     * @param channelId channelId
+     */
+    @RequestMapping(value = "/leave/{channelId}", method = RequestMethod.POST)
+    public final void leaveChat(
+            final HttpServletRequest req,
+            final Principal pro,
+            final @DestinationVariable String channelId
+    ) {
+        String sessionId = req.getSession().getId();
+        if (validatorService.validateLeave(sessionId, pro, channelId)) {
+            sessionRepo.leaveChannel(channelId, sessionId);
+        }
+    }
 
 }

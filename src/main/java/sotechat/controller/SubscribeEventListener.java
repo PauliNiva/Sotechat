@@ -7,8 +7,8 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.data.Session;
@@ -56,42 +56,33 @@ public class SubscribeEventListener
     public final void onApplicationEvent(
             final ApplicationEvent applicationEvent
     ) {
+        if (SessionDisconnectEvent.class == applicationEvent.getClass()) {
+            //TODO: Ilmoitus "left channel" kaikille kanaville
+        }
 
         /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
-        if (applicationEvent.getClass() != SessionSubscribeEvent.class
-            && applicationEvent.getClass() != SessionUnsubscribeEvent.class) {
+        if (applicationEvent.getClass() != SessionSubscribeEvent.class) {
             return;
         }
 
-        /** Kaynnistetaan timer, joka kasittelee eventin, kunhan
-         * subscribe-tapahtuma on suoritettu loppuun. */
+        /** Halutaan kasitella event, kunhan subscribe- tapahtuma on
+         * suoritettu loppuun. Muutoin juuri subscribannut
+         * kayttaja ei saa mahdollista broadcastia. Spring ei valitettavasti
+         * salli kyseisen logiikan kirjoittamista, joten on pakko
+         * kikkailla timerin kanssa. 1ms timer toimii lahes aina, mutta
+         * joskus sama ongelma toistuu sillakin. Kokeillaan 10ms timerilla. */
         Timer timer = new Timer();
-        int delay = 1; // milliseconds
+        int delay = 10; // milliseconds
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                delayedEventHandling(applicationEvent);
+                handleSubscribe((SessionSubscribeEvent) applicationEvent);
             }
         }, delay);
     }
 
-    /** Timerin avulla kutsuttu metodi, joka vain
-     * haarauttaa sub/unsub pyynnot oikeaan metodiin.
-     * @param applicationEvent appEvent
-     */
-    private void delayedEventHandling(
-            final ApplicationEvent applicationEvent
-    ) {
-        if (applicationEvent.getClass() == SessionSubscribeEvent.class) {
-            handleSubscribe((SessionSubscribeEvent) applicationEvent);
-        } else if
-                (applicationEvent.getClass() == SessionUnsubscribeEvent.class) {
-            handleUnsubscribe((SessionUnsubscribeEvent) applicationEvent);
-        }
-    }
-
     /** Kasittelee subscribe -tapahtumat.
-     * @param event event
+     * @param event applicationEvent
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
@@ -122,22 +113,16 @@ public class SubscribeEventListener
             queueBroadcaster.broadcastQueue();
         }
 
-        /** Jos subscribattu /chat/kanavalle, lahetetaan kanavan
-         * viestihistoria kaikille kanavan subscribaajille. */
+        /** Jos subscribattu /chat/kanavalle */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
             String channelId = channelIdWithPath.substring(chatPrefix.length());
+            /** Lahetetaan kanavan chat-historia kaikille subscribaajille. */
             chatLogger.broadcast(channelId, broker);
+            /** Lahetetaan tieto "uusi keskustelija liittynyt kanavalle". */
+            String joinInfo = "{\"join\":\"" + session.get("username") + "\"}";
+            broker.convertAndSend(channelIdWithPath, joinInfo);
         }
-    }
-
-    /** TODO: Kasittelee unsubscribe -tapahtumat.
-     * @param event event
-     */
-    private synchronized void handleUnsubscribe(
-            final SessionUnsubscribeEvent event
-    ) {
-        System.out.println("UNSUB = " + event.toString());
     }
 
     /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.

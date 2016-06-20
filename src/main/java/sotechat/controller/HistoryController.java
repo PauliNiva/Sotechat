@@ -10,26 +10,38 @@ import sotechat.data.Mapper;
 import java.security.Principal;
 
 /** Reititys ammattilaiskayttajan pyynnolle
- * "luettele kanavat, joilla olen ollut."
+ *  "luettele kanavat, joilla olen ollut.".
  * Vastaukseen saatuaan kayttaja voisi hakea yksittaisen kanavan lokit
  * lahettamalla normaalin WS subscriben kyseiselle kanavalle.
  */
 @RestController
 public class HistoryController {
 
+    /** Chat Logger. */
     private final ChatLogger chatLogger;
 
+    /** Mapper. */
     private final Mapper mapper;
 
+    /**
+     * Konstruktori.
+     * @param pChatLogger chat logger
+     * @param pMapper mapper
+     */
     @Autowired
     public HistoryController(
-            ChatLogger pChatLogger,
-            Mapper pMapper
+            final ChatLogger pChatLogger,
+            final Mapper pMapper
     ) {
         this.chatLogger = pChatLogger;
         this.mapper = pMapper;
     }
 
+    /** Reititys ammattilaiskayttajan pyynnolle
+     *  "luettele kanavat, joilla olen ollut.".
+     * @param professional kirjautumistiedot
+     * @return vastaus pyyntoon, null jos ei kirjautunut
+     */
     @RequestMapping(value = "/getHistoricChannels", method = RequestMethod.GET)
     public final String respondToHistoricChannelsRequest(
             final Principal professional

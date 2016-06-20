@@ -210,7 +210,6 @@ public class QueueService {
             output.append(item.toString());
         }
         output.append("]}");
-        System.out.println("TODO: Lisaa esimerkkioutput javadociin: " + output);
         return output.toString();
     }
 }
