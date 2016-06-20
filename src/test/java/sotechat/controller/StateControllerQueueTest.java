@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,15 +30,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import sotechat.data.MapperImpl;
+import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
-import sotechat.data.SessionRepoImpl;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
-import sotechat.service.ValidatorService;
 import sotechat.util.*;
 
 
@@ -64,9 +61,9 @@ import static org.mockito.Matchers.any;
 })
 public class StateControllerQueueTest {
 
-    private MapperImpl mapper;
+    private Mapper mapper;
 
-    private SessionRepoImpl sessionRepo;
+    private SessionRepo sessionRepo;
 
     @Autowired
     private ConversationRepo conversationRepo;
@@ -93,8 +90,8 @@ public class StateControllerQueueTest {
     public void setUp() throws Exception {
         Mockito.when(personRepo.findOne(any(String.class))).thenReturn(new Person());
         Mockito.when(conversationRepo.findOne(any(String.class))).thenReturn(new Conversation());
-        this.mapper = (MapperImpl) context.getBean("mapperImpl");
-        this.sessionRepo = (SessionRepoImpl) context.getBean("sessionRepoImpl");
+        this.mapper = (Mapper) context.getBean("mapper");
+        this.sessionRepo = (SessionRepo) context.getBean("sessionRepoImpl");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }

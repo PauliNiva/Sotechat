@@ -182,7 +182,7 @@ public class StateController {
          * HUOM: Ei broadcastata viesteja viela. Vasta kun joku subscribaa. */
         queueBroadcaster.broadcastQueue();
 
-        /** Palautetaan poppaajalle tieto, etta poppaus onnistui. */
+        /** Palautetaan kanavan osallisille tieto, etta poppaus onnistui. */
         return wakeUp;
     }
 
@@ -198,8 +198,14 @@ public class StateController {
             final Principal pro
     ) {
         String sessionId = req.getSession().getId();
-        if (validatorService.validateLeave(sessionId, pro, channelId)) {
-            sessionRepo.leaveChannel(channelId, sessionId);
+        if (!validatorService.validateLeave(sessionId, pro, channelId)) {
+            return;
+        }
+        sessionRepo.leaveChannel(channelId, sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
+        if (!session.isPro()) {
+            //TODO: sessionRepo.forgetSessionId(sessionId);
+            //TODO: kerro taviskayttajalle etta chatti on kii
         }
     }
 

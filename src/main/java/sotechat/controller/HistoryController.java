@@ -5,6 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
 import sotechat.service.DatabaseService;
 import sotechat.service.ValidatorService;
 import sotechat.wrappers.ConvInfo;
@@ -27,26 +29,29 @@ public class HistoryController {
     /** Chat Logger. */
     private ChatLogger chatLogger;
 
-    /** Mapper. */
-    private final Mapper mapper;
+    /** Session Repo. */
+    private final SessionRepo sessionRepo;
 
     /**
      * Konstruktori.
+     * @param pValidatorService p
      * @param pChatLogger p
-     * @param pMapper p
+     * @param pSessionRepo p
      */
     @Autowired
     public HistoryController(
             final ValidatorService pValidatorService,
             final ChatLogger pChatLogger,
-            final Mapper pMapper
+            final SessionRepo pSessionRepo
     ) {
         this.validatorService = pValidatorService;
         this.chatLogger = pChatLogger;
-        this.mapper = pMapper;
+        this.sessionRepo = pSessionRepo;
     }
 
     /** Client pyytaa meilta tietyn kanavan lokeja.
+     * @param pro autentikaatiotiedot
+     * @param req req
      * @param channelId channelId
      * @return lokit, jos clientilla oikeus niihin. Muuten null.
      */
@@ -73,14 +78,18 @@ public class HistoryController {
      */
     @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
     @ResponseBody
-    public final List<ConvInfo> getConversations(final Principal professional)
-                                                    throws Exception {
+    public final List<ConvInfo> getConversations(
+            final Principal professional,
+            final HttpServletRequest req
+    ) {
         if (professional == null) {
+            /** Listaus on kaytossa vain autentikoituneille kayttajille. */
             return null;
         }
         System.out.println("REQUESTING HISTORY ##########");
-        String username = professional.getName();
-        String userId = mapper.getIdFromRegisteredName(username);
+        String sessionId = req.getSession().getId();
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
+        String userId = session.get("userId");
         return chatLogger.getChannelsByUserId(userId);
     }
 

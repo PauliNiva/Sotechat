@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
+import sotechat.data.Channel;
 import sotechat.data.Mapper;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -51,16 +52,16 @@ public class ValidatorService {
             final SimpMessageHeaderAccessor accessor
     ) {
         String sessionId = getSessionIdFrom(accessor);
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         if (session == null) {
-            return "Kelvoton sessio, hylataan viesti";
+            return "Kelvoton sessioId, hylataan viesti";
         }
         String userId = msgToServer.getUserId();
-        if (!mapper.isUserIdMapped(userId)) {
+        if (sessionRepo.getSessionFromUserId(userId) != session) {
             return "Kelvoton userId, hylataan viesti";
         }
-        if (mapper.isUserProfessional(userId)) {
+        if (session.isPro()) {
             /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
 
             if (accessor.getUser() == null) {
@@ -75,9 +76,8 @@ public class ValidatorService {
 
         /** Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
-        String chatPrefix = "/toClient/chat/";
-        String channelIdWithPath = chatPrefix + channelId;
-        if (!mapper.getSubscribers(channelIdWithPath).contains(session)) {
+        Channel channel = mapper.getChannel(channelId);
+        if (!channel.hasActiveUser(userId)) {
             return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
@@ -94,7 +94,7 @@ public class ValidatorService {
             return "Unauthenticated user can't request logs!";
         }
         String sessionId = req.getSession().getId();
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return "Can't request logs outside an active session!";
         }
@@ -125,7 +125,7 @@ public class ValidatorService {
                 + " by session id " + sessionId + " ### ";
 
         /** Kelvollinen sessio? */
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return prefix + "Session is null";
         }
@@ -199,7 +199,7 @@ public class ValidatorService {
 
         /** Clientin session tarkistus. */
         String sessionId = request.getSession().getId();
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return "Denied due to missing or invalid session ID.";
         }
@@ -214,16 +214,14 @@ public class ValidatorService {
         }
 
         /** Tarkistetaan, ettei nimimerkki ole rekisteroity ammattilaiselle. */
-        String id = "" + mapper.getIdFromRegisteredName(username);
-        if (!id.isEmpty() && mapper.isUserProfessional(id)) {
+        if (mapper.isUsernameReserved(username)) {
             return "Denied join pool request due to reserved username.";
         }
 
         /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
-        String channelIdWithPath = "/toClient/chat/" + channelId;
-        Set<Session> list = mapper.getSubscribers(channelIdWithPath);
-        for (Session other : list) {
+        Channel channel = mapper.getChannel(channelId);
+        for (Session other : channel.getCurrentSubscribers()) {
             if (other.get("username").equals(username)) {
                 return "Denied join pool request. Username already on channel.";
             }
@@ -234,7 +232,7 @@ public class ValidatorService {
     }
 
     /** Validoi pyynnon poistua chat-kanavalta.
-     * @param req req
+     * @param sessionId sessionId
      * @param professional pro
      * @param channelId channelId
      * @return true jos salltiaan pyynto
@@ -245,15 +243,14 @@ public class ValidatorService {
             final String channelId
     ) {
         /** Clientin session tarkistus. */
-        Session session = sessionRepo.getSessionObj(sessionId);
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return false;
         }
 
         /** Jos sessioId kuuluu kirjautuneelle kayttajalle,
          * varmistetaan viela autentikointi. */
-        String userId = session.get("userId");
-        if (mapper.isUserProfessional(userId)) {
+        if (session.isPro()) {
             if (professional == null) {
                 /** Joku esittaa hoitajaa varastetulla sessio-cookiella. */
                 return false;
