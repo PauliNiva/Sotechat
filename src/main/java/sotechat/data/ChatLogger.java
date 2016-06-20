@@ -106,7 +106,7 @@ public class ChatLogger {
     public final synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
-    ) {
+    ) throws Exception {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
@@ -121,7 +121,7 @@ public class ChatLogger {
      */
     public final synchronized String getChannelsByUserId(
             final String userId
-    ) {
+    ) throws Exception {
         List<String> list = databaseService.personsConversations(userId);
         StringBuilder sb = new StringBuilder();
         for (String channelId : list) {
@@ -143,7 +143,7 @@ public class ChatLogger {
      */
     private synchronized List<MsgToClient> getLogs(
             final String channelId
-    ) {
+    ) throws Exception {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */

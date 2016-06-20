@@ -1,56 +1,66 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
-
+import sotechat.service.DatabaseService;
+import sotechat.wrappers.ConvInfo;
+import sotechat.wrappers.MsgToClient;
 import java.security.Principal;
+import java.util.List;
 
+/**
+ * Created by Asus on 17.6.2016.
+ */
 /** Reititys ammattilaiskayttajan pyynnolle
  *  "luettele kanavat, joilla olen ollut.".
  * Vastaukseen saatuaan kayttaja voisi hakea yksittaisen kanavan lokit
  * lahettamalla normaalin WS subscriben kyseiselle kanavalle.
  */
-@RestController
+@Controller
 public class HistoryController {
 
-    /** Chat Logger. */
-    private final ChatLogger chatLogger;
+    private DatabaseService databaseService;
 
     /** Mapper. */
     private final Mapper mapper;
 
     /**
      * Konstruktori.
-     * @param pChatLogger chat logger
+     * @param dbservice databaseService
      * @param pMapper mapper
      */
     @Autowired
-    public HistoryController(
-            final ChatLogger pChatLogger,
-            final Mapper pMapper
-    ) {
-        this.chatLogger = pChatLogger;
+    public HistoryController(final DatabaseService dbservice,
+                             Mapper pMapper){
         this.mapper = pMapper;
+        this.databaseService = dbservice;
     }
 
-    /** Reititys ammattilaiskayttajan pyynnolle
-     *  "luettele kanavat, joilla olen ollut.".
-     * @param professional kirjautumistiedot
-     * @return vastaus pyyntoon, null jos ei kirjautunut
-     */
-    @RequestMapping(value = "/getHistoricChannels", method = RequestMethod.GET)
-    public final String respondToHistoricChannelsRequest(
-            final Principal professional
-    ) {
+    @RequestMapping(value = "/messages/{channelId}",
+            method = RequestMethod.GET)
+    @ResponseBody
+    public final List<MsgToClient> getMessages(@PathVariable("channelId")
+                                                   final String channelId)
+                                                    throws Exception {
+        return databaseService.retrieveMessages(channelId);
+    }
+
+    @RequestMapping(value="/history", method = RequestMethod.GET)
+    @ResponseBody
+    public final List<ConvInfo> getConversations(final Principal professional)
+                                                    throws Exception {
         if (professional == null) {
             return null;
         }
         String username = professional.getName();
         String userId = mapper.getIdFromRegisteredName(username);
-        return chatLogger.getChannelsByUserId(userId);
+        return databaseService.retrieveConversationInfo(userId);
     }
+
 }

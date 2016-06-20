@@ -9,6 +9,15 @@ angular.module('chatProApp')
             $scope.pro = true;
             $scope.chats = [];
             $scope.activeChatTab=tabCount+1;
+            $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
+            
+            $scope.showHistory = function() {
+                $scope.proView = 'proHistories/chatHistory.html';
+            };
+
+            $scope.backToPanel = function() {
+                $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
+            };
 
             /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
             var initQueue = function () {

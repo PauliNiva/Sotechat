@@ -1,6 +1,7 @@
 package sotechat;
 
-public class Application {
+public class
+Application {
 
     private static Launcher launcher = new Launcher();
 
