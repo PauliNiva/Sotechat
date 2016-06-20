@@ -20,17 +20,20 @@ angular.module('chatProApp')
                 $scope.Conversations = [];
                 /** onko tietokannassa keskusteluja vai ei */
                 $scope.empty = false;
-
-
+                /** keskustelunakyman osoite */
+                $scope.view = 'proHistories/conversation.html';
+                /** naytetaanko keskustelunakyma */
+                $scope.showConv = false;
 
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
                     var userId = proStateService.getUserID();
-                    var response = proHistoryService.getHistory(userId).then(function() {
-                        if(response.value == null){
+                    proHistoryService.getHistory(userId).then(function(response) {
+                        var data = response.data;
+                        if(response == null){
                             $scope.Conversations = [];
-                        }else {
-                            $scope.Conversations = response;
+                        } else {
+                            $scope.Conversations = data;
                         }
                         if ($scope.Conversations.length > 0) {
                             $scope.empty = false;
@@ -38,6 +41,20 @@ angular.module('chatProApp')
                             $scope.empty = true;
                         }
                     })
+                };
+
+                /** haetaan naytettavat viestit ja siirrytaan ne nayttavalle sivulle */
+                $scope.showConversation = function (channelId) {
+                    proHistoryService.getMessages(channelId).then(function(response){
+                       var msghistory = response.data;
+                        if (msghistory.length > 0) {
+                            $scope.messagesLeft = true;
+                            $scope.messages = msghistory;
+                        }else {
+                            $scope.messagesLeft = false;
+                        }
+                        $scope.showConv = true;
+                    });
                 };
 
                 /** lisataan naytettavien keskustelujen maaraa */
@@ -56,7 +73,7 @@ angular.module('chatProApp')
                 };
 
                 /** lisataan naytettavien viestien maaraa */
-                var addMessageQuantity = function () {
+                $scope.addMessageQuantity = function () {
                     if ((-$scope.messageQuantity) < $scope.messages.length) {
                         $scope.messageQuantity -= 10;
                     } else {
@@ -70,27 +87,16 @@ angular.module('chatProApp')
                     $scope.messagesLeft = true;
                 };
 
-                /** haetaan naytettavat viestit ja siirrytaan ne nayttavalle sivulle */
-                var showConversation = function (channelId) {
-                    $scope.messages = proHistoryService.getMessages(channelId);
-                    if ($scope.messages.length > 0) {
-                        $scope.messagesLeft = true;
-                    }else {
-                        $scope.messagesLeft = false;
-                    }
-                    return proHistoryService.getConversationPage();
-                };
-
                 /** siirrytaan takaisin keskustelut -sivulle */
                 $scope.backToConversations = function () {
                     resetQuantity();
                     resetMessageQuantity();
                     $scope.left = true;
                     $scope.messagesLeft = true;
-                    return proHistoryService.getHistoryPage();
+                    $scope.showConv = false;
                 };
                 
-                /** alustetaan keskustelut kun kontrolleri adataan */
+                /** alustetaan keskustelut kun kontrolleri ladataan */
                 showHistory();
 
             }]);
