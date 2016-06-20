@@ -108,6 +108,8 @@ public class ValidatorService {
             return prefix + "Session is null";
         }
 
+        System.out.println("session id " + sessionId + " state " + session.get("state"));
+
         /** Ammattilaiskayttaja? */
         if (session.isPro()) {
             /** Loytyyko autentikaatio myos principal-oliosta? */
@@ -143,8 +145,10 @@ public class ValidatorService {
         }
         String channelId = splitted[3];
 
-        if (!session.isOnChannel(channelId)) {
-            return prefix + "Ei oikeutta kuunnella kanavaa!";
+        if (!session.hasAccessToChannel(channelId)) {
+            return prefix
+                    + "Ei oikeutta kuunnella kanavaa! userId "
+                    + session.get("userId");
         }
 
         /** Sessiolla on oikeus kuunnella kanavaa. */
@@ -206,7 +210,44 @@ public class ValidatorService {
         return "";
     }
 
+    /** Validoi pyynnon poistua chat-kanavalta.
+     * @param req req
+     * @param professional pro
+     * @param channelId channelId
+     * @return true jos salltiaan pyynto
+     */
+    public final boolean validateLeave(
+            final String sessionId,
+            final Principal professional,
+            final String channelId
+    ) {
+        /** Clientin session tarkistus. */
+        Session session = sessionRepo.getSessionObj(sessionId);
+        if (session == null) {
+            return false;
+        }
 
+        /** Jos sessioId kuuluu kirjautuneelle kayttajalle,
+         * varmistetaan viela autentikointi. */
+        String userId = session.get("userId");
+        if (mapper.isUserProfessional(userId)) {
+            if (professional == null) {
+                /** Joku esittaa hoitajaa varastetulla sessio-cookiella. */
+                return false;
+            }
+            if (!professional.getName().equals(session.get("username"))) {
+                /** Yksi hoitaja esittaa toista hoitajaa. */
+                return false;
+            }
+        }
+
+        if (!session.hasAccessToChannel(channelId)) {
+            /** Ei voi poistua kanavalta, jolla ei ole. */
+            return false;
+        }
+
+        return true;
+    }
 
 
     /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.

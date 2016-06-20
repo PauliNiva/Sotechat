@@ -166,7 +166,10 @@ public class QueueService {
         String channelIdWithPath = "/toClient/queue/" + channelId;
         Set<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session member : list) {
-            member.set("state", "chat");
+            /** Hoitajan tilan kuuluu aina olla "pro". */
+            if (!member.get("state").equals("pro")) {
+                member.set("state", "chat");
+            }
         }
     }
 
@@ -196,7 +199,7 @@ public class QueueService {
     }
 
     /** Palauttaa jonon Stringina, joka nayttaa JSON-ystavalliselta taulukolta.
-     * TODO: esimerkkioutput kommenttiin.
+     * Esim: {"jono": [{"channelId": "xyz", "category": "1", "username": "Ra"}]}
      * @return string
      */
     @Override
@@ -210,7 +213,6 @@ public class QueueService {
             output.append(item.toString());
         }
         output.append("]}");
-        System.out.println("TODO: Lisaa esimerkkioutput javadociin: " + output);
         return output.toString();
     }
 }

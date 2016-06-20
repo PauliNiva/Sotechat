@@ -59,6 +59,21 @@ public class SessionRepoImpl extends MapSessionRepository
      * @return Session-olio
      */
 
+    /** Merkitaan, etta sessioId on poistunut kanavalta channelId.
+     * @param channelId
+     * @param sessionId
+     */
+    @Override
+    public final synchronized void leaveChannel(
+            String channelId,
+            String sessionId
+    ) {
+        Session session = getSessionObj(sessionId);
+        session.removeChannel(channelId);
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+        mapperService.removeSessionFromChannel(channelIdWithPath, session);
+    }
+
     @Override
     public final synchronized Session updateSession(
             final HttpServletRequest req,

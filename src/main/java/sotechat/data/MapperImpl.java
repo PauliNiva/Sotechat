@@ -39,10 +39,16 @@ public class MapperImpl implements Mapper {
         this.professionalIDs = new HashSet<>();
 
         /** Kovakoodataan yksi hoitaja devausvaiheessa. */
+        /*
         mapUsernameToId("666", "hoitaja");
         professionalIDs.add("666");
         mapUsernameToId("667", "Hoitaja2");
         professionalIDs.add("667");
+        */
+    }
+
+    public void addProfessionalIds(String pId) {
+        this.professionalIDs.add(pId);
     }
 
     /** Tallentaa sekä tiedon mikä id vastaa mitäkin usernamea.
@@ -153,7 +159,7 @@ public class MapperImpl implements Mapper {
      * @param session
      */
     @Override
-    public final synchronized void removeSessionToChannel(
+    public final synchronized void removeSessionFromChannel(
             final String channelIdWithPath,
             final Session session
     ) {
@@ -179,7 +185,7 @@ public class MapperImpl implements Mapper {
              * koskaan enempaa kuin yksi. */
             String newId = getFastRandomString();
             if (!mapByUserId.containsKey(newId)
-                    && !mapByChannelId.containsKey(newId)){
+                    && !mapByChannelId.containsKey(newId)) {
                 return newId;
             }
         }

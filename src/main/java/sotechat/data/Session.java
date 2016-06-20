@@ -32,6 +32,7 @@ public class Session {
     }
 
     public final void addChannel(final String channelId) {
+        System.out.println("Sallitaan userId:lle " + get("userId") + " kanava " + channelId);
         channels.add(channelId);
         if (get("channelIds").isEmpty()) {
             /** Case: tavallinen kayttaja, jolla vain 1 kanava. */
@@ -70,7 +71,7 @@ public class Session {
      * @param channelId channelId
      * @return true jos on kanavalla
      */
-    public final boolean isOnChannel(final String channelId) {
+    public final boolean hasAccessToChannel(final String channelId) {
         return channels.contains(channelId);
     }
 

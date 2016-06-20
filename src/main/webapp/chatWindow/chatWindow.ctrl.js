@@ -71,7 +71,7 @@ angular.module('chatApp')
                     // Chat Logien broadcastauksen yhteydessa serveri saattaa
                     // lahettaa meille viesteja, jotka meilla jo on.
                     var message = getMessage(response.body);
-                    if (!messageIds[message.messageId]) {
+                    if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
                     }
