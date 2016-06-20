@@ -62,4 +62,6 @@ public interface Mapper {
             final String channelIdWithPath,
             final Session session
     );
+
+    void addProfessionalIds(String pId);
 }
