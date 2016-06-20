@@ -24,6 +24,21 @@
     height: 34px;
     padding: 4px 4px;
 }
+@media (max-width:1225px) {
+    .queueButton {
+        margin-bottom: 2px;
+        width: 100%;
+        min-width: 136px;
+    }
+
+    .proQueueDrop{
+        max-width: 100%;
+        margin-bottom: 10px;
+        height: 34px;
+        padding: 4px 4px;
+    }
+
+}
 .proQueueDropOption {
     height: 24px;
     padding: 4px 4px;
@@ -33,6 +48,7 @@
     padding-top: 3px;
     padding-bottom: 3px;
 }
+
 
 
 .pro-left{
@@ -72,4 +88,32 @@
 
 .loginLabel {
     font-size: large;
+}
+
+.historyHeader {
+    margin-top: 4px;
+}
+
+.historyConPanel {
+    margin-bottom: 0px;
+}
+
+.historyConPanelBody {
+    overflow-y: auto;
+    max-height: 416px;
+    width: auto;
+}
+
+.historyPanel {
+    margin-bottom: 4px;
+}
+
+.conTopic {
+    margin-bottom: 3px;
+}
+
+.conTopicText {
+    font-weight: bold;
+    text-decoration: underline;
+
 }

@@ -98,6 +98,7 @@ public class ValidatorService {
         if (session == null) {
             return "Can't request logs outside an active session!";
         }
+
         Channel channel = mapper.getChannel(channelId);
         String userId = session.get("userId");
         if (!channel.hasHistoricUser(userId)) {

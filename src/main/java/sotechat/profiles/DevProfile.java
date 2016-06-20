@@ -44,7 +44,7 @@ public class DevProfile {
         hoitaja.setUserId("666");
         hoitaja.setRole("ROLE_USER");
         personRepo.save(hoitaja);
-
+/*
         Conversation conversation = new Conversation("007", "6.6.2016");
         conversation.setCategory("Hammashoito");
         conversation.addPersonToConversation(admin);
@@ -62,5 +62,6 @@ public class DevProfile {
         messageRepo.save(message);
         conversation.addMessageToConversation(message);
         conversationRepo.save(conversation);
+        */
     }
 }

@@ -2,7 +2,7 @@ angular.module('chatProApp')
     .controller('historiesConversationController', ['$scope', 'proStateService','proHistoryService',
         function($scope, proStateService, proHistoryService) {
             /** kuinka paljon viesteja naytetaan */
-            $scope.messageQuantity = -10;
+            $scope.messageQuantity = -7;
             /** onko keskusteluja jaljella naytettavaksi */
             $scope.left = true;
             /** onko viesteja jaljella naytettavaksi */
@@ -38,7 +38,7 @@ angular.module('chatProApp')
             /** lisataan naytettavien viestien maaraa */
             $scope.addMessageQuantity = function () {
                 if ((-$scope.messageQuantity) < $scope.messages.length) {
-                    $scope.messageQuantity -= 10;
+                    $scope.messageQuantity -= 7;
                 } else if ($scope.messagesLeft == false ){
                     $scope.messagesLeft = true;
                 } else {
@@ -48,8 +48,8 @@ angular.module('chatProApp')
             };
 
             $scope.showLess = function () {
-                if($scope.messageQuantity<=-10){
-                    $scope.messageQuantity += 10;
+                if($scope.messageQuantity<=-7){
+                    $scope.messageQuantity += 7;
                     $scope.showLeft = false
                 } else {
                     $scope.messagesLeft = true;
@@ -58,7 +58,7 @@ angular.module('chatProApp')
 
             /** resetoidaan naytettavien viestien maara */
             var resetMessageQuantity = function () {
-                $scope.messageQuantity = -10;
+                $scope.messageQuantity = -7;
                 $scope.messagesLeft = true;
             };
             init();
