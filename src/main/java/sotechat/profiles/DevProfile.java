@@ -45,20 +45,22 @@ public class DevProfile {
         hoitaja.setRole("ROLE_USER");
         personRepo.save(hoitaja);
 
+        Conversation conversation = new Conversation("007", "6.6.2016");
+        conversation.setCategory("Hammashoito");
+        conversation.addPersonToConversation(admin);
+        conversationRepo.save(conversation);
+
+        admin.addConversationToPerson(conversation);
+        personRepo.save(admin);
+
         Message message = new Message();
         message.setChannelId("007");
         message.setContent("This project sux ballz!");
         message.setDate("6.6.2016");
-        message.setSender("admin");
-
-        Conversation conversation = new Conversation();
-
+        message.setSender("pauli");
         message.setConversation(conversation);
-
-        conversation.setChannelId("007");
-        conversation.setCategory("Hammashoito");
-        conversation.setDate("6.6.2016");
         messageRepo.save(message);
+        conversation.addMessageToConversation(message);
         conversationRepo.save(conversation);
     }
 }
