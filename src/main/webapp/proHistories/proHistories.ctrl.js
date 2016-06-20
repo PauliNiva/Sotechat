@@ -1,7 +1,3 @@
-/**
- * Created by varkoi on 17.6.2016.
- */
-
 angular.module('chatProApp')
         .controller('proHistoriesController', ['$scope', 'proStateService','proHistoryService',
             function($scope, proStateService, proHistoryService) {
@@ -24,6 +20,8 @@ angular.module('chatProApp')
                 $scope.view = 'proHistories/conversation.html';
                 /** naytetaanko keskustelunakyma */
                 $scope.showConv = false;
+                
+                $scope.myUsername = proStateService.getUsername();
 
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {

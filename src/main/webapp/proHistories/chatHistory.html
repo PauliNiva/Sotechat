@@ -10,13 +10,17 @@
     <div class="col-md-10" ng-hide="showConv">
         <div ng-hide="left">Ei enempää keskusteluja</div>
         <div ng-show="empty">Ei keskusteluja</div>
-    <div class="panel"
-         ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
-        <div class="panel-heading"
-             ng-click="showConversation(conversation.channelId)">
-            {{conversation.date | date:'dd.MM.yyyy HH:mm' }} {{ conversation.person }} {{
-            conversation.category }} </a>
-        </div>
+
+        <div class="panel panel-default" ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
+            <div class="panel-heading queuer-heading" ng-click="collapsed = !collapsed">
+                {{conversation.date | date:'dd.MM.yyyy HH:mm' }} {{ conversation.person }} {{
+                conversation.category }} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': collapsed, 'glyphicon-chevron-right': !collapsed}"></i>
+            </div>
+            <div class="panel-collapse collapse" uib-collapse="!collapsed">
+                <div class="panel-body">
+                    <history-conversation-component channel="{{conversation.channelId}}" myname="{{myUsername}}"></history-conversation-component>
+                </div>
+            </div>
     </div>
 
     </div>

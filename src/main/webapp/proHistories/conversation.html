@@ -1,8 +1,7 @@
-<a ng-click="backToConversations()" href="#">Takaisin</a>
-    <button ng-click="addMessageQuantity()">Näytä lisää</button>
-    <div ng-hide="messagesLeft" >Ei enempää viestejä</div>
-    <h2>{{ startTime | date: 'dd.MM.yyyy' }}</h2>
-    <div ng-repeat="message in messages | orderBy:'timeStamp':false | limitTo:messageQuantity">
-        <p> {{ message.timeStamp | date:'HH:mm' }} <strong>{{ message.username }}:</strong> {{ message.content }}</p>
+<div class="panel panel-default">
+<div class="panel-body chat-body">
+    <div ng-repeat="message in messages | orderBy:'timeStamp':false" class="message">
+        <div ng-include="'chatWindow/message.tpl.html'"></div>
     </div>
-
+</div>
+</div>
