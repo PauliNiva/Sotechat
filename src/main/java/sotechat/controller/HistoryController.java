@@ -14,9 +14,6 @@ import sotechat.wrappers.MsgToClient;
 import java.security.Principal;
 import java.util.List;
 
-/**
- * Created by Asus on 17.6.2016.
- */
 /** Reititys ammattilaiskayttajan pyynnolle
  *  "luettele kanavat, joilla olen ollut.".
  * Vastaukseen saatuaan kayttaja voisi hakea yksittaisen kanavan lokit

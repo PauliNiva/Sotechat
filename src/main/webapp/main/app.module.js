@@ -9,16 +9,16 @@ angular.module('chatProApp', ['luegg.directives', 'focus-if', 'ui.bootstrap', 'n
 
 });
 
-window.onbeforeunload = function (event) {
-    var message = 'Haluatko varmasti poistua?';
-    if (typeof event == 'undefined') {
-        event = window.event;
-    }
-    if (event) {
-        event.returnValue = message;
-    }
-    return message;
-};
+// window.onbeforeunload = function (event) {
+//     var message = 'Haluatko varmasti poistua?';
+//     if (typeof event == 'undefined') {
+//         event = window.event;
+//     }
+//     if (event) {
+//         event.returnValue = message;
+//     }
+//     return message;
+// };
 
 
 
