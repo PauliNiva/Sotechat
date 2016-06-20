@@ -2,10 +2,7 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.service.DatabaseService;
@@ -14,42 +11,53 @@ import sotechat.wrappers.MsgToClient;
 import java.security.Principal;
 import java.util.List;
 
-/** Reititys ammattilaiskayttajan pyynnolle
- *  "luettele kanavat, joilla olen ollut.".
- * Vastaukseen saatuaan kayttaja voisi hakea yksittaisen kanavan lokit
- * lahettamalla normaalin WS subscriben kyseiselle kanavalle.
+/** Reititys ammattilaiskayttajan historian selaamiseen liittyville pyynnoille:
+ *  - "luettele kanavat, joilla olen ollut."
+ *  - "anna kanavan x lokit".
  */
-@Controller
+@RestController
 public class HistoryController {
 
-    private DatabaseService databaseService;
+    /** Chat Logger. */
+    private ChatLogger chatLogger;
 
     /** Mapper. */
     private final Mapper mapper;
 
     /**
      * Konstruktori.
-     * @param dbservice databaseService
-     * @param pMapper mapper
+     * @param pChatLogger p
+     * @param pMapper p
      */
     @Autowired
-    public HistoryController(final DatabaseService dbservice,
-                             Mapper pMapper){
+    public HistoryController(
+            final ChatLogger pChatLogger,
+            final Mapper pMapper
+    ) {
+        this.chatLogger = pChatLogger;
         this.mapper = pMapper;
-        this.databaseService = dbservice;
     }
 
-    @RequestMapping(value = "/messages/{channelId}",
-            method = RequestMethod.GET)
+    /** Client pyytaa meilta tietyn kanavan lokeja.
+     * @param channelId channelId
+     * @return lokit, jos clientilla oikeus niihin. Muuten null.
+     */
+    @RequestMapping(value = "/getLogs/{channelId}", method = RequestMethod.GET)
     @ResponseBody
-    public final List<MsgToClient> getMessages(@PathVariable("channelId")
-                                                   final String channelId)
-                                                    throws Exception {
+    public final List<MsgToClient> getMessages(
+            final @PathVariable("channelId") String channelId
+    ) {
+        //TODO: Validate request
         System.out.println("Retrieving channel " + channelId + " ##########");
-        return databaseService.retrieveMessages(channelId);
+        return chatLogger.getLogs(channelId);
     }
 
-    @RequestMapping(value="/history", method = RequestMethod.GET)
+    /** Client pyytaa listauksen vanhoista keskusteluistaan.
+     * @param professional autentikointitiedot
+     * @return listaus, jos client autentikoitinut. Muuten null.
+     * @throws Exception
+     */
+    @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
     @ResponseBody
     public final List<ConvInfo> getConversations(final Principal professional)
                                                     throws Exception {
@@ -59,7 +67,7 @@ public class HistoryController {
         System.out.println("REQUESTING HISTORY ##########");
         String username = professional.getName();
         String userId = mapper.getIdFromRegisteredName(username);
-        return databaseService.retrieveConversationInfo(userId);
+        return chatLogger.getChannelsByUserId(userId);
     }
 
 }

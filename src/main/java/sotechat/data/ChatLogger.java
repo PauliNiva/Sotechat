@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import sotechat.service.DatabaseService;
+import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
@@ -106,7 +107,7 @@ public class ChatLogger {
     public final synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
-    ) throws Exception {
+    ) {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
@@ -119,21 +120,10 @@ public class ChatLogger {
      * @param userId userId
      * @return String muotoa ["kanava1", "kanava2"]
      */
-    public final synchronized String getChannelsByUserId(
+    public final synchronized List<ConvInfo> getChannelsByUserId(
             final String userId
-    ) throws Exception {
-        List<String> list = databaseService.personsConversations(userId);
-        StringBuilder sb = new StringBuilder();
-        for (String channelId : list) {
-            sb.append("\"" + channelId + "\", ");
-        }
-        if (!list.isEmpty()) {
-            /** Jos kanavia oli yli 0, poistetaan viimeinen pilkku ja vali. */
-            sb.deleteCharAt(sb.length() - 1);
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        sb.append("]");
-        return sb.toString();
+    ) {
+        return databaseService.getConvInfoListOfUserId(userId);
     }
 
     /** Getteri halutun kanavan logeille.
@@ -141,9 +131,9 @@ public class ChatLogger {
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
-    private synchronized List<MsgToClient> getLogs(
+    public final synchronized List<MsgToClient> getLogs(
             final String channelId
-    ) throws Exception {
+    ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */

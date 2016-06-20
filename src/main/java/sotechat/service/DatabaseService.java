@@ -99,29 +99,6 @@ public class DatabaseService {
     }
 
     /**
-     * Palauttaa listan henkiloon liittyvista channelid:sta eli henkilon
-     * kaikkien keskustelujen channelid:t listana.
-     * @param userId henkilon id
-     * @return List<String> henkiloon liittyvat channelid:t
-     * @throws Exception IllegalArgumentException
-     */
-    public final List<String> personsConversations(String userId)
-            {
-                try {
-                    Person person = personService.getPerson(userId);
-                    List<Conversation> convs = person.getConversationsOfPerson();
-                    List<String> channelIds = new ArrayList<String>();
-                    for(Conversation conv : convs){
-                        channelIds.add(conv.getChannelId());
-                    }
-                    return channelIds;
-                } catch (Exception e) {
-                    return new ArrayList<>();
-                }
-
-    }
-
-    /**
      * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun
      * viestit aikaleiman mukaan jarjestettyna listana MsgToClient olioita.
      * @param channelId keskustelun kanavan id
@@ -143,7 +120,7 @@ public class DatabaseService {
 
     }
 
-    public final List<ConvInfo> retrieveConversationInfo(String userId)
+    public final List<ConvInfo> getConvInfoListOfUserId(String userId)
             {
                 try {
                     Person person = personService.getPerson(userId);
