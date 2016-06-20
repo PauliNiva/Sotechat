@@ -73,3 +73,31 @@
 .loginLabel {
     font-size: large;
 }
+
+.historyHeader {
+    margin-top: 4px;
+}
+
+.historyConPanel {
+    margin-bottom: 0px;
+}
+
+.historyConPanelBody {
+    overflow-y: auto;
+    max-height: 416px;
+    width: auto;
+}
+
+.historyPanel {
+    margin-bottom: 4px;
+}
+
+.conTopic {
+    margin-bottom: 3px;
+}
+
+.conTopicText {
+    font-weight: bold;
+    text-decoration: underline;
+
+}

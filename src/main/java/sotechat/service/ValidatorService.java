@@ -98,10 +98,11 @@ public class ValidatorService {
         if (session == null) {
             return "Can't request logs outside an active session!";
         }
-        if (!session.hasAccessToChannel(channelId)) {
+       /*TODO: FIX
+       if (!session.hasAccessToChannel(channelId)) {
             return "Can't access other peoples' logs!";
         }
-
+*/
         /** Sallitaan pyynto. */
         return "";
     }
