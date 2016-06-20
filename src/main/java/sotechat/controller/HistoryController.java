@@ -27,20 +27,17 @@ public class HistoryController {
 
     private DatabaseService databaseService;
 
-    private final ChatLogger chatLogger;
-
     private final Mapper mapper;
 
     @Autowired
     public HistoryController(final DatabaseService dbservice,
-                             ChatLogger pChatLogger,
                              Mapper pMapper){
-        this.chatLogger = pChatLogger;
         this.mapper = pMapper;
         this.databaseService = dbservice;
     }
 
-    @RequestMapping(value = "/messages/{channelId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/messages/{channelId}",
+            method = RequestMethod.GET)
     @ResponseBody
     public final List<MsgToClient> getMessages(@PathVariable("channelId")
                                                    final String channelId)
@@ -48,24 +45,16 @@ public class HistoryController {
         return databaseService.retrieveMessages(channelId);
     }
 
-    @RequestMapping(value="/history/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value="/history", method = RequestMethod.GET)
     @ResponseBody
-    public final List<ConvInfo> getConversations(@PathVariable("userId")
-                                                     final String userId)
+    public final List<ConvInfo> getConversations(final Principal professional)
                                                     throws Exception {
+        if (professional == null){
+            return null;
+
+        String username = professional.getName();
+        String userId = mapper.getIdFromRegisteredName(username);
         return databaseService.retrieveConversationInfo(userId);
     }
 
-    @RequestMapping(value = "/getHistoricChannels", method = RequestMethod.GET)
-    @ResponseBody
-    public final String respondToHistoricChannelsRequest(
-            final Principal professional
-    ) throws Exception {
-        if (professional == null) {
-            return null;
-        }
-        String username = professional.getName();
-        String userId = mapper.getIdFromRegisteredName(username);
-        return chatLogger.getChannelsByUserId(userId);
-    }
 }

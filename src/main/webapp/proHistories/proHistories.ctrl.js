@@ -27,9 +27,9 @@ angular.module('chatProApp')
 
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
-                    var userId = proStateService.getUserID();
-                    proHistoryService.getHistory(userId).then(function(response) {
+                    proHistoryService.getHistory().then(function(response) {
                         var data = response.data;
+
                         if(response == null){
                             $scope.Conversations = [];
                         } else {

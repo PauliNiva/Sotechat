@@ -5,8 +5,8 @@
 angular.module('chatProApp')
     .factory('proHistoryService', ['$http', function ($http) {
         
-        function getHistory(userId){
-            return $http.get('/history/' + userId);
+        function getHistory(){
+            return $http.get('/history');
         }
 
         function getMessages(channelId){

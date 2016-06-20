@@ -14,8 +14,8 @@
          ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
         <div class="panel-heading"
              ng-click="showConversation(conversation.channelId)">
-            {{conversation.date | date:'dd.MM.yyyy HH:mm' }} {{ conversation.person }} {{
-            conversation.category }} </a>
+            {{conversation.date | date:'dd.MM.yyyy HH:mm' }} {{ conversation.person }}
+            {{conversation.category }} </a>
         </div>
     </div>
 
