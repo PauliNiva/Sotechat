@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
+import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
@@ -22,14 +23,16 @@ import sotechat.repo.PersonRepo;
 public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
+    private Mapper mapper;
+
+    @Autowired
     private PersonRepo personRepo;
 
     @Override
-    public Authentication authenticate(Authentication a)
+    public final Authentication authenticate(Authentication a)
             throws AuthenticationException {
         String loginName = a.getPrincipal().toString();
         String password = a.getCredentials().toString();
-
         Person person = personRepo.findByLoginName(loginName);
 
         if (person == null) {
@@ -37,7 +40,6 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
                     "Unable to authenticate user " + loginName) {
             };
         }
-
         if (!BCrypt.hashpw(password, person.getSalt())
                 .equals(person.getPassword())) {
             throw new AuthenticationException(
@@ -45,21 +47,29 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
             };
         }
 
-        List<GrantedAuthority> grantedAuths = new ArrayList<>();
-        grantedAuths.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        List<GrantedAuthority> grantedAuths = grantAuthority(person);
+        mapAuthenticatedPerson(person);
+        return new UsernamePasswordAuthenticationToken(person.getLoginName(),
+                password, grantedAuths);
+    }
 
+    private List<GrantedAuthority> grantAuthority(Person person) {
+        List<GrantedAuthority> grantedAuths = new ArrayList<>();
         if (person.getRole().equals("ROLE_ADMIN")) {
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
+        return grantedAuths;
+    }
 
-        return new UsernamePasswordAuthenticationToken(person.getLoginName(),
-                password, grantedAuths);
+    private void mapAuthenticatedPerson(Person person) {
+        mapper.mapUsernameToId(person.getUserId(), person.getUserName());
+        mapper.addProfessionalIds(person.getUserId());
     }
 
     @Override
-    public boolean supports(Class<?> type) {
+    public final boolean supports(Class<?> type) {
         return true;
     }
 }
