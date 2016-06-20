@@ -55,8 +55,10 @@ angular.module('chatApp')
             var getMessage = function (data) {
                 var message = JSON.parse(data);
                 message.I = message.username === userStateService.getUsername();
-                if (!message.I){
-                    $scope.chatText = 'Keskustelu käyttäjän '+ message.username + ' kanssa';
+                if (!angular.isUndefined(message.username)) {
+                    if (!message.I) {
+                        $scope.chatText = 'Keskustelu käyttäjän ' + message.username + ' kanssa';
+                    }
                 }
                 return message;
             };
