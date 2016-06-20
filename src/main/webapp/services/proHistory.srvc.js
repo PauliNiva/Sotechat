@@ -5,16 +5,6 @@
 angular.module('chatProApp')
     .factory('proHistoryService', ['$http', function ($http) {
         
-        var PROHISTORYURL = '/proHistory';
-        
-        function getHistoryPage(){
-            return $http.get(PROHISTORYURL);
-        };
-
-        function getConversationPage(){
-            return $http.get(PROHISTORYURL + '/Conversation');
-        }
-
         function getHistory(userId){
             return $http.get('/history/' + '666');
         }
@@ -24,8 +14,6 @@ angular.module('chatProApp')
         }
         
         var history = {
-            getHistoryPage: getHistoryPage,
-            getConversationPage: getConversationPage,
             getHistory: getHistory,
             getMessages: getMessages
         };

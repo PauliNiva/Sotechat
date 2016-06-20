@@ -26,15 +26,18 @@ angular.module('chatProApp')
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
                     var userId = proStateService.getUserID();
-                    $scope.Conversations = proHistoryService.getHistory(userId);
-                    if($scope.Conversations.empty){
-                        $scope.Conversations = [];
-                    }
-                    if ($scope.Conversations.length > 0) {
-                        $scope.empty = false;
-                    } else {
-                        $scope.empty = true;
-                    }
+                    var response = proHistoryService.getHistory(userId).then(function() {
+                        if(response.value == null){
+                            $scope.Conversations = [];
+                        }else {
+                            $scope.Conversations = response;
+                        }
+                        if ($scope.Conversations.length > 0) {
+                            $scope.empty = false;
+                        } else {
+                            $scope.empty = true;
+                        }
+                    })
                 };
 
                 /** lisataan naytettavien keskustelujen maaraa */
