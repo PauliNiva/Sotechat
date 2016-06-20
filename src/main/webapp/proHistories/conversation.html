@@ -1,8 +1,8 @@
 <a ng-click="backToConversations()" href="#">Takaisin</a>
-    <button ng-click="addQuantity()">Näytä lisää</button>
+    <button ng-click="addMessageQuantity()">Näytä lisää</button>
     <div ng-hide="messagesLeft" >Ei enempää viestejä</div>
+    <h2>{{ startTime | date: 'dd.MM.yyyy' }}</h2>
     <div ng-repeat="message in messages | orderBy:'timeStamp':false | limitTo:messageQuantity">
-        <p> {{ message.timeStamp | date:'dd.MM.yyyy HH:mm' }} {{ message.username }} </p>
-        <p> {{ message.content }}</p>
+        <p> {{ message.timeStamp | date:'HH:mm' }} <strong>{{ message.username }}:</strong> {{ message.content }}</p>
     </div>
 

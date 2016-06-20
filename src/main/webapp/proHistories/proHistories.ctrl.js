@@ -50,6 +50,7 @@ angular.module('chatProApp')
                         if (msghistory.length > 0) {
                             $scope.messagesLeft = true;
                             $scope.messages = msghistory;
+                            $scope.startTime = msghistory[0].timeStamp; 
                         }else {
                             $scope.messagesLeft = false;
                         }
@@ -61,6 +62,8 @@ angular.module('chatProApp')
                 $scope.addQuantity = function () {
                     if ((-$scope.quantity) < $scope.Conversations.length) {
                         $scope.quantity -= 10;
+                    } else if ($scope.left == false) {
+                        $scope.left = true;
                     } else {
                         $scope.left = false;
                     }
@@ -76,6 +79,8 @@ angular.module('chatProApp')
                 $scope.addMessageQuantity = function () {
                     if ((-$scope.messageQuantity) < $scope.messages.length) {
                         $scope.messageQuantity -= 10;
+                    } else if ($scope.messagesLeft == false ){
+                        $scope.messagesLeft = true;
                     } else {
                         $scope.messagesLeft = false;
                     }
@@ -91,8 +96,6 @@ angular.module('chatProApp')
                 $scope.backToConversations = function () {
                     resetQuantity();
                     resetMessageQuantity();
-                    $scope.left = true;
-                    $scope.messagesLeft = true;
                     $scope.showConv = false;
                 };
                 
