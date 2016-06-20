@@ -166,7 +166,10 @@ public class QueueService {
         String channelIdWithPath = "/toClient/queue/" + channelId;
         Set<Session> list = mapper.getSubscribers(channelIdWithPath);
         for (Session member : list) {
-            member.set("state", "chat");
+            /** Hoitajan tilan kuuluu aina olla "pro". */
+            if (!member.get("state").equals("pro")) {
+                member.set("state", "chat");
+            }
         }
     }
 

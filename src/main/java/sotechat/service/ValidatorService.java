@@ -108,6 +108,8 @@ public class ValidatorService {
             return prefix + "Session is null";
         }
 
+        System.out.println("session id " + sessionId + " state " + session.get("state"));
+
         /** Ammattilaiskayttaja? */
         if (session.isPro()) {
             /** Loytyyko autentikaatio myos principal-oliosta? */
