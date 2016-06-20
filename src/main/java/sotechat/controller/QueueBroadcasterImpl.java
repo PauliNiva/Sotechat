@@ -33,25 +33,9 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     }
 
     /** Tiedottaa jonon tilanteen kaikille QBCC subscribaajille (hoitajille).
-     * Timeria kaytetaan samanaikaisuusongelmien korjaamiseen.
      * TODO: Protection against flooding (max 1 broadcast/second).
      */
     public final void broadcastQueue() {
-        int delay = 50; // milliseconds. TODO: test 1ms, pitaisi toimia.
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                syncBcQ();
-            }
-        }, delay);
-
-    }
-
-    /** Timerin kutsuma broadcast.
-     * TODO: Refactor
-     */
-    private synchronized void syncBcQ() {
         String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         String qAsJson = queueService.toString();
         broker.convertAndSend(qbcc, qAsJson);

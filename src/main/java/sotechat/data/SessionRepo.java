@@ -15,7 +15,9 @@ public interface SessionRepo {
             String sessionId
     );
 
-    /** Paivittaa tarpeen vaatiessa session attribuutteja.
+    /** Paivittaa tarpeen vaatiessa
+     *  - sessio-objekti mappaykset
+     *  - sessio-attribuutit (kutsumalla metodia updateSessionAttributes)
      * @param req taalta sessioId
      * @param professional taalta kirjautumistiedot
      * @return sessio-olio
@@ -25,10 +27,19 @@ public interface SessionRepo {
             Principal professional
     );
 
+    /** Paivittaa tarpeen vaatiessa sessio-attribuutit.
+     * @param session sessio
+     * @param professional kirjautumistiedot
+     */
     void updateSessionAttributes(
             final Session session,
             final Principal professional
     );
 
     void removeSession(final String sessionId);
+
+    public void leaveChannel(
+            String channelId,
+            String sessionId
+    );
 }

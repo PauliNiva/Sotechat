@@ -88,8 +88,7 @@ public class ChatLogger {
         String timeStamp = msgToClient.getTimeStamp();
         String channelId = msgToClient.getChannelId();
         try {
-            databaseService.saveMsgToDatabase(
-                    username, content, timeStamp, channelId);
+            databaseService.saveMsg(username, content, timeStamp, channelId);
         } catch (Exception e) {
             System.out.println("Database exception! " + e.toString());
             /* Do not throw this exception! Even if saving message to db
@@ -107,14 +106,38 @@ public class ChatLogger {
     public final synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
-            ) {
+    ) {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
         }
     }
 
-    /** Getteri kanavan lokeille.
+    /** Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
+     * joilla kayttaja on ollut.
+     *
+     * @param userId userId
+     * @return String muotoa ["kanava1", "kanava2"]
+     */
+    public final synchronized String getChannelsByUserId(
+            final String userId
+    ) {
+        List<String> list = databaseService.personsConversations(userId);
+        StringBuilder sb = new StringBuilder();
+        for (String channelId : list) {
+            sb.append("\"" + channelId + "\", ");
+        }
+        if (!list.isEmpty()) {
+            /** Jos kanavia oli yli 0, poistetaan viimeinen pilkku ja vali. */
+            sb.deleteCharAt(sb.length() - 1);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /** Getteri halutun kanavan logeille.
+     * Yrittaa hakea ensin muistista, sitten tietokannasta.
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
@@ -123,12 +146,14 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
-            list = new ArrayList<>();
+            /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */
+            list = databaseService.retrieveMessages(channelId);
+            logs.put(channelId, list);
         }
         return list;
     }
 
-    /** Antaa seuraavan vapaan ID:n viestille.
+    /** Antaa seuraavan vapaan ID:n viestille AngularJS varten.
      * Joka kanavan viestit saapumisjarjestyksessa: 1,2,3...
      * @param channelId channelId
      * @return messageId
