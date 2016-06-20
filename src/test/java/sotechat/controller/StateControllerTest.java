@@ -49,7 +49,7 @@ public class StateControllerTest {
     @Before
     public void setUp() throws Exception {
         sessions = (SessionRepo)webApplicationContext
-                .getBean("sessionRepoImpl");
+                .getBean("sessionRepo");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 

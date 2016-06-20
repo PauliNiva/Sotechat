@@ -91,7 +91,7 @@ public class StateControllerQueueTest {
         Mockito.when(personRepo.findOne(any(String.class))).thenReturn(new Person());
         Mockito.when(conversationRepo.findOne(any(String.class))).thenReturn(new Conversation());
         this.mapper = (Mapper) context.getBean("mapper");
-        this.sessionRepo = (SessionRepo) context.getBean("sessionRepoImpl");
+        this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
