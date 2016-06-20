@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.service.DatabaseService;
+import sotechat.service.ValidatorService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
+
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
@@ -17,6 +20,9 @@ import java.util.List;
  */
 @RestController
 public class HistoryController {
+
+    /** Validator Service. */
+    private ValidatorService validatorService;
 
     /** Chat Logger. */
     private ChatLogger chatLogger;
@@ -31,9 +37,11 @@ public class HistoryController {
      */
     @Autowired
     public HistoryController(
+            final ValidatorService pValidatorService,
             final ChatLogger pChatLogger,
             final Mapper pMapper
     ) {
+        this.validatorService = pValidatorService;
         this.chatLogger = pChatLogger;
         this.mapper = pMapper;
     }
@@ -45,9 +53,15 @@ public class HistoryController {
     @RequestMapping(value = "/getLogs/{channelId}", method = RequestMethod.GET)
     @ResponseBody
     public final List<MsgToClient> getMessages(
-            final @PathVariable("channelId") String channelId
+            final @PathVariable("channelId") String channelId,
+            final HttpServletRequest req,
+            final Principal pro
     ) {
-        //TODO: Validate request
+        String error = validatorService.validateLogRequest(pro, req, channelId);
+        if (!error.isEmpty()) {
+            System.out.println("Hacking attempt with getLogs? " + error);
+            return null;
+        }
         System.out.println("Retrieving channel " + channelId + " ##########");
         return chatLogger.getLogs(channelId);
     }

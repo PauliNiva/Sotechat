@@ -85,6 +85,27 @@ public class ValidatorService {
         return "";
     }
 
+    public final String validateLogRequest(
+            final Principal principal,
+            final HttpServletRequest req,
+            final String channelId
+    ) {
+        if (principal == null) {
+            return "Unauthenticated user can't request logs!";
+        }
+        String sessionId = req.getSession().getId();
+        Session session = sessionRepo.getSessionObj(sessionId);
+        if (session == null) {
+            return "Can't request logs outside an active session!";
+        }
+        if (!session.hasAccessToChannel(channelId)) {
+            return "Can't access other peoples' logs!";
+        }
+
+        /** Sallitaan pyynto. */
+        return "";
+    }
+
 
     /** Sallitaanko subscription eli kanavan kuuntelu?.
      * Jos sallitaan, palauttaa tyhjan Stringin.
@@ -107,6 +128,7 @@ public class ValidatorService {
         if (session == null) {
             return prefix + "Session is null";
         }
+
 
         System.out.println("session id " + sessionId + " state " + session.get("state"));
 
