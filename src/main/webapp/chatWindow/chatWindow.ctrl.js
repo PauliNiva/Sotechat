@@ -1,10 +1,10 @@
 /** Kontrolleri paivittaa tietoja molempiin suuntiin:
  * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
-*/
+ */
 angular.module('chatApp')
-    .controller('chatController', ['$scope', 'stompSocket', 'connectToServer', 'userStateService', '$http',
-        function ($scope, stompSocket, connectToServer, userStateService, $http) {
+    .controller('chatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'userStateService', '$http',
+        function ($scope, $uibModal, stompSocket, connectToServer, userStateService, $http) {
             // "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             // "messageIds" sisaltaa messageId:t viesteille, jotta samaa
@@ -18,9 +18,17 @@ angular.module('chatApp')
 
 
             $scope.userLeave = function() {
-                sub.unsubscribe();
-                $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
-                $scope.chatClosed = true;
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'common/areUSureModal.tpl.html',
+                    controller: 'AreUSureModalController'
+                });
+
+                modalInstance.result.then(function(result) {
+                    sub.unsubscribe();
+                    $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
+                    $scope.chatClosed = true;
+                });
             };
 
             /** Funktio lahettaa servicen avulla tekstikentan
