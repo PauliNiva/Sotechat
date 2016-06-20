@@ -30,24 +30,25 @@
 <div class="col-lg-9 col-md-8 col-sm-8 chat-container">
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
-            <uib-tabset active="activeChatTab">
-                <uib-tab index="$index + 1" ng-repeat="chat in chats" heading="{{chat.title}}" name="{{chat.title}}" classes="chat-container">
-                    <div class="col-lg-9 col-md-8 col-sm-8 proContainer">
-                        <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>
-                    </div>
-                    <div class="col-lg-3 col-md-4 col-sm-4">
-                        <div class="panel panel-default">
-                            <div class="row">
-                                <div class="form-group">
-                                    <button type="button" class="btn btn-block btn-danger proButton" ng-click="removeChatTab(chat.channel)">Lopeta keskustelu
-                                    </button>
-                                </div>
+            <ul class="nav nav-tabs">
+                <li ng-repeat="chat in chats" name="{{chat.title}}" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
+            </ul>
+            <div ng-repeat="chat in chats" ng-show="activeChatTab == chat.index" class="chat-container">
+                <div class="col-lg-9 col-md-8 col-sm-8 proContainer">
+                    <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-4">
+                    <div class="panel panel-default">
+                        <div class="row">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-block btn-danger proButton" ng-click="removeChatTab(chat.channel)">Lopeta keskustelu
+                                </button>
                             </div>
-                            <div class="row" ng-include="'proPhrases/phrasePro.tpl.html'"></div>
                         </div>
+                        <div class="row" ng-include="'proPhrases/phrasePro.tpl.html'"></div>
                     </div>
-                </uib-tab>
-            </uib-tabset>
+                </div>
+            </div>
         </div>
     </div>
 </div>

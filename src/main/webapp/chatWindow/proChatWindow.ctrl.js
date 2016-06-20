@@ -47,9 +47,11 @@ angular.module('chatProApp')
              */
             var getMessage = function (data) {
                 var message = JSON.parse(data);
-                message.I = message.username === proStateService.getUsername();
-                if (!message.I) {
-                    $scope.chatText = 'Keskustelu käyttäjän '+ message.username + ' kanssa';
+                if (!angular.isUndefined(message.username)) {
+                    message.I = message.username === proStateService.getUsername();
+                    if (!message.I) {
+                        $scope.chatText = 'Keskustelu käyttäjän ' + message.username + ' kanssa';
+                    }
                 }
                 return message;
             };

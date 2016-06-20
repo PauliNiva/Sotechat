@@ -197,7 +197,6 @@ public class StateController {
             final HttpServletRequest req,
             final Principal pro
     ) {
-        System.out.println(channelId);
         String sessionId = req.getSession().getId();
         if (!validatorService.validateLeave(sessionId, pro, channelId)) {
             return;
