@@ -117,7 +117,6 @@ public class DatabaseService {
             MsgToClient newMsg = wrapMessage(message);
             messagelist.add(newMsg);
         }
-        Collections.sort(messagelist);
         return messagelist;
     }
 
