@@ -29,6 +29,7 @@ angular.module('chatProApp')
                 $scope.chats.push({title: 'Chat' + tabCount++, channel: channelID});
                 $timeout(function(){
                     $scope.activeChatTab=tabCount-1;
+                    console.log($scope.activeChatTab);
                 });
             };
             
@@ -41,11 +42,20 @@ angular.module('chatProApp')
 
                 modalInstance.result.then(function(result) {
                     $scope.$broadcast('unSubscribeChat', {'channelID' : channelID});
-                    $http.post("/leave/" + channelID);
+                    $http.post("/leave/" + channelID, {});
+                    console.log(tabCount);
+                    tabCount--;
+                    $timeout(function(){
+                        $scope.activeChatTab=tabCount-1;
+                    });
+                    console.log(tabCount);
+                    console.log($scope.activeChatTab);
+                    console.log($scope.chats);
                     var chatTabIndex =  arrayObjectIndexOf($scope.chats, channelID, 'channel');
                     if (chatTabIndex > -1) {
                         $scope.chats.splice(chatTabIndex, 1);
                     }
+                    console.log($scope.chats);
                 });
             };
 

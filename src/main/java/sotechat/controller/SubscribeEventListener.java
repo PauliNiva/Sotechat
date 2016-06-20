@@ -76,7 +76,11 @@ public class SubscribeEventListener
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                handleSubscribe((SessionSubscribeEvent) applicationEvent);
+                try {
+                    handleSubscribe((SessionSubscribeEvent) applicationEvent);
+                } catch (Exception e) {
+                    //TODO:Better?
+                }
             }
         }, delay);
     }
@@ -86,7 +90,7 @@ public class SubscribeEventListener
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
-    ) {
+    ) throws Exception {
         MessageHeaders headers = event.getMessage().getHeaders();
 
         /** Interceptor estaa subscribet, joista puuttuu sessionId.
