@@ -1,10 +1,5 @@
 package sotechat.connectionEvents;
 
-/**
- * Luokka, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys katkeaa.
- *
- * @param <S> Abstrakti olio.
- */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
@@ -13,6 +8,11 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 
+/**
+ * Luokka, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys katkeaa.
+ *
+ * @param <S> Abstrakti olio.
+ */
 public class WebSocketDisconnectHandler<S>
         implements ApplicationListener<SessionDisconnectEvent> {
 
@@ -27,7 +27,7 @@ public class WebSocketDisconnectHandler<S>
      * Olio, jonka vastuuseen kuuluu poistaa inaktiiviset käyttäjät jonosta.
      */
     @Autowired
-    private ConnectionHandler connectionHandler;
+    private QueueTimeout queueTimeout;
 
     /**
      * Konstruktori.
@@ -55,7 +55,7 @@ public class WebSocketDisconnectHandler<S>
                    sessionId);
        }*/
        if (user == null) {
-           this.connectionHandler
+           this.queueTimeout
                    .initiateWaitBeforeScanningForInactiveUsers(
                            sessionId);
        }

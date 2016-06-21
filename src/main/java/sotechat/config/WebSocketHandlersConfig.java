@@ -4,13 +4,10 @@ package sotechat.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.ExpiringSession;
-import sotechat.connectionEvents.ConnectionHandler;
+import sotechat.connectionEvents.QueueTimeout;
 import sotechat.connectionEvents.ConnectionRepo;
 import sotechat.connectionEvents.WebSocketConnectHandler;
-import sotechat.controller.QueueBroadcaster;
-import sotechat.data.SessionRepo;
 import sotechat.connectionEvents.WebSocketDisconnectHandler;
-import sotechat.service.QueueService;
 
 /**
  * Konfiguraatioluokka, jossa luodaan Springin käyttöön Beanit, jotka
@@ -32,13 +29,13 @@ public class WebSocketHandlersConfig<S extends ExpiringSession> {
     }
 
     /**
-     * Katso ConnectionHandler-luokasta tarkempi kuvaus.
+     * Katso QueueTimeout-luokasta tarkempi kuvaus.
      *
-     * @return Palautetaan ConnectionHandler-olio Beanina Springin käyttöön.
+     * @return Palautetaan QueueTimeout-olio Beanina Springin käyttöön.
      */
     @Bean
-    public ConnectionHandler connectionHandler() {
-        return new ConnectionHandler();
+    public QueueTimeout connectionHandler() {
+        return new QueueTimeout();
     }
 
     /**

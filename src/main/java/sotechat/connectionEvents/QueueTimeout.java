@@ -18,7 +18,7 @@ import java.util.TimerTask;
  * Käyttäjiä ei poisteta heti vaan WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT
  * _USERS-muuttujassa määritellyn odotusajan jälkeen.
  */
-public class ConnectionHandler {
+public class QueueTimeout {
 
     /**
      * ConnectionRepo-olio, josta päästään käsiksi sessioiden aktiivisuuteen,
@@ -61,7 +61,7 @@ public class ConnectionHandler {
     /**
      * Konstruktori
      */
-    public ConnectionHandler() {
+    public QueueTimeout() {
     }
 
     /**
