@@ -176,4 +176,14 @@ public class SessionRepo extends MapSessionRepository {
 
         return session;
     }
+
+
+
+
+    /** Testausta helpottamaan metodi sessioiden unohtamiseen. */
+    public final void forgetSessions() {
+        this.sessionsBySessionId.clear();
+        this.sessionsByUserId.clear();
+        this.proUserSessions.clear();
+    }
 }
