@@ -69,8 +69,6 @@ public class SessionRepo extends MapSessionRepository {
         Session session = getSessionFromSessionId(sessionId);
         session.removeChannel(channelId);
         Channel channel = mapper.getChannel(channelId);
-        channel.removeSubscriber(session);
-        channel.removeActiveUserId(session.get("userId"));
         for (String someUserId : channel.getActiveUserIds()) {
             Session someSession = getSessionFromUserId(someUserId);
             String someSessionId = someSession.get("sessionId");
@@ -81,7 +79,8 @@ public class SessionRepo extends MapSessionRepository {
                 sessionsBySessionId.remove(someSessionId);
             }
         }
-
+        channel.removeSubscriber(session);
+        channel.removeActiveUserId(session.get("userId"));
     }
 
     /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
