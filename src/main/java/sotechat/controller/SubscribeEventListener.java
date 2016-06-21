@@ -53,10 +53,6 @@ public class SubscribeEventListener
     public final void onApplicationEvent(
             final ApplicationEvent event
     ) {
-        if (SessionDisconnectEvent.class == event.getClass()) {
-            handleDisconnect((SessionDisconnectEvent) event);
-        }
-
         /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
         if (event.getClass() != SessionSubscribeEvent.class) {
             return;
@@ -78,7 +74,8 @@ public class SubscribeEventListener
         }, delay);
     }
 
-    /** Kasittelee subscribe -tapahtumat.
+    /** Kasittelee subscribe -tapahtumat
+     *      (sen jalkeen, kun Interceptor on validoinut ne).
      * @param event event
      */
     private synchronized void handleSubscribe(
@@ -94,8 +91,6 @@ public class SubscribeEventListener
 
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
-        Session session = sessionRepo.getSessionFromSessionId(sessionId);
-
         if (channelIdWithPath.isEmpty()) {
             return;
         }
@@ -109,13 +104,10 @@ public class SubscribeEventListener
 
         /** Add session to list of subscribers to channel.
          * HUOM: Aktivoituu seka /queue/ etta /chat/ subscribesta. */
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
         String channelId = channelIdWithPath.split("/")[3];
         Channel channel = mapper.getChannel(channelId);
         channel.addSubscriber(session);
-        System.out.println("########## Adding subscriber to channelId " + channelId + " , sessionId " + sessionId);
-        for (String meh : channel.getActiveUserIds()) {
-            System.out.println("           fodfnodfiodfidfg " + meh);
-        }
 
         /** Jos subscribattu /chat/kanavalle */
         String chatPrefix = "/toClient/chat/";
@@ -126,19 +118,6 @@ public class SubscribeEventListener
             String joinInfo = "{\"join\":\"" + session.get("username") + "\"}";
             broker.convertAndSend(channelIdWithPath, joinInfo);
         }
-    }
-
-    /** Disconnect eventin kasittely.
-     * @param event disconnect event
-     */
-    private synchronized void handleDisconnect(
-            final SessionDisconnectEvent event
-    ) {
-        System.out.println("DISCONNECT EVENT STRING: " + event.toString());
-        System.out.println("          ja id: " + event.getSessionId());
-        //TODO: yhdista WS Session Id:t HTTP Session Id:hen
-        //TODO: Ilmoitus "left channel" kaikille kanaville
-        //TODO: remove subscribe
     }
 
     /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
