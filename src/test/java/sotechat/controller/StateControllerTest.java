@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sotechat.Launcher;
+import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
 
 
@@ -40,14 +41,16 @@ public class StateControllerTest {
 
     private MockMvc mvc;
     private SessionRepo sessions;
+    private Mapper mapper;
 
     /** Before.
      * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
+        mapper = (Mapper)webApplicationContext.getBean("mapper");
         sessions = (SessionRepo)webApplicationContext
-                .getBean("sessionRepoImpl");
+                .getBean("sessionRepo");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -87,7 +90,7 @@ public class StateControllerTest {
     @Test
     public void joinPoolWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinQueue")
+        mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
         )
                 .andExpect(status().isOk())
@@ -120,7 +123,7 @@ public class StateControllerTest {
 
         /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinQueue")
+        mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .session(mockSession)
                     )
@@ -145,7 +148,7 @@ public class StateControllerTest {
 
         /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila eioo "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinQueue")
+        mvc.perform(post("/joinPool")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
                         .session(mockSession)
                         )
@@ -157,7 +160,9 @@ public class StateControllerTest {
 
     @Test
     public void joinPoolWithReservedScreennameFails() throws Exception {
-       MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        this.mapper.mapProUsernameToUserId("hoitaja", "666");
+
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
@@ -171,7 +176,7 @@ public class StateControllerTest {
         /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinQueue")
+        mvc.perform(post("/joinPool")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))
                 .andExpect(status().isOk())
