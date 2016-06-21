@@ -12,6 +12,7 @@ import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @Configuration
 @Profile("development")
@@ -45,6 +46,7 @@ public class DevProfile {
         hoitaja.setRole("ROLE_USER");
         personRepo.save(hoitaja);
 
+        /*
         Conversation conversation = new Conversation("007", "6.6.2016");
         conversation.setCategory("Hammashoito");
         conversation.addPersonToConversation(admin);
@@ -60,7 +62,16 @@ public class DevProfile {
         message.setSender("pauli");
         message.setConversation(conversation);
         messageRepo.save(message);
+
         conversation.addMessageToConversation(message);
         conversationRepo.save(conversation);
+        */
+    }
+
+    @PreDestroy
+    public void cleanUp() {
+        personRepo.deleteAll();
+        conversationRepo.deleteAll();
+        messageRepo.deleteAll();
     }
 }

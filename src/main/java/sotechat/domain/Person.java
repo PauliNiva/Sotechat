@@ -37,6 +37,7 @@ public class Person {
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
 
+    /** Henkilon rooli. */
     private String role;
 
     /**
@@ -149,10 +150,18 @@ public class Person {
         this.userId = userId;
     }
 
+    /**
+     * Palauttaa henkilon roolin.
+     * @return String henkilon rooli
+     */
     public final String getRole() {
         return this.role;
     }
 
+    /**
+     * Asettaa hemkilon roolin.
+     * @param pRole henkilän rooli merkkijonona.
+     */
     public final void setRole(String pRole) {
         this.role = pRole;
     }

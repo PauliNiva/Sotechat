@@ -78,6 +78,7 @@ public class ConversationService {
      *             viesti liittyy
      * @throws Exception NullPointerException
      */
+
     @Transactional
     public Message addMessage(Message message, Conversation conv)
             throws Exception {
@@ -98,6 +99,7 @@ public class ConversationService {
      * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
      *                  lisata
      */
+    /*
     @Transactional
     public Message addMessage(Message message, String channelId) {
         Conversation conv = conversationRepo.findOne(channelId);
@@ -107,6 +109,7 @@ public class ConversationService {
         conversationRepo.save(conv);
         return messageToBeAddedToConversation;
     }
+    */
 
     /**
      * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
