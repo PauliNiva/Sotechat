@@ -74,7 +74,6 @@ public class HistoryController {
     /** Client pyytaa listauksen vanhoista keskusteluistaan.
      * @param professional autentikointitiedot
      * @return listaus, jos client autentikoitinut. Muuten null.
-     * @throws Exception
      */
     @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
     @ResponseBody
