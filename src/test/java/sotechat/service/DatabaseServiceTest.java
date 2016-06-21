@@ -42,6 +42,7 @@ public class DatabaseServiceTest {
     DatabaseService databaseService;
 
     @Before
+    @Transactional
     public void setUp() throws Exception {
         person = new Person("xxd");
         personRepo.save(person);
@@ -137,7 +138,10 @@ public class DatabaseServiceTest {
     @Transactional
     public void personsConversationsTest() throws Exception {
         Assert.assertTrue(databaseService.getConvInfoListOfUserId("xxd").isEmpty());
-        conversationRepo.save(new Conversation("1", "22xx"));
+        Assert.assertEquals(0, conversationRepo.count());
+        conversationRepo.save(new Conversation("22xx", "1"));
+
+        Assert.assertEquals(1, conversationRepo.count());
         databaseService.addPersonToConversation("xxd", "22xx");
         Assert.assertFalse(databaseService.getConvInfoListOfUserId("xxd").isEmpty());
     }
@@ -169,8 +173,8 @@ public class DatabaseServiceTest {
         databaseService.saveMsg("Anon", "Moikka!", "1", "224r");
         List<MsgToClient> msgs = databaseService.retrieveMessages("224r");
         Assert.assertEquals(2, msgs.size());
-        Assert.assertEquals("Moi", msgs.get(1).getContent());
-        Assert.assertEquals("Moikka!", msgs.get(0).getContent());
+        Assert.assertEquals("Moi", msgs.get(0).getContent());
+        Assert.assertEquals("Moikka!", msgs.get(1).getContent());
     }
 
     @Test
@@ -195,7 +199,7 @@ public class DatabaseServiceTest {
         conversation.setChannelId("224r");
         conversation.setDate("2");
         conversationRepo.save(conversation);
-        conversationRepo.save(new Conversation("3", "1xxx"));
+        conversationRepo.save(new Conversation("1xxx","3"));
         databaseService.saveMsg("Salla", "Moi", "2", "224r");
         databaseService.saveMsg("Anon", "Hello", "2", "1xxx");
         List<MsgToClient> msgs = databaseService.retrieveMessages("224r");
