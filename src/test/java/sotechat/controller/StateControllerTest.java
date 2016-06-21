@@ -24,6 +24,8 @@ import sotechat.repo.ConversationRepo;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
 
+import javax.transaction.Transactional;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @WebAppConfiguration
+@Transactional
 public class StateControllerTest {
 
     @Autowired
@@ -191,8 +194,4 @@ public class StateControllerTest {
                                    + "to reserved username.")));
     }
 
-    @After
-    public void tearDown() {
-        conversationRepo.deleteAll();
-    }
 }
