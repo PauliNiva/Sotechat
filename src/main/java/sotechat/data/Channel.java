@@ -11,12 +11,24 @@ import java.util.Set;
  */
 public class Channel {
 
+    /** ChannelId. */
     private String channelId;
+
+    /** Current Subscribers. */
     private Set<Session> currentSubscribers;
+
+    /** Active User Ids (oikeus osallistua, myos Session-olioissa). */
     private Set<String> activeUserIds;
+
+    /** Historic User Ids. */
     private Set<String> historicUserIds;
+
+    /** String of pro username assigned to this Channel. */
     private String assignedPro;
 
+    /** Konstruktori.
+     * @param pChannelId channelId/
+     */
     public Channel(
             final String pChannelId
     ) {

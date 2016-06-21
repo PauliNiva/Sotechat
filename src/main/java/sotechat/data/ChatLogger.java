@@ -19,10 +19,6 @@ public class ChatLogger {
     /** Avain = kanavan id. Arvo = lista viesteja (kanavan lokit). */
     private HashMap<String, List<MsgToClient>> logs;
 
-    /** Mapper. */
-    @Autowired
-    private Mapper mapper;
-
     /** Session Repository. */
     @Autowired
     private SessionRepo sessionRepo;
@@ -158,6 +154,7 @@ public class ChatLogger {
      * Taman vuoksi tata metodia on kutsuttava esim. kerran viikossa.
      * Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
      * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
+     * TODO: Testaa
      * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
      */
     public final synchronized void removeOldMessagesFromMemory(
