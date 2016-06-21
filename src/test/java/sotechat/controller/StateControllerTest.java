@@ -1,5 +1,6 @@
 package sotechat.controller;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
 
 
+import sotechat.repo.ConversationRepo;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
 
@@ -42,6 +44,9 @@ public class StateControllerTest {
     private MockMvc mvc;
     private SessionRepo sessions;
     private Mapper mapper;
+
+    @Autowired
+    private ConversationRepo conversationRepo;
 
     /** Before.
      * @throws Exception
@@ -184,5 +189,10 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.content",
                            is("Denied join pool request due "
                                    + "to reserved username.")));
+    }
+
+    @After
+    public void tearDown() {
+        conversationRepo.deleteAll();
     }
 }
