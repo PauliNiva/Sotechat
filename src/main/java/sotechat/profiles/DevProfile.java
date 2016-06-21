@@ -66,11 +66,4 @@ public class DevProfile {
         conversationRepo.save(conversation);
         */
     }
-
-    @PreDestroy
-    public void cleanUp() {
-        personRepo.deleteAll();
-        conversationRepo.deleteAll();
-        messageRepo.deleteAll();
-    }
 }

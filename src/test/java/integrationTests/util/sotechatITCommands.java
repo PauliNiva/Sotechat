@@ -1,9 +1,12 @@
 package integrationTests.util;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 /**
  * Selenium webdriverin käyttöä nopeuttavia funktioita hyväksymätestejä varten
@@ -69,6 +72,17 @@ public final class sotechatITCommands {
         waitElementPresent(wait, By.name("login")).submit();
     }
 
+    public static void proLogout(WebDriverWait wait) {
+        waitElementPresent(wait, By.name("menu")).click();
+        waitElementPresent(wait, By.name("logout")).click();
+    }
+
+    public static void endConversationPro(WebDriverWait wait) {
+        waitElementPresent(wait, By.name("endConversation")).click();
+        waitElementPresent(wait, By.name("sure")).click();
+        waitInVisibilityOfElement(wait, By.name("messageArea"));
+    }
+
     /**
      * Odottaa kunnes jonosta voi nostaa seuraavan ja sitten nostaa
      *
@@ -104,6 +118,10 @@ public final class sotechatITCommands {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
+    public static boolean waitInVisibilityOfElement(WebDriverWait wait, By by) {
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+    }
+
     /**
      * @param wait         Odottavaan webdriveriin kiinnitetty WebDriverWait
      * @param textToAppear Teksti jonka oletetaan ilmestyvän sivulle
@@ -114,5 +132,30 @@ public final class sotechatITCommands {
         wait.until(ExpectedConditions.presenceOfElementLocated(byXpath));
         return true;
     }
+
+
+
+    public static int countTabs(WebDriverWait wait, WebDriver driver, By by) {
+        return driver.findElements(by).size();
+    }
+
+    public static int tabsCountToBe(WebDriverWait wait, int count) {
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.name("chatTab"), count));
+        return count;
+    }
+
+    public static void sendMessageLastChatWindow(WebDriverWait wait, WebDriver driver, String message) {
+        List<WebElement> l = findAllElements(driver, By.name("messageArea"));
+        List<WebElement> l1 = findAllElements(driver, By.name("send"));
+        if (!l.isEmpty() && !l1.isEmpty()) {
+            l.get(l.size()-1).sendKeys(message);
+            l1.get(l1.size()-1).submit();
+        }
+    }
+
+    public static List<WebElement> findAllElements(WebDriver driver, By by) {
+        return driver.findElements(by);
+    }
+
 
 }

@@ -60,6 +60,7 @@ public class pickingClientFromPoolIT {
         waitFor(2, SECONDS);
         assertTrue(waitChatWindowsAppear(proWait).isDisplayed());
         waitChatWindowsAppear(userWait);
+        endConversationPro(proWait);
     }
 
     /**

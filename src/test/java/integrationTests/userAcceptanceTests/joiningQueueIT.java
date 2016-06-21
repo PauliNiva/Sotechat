@@ -59,6 +59,7 @@ public class joiningQueueIT {
         assertTrue(waitElementPresent(proWait,By.id("queuerBlock")).isDisplayed());
         waitAndPickFromQueue(proWait);
         waitChatWindowsAppear(userWait);
+        endConversationPro(proWait);
     }
 
 
