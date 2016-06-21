@@ -50,7 +50,7 @@ public class QueueService {
      * @param request req
      * @param payload payload
      */
-    public final synchronized void joinPool(
+    public final synchronized void joinQueue(
             final HttpServletRequest request,
             final JsonObject payload
     ) {
@@ -78,11 +78,7 @@ public class QueueService {
         session.set("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu. */
-        try {
-            databaseService.createConversation(username, channelId, category);
-        } catch (Exception e) {
-            System.out.println("Continuing despite db error(1)" + e.toString());
-        }
+        databaseService.createConversation(username, channelId, category);
 
         /** Luodaan aloitusviestista msgToServer-olio. */
         MsgToServer msgToServer = new MsgToServer();
@@ -99,38 +95,35 @@ public class QueueService {
     /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @return tyhja String jos poppaus epaonnistuu,
-     *          JSON {"content":"channel activated."} jos poppaus onnistuu.
+     * @return String pro username, kenelle popattu kanava kuuluu
      */
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
     ) {
+        Channel channel = mapper.getChannel(channelId);
         if (!removeFromQueue(channelId)) {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
-            return "";
+            return channel.getAssignedPro();
         }
         String sessionId =  accessor.getSessionAttributes()
                 .get("SPRING.SESSION.ID").toString();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         /** Lisataan popattu kanava poppaajan kanaviin. */
-        Channel channel = mapper.getChannel(channelId);
         channel.allowParticipation(session);
 
         /** Muutetaan popattavan kanavan henkiloiden tilaa. */
         changeParticipantsState(channelId);
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
-        try {
-            databaseService.addPersonToConversation(
-                    session.get("userId"), channelId);
-        } catch (Exception e) {
-            System.out.println("Continuing despite db error(1)" + e.toString());
-        }
+        String userId = session.get("userId");
+        databaseService.addPersonToConversation(userId, channelId);
 
-        /** Onnistui, palautetaan JSONi. */
-        return "{\"content\":\"channel activated.\"}";
+        /** Muistetaan ja palautetaan poppaajan nimi. */
+        String username = session.get("username");
+        channel.setAssignedPro(username);
+        return username;
     }
 
     /** Poistaa jonosta alkion, jonka channelId sama kuin parametrissa.

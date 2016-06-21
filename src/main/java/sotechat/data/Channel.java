@@ -15,6 +15,7 @@ public class Channel {
     private Set<Session> currentSubscribers;
     private Set<String> activeUserIds;
     private Set<String> historicUserIds;
+    private String assignedPro;
 
     public Channel(
             final String pChannelId
@@ -23,6 +24,7 @@ public class Channel {
         currentSubscribers = new HashSet<>();
         activeUserIds = new HashSet<>();
         historicUserIds = new HashSet<>();
+        this.assignedPro = "";
     }
 
     /** Kirjaa Channel-olioon ja Session-olioon oikeuden osallistua kanavalle.
@@ -119,6 +121,19 @@ public class Channel {
         return historicUserIds;
     }
 
+    /** Palauttaa usernamen, kenelle pro:lle kanava on assignattu.
+     * @return String
+     */
+    public final String getAssignedPro() {
+        return assignedPro;
+    }
 
-
+    /** Asettaa parametrina annetun usernamen taman kavan pro:ksi.
+     * @param username pro
+     */
+    public final void setAssignedPro(
+            final String username
+    ) {
+        assignedPro = username;
+    }
 }

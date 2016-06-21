@@ -147,23 +147,28 @@ public class StateController {
         }
 
         /** Suorittaminen. */
-        queueService.joinPool(req, payload);
+        queueService.joinQueue(req, payload);
         queueBroadcaster.broadcastQueue();
         return "OK, please request new state now.";
     }
 
-    /** Kasitellaan subscribe-pyynto /queue/id/, joka tulee
-     * kun hoitaja ottaa jonosta uuden chatin.
+    /** Kun hoitaja yrittaa ottaa jonosta uuden chatin, client lahettaa
+     * subscribe-pyynnon /queue/id/ ja tama metodi aktivoituu.
      *
      *  Toimenpiteet mita tehdaan:
      *  - Poistetaan jonosta kyseinen chatti.
      *  - Broadcastataan jonon uusi tila hoitajille
-     *  - Kerrotaan kanavan osallisille, etta chatti on auki.
+     *  - Kerrotaan kaikille asianomaisille (/queue/id/ subscribaajille),
+     *    kenelle hoitajalle kanava kuuluu. Huomaa palautusarvon selitys!
      * @param channelId channelId
      * @param accessor accessor
-     * @return Joko tyhja String "" tai JSON {"content":"channel activated."}
-     *          Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle
-     *          seka hoitajalle tiedoksi, etta poppaus onnistui.
+     * @return Palautusarvo lahetetaan JSONina jonotuskanavalle.
+     *          esim. {"channel assigned to":"Hoitaja Anne"}
+     *          Kayttotapauksia viestille:
+     *          - Kerrotaan jonottajalle, etta chatti on auki
+     *          - Poppausta yrittanyt client tietaa, etta poppaus onnistui
+     *          - Poppausta yrittanyt client tietaa, etta joku toinen ehti
+     *              juuri popata ennen meita.
      */
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
@@ -178,19 +183,15 @@ public class StateController {
             return "";
         }
 
-        /** Yritetaan popata. */
-        String wakeUp = queueService.popQueue(channelId, accessor);
-        if (wakeUp.isEmpty()) {
-            /** Case: Toinen auth ehtikin popata taman ennen meita. */
-            return "";
-        }
+        /** Yritetaan popata ja haetaan username kenelle kanava on popattu. */
+        String assignee = queueService.popQueue(channelId, accessor);
 
         /** Broadcastataan jonon tila kaikille ammattilaisille.
          * HUOM: Ei broadcastata viesteja viela. Vasta kun joku subscribaa. */
         queueBroadcaster.broadcastQueue();
 
-        /** Palautetaan kanavan osallisille tieto, etta poppaus onnistui. */
-        return wakeUp;
+        /** Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
+        return "{\"channel assigned to\":\"" + assignee + "\"}";
     }
 
     /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).

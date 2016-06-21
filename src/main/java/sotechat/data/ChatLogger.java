@@ -83,7 +83,6 @@ public class ChatLogger {
     }
 
     /** Tries to save message to database.
-     * In case of failure, does NOT throw an exception.
      * @param msgToClient msgToClient.
      */
     private void saveToDatabase(
@@ -93,13 +92,7 @@ public class ChatLogger {
         String content = msgToClient.getContent();
         String timeStamp = msgToClient.getTimeStamp();
         String channelId = msgToClient.getChannelId();
-        try {
-            databaseService.saveMsg(username, content, timeStamp, channelId);
-        } catch (Exception e) {
-            System.out.println("Database exception! " + e.toString());
-            /* Do not throw this exception! Even if saving message to db
-               fails, we still want to deliver the message. */
-        }
+        databaseService.saveMsg(username, content, timeStamp, channelId);
     }
 
     /** Metodi lahettaa kanavan chat-logit kanavan subscribaajille.

@@ -49,7 +49,7 @@ public class StateControllerTest {
     @Before
     public void setUp() throws Exception {
         sessions = (SessionRepo)webApplicationContext
-                .getBean("sessionRepo");
+                .getBean("sessionRepoImpl");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -89,7 +89,7 @@ public class StateControllerTest {
     @Test
     public void joinPoolWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
         )
                 .andExpect(status().isOk())
@@ -102,7 +102,7 @@ public class StateControllerTest {
     public void joinPoolTypicalCaseWorks() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
                         .get("/userState")
@@ -120,9 +120,9 @@ public class StateControllerTest {
         // UserStateResponsen state on chat??? Pitää asettaa tila tässä keinotekoisesti.
         sessions.getSessionFromSessionId("007").set("state", "start");
 
-        /** Tehdaan sitten samalta 007-sessiolta kelpo /joinPool pyynto. */
+        /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .session(mockSession)
                     )
@@ -136,7 +136,7 @@ public class StateControllerTest {
     public void joinPoolWithWrongStateFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
                 .get("/userState")
                 .session(mockSession)
@@ -145,9 +145,9 @@ public class StateControllerTest {
         /** Asetetaan palvelimella session tilaksi "chat". */
         sessions.getSessionFromSessionId("007").set("state", "chat");
 
-        /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila eioo "start". */
+        /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila eioo "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
                         .session(mockSession)
                         )
@@ -161,7 +161,7 @@ public class StateControllerTest {
     public void joinPoolWithReservedScreennameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
                         .get("/userState")
                         .session(mockSession)
@@ -170,10 +170,10 @@ public class StateControllerTest {
         // Tässä kanssa jotain hämärää, userstateresponse palauttaa väärän tilan.
         sessions.getSessionFromSessionId("007").set("state", "start");
 
-        /** Tehdaan sitten samalta 007-sessiolta /joinPool pyynto,
+        /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
                 .session(mockSession))
                 .andExpect(status().isOk())
