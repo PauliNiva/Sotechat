@@ -130,7 +130,7 @@ public class QueueService {
      * @param channelId haettu channelId
      * @return true jos poisto onnistui, fail jos alkiota ei loytynyt.
      */
-    private boolean removeFromQueue(
+    public boolean removeFromQueue(
             final String channelId
     ) {
         /** Etsitaan jonosta oikea alkio. */

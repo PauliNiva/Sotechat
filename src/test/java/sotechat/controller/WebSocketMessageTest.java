@@ -49,10 +49,10 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
 
-///**
-// * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
-// *
-// */
+/**
+ * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
+ *
+ */
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(classes = {
 //        WebSocketMessageTest.TestWebSocketConfig.class,
@@ -90,7 +90,7 @@ import static org.mockito.Matchers.anyString;
 //    public void setUp() throws Exception {
 //        Mockito.when(conversationRepo.findOne(anyString()))
 //                .thenReturn(new Conversation());
-//        this.mapper = (Mapper) context.getBean("mapper");
+//        this.mapper = (Mapper) context.getBean("mapperImpl");
 //        this.sessionRepo = (SessionRepo) context.getBean("sessionRepoImpl");
 //        this.mapper.mapUsernameToId("666", "hoitaja");
 //        this.mapper.mapUsernameToId("676", "Morko");
@@ -211,7 +211,7 @@ import static org.mockito.Matchers.anyString;
 //            assertTrue(msgUtil.getMsgUtilSet().contains(key));
 //        }
 //    }
-//
+///*
 //    @Test
 //    public void unAuthenticatedRegisteredUserDoesNotReceiveResponse()
 //        throws Exception {
@@ -234,12 +234,13 @@ import static org.mockito.Matchers.anyString;
 //        this.clientInboundChannel.send(message);
 //
 //        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
+//        */
 //        /**
 //         * Ei pitaisi tulla vastausta, koska rekisteroityneella kayttajalla
 //         * eli hoitajalla ei ole Principal-statusta eli han ei ole kirjautunut.
 //         */
-//        assertNull(reply);
-//    }
+//      //  assertNull(reply);
+//   // }
 //
 //    @Test
 //    public void serverDoesntAcceptMessageFromUserIfUserIdDoesntExist()

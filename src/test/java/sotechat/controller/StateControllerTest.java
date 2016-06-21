@@ -22,8 +22,6 @@ import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -159,7 +157,7 @@ public class StateControllerTest {
 
     @Test
     public void joinPoolWithReservedScreennameFails() throws Exception {
-        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+       MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
@@ -174,13 +172,12 @@ public class StateControllerTest {
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinQueue")
-                .contentType(MediaType.APPLICATION_JSON).content(json)
-                .session(mockSession))
+        .contentType(MediaType.APPLICATION_JSON).content(json)
+        .session(mockSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                        is("Denied join pool request due "
-                                + "to reserved username.")));
+                           is("Denied join pool request due "
+                                   + "to reserved username.")));
     }
-
 }

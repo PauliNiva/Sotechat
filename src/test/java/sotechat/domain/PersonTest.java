@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 public class PersonTest {
 
     private Person person;
+    private String role = "USER_ADMIN";
 
     @Before
     public void setUp() {
@@ -35,5 +36,16 @@ public class PersonTest {
         person.setPassword("0000");
         Assert.assertTrue(BCrypt.checkpw("0000", person.getPassword()));
     }
-    
+
+    @Test
+    public void setAndGetRoleTest() {
+        person.setRole(role);
+        Assert.assertEquals(role, person.getRole());
+    }
+
+    @Test
+    public void getSaltIsNotNullTest() {
+        person.setPassword("0000");
+        Assert.assertNotNull(person.getSalt());
+    }
 }
