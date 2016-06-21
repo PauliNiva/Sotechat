@@ -166,8 +166,8 @@ public class StateController {
      *          esim. {"channel assigned to":"Hoitaja Anne"}
      *          Kayttotapauksia viestille:
      *          - Kerrotaan jonottajalle, etta chatti on auki
-     *          - Poppausta yrittanyt client tietaa, etta poppaus onnistui
-     *          - Poppausta yrittanyt client tietaa, etta joku toinen ehti
+     *          - Poppausta yrittanyt client saa kuulla, etta poppaus onnistui
+     *          - Poppausta yrittanyt client saa kuulla, etta joku toinen ehti
      *              juuri popata ennen meita.
      */
     @MessageMapping("/toServer/queue/{channelId}")

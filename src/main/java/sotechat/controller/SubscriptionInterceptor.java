@@ -13,6 +13,8 @@ import java.security.Principal;
 
 /**
  * Sallii/kieltaa subscriptionin kayttajaoikeuksista riippuen.
+ * Jos Interceptoria ei ole, kuka tahansa voi subscribaa esimerkiksi
+ * kanavalle /toClient/* ja siten kuunnella salaa kaikkien viesteja.
  */
 @Component
 public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
@@ -53,10 +55,6 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
                 throw new IllegalArgumentException("Hacking attempt? " + error);
             }
         }
-
-        /** Myos viestien lahetyksen voisi sallia/estaa taalla, mutta
-         * se tehdaan ChatControllerissa. Esim:
-         * if (StompCommand.SEND.equals(headerAccessor.getCommand())) ... */
 
         return message;
     }
