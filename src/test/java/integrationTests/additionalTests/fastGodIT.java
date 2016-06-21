@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.Assert.assertEquals;
@@ -53,6 +54,8 @@ public class fastGodIT {
         sendMessageChatWindow(proWait, "kaa koo yy");
         assertTrue(waitForTextToAppear(proWait, "kaa koo yy"));
         assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
+
+        endConversationPro(proWait);
 
         handler.closeAll();
     }

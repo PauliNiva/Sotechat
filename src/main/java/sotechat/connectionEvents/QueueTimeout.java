@@ -110,11 +110,13 @@ public class QueueTimeout {
 
             System.out.println("Removing user with sessionId "
                     + sessionId + " from queue");
+            if (session != null) { //TODO:Jotain muuta?
+                String channelId = session.get("channelId");
 
-            String channelId = session.get("channelId");
-            this.sessionRepo.leaveChannel(channelId, sessionId);
-            this.queueService.removeFromQueue(channelId);
-            this.queueBroadcaster.broadcastQueue();
+                this.sessionRepo.leaveChannel(channelId, sessionId);
+                this.queueService.removeFromQueue(channelId);
+                this.queueBroadcaster.broadcastQueue();
+            }
         }
     }
 

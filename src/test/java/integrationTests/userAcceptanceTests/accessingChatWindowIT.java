@@ -56,6 +56,7 @@ public class accessingChatWindowIT {
 
         // A chat window is opened for the user
         assertTrue(waitChatWindowsAppear(userWait).isDisplayed());
+        endConversationPro(proWait);
     }
 
 

@@ -69,6 +69,7 @@ public class sendingMessageIT {
 
         assertEquals("", waitChatWindowsAppear(userWait).getText());
         assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
+        endConversationPro(proWait);
     }
 
 

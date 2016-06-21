@@ -65,7 +65,7 @@ public class viewingChatMessagesIT {
 
         // User sees it
         assertTrue(waitForTextToAppear(userWait, "kaa koo yy"));
-
+        endConversationPro(proWait);
     }
 
 

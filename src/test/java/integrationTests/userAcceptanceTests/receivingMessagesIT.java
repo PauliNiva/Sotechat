@@ -56,6 +56,7 @@ public class receivingMessagesIT {
 
         // User can view it in the chat window
         assertTrue(waitForTextToAppear(userWait,"Can you see this message?"));
+        endConversationPro(proWait);
     }
 
 
