@@ -86,7 +86,7 @@ public class WebSocketDisconnectTest {
     public void setUp() throws Exception {
         Mockito.when(conversationRepo.findOne(any(String.class)))
                 .thenReturn(new Conversation());
-        this.mapper = (Mapper) context.getBean("mapperImpl");
+        this.mapper = (Mapper) context.getBean("mapper");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
