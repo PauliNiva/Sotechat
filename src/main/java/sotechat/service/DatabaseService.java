@@ -163,7 +163,10 @@ public class DatabaseService {
        String channelId = conv.getChannelId();
        String date = conv.getDate();
        /** ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
-       String person = conv.getMessagesOfConversation().get(0).getSender();
+        String person = "";
+        if (conv.getMessagesOfConversation().size() > 0) {
+            person = conv.getMessagesOfConversation().get(0).getSender();
+        }
        String category = conv.getCategory();
        return new ConvInfo(channelId, date, person, category);
     }
