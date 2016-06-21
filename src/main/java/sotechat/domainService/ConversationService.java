@@ -12,7 +12,6 @@ import sotechat.repo.MessageRepo;
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
  * (CRUD -operaatiot)
- * Created by varkoi on 8.6.2016.
  */
 @Service
 public class ConversationService {
@@ -22,8 +21,6 @@ public class ConversationService {
 
     @Autowired
     private ConversationRepo conversationRepo;
-
-    /** Keskustelujen tallentamiseen */
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima

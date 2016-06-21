@@ -16,7 +16,7 @@ import java.util.Set;
 
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
-/** Luokan tehtava on validoida netista tuleva data
+/** Luokan tehtava on validoida netista tuleva data.
  *  (hyvaksya/siivota/kieltaytya vastaanottamasta). */
 @Service
 public class ValidatorService {
@@ -77,7 +77,7 @@ public class ValidatorService {
         /** Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
         Channel channel = mapper.getChannel(channelId);
-        if (!channel.hasActiveUser(userId)) {
+        if (!channel.hasActiveUser(userId)) { //TODO:NULL
             return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
@@ -179,7 +179,6 @@ public class ValidatorService {
         /** Sessiolla on oikeus kuunnella kanavaa. */
         return "";
     }
-
 
     /** Validointi pyynnolle liittya jonoon.
      * @param request req

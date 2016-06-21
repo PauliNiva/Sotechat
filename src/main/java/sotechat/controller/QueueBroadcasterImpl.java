@@ -5,8 +5,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import sotechat.service.QueueService;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Tiedottaa jonon tilanteesta kaikille QBCC subscribanneille. */

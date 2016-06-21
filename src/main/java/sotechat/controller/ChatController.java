@@ -52,8 +52,8 @@ public class ChatController {
     @SendTo("/toClient/chat/{channelId}")
     public final MsgToClient routeMessage(
             final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor acc
-            ) throws Exception {
+            final SimpMessageHeaderAccessor acc)
+            throws Exception {
 
         String error = validatorService.isMessageFraudulent(msgToServer, acc);
         if (!error.isEmpty()) {

@@ -107,7 +107,7 @@ public class DatabaseService {
     }
 
     /**
-     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
      * viestit aikaleiman mukaan jarjestettyna listana MsgToClient olioita.
      * @param channelId keskustelun kanavan id
      * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa

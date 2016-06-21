@@ -1,8 +1,5 @@
 package sotechat.wrappers;
 
-/**
- * Created by Asus on 19.6.2016.
- */
 public class ConvInfo {
 
     private String channelId;

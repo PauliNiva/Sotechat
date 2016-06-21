@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/** Tarjoaa palvelut jonoon lisaamiseen, jonosta
- * poistamiseen ja jonon tarkasteluun.
+/** Tarjoaa palvelut jonoon lisaamiseen.
+ *  Jonosta poistamiseen ja jonon tarkasteluun.
  * Tata Servicea ei tarvitse synkronisoida, koska queue on jo synkronisoitu.
  */
 @Service
@@ -74,7 +74,7 @@ public class QueueService {
 
         /** Asetetaan kayttaja jonoon odottamaan palvelua. */
         QueueItem item = new QueueItem(channelId, category, username);
-        queue.add(item);
+        queue.add(item); //TODO: metodi
         session.set("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu. */

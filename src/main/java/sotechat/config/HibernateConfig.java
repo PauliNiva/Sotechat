@@ -35,14 +35,17 @@ public class HibernateConfig {
      * Ajuri, jolla saadaan Javasta muodostettua yhteys tietokantaan.
      */
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
+
     /**
      * Salasana tietokantayhteyden muodostamiseksi.
      */
     private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
+
     /**
      * Osoite, josta SQL-tietokanta löytyy.
      */
     private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
+
     /**
      * Käyttäjänimi tietokantayhteyden muodostamiseksi.
      */
@@ -55,12 +58,14 @@ public class HibernateConfig {
      */
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT =
             "hibernate.dialect";
+
     /**
      * Mistä EntityManager-bean etsii @Entity-annotaatiolla merkittyjä
      * luokkia.
      */
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN =
             "entitymanager.packages.to.scan";
+
     /**
      * Miten toimitaan palvelimen käynnistys- ja sammutustilanteessa, voi olla
      * esim. että käynnistystilanteessa tietokanta pystytetään ja sammutus-
@@ -68,17 +73,20 @@ public class HibernateConfig {
      */
     private static final String PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO =
             "hibernate.hbm2ddl.auto";
+
     /**
      * Mistä Hibernate löytää Entity-luokat.
      */
     private static final String PROPERTY_NAME_PACKAGES_TO_SCAN =
             "sotechat.domain";
+
     /**
      * Miten SQL-tietokantataulut
      * nimetään @Entity-luokkien nimien pohjalta.
      */
     private static final String PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY =
             "hibernate.ejb.naming_strategy";
+
     /**
      * Näytetäänkö komentorivillä tietokantaoperaatiot.
      */

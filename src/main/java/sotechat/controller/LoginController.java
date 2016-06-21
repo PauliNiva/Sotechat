@@ -17,7 +17,7 @@ public class LoginController {
 
     /**
      * Liittää /auth polun kirjautumista ja sen tarkistamista varten.
-     * @param user Security principal joka liittyy evästeesen.
+     * @param user Security principal, joka liittyy evästeesen.
      *             Null, jos ei kirjautuneena.
      * @return Käyttäjän nimen, jos kirjautunut, muuten tyhjä JSON.
      */

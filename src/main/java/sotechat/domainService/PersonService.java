@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Luokka tietokannassa olevien Person -olioiden tallentamiseen
  * (CRUD -operaatiot)
- * Created by varkoi on 8.6.2016.
  */
 @Service
 public class PersonService {
@@ -101,7 +100,7 @@ public class PersonService {
             person.setUserName(newName);
             personRepo.save(person);
             return true;
-        }catch(Exception e) {
+        } catch(Exception e) {
             return false;
         }
     }
