@@ -9,9 +9,7 @@ import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /** Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
  */
@@ -154,5 +152,22 @@ public class ChatLogger {
             return "0";
         }
         return list.size() + "";
+    }
+
+
+    public synchronized void removeOldMessagesFromMemory(
+            int daysOld
+    ) {
+        Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
+                logs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<MsgToClient>> entry = iterator.next();
+            String channelId = entry.getKey();
+            List<MsgToClient> listOfMsgs = entry.getValue();
+            //if (channelIsOld(listOfMsgs, daysOld)) {
+            //    logs.remove(entry.getKey());
+            //}
+        }
+
     }
 }

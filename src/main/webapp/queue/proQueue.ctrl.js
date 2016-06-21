@@ -47,7 +47,7 @@ angular.module('chatProApp')
                 var checkChannelID = queueProService.checkChannelID(channelID);
                 if (checkChannelID != null) {
                     var checkIsPopOk = connectToServer.subscribe(CLIENTQUEUE + checkChannelID, function (response) {
-                        if (JSON.parse(response.body).content === 'channel activated.') {
+                        if (JSON.parse(response.body).channelAssignedTo === proStateService.getUsername()) {
                             $scope.addChatTab(checkChannelID);
                         }
                         checkIsPopOk.unsubscribe();

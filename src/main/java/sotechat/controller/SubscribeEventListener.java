@@ -96,7 +96,6 @@ public class SubscribeEventListener
                 .getDestination(headers);
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
-        System.out.println("Subscribing someone to " + channelIdWithPath);
         if (channelIdWithPath.isEmpty()) {
             return;
         }
@@ -113,6 +112,10 @@ public class SubscribeEventListener
         String channelId = channelIdWithPath.split("/")[3];
         Channel channel = mapper.getChannel(channelId);
         channel.addSubscriber(session);
+        System.out.println("########## Adding subscriber to channelId " + channelId + " , sessionId " + sessionId);
+        for (String meh : channel.getActiveUserIds()) {
+            System.out.println("           fodfnodfiodfidfg " + meh);
+        }
 
         /** Jos subscribattu /chat/kanavalle */
         String chatPrefix = "/toClient/chat/";

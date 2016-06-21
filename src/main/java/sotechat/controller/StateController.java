@@ -191,7 +191,7 @@ public class StateController {
         queueBroadcaster.broadcastQueue();
 
         /** Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
-        return "{\"channel assigned to\":\"" + assignee + "\"}";
+        return "{\"channelAssignedTo\":\"" + assignee + "\"}";
     }
 
     /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
