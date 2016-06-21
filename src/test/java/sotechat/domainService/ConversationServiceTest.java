@@ -38,7 +38,7 @@ public class ConversationServiceTest {
     @Before
     public void setUp() {
         this.conversation = new Conversation();
-        this.conversation.setChannelId("007");
+        this.conversation.setChannelId("009");
         this.conversation.setDate("2006");
         this.message1 = new Message();
         this.message2 = new Message();
@@ -59,9 +59,9 @@ public class ConversationServiceTest {
         Assert.assertEquals(2,
                 this.conversation.getMessagesOfConversation().size());
         conversationService.addConversation(conversation);
+        Assert.assertEquals(2, conversationRepo.count());
+        conversationService.removeConversation("009");
         Assert.assertEquals(1, conversationRepo.count());
-        conversationService.removeConversation("007");
-        Assert.assertEquals(0, conversationRepo.count());
     }
 
     @Test
@@ -73,8 +73,8 @@ public class ConversationServiceTest {
         conversationService.addMessage(message2, conversation);
         Assert.assertEquals(2, conversation.getMessagesOfConversation().size());
         conversationService.removeConversation(conversation.getChannelId());
-        Assert.assertEquals(0, conversationRepo.count());
-        Assert.assertEquals(0, messageRepo.count());
+        Assert.assertEquals(1, conversationRepo.count());
+        Assert.assertEquals(1, messageRepo.count());
     }
 
     @Test
@@ -83,11 +83,11 @@ public class ConversationServiceTest {
         Message msg1 = conversationService.addMessage(message1, conversation);
         Assert.assertEquals(1, conversation.getMessagesOfConversation().size());
         Message msg2 = conversationService.addMessage(message2, conversation);
-        Conversation conversation2 = conversationService.getConversation("007");
+        Conversation conversation2 = conversationService.getConversation("009");
         Assert.assertEquals(2,
                 conversation2.getMessagesOfConversation().size());
         conversationService.removeMessage(msg1);
-        Conversation conversation3 = conversationService.getConversation("007");
+        Conversation conversation3 = conversationService.getConversation("009");
         Assert.assertEquals(1,
                 conversation3.getMessagesOfConversation().size());
         conversationService.removeMessage(msg2);

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import sotechat.Application;
 import sotechat.Launcher;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
@@ -21,7 +22,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Launcher.class)
+@SpringApplicationConfiguration(classes = {Launcher.class, Application.class})
 @Transactional
 @ActiveProfiles("development")
 public class PersonServiceTest {
