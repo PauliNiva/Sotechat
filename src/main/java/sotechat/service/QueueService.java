@@ -113,7 +113,7 @@ public class QueueService {
     public final synchronized String popQueue(
             final String channelId,
             final SimpMessageHeaderAccessor accessor
-    ) throws Exception {
+    ) {
         Channel channel = mapper.getChannel(channelId);
         if (!removeFromQueue(channelId)) {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */

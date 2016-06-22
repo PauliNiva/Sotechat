@@ -7,7 +7,6 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import sotechat.data.*;
 
@@ -31,7 +30,7 @@ public class SubscribeEventListener
     @Autowired
     private QueueBroadcaster queueBroadcaster;
 
-    /** Taikoo viestien lahetyksen. */
+    /** Viestien lahetys. */
     @Autowired
     private SimpMessagingTemplate broker;
 
@@ -43,11 +42,8 @@ public class SubscribeEventListener
     @Autowired
     private Mapper mapper;
 
-    /** Siirtaa tehtavat "kasittele sub" ja "kasittele unsub" oikeille
-     * metodeille. Timeria kaytetaan, jotta subscribe -tapahtuma ehditaan
-     * suorittamaan loppuun ennen mahdollisia broadcasteja. Ilman timeria
-     * kay usein niin, etta juuri subscribannut kayttaja ei saa broadcastia.
-     * @param event kaikki applikaatioEventit aktivoivat taman.
+    /** Kaynnistaa SessionSubscribeEventeista timerin handleSubscribe-metodiin.
+     * @param event Kaikki applikaatioeventit aktivoivat taman metodin.
      */
     @Override
     public final void onApplicationEvent(
@@ -58,12 +54,27 @@ public class SubscribeEventListener
             return;
         }
 
-        /** Halutaan kasitella event, kunhan subscribe- tapahtuma on
-         * suoritettu loppuun. Muutoin juuri subscribannut
-         * kayttaja ei saa mahdollista broadcastia. Spring ei valitettavasti
-         * salli kyseisen logiikan kirjoittamista, joten on pakko
-         * kikkailla timerin kanssa. 1ms timer toimii lahes aina, mutta
-         * joskus sama ongelma toistuu sillakin. Kokeillaan 10ms timerilla. */
+        /** Eventin kasittelyn voi ajatella tapahtuvan kahdessa osassa:
+         * 1. Spring kirjaa kanavan subscribaajiin uuden kuuntelijan ylos
+         * 2. Logiikka handleSubscribe -metodissa
+         *
+         * Haluaisimme, etta 1) suoritetaan ennen 2).
+         *
+         * Valitettavasti tama EventListener aktivoituu kesken 1) suorituksen.
+         * Spring ei tarjoa meille nakyvyytta siihen, milloin 1) on suoritettu
+         * loppun.
+         *
+         * Jos kutsuisimme handleSubscribe -metodia suoraan tassa nyt,
+         * kavisi usein niin ettei uusi kuuntelija saa mahdollisia
+         * broadcasteja lainkaan, silla broadcastit lahetetaan kanavalle
+         * ennen kuin Spring on ehtinyt kirjata uuden kuuntelijan mukaan.
+         *
+         * Timerin avulla saadaan eventin kasittely tehtya eri threadissa,
+         * siina toivossa etta alkuperainen threadi on ehtinyt suorittaa
+         * subscriben kirjaamisen loppuun.
+         *
+         * Testattu: 1ms timer toimi lahes aina
+         * 10ms timerilla ei toistaiseksi havaittu samanaikaisuusvirheita. */
         Timer timer = new Timer();
         int delay = 10; // milliseconds
         timer.schedule(new TimerTask() {
