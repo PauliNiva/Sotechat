@@ -27,6 +27,7 @@ import sotechat.util.MockPrincipal;
 import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -101,6 +102,16 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.channelIds", is("[]")));
     }
 
+    @Test
+    public void cantAccessProStateWithoutAuthentication() throws Exception {
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get("/proState")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        assertEquals("", content);
+    }
 
     @Test
     public void testJoinQueueWithoutProperSessionFails() throws Exception {
