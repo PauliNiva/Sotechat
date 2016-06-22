@@ -22,7 +22,7 @@ public class Session {
         channels = new LinkedHashSet<>();
     }
 
-    /** Konstruktori.
+    /** Setteri attribuuteille.
      * @param key avain, esim. "username"
      * @param value arvo, esim. "Mikko"
      */

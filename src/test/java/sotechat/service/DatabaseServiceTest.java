@@ -19,9 +19,6 @@ import sotechat.wrappers.MsgToClient;
 import javax.transaction.Transactional;
 import java.util.List;
 
-/**
- * Created by varkoi on 14.6.2016.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @Transactional

@@ -1,4 +1,4 @@
-package sotechat.queue;
+package sotechat.wrappers;
 
 
 import org.junit.Assert;
