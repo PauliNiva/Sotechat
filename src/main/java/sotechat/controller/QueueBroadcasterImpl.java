@@ -26,7 +26,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     private Long lastBroadcastTime;
 
     /** Millisekunneissa minimiviive broadcastien valilla. */
-    public static final long QBC_DELAY_MS = 200L;
+    public static final long QBC_DELAY_MS = 100L;
 
     /** Konstruktori.
      * @param pQueueService queueService
