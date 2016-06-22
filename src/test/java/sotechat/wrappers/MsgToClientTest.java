@@ -10,10 +10,16 @@ public class MsgToClientTest {
      * m2c.
      */
     private MsgToClient m2c;
+    private MsgToClient m2c1;
+    private MsgToClient m2c2;
+    private MsgToClient m2c3;
 
     @Before
     public void setUp() {
         m2c = new MsgToClient("1", "pniva", "1", "2", "cont");
+        m2c1 = new MsgToClient("1", "pniva", "1", "1", "cont");
+        m2c2 = new MsgToClient("1", "pniva", "1", "2", "cont");
+        m2c3 = new MsgToClient("1", "pniva", "1", "3", "cont");
     }
 
     /**
@@ -46,5 +52,17 @@ public class MsgToClientTest {
     @Test
     public void getContent() {
         Assert.assertEquals("cont", m2c.getContent());
+    }
+
+    @Test
+    public void getMessageId() {
+        Assert.assertEquals("1", m2c.getMessageId());
+    }
+
+    @Test
+    public void compareTo() {
+        Assert.assertEquals(0, m2c.compareTo(m2c2));
+        Assert.assertEquals(-1, m2c.compareTo(m2c3));
+        Assert.assertEquals(1, m2c.compareTo(m2c1));
     }
 }
