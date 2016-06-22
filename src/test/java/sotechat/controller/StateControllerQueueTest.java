@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -43,6 +44,7 @@ import sotechat.wrappers.QueueItem;
 
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,6 +72,8 @@ public class StateControllerQueueTest {
 
     private SimpMessageHeaderAccessor accessor;
 
+    private MockChannelInterceptor brokerChannelInterceptor;
+
     private List<Session> queueItems;
 
     @Autowired
@@ -90,6 +94,8 @@ public class StateControllerQueueTest {
     @Autowired
     private StateController stateController;
 
+    @Autowired
+    private AbstractSubscribableChannel brokerChannel;
 
     @Before
     public void setUp() throws Exception {
@@ -106,6 +112,8 @@ public class StateControllerQueueTest {
         this.mapper.mapProUsernameToUserId("hoitaja2", "667");
         this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
         this.queueItems = new ArrayList();
+        this.brokerChannelInterceptor = new MockChannelInterceptor();
+        this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
     @After
@@ -117,13 +125,26 @@ public class StateControllerQueueTest {
     }
 
     @Test
+    public void normalUserCantPopFromQueue() throws Exception {
+        Session userInQueue = joinQueue("1111", "Hammas");
+
+        String channelId = userInQueue.get("channelId");
+
+        assertEquals(1, this.queueService.getQueueLength());
+        assertEquals("queue", userInQueue.get("state"));
+
+        Mockito.when(accessor.getUser()).thenReturn(null);
+
+        assertEquals("", this.stateController
+                .popClientFromQueue(channelId, this.accessor));
+    }
+
+    @Test
     public void professionalCanPopFromQueue() throws Exception {
         // Liitytään jonoon sessionId:llä 1111.
         Session userInQueue = joinQueue("1111", "Hammas");
 
         String channelId = userInQueue.get("channelId");
-
-        subscribeSessionToChannel(userInQueue, channelId);
 
         assertEquals(1, this.queueService.getQueueLength());
         assertEquals("queue", userInQueue.get("state"));
@@ -191,19 +212,18 @@ public class StateControllerQueueTest {
         Session firstUserInQueue = joinQueue("1111", "Hammas");
         String channelIdOfFirstUser = firstUserInQueue.get("channelId");
         assertEquals(1, this.queueService.getQueueLength());
-        subscribeSessionToChannel(firstUserInQueue, channelIdOfFirstUser);
 
         Session secondUserInQueue = joinQueue("1112", "Hammas");
         String channelIdOfSecondUser = secondUserInQueue.get("channelId");
         assertEquals(2, this.queueService.getQueueLength());
-        subscribeSessionToChannel(secondUserInQueue, channelIdOfSecondUser);
 
         Session thirdUserInQueue = joinQueue("1113", "Hammas");
         String channelIdOfThirdUser = thirdUserInQueue.get("channelId");
         assertEquals(3, this.queueService.getQueueLength());
-        subscribeSessionToChannel(thirdUserInQueue, channelIdOfThirdUser);
 
         assertEquals("queue", firstUserInQueue.get("state"));
+        assertEquals("queue", secondUserInQueue.get("state"));
+        assertEquals("queue", thirdUserInQueue.get("state"));
 
         Session proSession = logInAsAProfessional("hoitaja");
 
@@ -239,9 +259,9 @@ public class StateControllerQueueTest {
 
     @Test
     public void cantRemoveFromQueueWithNonexistentChannelId() throws Exception {
-        Session firstUser = joinQueue("1111", "Hammas");
-        Session secondUser = joinQueue("1112", "Hammas");
-        Session thirdUser = joinQueue("1113", "Hammas");
+        joinQueue("1111", "Hammas");
+        joinQueue("1112", "Hammas");
+        joinQueue("1113", "Hammas");
         this.queueService.removeFromQueue("abc");
         assertEquals(3, this.queueService.getQueueLength());
     }
@@ -286,6 +306,83 @@ public class StateControllerQueueTest {
         assertEquals(-1, length1);
     }
 
+    @Test
+    public void professionalCanLeaveChat() throws Exception {
+        Session userInQueue = joinQueue("1111", "Hammas");
+
+        String channelId = userInQueue.get("channelId");
+        String userId = userInQueue.get("userId");
+
+        assertEquals(1, this.queueService.getQueueLength());
+        assertEquals("queue", userInQueue.get("state"));
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
+        Principal mockPrincipal = new MockPrincipal("hoitaja");
+        Session proSession = sessionRepo.updateSession(mockRequest, mockPrincipal);
+
+        // Subscribetaan kirjautuva hoitaja kanavalle
+        subscribeSessionToChannel(proSession, channelId);
+
+        assertEquals("pro", proSession.get("state"));
+
+        Mockito.when(this.accessor.getUser()).thenReturn(new MockPrincipal("hoitaja"));
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("SPRING.SESSION.ID", "1234");
+        Mockito.when(this.accessor.getSessionAttributes()).thenReturn(sessionAttributes);
+
+        // Keskustelu alkaa
+        this.stateController.popClientFromQueue(channelId, this.accessor);
+        // Ketään ei jonossa
+        assertEquals(0, this.queueService.getQueueLength());
+        // Asiakkaan tila on chat
+        assertEquals("chat", userInQueue.get("state"));
+
+        // Hoitaja sulkee keskustelun
+        this.stateController.leaveChat(channelId, mockRequest, mockPrincipal);
+
+        // Asiakkaan sessio poistetaan keskustelun sulkemisen tuloksena
+        assertNull(this.sessionRepo.getSessionFromUserId(userId));
+        assertNull(this.sessionRepo.getSessionFromSessionId("1111"));
+    }
+
+    @Test
+    public void unAuthenticatedProCantLeaveChatProperly() throws Exception {
+        Session userInQueue = joinQueue("1111", "Hammas");
+
+        String channelId = userInQueue.get("channelId");
+        String userId = userInQueue.get("userId");
+
+        assertEquals(1, this.queueService.getQueueLength());
+        assertEquals("queue", userInQueue.get("state"));
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
+        Principal mockPrincipal = new MockPrincipal("hoitaja");
+        Session proSession = sessionRepo.updateSession(mockRequest, mockPrincipal);
+
+        // Subscribetaan kirjautuva hoitaja kanavalle
+        subscribeSessionToChannel(proSession, channelId);
+
+        assertEquals("pro", proSession.get("state"));
+
+        Mockito.when(this.accessor.getUser()).thenReturn(new MockPrincipal("hoitaja"));
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("SPRING.SESSION.ID", "1234");
+        Mockito.when(this.accessor.getSessionAttributes()).thenReturn(sessionAttributes);
+
+        // Keskustelu alkaa
+        this.stateController.popClientFromQueue(channelId, this.accessor);
+        // Ketään ei jonossa
+        assertEquals(0, this.queueService.getQueueLength());
+        // Asiakkaan tila on chat
+        assertEquals("chat", userInQueue.get("state"));
+
+        // Hoitaja sulkee keskustelun
+        this.stateController.leaveChat(channelId, mockRequest, null);
+
+        assertNotNull(this.sessionRepo.getSessionFromUserId(userId));
+        assertNotNull(this.sessionRepo.getSessionFromSessionId("1111"));
+    }
+
     // Apumetodeja
 
     public Session joinQueue(String sessionId, String category) {
@@ -296,6 +393,7 @@ public class StateControllerQueueTest {
         joiningPerson.set("category", category);
         this.queueService.joinQueue(joiningPerson, "Anon", "Hei!");
         this.queueItems.add(joiningPerson);
+        subscribeSessionToChannel(joiningPerson, joiningPerson.get("channelId"));
         return joiningPerson;
     }
 
