@@ -137,12 +137,13 @@ public class ValidatorService {
     /** Sallitaanko subscription eli kanavan kuuntelu?.
      * Jos sallitaan, palauttaa tyhjan Stringin.
      * Jos ei sallita, palauttaa virheilmoituksen.
+     * HUOM: Mockito vaatii, ettei metodi ole final!
      * @param principal autentikaatiotiedot
      * @param sessionId sessioId
      * @param channelIdWithPath channelIdWithPath
      * @return virheilmoitus Stringina jos ei sallita pyyntoa.
      */
-    public final String validateSubscription(
+    public String validateSubscription(
             final Principal principal,
             final String sessionId,
             final String channelIdWithPath

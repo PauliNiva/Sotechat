@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
-import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.util.MockHttpServletRequest;
 import sotechat.util.MockPrincipal;
