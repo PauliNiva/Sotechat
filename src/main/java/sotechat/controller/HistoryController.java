@@ -73,6 +73,7 @@ public class HistoryController {
 
     /** Client pyytaa listauksen vanhoista keskusteluistaan.
      * @param professional autentikointitiedot
+     * @param req req
      * @return listaus, jos client autentikoitinut. Muuten null.
      */
     @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
