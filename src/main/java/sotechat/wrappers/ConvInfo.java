@@ -29,23 +29,8 @@ public class ConvInfo {
         return person;
     }
 
-    public final void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
-
-    public final void setDate(String date) {
-        this.date = date;
-    }
-
-    public final void setPerson(String info) {
-        this.person = person;
-    }
-
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
 }
