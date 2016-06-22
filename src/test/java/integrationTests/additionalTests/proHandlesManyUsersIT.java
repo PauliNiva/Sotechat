@@ -5,6 +5,7 @@ import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
@@ -13,13 +14,14 @@ import org.openqa.selenium.support.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import static integrationTests.util.sotechatITCommands.*;
+import static org.junit.Assert.*;
 
 /**
  * As a user I want to send a message
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class zproHandlesManyUsersIT {
+public class proHandlesManyUsersIT {
 
     private static final int MAX_CUSTOMERS = 10;
     private DriverHandler handler;
@@ -48,8 +50,8 @@ public class zproHandlesManyUsersIT {
     /**
      * Test disabled while waiting for AngularJS changes.
      */
-    
-    public void KillerTest() {
+    @Test
+    public void KillerTest() throws InterruptedException {
 
         /** All customers join the queue. */
         for (WebDriver customer : customers) {
@@ -63,7 +65,8 @@ public class zproHandlesManyUsersIT {
         proLogin(proWait);
         for (int i = 0; i < MAX_CUSTOMERS; i++) {
             waitAndPickFromQueue(proWait);
-            sendMessageChatWindow(proWait, "Buhahaha");
+            assertEquals(i +1,tabsCountToBe(proWait, i+1));
+            sendMessageLastChatWindow(proWait, handler.getDriver("pro"), "Buhahaa");
         }
 
         /** Customers send many messages. */
@@ -71,8 +74,14 @@ public class zproHandlesManyUsersIT {
             customer.get(CUSTOMERADDRESS);
             WebDriverWait wait = new WebDriverWait(customer, 4);
             for (int i = 0; i < MAX_CUSTOMERS; i++) {
+                assertTrue(waitForTextToAppear(wait, "Buhahaa"));
                 sendMessageChatWindow(wait, "Oletko okei");
             }
+        }
+        closeLastChatWindow(proWait, handler.getDriver("pro"));
+        for (int i = 1; i < MAX_CUSTOMERS; i++) {
+            Thread.sleep(2000);
+            closeFirstChatWindow(proWait, handler.getDriver("pro"));
         }
 
     }

@@ -3,6 +3,7 @@ package integrationTests.util;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -73,8 +74,8 @@ public final class sotechatITCommands {
     }
 
     public static void proLogout(WebDriverWait wait) {
-        waitElementPresent(wait, By.name("menu")).click();
-        waitElementPresent(wait, By.name("logout")).click();
+        waitElementClickable(wait, By.name("menu")).click();
+        waitElementClickable(wait, By.name("logout")).click();
     }
 
     public static void endConversationPro(WebDriverWait wait) {
@@ -152,6 +153,29 @@ public final class sotechatITCommands {
             l1.get(l1.size()-1).submit();
         }
     }
+
+    public static void closeLastChatWindow(WebDriverWait wait, WebDriver driver) {
+        List<WebElement> l = findAllElements(driver, By.name("endConversation"));
+        if (!l.isEmpty()) {
+            l.get(l.size()-1).click();
+            waitElementPresent(wait, By.name("sure")).click();
+            tabsCountToBe(wait, l.size()-1);
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal")));
+        }
+    }
+
+    public static void closeFirstChatWindow(WebDriverWait wait, WebDriver driver) {
+        List<WebElement> l = findAllElements(driver, By.name("endConversation"));
+        if (!l.isEmpty()) {
+            waitElementPresent(wait, By.name("endConversation"));
+            waitElementClickable(wait, By.name("endConversation")).click();
+           // l.get(0).click();
+            waitElementPresent(wait, By.name("sure")).click();
+            tabsCountToBe(wait, l.size()-1);
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal")));
+        }
+    }
+
 
     public static List<WebElement> findAllElements(WebDriver driver, By by) {
         return driver.findElements(by);

@@ -175,7 +175,7 @@ public class StateController {
     public final String popClientFromQueue(
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
-    ) {
+    ) throws Exception {
 
         /** Varmista, etta poppaaja on autentikoitunut. */
         if (accessor.getUser() == null) {

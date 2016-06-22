@@ -14,6 +14,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 
 import javax.transaction.Transactional;
@@ -149,15 +150,28 @@ public class DatabaseServiceTest {
         conversation.setChannelId("224r");
         conversation.setDate("2");
         conversationRepo.save(conversation);
-        Conversation c2 = new Conversation("1", "333f");
+        Conversation c2 = new Conversation("333f", "1" );
         conversationRepo.save(c2);
         databaseService.addPersonToConversation("xxd", "224r");
         databaseService.addPersonToConversation("xxd", "333f");
-        //TODO:fix
-        //List<String> channelIds = databaseService.getConvInfoListOfUserId("xxd");
-        //Assert.assertEquals(2, channelIds.size());
-        //Assert.assertEquals("224r", channelIds.get(0));
-        //Assert.assertEquals("333f", channelIds.get(1));
+        List<ConvInfo> channelIds = databaseService.getConvInfoListOfUserId("xxd");
+        Assert.assertEquals(2, channelIds.size());
+        Assert.assertEquals("224r", channelIds.get(0).getChannelId());
+        Assert.assertEquals("333f", channelIds.get(1).getChannelId());
+    }
+
+    @Test
+    @Transactional
+    public void personsConversationsTest3() throws Exception {
+        conversation.setChannelId("224r");
+        conversation.setDate("2");
+        conversationRepo.save(conversation);
+        databaseService.addPersonToConversation("xxd", "224r");
+        databaseService.saveMsg("Anon", "moi", "1", "224r");
+        List<ConvInfo> convInfo = databaseService.getConvInfoListOfUserId("xxd");
+        Assert.assertEquals(1, convInfo.size());
+        Assert.assertEquals("224r", convInfo.get(0).getChannelId());
+        Assert.assertEquals("Anon", convInfo.get(0).getPerson());
     }
 
     @Test
@@ -205,5 +219,40 @@ public class DatabaseServiceTest {
         Assert.assertEquals(1, msgs2.size());
         Assert.assertNotEquals(msgs.get(0).getContent(), msgs2.get(0).getContent());
     }
+
+    @Test
+    public void invalidChannelIdRetvieveMessages() {
+        Assert.assertEquals(0,
+                databaseService.retrieveMessages("tataEiloydy").size());
+    }
+
+    @Test
+    public void invalidUserlIdConvInfo() {
+        Assert.assertEquals(0,
+                databaseService.getConvInfoListOfUserId("tataEiloydy").size());
+    }
+
+    @Test
+    @Transactional
+    public void invalidDataCreateConversation() {
+        databaseService.createConversation(null,null, null);
+        Assert.assertEquals(0, conversationRepo.findAll().size());
+    }
+
+    @Test
+    @Transactional
+    public void invalidDataSaveMessage() {
+        databaseService.saveMsg("Anon",null, null, "1xxx");
+        Assert.assertEquals(0, databaseService.retrieveMessages("1xxx").size());
+    }
+
+    @Test
+    @Transactional
+    public void invalidDataAddPerson() {
+        databaseService.addPersonToConversation("xxd", "tataEiloydy");
+        Assert.assertEquals(0, databaseService.getConvInfoListOfUserId("xxd").size());
+    }
+
+
 
 }
