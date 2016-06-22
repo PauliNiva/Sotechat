@@ -205,7 +205,7 @@ public class QueueService {
      * @return string
      */
     @Override
-    public final String toString() {
+    public String toString() {
         StringBuilder output = new StringBuilder("{\"jono\": [");
         for (int i = 0; i < queue.size(); i++) {
             QueueItem item = queue.get(i);

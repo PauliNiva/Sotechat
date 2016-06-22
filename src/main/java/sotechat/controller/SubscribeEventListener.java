@@ -22,6 +22,8 @@ import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
+    private static final int TIMER_DELAY_MS = 10;
+
     /** Session Repository. */
     @Autowired
     private SessionRepo sessionRepo;
@@ -69,20 +71,19 @@ public class SubscribeEventListener
          * broadcasteja lainkaan, silla broadcastit lahetetaan kanavalle
          * ennen kuin Spring on ehtinyt kirjata uuden kuuntelijan mukaan.
          *
-         * Timerin avulla saadaan eventin kasittely tehtya eri threadissa,
-         * siina toivossa etta alkuperainen threadi on ehtinyt suorittaa
+         * Timerin avulla saadaan 2) suoritettua eri threadissa kuin tassa,
+         * siina toivossa etta threadi joka suorittaa 1) on ehtinyt suorittaa
          * subscriben kirjaamisen loppuun.
          *
-         * Testattu: 1ms timer toimi lahes aina
+         * Testattu: 1ms timer toimi lahes aina.
          * 10ms timerilla ei toistaiseksi havaittu samanaikaisuusvirheita. */
         Timer timer = new Timer();
-        int delay = 10; // milliseconds
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 handleSubscribe((SessionSubscribeEvent) event);
             }
-        }, delay);
+        }, TIMER_DELAY_MS);
     }
 
     /** Kasittelee subscribe -tapahtumat

@@ -23,7 +23,6 @@ import static org.mockito.Matchers.any;
  */
 public class SubscriptionInterceptorTest {
 
-    @Mock
     ValidatorService validator;
 
     SubscriptionInterceptor interceptor;
