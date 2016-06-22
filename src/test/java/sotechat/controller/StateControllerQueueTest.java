@@ -117,6 +117,23 @@ public class StateControllerQueueTest {
     }
 
     @Test
+    public void normalUserCantPopFromQueue() throws Exception {
+        Session userInQueue = joinQueue("1111", "Hammas");
+
+        String channelId = userInQueue.get("channelId");
+
+        subscribeSessionToChannel(userInQueue, channelId);
+
+        assertEquals(1, this.queueService.getQueueLength());
+        assertEquals("queue", userInQueue.get("state"));
+
+        Mockito.when(accessor.getUser()).thenReturn(null);
+
+        assertEquals("", this.stateController
+                .popClientFromQueue(channelId, this.accessor));
+    }
+
+    @Test
     public void professionalCanPopFromQueue() throws Exception {
         // Liitytään jonoon sessionId:llä 1111.
         Session userInQueue = joinQueue("1111", "Hammas");
