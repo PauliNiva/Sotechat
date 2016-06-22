@@ -4,9 +4,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Created by varkoi on 22.6.2016.
- */
 public class ConvInfoTest {
 
     ConvInfo info;
@@ -23,7 +20,7 @@ public class ConvInfoTest {
 
     @Test
     public void getDateTest(){
-        Assert.assertEquals("31.1.", info.getDate());
+        Assert.assertEquals("30.1.", info.getDate());
     }
 
     @Test

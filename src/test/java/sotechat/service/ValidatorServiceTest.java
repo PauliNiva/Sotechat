@@ -1,5 +1,6 @@
 package sotechat.service;
 
+import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import sotechat.data.Channel;
@@ -235,6 +236,145 @@ public class ValidatorServiceTest {
         assertSuccess(validateSubscription(proB, "queue", chanD));
     }
 
+    /**
+     * Ammattilaiskayttaja saa subscribaa omille /chat/ kanavilleen.
+     */
+    @Test
+    public void subscriptionValidationOkForProChatChannelTest() {
+        assertSuccess(validateSubscription(proB, "queue", chanB));
+    }
+
+    /**
+     * Ammattilaiskayttaja ei saa subscribaa muiden /chat/ kanaville.
+     */
+    @Test
+    public void subscriptionValidationFailForProOtherPeoplesChatChannelTest() {
+        assertFail(validateSubscription(proB, "chat", chanA));
+    }
+
+    /**
+     * Subscribe ilman kelvollista sessiosta ei kay.
+     */
+    @Test
+    public void subscriptionValidationFailWithoutProperSessionTest() {
+        sessionRepo.forgetSessions();
+        assertFail(validateSubscription(proB, "queue", chanB));
+        assertFail(validateSubscription(proB, "chat", chanB));
+        assertFail(validateSubscription(clientB, "queue", chanB));
+        assertFail(validateSubscription(proB, "chat", chanB));
+    }
+
+    /**
+     * Subscribe pro-sessiolla ilman autentikaatiota ei kay.
+     */
+    @Test
+    public void subscriptionValidationFailProSessionNoAuthTest() {
+        proB.principal = null;
+        assertFail(validateSubscription(proB, "queue", chanB));
+        assertFail(validateSubscription(proB, "chat", chanB));
+    }
+
+    /**
+     * Ammattilaiskayttaja saa kuunnella jonobroadcast (QBCC) kanavaa.
+     */
+    @Test
+    public void subscriptionValidationOkForProsOnQBCCTest() {
+        assertSuccess(validateSubscription(proA, "/toClient/QBCC"));
+        assertSuccess(validateSubscription(proB, "/toClient/QBCC"));
+    }
+
+    /**
+     * Estetaan subscribe muihin kuin erikseen sallittuihin osoitteisiin.
+     */
+    @Test
+    public void subscriptionValidationFailForHackersTest() {
+        assertFail(validateSubscription(clientA, "/*"));
+        assertFail(validateSubscription(clientA, "/toClient/*"));
+        assertFail(validateSubscription(clientA, "/toServer/*"));
+        assertFail(validateSubscription(clientA, "/toClient/QBCC/"));
+        assertFail(validateSubscription(clientA, "/toClient/QBCC/*"));
+        assertFail(validateSubscription(clientA, "/toClient/queue/*"));
+        assertFail(validateSubscription(clientA, "/toClient/chat/*"));
+        assertFail(validateSubscription(clientA, "/toClient/chat/kanava"));
+        assertFail(validateSubscription(clientA, "/toServer/chat/kanava"));
+    }
+
+    /**
+     * Normikayttaja liittyy jonoon.
+     */
+    @Test
+    public void joinQueueValidationOkTest() {
+        assertFail(validateJoinQ(clientA));
+    }
+
+    /**
+     * Ammattikayttaja ei voi liittya jonoon.
+     */
+    @Test
+    public void joinQueueValidationFailForProTest() {
+        assertFail(validateJoinQ(proA));
+    }
+
+
+    /**
+     * Kanavalta poistuminen.
+     */
+    @Test
+    public void leaveValidationOkTest() {
+        assertSuccess(validateLeave(proA, chanA));
+        assertSuccess(validateLeave(clientB, chanB));
+    }
+
+    /**
+     * Kanavalta poistuminen, jos ei ole kanavalla.
+     */
+    @Test
+    public void leaveValidationFailNotOnChannelTest() {
+        assertFail(validateLeave(proB, chanA));
+    }
+
+    /**
+     * Kanavalta poistuminen, jos sessio on epakelpo.
+     */
+    @Test
+    public void leaveValidationFailWithBadSessionTest() {
+        sessionRepo.forgetSessions();
+        assertFail(validateLeave(proA, chanA));
+    }
+
+    /**
+     * Kanavalta poistuminen pro-sessiolla ilman autentikointia.
+     */
+    @Test
+    public void leaveValidationFailWithProSessionNoAuthTest() {
+        proA.principal = null;
+        assertFail(validateLeave(proA, chanA));
+    }
+
+    /**
+     * Yksi hoitaja esittaa toista hoitajaa poistumisviestissa.
+     */
+    @Test
+    public void leaveValidationFailWithProMismatchTest() {
+        proA.session.set("username", "feikki");
+        assertFail(validateLeave(proA, chanA));
+    }
+
+    private String validateLeave(User user, Channel channel) {
+        boolean accepted = validator.validateLeave(
+                user.sessionId, user.principal, channel.getId());
+        if (accepted) return "";
+        else return "error";
+    }
+
+
+    private String validateJoinQ(User user) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("username", user.session.get("username"));
+        return validator.validateJoin(user.req, payload, user.principal);
+    }
+
+
     private String validateMsg(
             User user,
             Channel channel
@@ -263,12 +403,14 @@ public class ValidatorServiceTest {
             Channel channel
     ) {
         String channelId = channel.getId();
-        String sessionId = user.sessionId;
-        MockPrincipal principal = user.principal;
         String channelIdWithPath = "/toClient/" + channelType + "/" + channelId;
-        String error = validator.validateSubscription(
-                principal, sessionId, channelIdWithPath);
-        return error;
+        return validateSubscription(user, channelIdWithPath);
+    }
+
+    private String validateSubscription(User user, String path) {
+        return validator.validateSubscription(
+                user.principal, user.sessionId, path
+        );
     }
 
 

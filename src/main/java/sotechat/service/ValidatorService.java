@@ -58,7 +58,14 @@ public class ValidatorService {
         return isMessageFraudulent(msgToServer, sessionId, principal);
     }
 
-
+    /**
+     * Onko chattiin tuleva viesti vaarennetty?
+     * @param msgToServer p
+     * @param sessionId p
+     * @param principal p
+     * @return tyhja String jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus-String.
+     */
     public final String isMessageFraudulent(
             final MsgToServer msgToServer,
             final String sessionId,
