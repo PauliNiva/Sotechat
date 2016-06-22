@@ -103,18 +103,26 @@ public class QueueTimeout {
      * @param sessionId SessionId, jonka avulla session status voidaan
      *                  selvittää ConnectionReposta.
      */
-    public final void removeInactiveUsersFromQueue(final String sessionId) {
+    public final void removeInactiveUsersFromQueue(
+            final String sessionId
+    ) {
         if (!this.connectionRepo.sessionIsConnected(sessionId)) {
 
-            Session session = this.sessionRepo.getSessionFromSessionId((sessionId));
+            Session session = sessionRepo.getSessionFromSessionId(sessionId);
+            if (session == null) {
+                /** Session already removed? */
+                return;
+            }
 
             System.out.println("Removing user with sessionId "
                     + sessionId + " from queue");
+            if (session != null) { //TODO:Jotain muuta?
+                String channelId = session.get("channelId");
 
-            String channelId = session.get("channelId");
-            this.sessionRepo.leaveChannel(channelId, sessionId);
-            this.queueService.removeFromQueue(channelId);
-            this.queueBroadcaster.broadcastQueue();
+                this.sessionRepo.leaveChannel(channelId, sessionId);
+                this.queueService.removeFromQueue(channelId);
+                this.queueBroadcaster.broadcastQueue();
+            }
         }
     }
 

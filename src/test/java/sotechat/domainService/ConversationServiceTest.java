@@ -59,9 +59,9 @@ public class ConversationServiceTest {
         Assert.assertEquals(2,
                 this.conversation.getMessagesOfConversation().size());
         conversationService.addConversation(conversation);
-        Assert.assertEquals(2, conversationRepo.count());
-        conversationService.removeConversation("009");
         Assert.assertEquals(1, conversationRepo.count());
+        conversationService.removeConversation("009");
+        Assert.assertEquals(0, conversationRepo.count());
     }
 
     @Test
@@ -73,8 +73,8 @@ public class ConversationServiceTest {
         conversationService.addMessage(message2, conversation);
         Assert.assertEquals(2, conversation.getMessagesOfConversation().size());
         conversationService.removeConversation(conversation.getChannelId());
-        Assert.assertEquals(1, conversationRepo.count());
-        Assert.assertEquals(1, messageRepo.count());
+        Assert.assertEquals(0, conversationRepo.count());
+        Assert.assertEquals(0, messageRepo.count());
     }
 
     @Test

@@ -12,10 +12,24 @@ public class MsgToServer {
     /** Viestin sisalto. */
     private String content;
 
-
-
-    /** Huom: Äla lisaa konstruktoria, se rikkoo Springin. */
-
+    /** Huom: konstruktorin lisaaminen rikkoo Springin (ChatControllerin).
+     * Siksi luotu epavirallinen konstruktori staattisena metodina.
+     * @param pUserId p
+     * @param pChannelId p
+     * @param pContent p
+     * @return uusi MsgToServer-olio annetuilla arvoilla.
+     */
+    public static MsgToServer create(
+            final String pUserId,
+            final String pChannelId,
+            final String pContent
+    ) {
+        MsgToServer instance = new MsgToServer();
+        instance.setUserId(pUserId);
+        instance.setChannelId(pChannelId);
+        instance.setContent(pContent);
+        return instance;
+    }
 
 
     /** Palauttaa kayttajaID:n, jota ei saa vuotaa muille kayttajille.

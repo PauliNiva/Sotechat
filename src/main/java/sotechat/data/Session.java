@@ -4,20 +4,32 @@ package sotechat.data;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
+/** Session-oliot kuvaamaan aktiivisia sessioita.
+ * Syy miksi HttpSession-oliot eivat riita: TODO kirjoita
+ * Usea sessioId voidaan liittaa samaan Sessioon.
+ */
 public class Session {
 
+    /** Attribuutit, kuten "username", "userId", yms. */
     private HashMap<String, String> attributes;
 
+    /** Kanavat, joille sessiolla on oikeus osallistua. Myos Channel-oliossa. */
     private LinkedHashSet<String> channels;
 
-    private boolean isPro;
-
+    /** Konstruktori. */
     public Session() {
         attributes = new HashMap<>();
         channels = new LinkedHashSet<>();
     }
 
-    public void set(String key, String value) {
+    /** Konstruktori.
+     * @param key avain, esim. "username"
+     * @param value arvo, esim. "Mikko"
+     */
+    public final void set(
+            final String key,
+            final String value
+    ) {
         attributes.put(key, value);
     }
 
@@ -31,6 +43,9 @@ public class Session {
         return value;
     }
 
+    /** Lisaa kanavan ja paivittaa attribuutin channelId/channelIds.
+     * @param channelId lisattavan kanavan id
+     */
     public final void addChannel(final String channelId) {
         channels.add(channelId);
         if (get("channelIds").isEmpty()) {

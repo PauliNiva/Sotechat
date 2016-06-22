@@ -16,7 +16,7 @@ import static integrationTests.util.sotechatITCommands.sendMessageChatWindow;
 import static integrationTests.util.sotechatITCommands.waitForTextToAppear;
 
 /**
- * Run godtest 1000 times, hope to catch concurrency errors.
+ * Run godtest 10 times, hope to catch concurrency errors.
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
@@ -25,7 +25,7 @@ public class concurrencyIT {
     @Test
     public void concurrencyTesting() throws Exception {
         fastGodIT god = new fastGodIT();
-        for (int i=1; i<=1000; i++) {
+        for (int i=1; i<=10; i++) {
             System.out.println("Starting i = " + i);
             god.typicalFlow();
         }

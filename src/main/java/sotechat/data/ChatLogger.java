@@ -19,10 +19,6 @@ public class ChatLogger {
     /** Avain = kanavan id. Arvo = lista viesteja (kanavan lokit). */
     private HashMap<String, List<MsgToClient>> logs;
 
-    /** Mapper. */
-    @Autowired
-    private Mapper mapper;
-
     /** Session Repository. */
     @Autowired
     private SessionRepo sessionRepo;
@@ -154,19 +150,33 @@ public class ChatLogger {
         return list.size() + "";
     }
 
-
-    public synchronized void removeOldMessagesFromMemory(
-            int daysOld
+    /** Palvelimen ollessa paalla pitkaan muisti voi loppua.
+     * Taman vuoksi tata metodia on kutsuttava esim. kerran viikossa.
+     * Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
+     * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
+     * TODO: Testaa
+     * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
+     */
+    public final synchronized void removeOldMessagesFromMemory(
+            final int daysOld
     ) {
+        Long now = Long.parseLong(new DateTime().toString());
+        Long threshold = now + daysOld * 1000 * 60 * 60 * 24;
         Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
                 logs.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, List<MsgToClient>> entry = iterator.next();
             String channelId = entry.getKey();
             List<MsgToClient> listOfMsgs = entry.getValue();
-            //if (channelIsOld(listOfMsgs, daysOld)) {
-            //    logs.remove(entry.getKey());
-            //}
+            if (listOfMsgs == null || listOfMsgs.isEmpty()) {
+                logs.remove(channelId);
+            } else {
+                MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
+                Long time = Long.parseLong(last.getTimeStamp());
+                if (time < threshold) {
+                    logs.remove(channelId);
+                }
+            }
         }
 
     }

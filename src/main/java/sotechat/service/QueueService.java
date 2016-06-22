@@ -39,14 +39,12 @@ public class QueueService {
     @Autowired
     private ChatLogger chatLogger;
 
-    /** Konstruktori.
-     */
-  //  @Autowired
+    /** Konstruktori. */
     public QueueService() {
         this.queue = new ArrayList<>();
     }
 
-    /** Suoritetaan kayttajan pyynto tulla jonoon (oletettavasti validoitu jo).
+    /** Pyynto liittya jonoon, validoitava ennen taman metodin kutsua.
      * @param request req
      * @param payload payload
      */
@@ -54,16 +52,29 @@ public class QueueService {
             final HttpServletRequest request,
             final JsonObject payload
     ) {
-        /** Alustetaan muuttujia. */
+        /** Kaivetaan requestista ja payloadista tietoja.*/
         String sessionId = request.getSession().getId();
-
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
+        String username = payload.get("username").getAsString();
+        String startMessage = payload.get("startMessage").getAsString();
 
+        /** Siirretaan tehtava overloadatulle metodille. */
+        joinQueue(session, username, startMessage);
+    }
+
+    /** Overloadattu metodi joinQueue testauksen helpottamiseksi.
+     * @param session palvelimelta loytyva sessio-olio
+     * @param username kayttajan antama
+     * @param startMsg kayttajan antama
+     */
+    public final synchronized void joinQueue(
+            final Session session,
+            final String username,
+            final String startMsg
+    ) {
         String userId = session.get("userId");
         String channelId = session.get("channelId");
         String category = session.get("category");
-        String username = payload.get("username").getAsString();
-        String startMessage = payload.get("startMessage").getAsString();
 
         /** Muistetaan kayttajan valitsema nimimerkki. */
         session.set("username", username);
@@ -74,22 +85,21 @@ public class QueueService {
 
         /** Asetetaan kayttaja jonoon odottamaan palvelua. */
         QueueItem item = new QueueItem(channelId, category, username);
-        queue.add(item); //TODO: metodi
+        queue.add(item);
+
+        /** Asetetaan kayttajan tilaksi "jono". */
         session.set("state", "queue");
 
         /** Luodaan tietokantaan uusi keskustelu. */
         databaseService.createConversation(username, channelId, category);
 
         /** Luodaan aloitusviestista msgToServer-olio. */
-        MsgToServer msgToServer = new MsgToServer();
-        msgToServer.setUserId(userId);
-        msgToServer.setChannelId(channelId);
-        msgToServer.setContent(startMessage);
+        MsgToServer msg = MsgToServer.create(userId, channelId, startMsg);
 
         /** Kirjataan viesti lokeihin, mutta ei laheteta sita viela, koska
          * kanavalla ei ole ketaan. Kun kanavalle liittyy joku,
          * sille lahetetaan lokit. */
-        chatLogger.logNewMessage(msgToServer);
+        chatLogger.logNewMessage(msg);
     }
 
     /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).

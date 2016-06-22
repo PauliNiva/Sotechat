@@ -1,5 +1,6 @@
 package sotechat.controller;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +20,11 @@ import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
 
 
+import sotechat.repo.ConversationRepo;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
+
+import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,6 +38,7 @@ import static org.springframework.test.web.servlet.result
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @WebAppConfiguration
+@Transactional
 public class StateControllerTest {
 
     @Autowired
@@ -42,6 +47,9 @@ public class StateControllerTest {
     private MockMvc mvc;
     private SessionRepo sessions;
     private Mapper mapper;
+
+    @Autowired
+    private ConversationRepo conversationRepo;
 
     /** Before.
      * @throws Exception
@@ -52,6 +60,13 @@ public class StateControllerTest {
         sessions = (SessionRepo)webApplicationContext
                 .getBean("sessionRepo");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        /* Unohdetaan sessiot, jotta testien valille
+         * ei syntyisi riippuvaisuuksia. */
+        sessions.forgetSessions();
     }
 
     /** GET polkuun /userState palauttaa uskottavat arvot.
@@ -88,7 +103,7 @@ public class StateControllerTest {
 
 
     @Test
-    public void joinPoolWithoutProperSessionFails() throws Exception {
+    public void testJoinQueueWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -100,7 +115,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolTypicalCaseWorks() throws Exception {
+    public void testJoinQueueTypicalCaseWorks() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
@@ -118,9 +133,6 @@ public class StateControllerTest {
         String channelId = jsonObj.get("channelId").toString();
         String userId = jsonObj.get("userId").toString();*/
 
-        // UserStateResponsen state on chat??? Pitää asettaa tila tässä keinotekoisesti.
-        sessions.getSessionFromSessionId("007").set("state", "start");
-
         /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
@@ -134,7 +146,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithWrongStateFails() throws Exception {
+    public void testJoinQueueWithWrongStateFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
@@ -146,7 +158,7 @@ public class StateControllerTest {
         /** Asetetaan palvelimella session tilaksi "chat". */
         sessions.getSessionFromSessionId("007").set("state", "chat");
 
-        /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila eioo "start". */
+        /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila != "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -159,7 +171,7 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithReservedScreennameFails() throws Exception {
+    public void testJoinQueueWithReservedScreennameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         this.mapper.mapProUsernameToUserId("hoitaja", "666");
 
@@ -169,9 +181,6 @@ public class StateControllerTest {
                         .get("/userState")
                         .session(mockSession)
                         .accept(MediaType.APPLICATION_JSON));
-
-        // Tässä kanssa jotain hämärää, userstateresponse palauttaa väärän tilan.
-        sessions.getSessionFromSessionId("007").set("state", "start");
 
         /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
@@ -185,4 +194,5 @@ public class StateControllerTest {
                            is("Denied join pool request due "
                                    + "to reserved username.")));
     }
+
 }
