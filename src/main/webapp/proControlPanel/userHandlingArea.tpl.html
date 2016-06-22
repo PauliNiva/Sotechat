@@ -31,7 +31,7 @@
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
             <ul class="nav nav-tabs">
-                <li ng-repeat="chat in chats" name="{{chat.title}}" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
+                <li ng-repeat="chat in chats" name="chatTab" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
             </ul>
             <div ng-repeat="chat in chats" ng-show="activeChatTab == chat.index" class="chat-container">
                 <div class="col-lg-9 col-md-8 col-sm-8 proContainer">

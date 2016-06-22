@@ -5,6 +5,7 @@ import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import static integrationTests.util.sotechatITCommands.*;
+import static org.junit.Assert.*;
 
 /**
  * As a user I want to send a message
@@ -48,7 +50,7 @@ public class zproHandlesManyUsersIT {
     /**
      * Test disabled while waiting for AngularJS changes.
      */
-    
+    @Test
     public void KillerTest() {
 
         /** All customers join the queue. */
@@ -63,7 +65,7 @@ public class zproHandlesManyUsersIT {
         proLogin(proWait);
         for (int i = 0; i < MAX_CUSTOMERS; i++) {
             waitAndPickFromQueue(proWait);
-            sendMessageChatWindow(proWait, "Buhahaha");
+            assertEquals(1,tabsCountToBe(proWait, i+1));
         }
 
         /** Customers send many messages. */
