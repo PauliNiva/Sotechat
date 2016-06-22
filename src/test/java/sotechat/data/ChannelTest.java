@@ -30,6 +30,8 @@ public class ChannelTest {
 
     @Test
     public void getHistoricUserIdsTest() {
+        Assert.assertEquals(0, channel.getHistoricUserIds().size());
+        channel.allowParticipation(session);
         Assert.assertEquals(1, channel.getHistoricUserIds().size());
     }
 }
