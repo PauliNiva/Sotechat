@@ -33,6 +33,18 @@ public class ChatLogger {
         this.logs = new HashMap<>();
     }
 
+    /**
+     * Injektoiva konstruktori testausta varten
+     * @param sessionRepo SessionRepo
+     * @param databaseService DatabaseService
+     */
+    public ChatLogger(SessionRepo sessionRepo,
+                      DatabaseService databaseService) {
+        this.sessionRepo = sessionRepo;
+        this.databaseService = databaseService;
+        this.logs = new HashMap<>();
+    }
+
     /** Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.
      * Palauttaa viestin clienteille lahetettavassa muodossa.
      * @param msgToServer msgToServer.
