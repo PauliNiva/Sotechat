@@ -44,7 +44,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param sessionId sessionId
      * @return sesson-olio
      */
-    public final synchronized Session getSessionFromSessionId(
+    public synchronized Session getSessionFromSessionId(
             final String sessionId
     ) {
         return sessionsBySessionId.get(sessionId);

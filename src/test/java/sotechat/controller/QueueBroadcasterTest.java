@@ -1,4 +1,4 @@
-package sotechat.data;
+package sotechat.controller;
 
 import org.junit.Before;
 import org.junit.Test;

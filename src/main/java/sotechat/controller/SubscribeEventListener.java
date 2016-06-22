@@ -135,14 +135,54 @@ public class SubscribeEventListener
     /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
      * @param repo repo
      */
-    private synchronized void setSessionRepo(final SessionRepo repo) {
+    public synchronized void setSessionRepo(final SessionRepo repo) {
         this.sessionRepo = repo;
     }
 
     /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
      *  @return SessionRepo sessionRepo
      * */
-    private synchronized SessionRepo getSessionRepo() {
+    public synchronized SessionRepo getSessionRepo() {
         return this.sessionRepo;
+    }
+
+    /**
+     * Testausta helpottamaan.
+     * @param qbc qbc
+     */
+    public synchronized void setQueueBroadcaster(
+            final QueueBroadcaster qbc
+    ) {
+        this.queueBroadcaster = qbc;
+    }
+
+    /**
+     * Testausta helpottamaan.
+     * @param pBroker p
+     */
+    public synchronized void setBroker(
+            final SimpMessagingTemplate pBroker
+    ) {
+        this.broker = pBroker;
+    }
+
+    /**
+     * Testausta helpottamaan.
+     * @param pChatLogger p
+     */
+    public synchronized void setChatLogger(
+            final ChatLogger pChatLogger
+    ) {
+        this.chatLogger = pChatLogger;
+    }
+
+    /**
+     * Testausta helpottamaan.
+     * @param pMapper p
+     */
+    public synchronized void setMapper(
+            final Mapper pMapper
+    ) {
+        this.mapper = pMapper;
     }
 }

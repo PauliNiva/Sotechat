@@ -49,7 +49,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
      * valille on asetettu minimiviive. Tama metodi ohjaa tehtavan
      * mahdollisen timerin kautta metodille actuallyBroadcast.
      */
-    public final synchronized void broadcastQueue() {
+    public synchronized void broadcastQueue() {
         long timeNow = new DateTime().getMillis();
         if (lastBroadcastTime + QBC_DELAY_MS < timeNow) {
             /* Jos ei olla juuri asken broadcastattu, tehdaan se nyt. */
