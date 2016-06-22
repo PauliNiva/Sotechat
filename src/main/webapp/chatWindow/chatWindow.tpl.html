@@ -1,7 +1,8 @@
 <div class="panel panel-default chat-panel">
     <div class="panel-heading chat-heading">
             <h4 class="panel-title pull-left chatTitle">{{chatText}}</h4>
-            <button class="btn btn-danger pull-right" type="button" ng-click="userLeave()" ng-hide="pro || chatClosed">Lopeta keskustelu</button>
+            <button class="btn btn-danger pull-right" name="userEndConversation"
+                    type="button" ng-click="userLeave()" ng-hide="pro || chatClosed">Lopeta keskustelu</button>
         <div class="clearfix"></div>
     </div>
 

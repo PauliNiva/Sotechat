@@ -106,17 +106,12 @@ public class Mapper {
      * @return userId
      */
     public final synchronized String generateNewId() {
-        while (true) {
-            /** Tuotetaan satunnaismerkkijonoja niin kauan,
-             * etta vapaa merkkijono loytyy. On erittain
-             * epatodennakoista, etta iteraatioita olisi
-             * koskaan enempaa kuin yksi. */
-            String newId = getFastRandomString();
-            if (!reservedIds.contains(newId)) {
-                reservedIds.add(newId);
-                return newId;
-            }
-        }
+        String newId;
+        do {
+            newId = getFastRandomString();
+        } while (reservedIds.contains(newId));
+        reservedIds.add(newId);
+        return newId;
     }
 
     /** Nopea satunnaismerkkijonotuottaja (kaytossa).

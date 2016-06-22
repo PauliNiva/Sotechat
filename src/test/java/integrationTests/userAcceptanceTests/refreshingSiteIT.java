@@ -1,31 +1,28 @@
 package integrationTests.userAcceptanceTests;
 
-
+import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import integrationTests.util.DriverHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.*;
-
-import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import org.openqa.selenium.support.ui.*;
+
 
 import static org.junit.Assert.*;
 import static integrationTests.util.sotechatITCommands.*;
 
 /**
- * As a user, I want to join the queue to wait my turn
+ * As a professional, I want to pick a client from the visible queue
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class joiningQueueIT {
+public class refreshingSiteIT {
 
-    private WebDriverWait userWait;
     private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
-
 
     @Before
     public void setUp() throws Exception {
@@ -43,22 +40,30 @@ public class joiningQueueIT {
     }
 
     /**
-     * User joins a common queue when accessing chat
+     * As a user I want to see the messages other people have sent to discussion
      */
     @Test
-    public void UserJoinsACommonQueue() {
-        // User has accessed chat pag
-        // Username and a starting message is submitted
+    public void UserSeesOtherPeopleMessages() {
+        // User has accessed queue
         waitAndFillInformation(userWait);
+        waitQueueWindowsAppear(userWait);
 
-        // A queueing view is showed to the user
-        assertTrue(waitForTextToAppear(userWait, "sinua palvellaan mahdollisimman pian"));
-
-        // User is added to the pool of customers professionals side
+        // Professional has logged in & next in line button
         proLogin(proWait);
-        assertTrue(waitElementPresent(proWait,By.id("queuerBlock")).isDisplayed());
         waitAndPickFromQueue(proWait);
-        waitChatWindowsAppear(userWait);
+        // The other person sends a message
+        sendMessageChatWindow(proWait,"Can you see this message?");
+
+        // User can view it in the chat window
+        assertTrue(waitForTextToAppear(userWait,"Can you see this message?"));
+        sendMessageChatWindow(userWait, "Kylla kylla");
+        assertTrue(waitForTextToAppear(userWait,"Kylla kylla"));
+
+        handler.getDriver("user").navigate().refresh();
+        assertTrue(waitForTextToAppear(userWait,"Can you see this message?"));
+
+        handler.getDriver("pro").navigate().refresh();
+        assertTrue(waitForTextToAppear(userWait,"Kylla kylla"));
         endConversationPro(proWait);
     }
 

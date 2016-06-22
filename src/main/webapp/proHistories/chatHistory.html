@@ -1,7 +1,7 @@
 <div ng-controller="proHistoriesController">
     <h1 class="page-header historyHeader">Menneet keskustelut</h1>
     <div class="col-md-2 col-lg-2" ng-hide="showConv">
-        <button class="btn btn-default btn-block" ng-click="$parent.backToPanel()">
+        <button class="btn btn-default btn-block" name="backToPanel" ng-click="$parent.backToPanel()">
             Takaisin
         </button>
         <button class="btn btn-primary btn-block proButton" ng-click="addQuantity()">Näytä lisää
@@ -19,7 +19,7 @@
         </div>
         <div class="panel panel-default historyPanel"
              ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
-            <div class="panel-heading historyHeading row" ng-click="collapsed = !collapsed">
+            <div class="panel-heading historyHeading row" name="conversation" ng-click="collapsed = !collapsed">
                 <div class="col-md-2">{{conversation.date | date:'dd.MM.yyyy' }}</div>
                 <div class="col-md-2">{{ conversation.person }}</div>
                 <div class="col-md-2"> {{conversation.category }}</div>
