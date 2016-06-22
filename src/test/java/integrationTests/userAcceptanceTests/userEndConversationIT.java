@@ -61,7 +61,9 @@ public class userEndConversationIT {
         waitElementClickable(userWait, By.name("userEndConversation")).click();
         waitElementClickable(userWait, By.name("sure")).click();
         Assert.assertTrue(waitForTextToAppear(userWait, "Keskustelu on "));
-        // Assert.assertEquals(0, tabsCountToBe(proWait, 0)); TODO:FIX
-        endConversationPro(proWait);
+        Assert.assertTrue(waitForTextToAppear(proWait, "Vastapuoli on "));
+        waitElementClickable(proWait, By.name("closeConversation")).click();
+        Assert.assertEquals(0, tabsCountToBe(proWait, 0));
+
     }
 }

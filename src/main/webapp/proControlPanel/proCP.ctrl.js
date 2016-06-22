@@ -26,20 +26,20 @@ angular.module('chatProApp')
 
             /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
             $scope.addChatTab = function (channelID) {
-                $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: channelID});
+                $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: channelID, status: 'online'});
                 $scope.activeChatTab = tabCount;
                 tabCount++;
             };
 
-            $scope.changeTab = function(index) {
+            $scope.changeTab = function (index) {
                 $scope.activeChatTab = index;
             };
 
-            $scope.tabIsSelected = function(index) {
+            $scope.tabIsSelected = function (index) {
                 return index === $scope.activeChatTab;
             }
 
-            $scope.removeChatTab = function(channelID) {
+            $scope.endConversation = function (channelID) {
                 var modalInstance = $uibModal.open({
                     animation: true,
                     templateUrl: 'common/areUSureModal.tpl.html',
@@ -49,15 +49,30 @@ angular.module('chatProApp')
                 modalInstance.result.then(function (result) {
                     $scope.$broadcast('unSubscribeChat', {'channelID': channelID});
                     $http.post("/leave/" + channelID, {});
-                    var chatTabIndex = arrayObjectIndexOf($scope.chats, channelID, 'channel');
-                    if (chatTabIndex > -1) {
-                        $scope.chats.splice(chatTabIndex, 1);
-                    }
-
-                    if($scope.chats.length > 0) {
-                        $scope.activeChatTab = $scope.chats[0].index;
-                    }
+                    removeTab(channelID);
                 });
+            };
+
+            $scope.userLeavesChat = function (channelID) {
+                $http.post("/leave/" + channelID, {});
+                var chatTabIndex = arrayObjectIndexOf($scope.chats, channelID, 'channel');
+                if (chatTabIndex > -1) {
+                    $scope.chats[chatTabIndex].status = 'offline';
+                }
+            };
+
+            $scope.closeConversation = function (channelID) {
+                removeTab(channelID);
+            };
+
+            var removeTab = function (channelID) {
+                var chatTabIndex = arrayObjectIndexOf($scope.chats, channelID, 'channel');
+                if (chatTabIndex > -1) {
+                    $scope.chats.splice(chatTabIndex, 1);
+                }
+                if ($scope.chats.length > 0) {
+                    $scope.activeChatTab = $scope.chats[0].index;
+                }
             };
 
             var arrayObjectIndexOf = function (myArray, searchTerm, property) {
@@ -65,14 +80,14 @@ angular.module('chatProApp')
                     if (myArray[i][property] === searchTerm) return i;
                 }
                 return -1;
-            }
+            };
 
 
             /** Avaa kaikki amamttilaisen avoimet välilehdet */
             var updateChannels = function () {
                 $scope.chats = [];
                 angular.forEach(proStateService.getChannelIDs(), function (key) {
-                    $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: key});
+                    $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: key, status: 'online'});
                     tabCount++;
                 });
             };

@@ -14,7 +14,7 @@ angular.module('chatApp')
             var messageIds = {};
             var sub;
             // Alustetaan ChatName tyhjäksi
-            $scope.chatText = '';
+            $scope.chatText = 'Tervetuloa!';
 
             $scope.userLeave = function() {
                 var modalInstance = $uibModal.open({
@@ -23,7 +23,7 @@ angular.module('chatApp')
                     controller: 'AreUSureModalController'
                 });
 
-                modalInstance.result.then(closeChat());
+                modalInstance.result.then(closeChat);
             };
 
             var closeChat = function() {
@@ -31,7 +31,7 @@ angular.module('chatApp')
                 sub.unsubscribe();
                 $scope.chatText = 'Keskustelu on päättynyt! Historia katoaa sivulta poistuttaessa!'
                 $scope.chatClosed = true;
-            }
+            };
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -67,10 +67,6 @@ angular.module('chatApp')
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + userStateService.getChannelID(), function (response) {
-
-                    //TODO: Testaa ettei allaoleva hakkerointi toimi
-                    //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
-
                     // Lisataan viesti, jos sita ei ole jo entuudestaan.
                     // Chat Logien broadcastauksen yhteydessa serveri saattaa
                     // lahettaa meille viesteja, jotka meilla jo on.
