@@ -2,6 +2,7 @@ package sotechat.controller;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,10 +39,12 @@ import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.QueueService;
 import sotechat.util.*;
+import sotechat.wrappers.QueueItem;
 
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +70,8 @@ public class StateControllerQueueTest {
 
     private SimpMessageHeaderAccessor accessor;
 
+    private List<Session> queueItems;
+
     @Autowired
     private ConversationRepo conversationRepo;
 
@@ -83,15 +88,7 @@ public class StateControllerQueueTest {
     private QueueService queueService;
 
     @Autowired
-    private AbstractSubscribableChannel clientInboundChannel;
-
-    @Autowired
-    private AbstractSubscribableChannel brokerChannel;
-
-    @Autowired
     private StateController stateController;
-
-    private MockChannelInterceptor brokerChannelInterceptor;
 
 
     @Before
@@ -108,14 +105,21 @@ public class StateControllerQueueTest {
         this.mapper.mapProUsernameToUserId("hoitaja", "666");
         this.mapper.mapProUsernameToUserId("hoitaja2", "667");
         this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
-        this.brokerChannelInterceptor = new MockChannelInterceptor();
-        this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
+        this.queueItems = new ArrayList();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        /* Unohdetaan sessiot, jotta testien valille
+         * ei syntyisi riippuvaisuuksia. */
+        sessionRepo.forgetSessions();
+        emptyQueue();
     }
 
     @Test
     public void professionalCanPopFromQueue() throws Exception {
         // Liitytään jonoon sessionId:llä 1111.
-        Session userInQueue = joinQueue("1111");
+        Session userInQueue = joinQueue("1111", "Hammas");
 
         String channelId = userInQueue.get("channelId");
 
@@ -184,17 +188,17 @@ public class StateControllerQueueTest {
     @Test
     public void professionalCanPopMultipleUsersFromQueue() throws Exception {
         // Liitytään jonoon sessionId:llä 1111.
-        Session firstUserInQueue = joinQueue("1111");
+        Session firstUserInQueue = joinQueue("1111", "Hammas");
         String channelIdOfFirstUser = firstUserInQueue.get("channelId");
         assertEquals(1, this.queueService.getQueueLength());
         subscribeSessionToChannel(firstUserInQueue, channelIdOfFirstUser);
 
-        Session secondUserInQueue = joinQueue("1112");
+        Session secondUserInQueue = joinQueue("1112", "Hammas");
         String channelIdOfSecondUser = secondUserInQueue.get("channelId");
         assertEquals(2, this.queueService.getQueueLength());
         subscribeSessionToChannel(secondUserInQueue, channelIdOfSecondUser);
 
-        Session thirdUserInQueue = joinQueue("1113");
+        Session thirdUserInQueue = joinQueue("1113", "Hammas");
         String channelIdOfThirdUser = thirdUserInQueue.get("channelId");
         assertEquals(3, this.queueService.getQueueLength());
         subscribeSessionToChannel(thirdUserInQueue, channelIdOfThirdUser);
@@ -235,25 +239,70 @@ public class StateControllerQueueTest {
 
     @Test
     public void cantRemoveFromQueueWithNonexistentChannelId() throws Exception {
-        Session firstUser = joinQueue("1111");
-        Session secondUser = joinQueue("1112");
-        Session thirdUser = joinQueue("1113");
+        Session firstUser = joinQueue("1111", "Hammas");
+        Session secondUser = joinQueue("1112", "Hammas");
+        Session thirdUser = joinQueue("1113", "Hammas");
         this.queueService.removeFromQueue("abc");
         assertEquals(3, this.queueService.getQueueLength());
-        this.queueService.removeFromQueue(firstUser.get("channelId"));
-        this.queueService.removeFromQueue(secondUser.get("channelId"));
-        this.queueService.removeFromQueue(thirdUser.get("channelId"));
+    }
+
+    @Test
+    public void queueServiceFindsTheCorrectNumberOfQueueItemsWithSameCategory()
+        throws Exception {
+        Session firstUser = joinQueue("1111", "Hammas");
+        int length1 = this.queueService.getPositionInQueue(firstUser.get("channelId"), "Hammas");
+        assertEquals(1, length1);
+
+        Session secondUser = joinQueue("1112", "Hammas");
+        int length2 = this.queueService.getPositionInQueue(secondUser.get("channelId"), "Hammas");
+        assertEquals(2, length2);
+
+        Session thirdUser = joinQueue("1113", "Hammas");
+        int length3 = this.queueService.getPositionInQueue(thirdUser.get("channelId"), "Hammas");
+        assertEquals(3, length3);
+    }
+
+    @Test
+    public void queueServiceFindsTheCorrectNumberOfQueueItemsWithDifferentCategory()
+        throws Exception {
+        Session firstUser = joinQueue("1111", "Hammas");
+        int length1 = this.queueService.getPositionInQueue(firstUser.get("channelId"), "Hammas");
+        assertEquals(1, length1);
+
+        Session secondUser = joinQueue("1112", "Päihteet");
+        int length2 = this.queueService.getPositionInQueue(secondUser.get("channelId"), "Päihteet");
+        assertEquals(1, length2);
+
+        Session thirdUser = joinQueue("1113", "Hammas");
+        thirdUser.set("category", "Hammas");
+        int length3 = this.queueService.getPositionInQueue(thirdUser.get("channelId"), "Hammas");
+        assertEquals(2, length3);
+    }
+
+    @Test
+    public void queueServiceDoesntFindNonexistentQueueItem() throws Exception {
+        Session firstUser = joinQueue("1111", "Hammas");
+        int length1 = this.queueService.getPositionInQueue("randomChannelId", "Hammas");
+        assertEquals(-1, length1);
     }
 
     // Apumetodeja
 
-    public Session joinQueue(String sessionId) {
+    public Session joinQueue(String sessionId, String category) {
         HttpServletRequest mockRequest = new MockHttpServletRequest(sessionId);
         Principal mockPrincipal = null;
         Session joiningPerson = sessionRepo
                 .updateSession(mockRequest, mockPrincipal);
+        joiningPerson.set("category", category);
         this.queueService.joinQueue(joiningPerson, "Anon", "Hei!");
+        this.queueItems.add(joiningPerson);
         return joiningPerson;
+    }
+
+    public void emptyQueue() {
+        for (Session s : this.queueItems) {
+            this.queueService.removeFromQueue(s.get("channelId"));
+        }
     }
 
     public void subscribeSessionToChannel(Session session, String channelId) {
