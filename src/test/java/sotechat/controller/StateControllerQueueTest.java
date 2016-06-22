@@ -1,5 +1,6 @@
 package sotechat.controller;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Before;
@@ -18,6 +19,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.support.SimpAnnotationMethodMessageHandler;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -31,12 +33,14 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import sotechat.data.Mapper;
+import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.service.QueueService;
 import sotechat.util.*;
 
 
@@ -45,9 +49,11 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -65,6 +71,8 @@ public class StateControllerQueueTest {
 
     private SessionRepo sessionRepo;
 
+    private SimpMessageHeaderAccessor accessor;
+
     @Autowired
     private ConversationRepo conversationRepo;
 
@@ -75,7 +83,10 @@ public class StateControllerQueueTest {
     private MessageRepo messageRepo;
 
     @Autowired
-    ApplicationContext context;
+    private ApplicationContext context;
+
+    @Autowired
+    private QueueService queueService;
 
     @Autowired
     private AbstractSubscribableChannel clientInboundChannel;
@@ -88,9 +99,14 @@ public class StateControllerQueueTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(personRepo.findOne(any(String.class))).thenReturn(new Person());
-        Mockito.when(conversationRepo.findOne(any(String.class))).thenReturn(new Conversation());
+        Mockito.when(personRepo.findOne(any(String.class)))
+                .thenReturn(new Person());
+        Mockito.when(conversationRepo.findOne(any(String.class)))
+                .thenReturn(new Conversation());
         this.mapper = (Mapper) context.getBean("mapper");
+        this.queueService = (QueueService) context.getBean("queueService");
+
+        this.mapper.mapProUsernameToUserId("hoitaja", "666");
         this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
@@ -99,15 +115,20 @@ public class StateControllerQueueTest {
     // TODO: testi onnistuneelle popqueuelle
 
     @Test
-    public void professionalCantPopUserFromQueueIfQueueIsEmpty()
+    public void professionalCanPopFromQueueWebSocketTest()
             throws Exception {
+        // Joinataan asiakkaana
+        Session joiningPerson = joinQueue();
+
+        String channelId = joiningPerson.get("channelId");
+        // Subscribetaan samalle kanavalle kuin SetUpissa joinannut asiakas.
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/queue/" + channelId);
         /**
          * Luodaan hoitajalle sessio.
          */
         HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
-        Principal mockPrincipal = new MockPrincipal("Hoitaja");
+        Principal mockPrincipal = new MockPrincipal("hoitaja");
         sessionRepo.updateSession(mockRequest, mockPrincipal);
 
         /**
@@ -130,18 +151,27 @@ public class StateControllerQueueTest {
 
         Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 
-//        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
- //       String json = new String((byte[]) reply.getPayload(),
-      //          Charset.forName("UTF-8"));
-  //      assertEquals("", json);
-       // assertEquals("channel activated.",
-     //           jsonMessage.get("content").getAsString());
+        String replyAsString = new String((byte[]) reply.getPayload(),
+                Charset.forName("UTF-8"));
+
+        JsonObject jsonMessage = parseStringIntoJsonObject(replyAsString);
+
+        JsonObject queueParameters = parseStringIntoJsonObject(jsonMessage
+                .get("jono").getAsJsonArray().get(0).toString());
+
+        assertEquals(channelId, queueParameters.get("channelId").getAsString());
+        assertEquals("Anon", queueParameters.get("username").getAsString());
+        assertEquals("Kategoria", queueParameters.get("category").getAsString());
     }
 
     @Test
     public void unAuthenticatedUserCantPopUserFromQueue() throws Exception {
+        Session joiningPerson = joinQueue();
+
+        String channelId = joiningPerson.get("channelId");
+        // Subscribetaan samalle kanavalle kuin SetUpissa joinannut asiakas.
         StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/queue/DEV_CHANNEL");
+                setDefaultHeadersForChannel("/toServer/queue/" + channelId);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("1234");
         Principal principal = null;
@@ -166,7 +196,7 @@ public class StateControllerQueueTest {
          * käyttäjää jonosta.
          */
         System.out.println(replyPayload);
-       // assertEquals(replyPayload.length(), 0); //TODO: FIX
+        assertEquals(replyPayload.length(), 0);
     }
 
     /**
@@ -190,17 +220,25 @@ public class StateControllerQueueTest {
         return headers;
     }
 
+    public Session joinQueue() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest("1111");
+        Principal mockPrincipal = null;
+        Session joiningPerson = sessionRepo
+                .updateSession(mockRequest, mockPrincipal);
+
+        this.queueService.joinQueue(joiningPerson, "Anon", "Hei!");
+        return joiningPerson;
+    }
+
     /**
      * Apumetodi viestien muuntamiseski helpommin kasiteltavaan Json-muotoon.
      *
      * @param message Palvelimelta saatu vastausviesti
      * @return
      */
-    public JsonObject parseMessageIntoJsonObject(Message<?> message) {
-        String json = new String((byte[]) message.getPayload(),
-                Charset.forName("UTF-8"));
+    public JsonObject parseStringIntoJsonObject(String message) {
         JsonParser parser = new JsonParser();
-        JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
+        JsonObject jsonMessage = parser.parse(message).getAsJsonObject();
         return jsonMessage;
     }
 

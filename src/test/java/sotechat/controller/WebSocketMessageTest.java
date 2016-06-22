@@ -157,7 +157,7 @@ import static org.mockito.Matchers.anyString;
 //        /**
 //         * Parsetaan vastauksena saatu string JsonObjectiksi.
 //         */
-//        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
+//        JsonObject jsonMessage = parseStringIntoJsonObject(reply);
 //
 //        /**
 //         * Tarkistetaan, etta vastauksena tullut JsonObject sisaltaa
@@ -204,7 +204,7 @@ import static org.mockito.Matchers.anyString;
 //
 //        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
 //
-//        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
+//        JsonObject jsonMessage = parseStringIntoJsonObject(reply);
 //
 //        for (Map.Entry entry : jsonMessage.entrySet()) {
 //            String key = entry.getKey().toString();
@@ -297,7 +297,7 @@ import static org.mockito.Matchers.anyString;
 //     * @param message Palvelimelta saatu vastausviesti
 //     * @return
 //     */
-//    public JsonObject parseMessageIntoJsonObject(Message<?> message) {
+//    public JsonObject parseStringIntoJsonObject(Message<?> message) {
 //        String json = new String((byte[]) message.getPayload(),
 //                Charset.forName("UTF-8"));
 //        JsonParser parser = new JsonParser();
