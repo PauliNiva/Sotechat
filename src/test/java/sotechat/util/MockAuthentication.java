@@ -1,13 +1,20 @@
 package sotechat.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import sotechat.repo.PersonRepo;
 
 import java.util.Collection;
 
 public class MockAuthentication implements Authentication {
 
-    public MockAuthentication() {
+    private String principal;
+    private String credential;
+
+    public MockAuthentication(String pPrincipal, String pCredential) {
+        this.principal = pPrincipal;
+        this.credential = pCredential;
     }
 
     @Override
@@ -17,7 +24,7 @@ public class MockAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return "0000";
+        return this.credential;
     }
 
     @Override
@@ -27,7 +34,7 @@ public class MockAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return "admin";
+        return this.principal;
     }
 
     @Override
