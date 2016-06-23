@@ -3,7 +3,6 @@ package sotechat.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -27,23 +26,12 @@ public class SubscriptionInterceptorTest {
 
     SubscriptionInterceptor interceptor;
 
-    Message<?> someMessage;
+    Message<?> msg;
 
     @Before
     public void setUp() {
         validator = Mockito.mock(ValidatorService.class);
         interceptor = new SubscriptionInterceptor(validator);
-        someMessage = generateSomeMessage();
-    }
-
-    /**
-     * Testaa, etta Interceptor heittaa poikkeuksen epakelvolla subscribella.
-     */
-    @Test(expected=IllegalArgumentException.class)
-    public void subscriberInterceptorThrowsExceptionOnInvalidSubscribeTest() {
-        Mockito.when(validator.validateSubscription(any(), any(), any()))
-                .thenReturn("Error");
-        interceptor.preSend(someMessage, null);
     }
 
     /**
@@ -52,20 +40,42 @@ public class SubscriptionInterceptorTest {
      * matkaansa Springin sisalla varsinaiseen kasittelyyn).
      */
     @Test
-    public void subscriberInterceptorDoesNotThrowExceptionOnValidSubscribeTest() {
-        Mockito.when(validator.validateSubscription(any(), any(), any()))
+    public void subscribeInterceptorDoesNotThrowExceptionOnValidSubscribeTest() {
+        msg = generateSomeMessage(StompCommand.SUBSCRIBE);
+        Mockito.when(validator.validateSubscription(any()))
                 .thenReturn(""); // no error
-        Message<?> returnValue = interceptor.preSend(someMessage, null);
-        assertEquals(someMessage, returnValue);
+        Message<?> returnValue = interceptor.preSend(msg, null);
+        assertEquals(msg, returnValue);
     }
 
-    private Message<?> generateSomeMessage() {
+    /**
+     * Testaa, etta Interceptor heittaa poikkeuksen epakelvolla subscribella.
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void subscribeInterceptorThrowsExceptionOnInvalidSubscribeTest() {
+        msg = generateSomeMessage(StompCommand.SUBSCRIBE);
+        Mockito.when(validator.validateSubscription(any()))
+                .thenReturn("Error");
+        interceptor.preSend(msg, null);
+    }
+
+    /**
+     * Testaa, etta Interceptor antaa muiden eventtien kulkea.
+     */
+    @Test
+    public void subscribeInterceptorLetsOtherEventsPassTest() {
+        msg = generateSomeMessage(StompCommand.UNSUBSCRIBE);
+        Message<?> returnValue = interceptor.preSend(msg, null);
+        assertEquals(msg, returnValue);
+    }
+
+    private Message<?> generateSomeMessage(StompCommand eventType) {
         Map<String, List<String>> nativeHeaders = new HashMap<>();
         nativeHeaders.put("id", Collections.singletonList("sub-0"));
         nativeHeaders.put("destination", Collections.singletonList("/toClient/queue/6pbdx57vwqosurk5"));
         return MessageBuilder.withPayload("test")
                 .setHeader("simpMessageType", SimpMessageType.SUBSCRIBE)
-                .setHeader("stompCommand", StompCommand.SUBSCRIBE)
+                .setHeader("stompCommand", eventType)
                 .setHeader(NativeMessageHeaderAccessor.NATIVE_HEADERS, nativeHeaders)
                 .setHeader("simpSessionAttributes", "{SPRING.SESSION.ID=533A5A285E4E69BEBF4A61CF24B363B5}")
                 .setHeader("simpHeartbeat", "[J@2b67932")

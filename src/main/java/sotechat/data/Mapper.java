@@ -96,9 +96,7 @@ public class Mapper {
         if (username == null
                 || username.isEmpty()
                 || !mapRegisteredUsers.containsKey(username)) {
-            System.out.println("Error! Unknown userId for " + username);
-            //TODO: Pitaisiko tassa heittaa poikkeus?
-            return "UNKNOWN_ID";
+            throw new IllegalArgumentException(("Error! Unknown userId for registered name " + username));
         }
         return this.mapRegisteredUsers.get(username);
     }
