@@ -87,11 +87,7 @@ public class QueueTimeoutService {
     public final void removeInactiveUsersFromQueue(
             final String sessionId
     ) {
-        try {
-            this.sessionRepo.getSessionFromSessionId(sessionId);
-        } catch (Exception e) {
-            System.out.println("Sessiota sessionId:llä " + sessionId
-            + " ei ole olemassa.");
+        if (this.sessionRepo.getSessionFromSessionId(sessionId) == null) {
             return;
         }
 
