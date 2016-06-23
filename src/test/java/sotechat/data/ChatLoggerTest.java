@@ -169,6 +169,8 @@ public class ChatLoggerTest {
         Assert.assertEquals(2, chatlogger.getLogs("xxx").size());
         chatlogger.removeOldMessagesFromMemory(2);
         Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
-        verify(mockdb, times(2)).retrieveMessages("xxx");
+        chatlogger.removeOldMessagesFromMemory(2);  //huom yritetaan poistaa tyhjasta
+        Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
+        verify(mockdb, times(3)).retrieveMessages("xxx");
     }
 }
