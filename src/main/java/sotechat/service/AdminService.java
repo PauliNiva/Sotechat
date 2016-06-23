@@ -20,6 +20,9 @@ public class AdminService {
     @Autowired
     PersonRepo personRepo;
 
+    @Autowired
+    DatabaseService databaseService;
+
     private Person person;
 
     @Transactional
@@ -56,5 +59,10 @@ public class AdminService {
     public void changePassword(String id, String newPassword) {
         this.person = personRepo.findOne(id);
         this.person.setPassword(newPassword);
+    }
+
+    @Transactional
+    public void resetDatabase() {
+        databaseService.resetDatabase();
     }
 }

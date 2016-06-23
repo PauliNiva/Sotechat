@@ -184,4 +184,11 @@ public class DatabaseService {
         return msg;
     }
 
+    /**
+     * Tarkoitettu tietokannan tyhjentamiseen testikaytossa/demoamista varten.
+     */
+    public void resetDatabase() {
+        //TODO:ME
+    }
+
 }

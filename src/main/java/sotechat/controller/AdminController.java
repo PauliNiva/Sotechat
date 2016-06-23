@@ -42,5 +42,12 @@ public class AdminController {
         return "redirect:/getusers";
     }
 
+    @Secured("ROLE_ADMIN")
+    @RequestMapping(value = "/tyhjennaTietokantaDemoamistaVarten", method = RequestMethod.GET)
+    public String resetDatabase() {
+        adminService.resetDatabase();
+        return "Tyhjennetaan tietokantaa... Kokeile menna etusivulle.";
+    }
+
 
 }
