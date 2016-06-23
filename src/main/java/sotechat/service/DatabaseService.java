@@ -109,7 +109,7 @@ public class DatabaseService {
      * @param channelId keskustelun kanavan id
      * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa
      */
-    public final List<MsgToClient> retrieveMessages(
+    public List<MsgToClient> retrieveMessages(
             final String channelId
     ) {
         try {
