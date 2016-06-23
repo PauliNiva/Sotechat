@@ -1,6 +1,7 @@
-package sotechat.connectionEvents;
+package sotechat.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sotechat.controller.QueueBroadcaster;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -18,15 +19,8 @@ import java.util.TimerTask;
  * Käyttäjiä ei poisteta heti vaan WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT
  * _USERS-muuttujassa määritellyn odotusajan jälkeen.
  */
-public class QueueTimeout {
-
-    /**
-     * ConnectionRepo-olio, josta päästään käsiksi sessioiden aktiivisuuteen,
-     * siis onko käyttäjä esim. sulkenut jo selaimen, jolloin sessio on
-     * muuttunut inaktiiviseksi.
-     */
-    @Autowired
-    private ConnectionRepo connectionRepo;
+@Service
+public class QueueTimeoutService {
 
     /**
      * SessionRepo-olio, jonka avulla päästään sessioihin käsiksi niiden
@@ -56,12 +50,11 @@ public class QueueTimeout {
      */
     private static final int WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT_USERS
             = 10000;
- //   private final int WAIT_TIME_BEFORE_SCANNING_PRO_ACTIVITY = 2000;
 
     /**
      * Konstruktori
      */
-    public QueueTimeout() {
+    public QueueTimeoutService() {
     }
 
     /**
@@ -83,18 +76,6 @@ public class QueueTimeout {
             }, WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT_USERS);
     }
 
-   /* public void initiateWaitBeforeScanningForInactiveProfessional(final
-    String sessionId) {
-        int delay = WAIT_TIME_BEFORE_SCANNING_PRO_ACTIVITY;
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                removeProSession(sessionId);
-            }
-        }, delay);
-    } */
-
     /**
      * Metodi, jossa tarkistetaan onko parametrina annetun sessionId:n omaavan
      * session status aktiivinen vai inaktiivinen. Jos se on inaktiivinen,
@@ -106,30 +87,25 @@ public class QueueTimeout {
     public final void removeInactiveUsersFromQueue(
             final String sessionId
     ) {
-        if (!this.connectionRepo.sessionIsConnected(sessionId)) {
+        try {
+            this.sessionRepo.getSessionFromSessionId(sessionId);
+        } catch (Exception e) {
+            System.out.println("Sessiota sessionId:llä " + sessionId
+            + " ei ole olemassa.");
+            return;
+        }
 
-            Session session = sessionRepo.getSessionFromSessionId(sessionId);
-            if (session == null) {
-                /** Session already removed? */
-                return;
-            }
+        Session userSession = this.sessionRepo
+                .getSessionFromSessionId(sessionId);
 
+        if (userSession.get("connectionStatus").equals("disconnected")) {
             System.out.println("Removing user with sessionId "
                     + sessionId + " from queue");
-            if (session != null) { //TODO:Jotain muuta?
-                String channelId = session.get("channelId");
+            String channelId = userSession.get("channelId");
 
-                this.sessionRepo.leaveChannel(channelId, sessionId);
-                this.queueService.removeFromQueue(channelId);
-                this.queueBroadcaster.broadcastQueue();
-            }
+            this.sessionRepo.leaveChannel(channelId, sessionId);
+            this.queueService.removeFromQueue(channelId);
+            this.queueBroadcaster.broadcastQueue();
         }
     }
-
- /*   public void removeProSession(String sessionId) {
-        for (int i = 0; i < 10; i++) {
-            System.out.println("Removing pro session");
-        }
-       // this.sessionRepo.removeSession(sessionId);
-    } */
 }

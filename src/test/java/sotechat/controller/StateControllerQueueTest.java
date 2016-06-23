@@ -72,8 +72,6 @@ public class StateControllerQueueTest {
 
     private SimpMessageHeaderAccessor accessor;
 
-    private MockChannelInterceptor brokerChannelInterceptor;
-
     private List<Session> queueItems;
 
     @Autowired
@@ -94,9 +92,6 @@ public class StateControllerQueueTest {
     @Autowired
     private StateController stateController;
 
-    @Autowired
-    private AbstractSubscribableChannel brokerChannel;
-
     @Before
     public void setUp() throws Exception {
         Mockito.when(personRepo.findOne(any(String.class)))
@@ -112,8 +107,6 @@ public class StateControllerQueueTest {
         this.mapper.mapProUsernameToUserId("hoitaja2", "667");
         this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
         this.queueItems = new ArrayList();
-        this.brokerChannelInterceptor = new MockChannelInterceptor();
-        this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
     @After
@@ -376,7 +369,7 @@ public class StateControllerQueueTest {
         // Asiakkaan tila on chat
         assertEquals("chat", userInQueue.get("state"));
 
-        // Hoitaja sulkee keskustelun
+        // Hoitaja sessio on kaapattu, ja yritetään poistua chatista.
         this.stateController.leaveChat(channelId, mockRequest, null);
 
         assertNotNull(this.sessionRepo.getSessionFromUserId(userId));
@@ -452,7 +445,6 @@ public class StateControllerQueueTest {
             basePackages={"sotechat.controller",
                     "sotechat.data",
                     "sotechat.service",
-                    "sotechat.domainService",
                     "sotechat.domain"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
                     value = Configuration.class)

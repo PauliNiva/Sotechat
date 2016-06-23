@@ -1,4 +1,4 @@
-package sotechat.domainService;
+package sotechat.service;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +13,7 @@ import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
+import sotechat.service.ConversationService;
 
 import javax.transaction.Transactional;
 

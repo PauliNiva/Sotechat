@@ -11,8 +11,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sotechat.Launcher;
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.PersonService;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.DatabaseService;
@@ -27,7 +25,6 @@ import java.util.List;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by varkoi on 22.6.2016.
