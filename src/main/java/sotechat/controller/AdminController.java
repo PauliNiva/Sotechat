@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sotechat.domain.Person;
-import sotechat.service.AdminService;
 
-import java.util.List;
+import sotechat.service.AdminService;
 
 @RestController
 public class AdminController {
@@ -19,15 +17,15 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public void addNewUser() {
-        Person person = adminService.makePerson();
-        adminService.addUser(person);
+    public String addNewUser(String jsonPerson) {
+        adminService.addUser(jsonPerson);
+        return "redirect:/getusers";
     }
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/getusers", method = RequestMethod.GET)
-    public void getAllUsers() {
-        List<Person> personList = adminService.listAllPersons();
+    public String getAllUsers() {
+        return adminService.listAllPersonsAsJsonList();
     }
 
     @Secured("ROLE_ADMIN")
@@ -36,4 +34,13 @@ public class AdminController {
         adminService.deleteUser(id);
         return "redirect:/getusers";
     }
+
+    @Secured("ROLE_ADMIN")
+    @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
+    public String resetPassword(@PathVariable String id, String newPassword) {
+        adminService.changePassword(id, newPassword);
+        return "redirect:/getusers";
+    }
+
+
 }
