@@ -9,8 +9,8 @@ Sosiaali- ja terveyspalveluiden chat
 
 # Testaa sovellusta Herokussa
 
-[Hammashoidon asiakkaan linkki](http://sotechat.herokuapp.com/from/source?=hammashoito)
+[Hammashoidon asiakkaan linkki](http://sotechat.herokuapp.com/from/?source=hammashoito)
 
-[Terveydenhuollon asiakkaan linkki](http://sotechat.herokuapp.com/from/source?=terveyshuolto)
+[Terveydenhuollon asiakkaan linkki](http://sotechat.herokuapp.com/from/?source=terveyshuolto)
 
 [Ammattilaisen linkki](http://sotechat.herokuapp.com/pro) (vaatii kirjautumista *hoitaja/salasana*)
