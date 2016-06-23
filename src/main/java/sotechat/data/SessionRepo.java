@@ -90,7 +90,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param professional taalta saadaan kirjautumistiedot, voi olla null
      * @return Session-olio
      */
-    public final synchronized Session updateSession(
+    public synchronized Session updateSession(
             final HttpServletRequest req,
             final Principal professional
     ) {

@@ -17,12 +17,23 @@ import java.util.Map;
 @Controller
 public class CategoryController {
 
-    @Autowired
+    /** Session Repo. */
     SessionRepo sessionRepo;
+
+    /** Konstruktori.
+     *
+     * @param pSessionRepo p
+     */
+    @Autowired
+    public CategoryController(
+            final SessionRepo pSessionRepo
+    ) {
+        this.sessionRepo = pSessionRepo;
+    }
 
 
     /** Kun asiakas tulee paasivulle tulokategorian nayttavan linkin kautta.
-     * esim. www.sotechat.com/from/source?=mielenterveys
+     * esim. www.sotechat.com/from/?source=mielenterveys
      * @param source polusta haettu kategoriamuuttuja
      * @param req pyynto
      * @param professional autentikaatiotiedot
@@ -39,4 +50,5 @@ public class CategoryController {
         /** Pyydetaan clientia tekemaan uudelleenohjaus juureen. */
         return "redirect:/";
     }
+
 }
