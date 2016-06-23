@@ -253,6 +253,10 @@ public class DatabaseServiceTest {
         Assert.assertEquals(0, databaseService.getConvInfoListOfUserId("xxd").size());
     }
 
-
+    @Test
+    Transactional
+    public void createNewUserTest(){
+        
+    }
 
 }

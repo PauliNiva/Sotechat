@@ -58,6 +58,29 @@ public class DatabaseService {
     }
 
     /**
+     * Luo uuden kayttajatilin ts. Person olion tietokantaan ja asettaa tälle
+     * parametrina annetut nimimerkin, login-nimen, salasanan ja roolin sekä
+     * käyttäjäid:n.
+     * @param userId kayttajan id
+     * @param loginName login-nimi
+     * @param screenName niminerkki
+     * @param role rooli
+     * @param password salasana
+     */
+    public final void createNewUser(String userId, String loginName,
+                                    String screenName, String role, String password){
+        try {
+            Person person = new Person(userId);
+            person.setUserName(screenName);
+            person.setLoginName(loginName);
+            person.setRole(role);
+            personService.addPerson(person, password);
+        }catch (Exception e){
+            System.out.println("DBE on createNewUser! " + e.toString());
+        }
+    }
+
+    /**
      * Lisätään parametrina annetun kayttaja id:n omaava henkilo parametrina
      * annettua kanavaid:ta vastaavaan keskusteluun.
      * @param userId kayttajan id
