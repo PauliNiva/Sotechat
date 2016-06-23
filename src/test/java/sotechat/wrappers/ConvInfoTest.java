@@ -23,7 +23,7 @@ public class ConvInfoTest {
 
     @Test
     public void getDateTest(){
-        Assert.assertEquals("31.1.", info.getDate());
+        Assert.assertEquals("30.1.", info.getDate());
     }
 
     @Test
