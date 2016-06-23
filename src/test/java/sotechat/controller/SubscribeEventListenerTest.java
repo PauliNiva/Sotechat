@@ -19,6 +19,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Luokkaa testaa subscribejen kasittelya SubscribeEventListenerissa
+ * (eli sen jalkeen, kun subscribe on jo validoitu Interceptorissa).
+ */
 public class SubscribeEventListenerTest {
 
     SubscribeEventListener listener;
@@ -44,8 +48,8 @@ public class SubscribeEventListenerTest {
         listener.setBroker(broker);
         listener.setSessionRepo(sessionRepo);
         listener.setMapper(mapper);
-
         channel = mock(Channel.class);
+
         when(sessionRepo.getSessionFromSessionId(any())).thenReturn(new Session());
         when(mapper.getChannel(any())).thenReturn(channel);
     }
