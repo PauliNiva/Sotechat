@@ -321,22 +321,25 @@
                 <version>1.1.10</version>
                 <configuration>
                     <targetClasses>
+                        <param>sotechat.Application</param>
+                        <param>sotechat.Launcher</param>
                         <param>sotechat.auth*</param>
-                        <param>sotechat.config*</param>
-                        <param>sotechat.controller*</param>
-                        <param>sotechat.data*</param>
                         <param>sotechat.domain*</param>
-                        <param>sotechat.domainService*</param>
+                        <param>sotechat.data*</param>
                         <param>sotechat.service*</param>
+                        <param>sotechat.wrappers*</param>
+                        <param>sotechat.websocketService*</param>
+                        <param>sotechat.controller*</param>
                     </targetClasses>
                     <targetTests>
+                        <param>sotechat.ApplicationTest</param>
+                        <param>sotechat.LauncherTest</param>
                         <param>sotechat.auth*</param>
-                        <param>sotechat.config*</param>
-                        <param>sotechat.controller*</param>
-                        <param>sotechat.data*</param>
                         <param>sotechat.domain*</param>
-                        <param>sotechat.domainService*</param>
                         <param>sotechat.service*</param>
+                        <param>sotechat.wrappers*</param>
+                        <param>sotechat.websocketService*</param>
+                        <param>sotechat.controller*</param>
                     </targetTests>
                 </configuration>
             </plugin>
