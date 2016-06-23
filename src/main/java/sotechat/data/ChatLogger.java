@@ -193,7 +193,6 @@ public class ChatLogger {
      * Taman vuoksi tata metodia on kutsuttava esim. kerran viikossa.
      * Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
      * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
-     * TODO: Testaa
      *
      * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
      */
@@ -221,7 +220,7 @@ public class ChatLogger {
             }
 
         } catch(Exception e) {
-            System.out.println("virhe!");
+            System.out.println("virhe yritettäessä tyhjentää lokia!");  //tms.
         }
 }
 
