@@ -43,7 +43,6 @@ public class WebSocketConnectHandler<S>
        String sessionId = SimpMessageHeaderAccessor
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
- //      this.connectionRepo.setSessionStatusToConnected(sessionId);
        Session userSession = this.sessionRepo
                .getSessionFromSessionId(sessionId);
        userSession.set("connectionStatus", "connected");
