@@ -132,7 +132,7 @@ public class SessionRepo extends MapSessionRepository {
             session.set("username", username);
             session.set("userId", userId);
             session.set("state", "start");
-            session.set("category", "Kategoria"); //TODO
+            session.set("category", "Aihe ei tiedossa");
             Channel channel = mapper.createChannel();
             channel.allowParticipation(session);
         }

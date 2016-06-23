@@ -65,6 +65,7 @@ public class StateController {
         this.broker = pBroker;
     }
 
+
     /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional autentikointitiedot

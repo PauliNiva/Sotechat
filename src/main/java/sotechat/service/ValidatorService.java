@@ -3,6 +3,7 @@ package sotechat.service;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
@@ -138,16 +139,15 @@ public class ValidatorService {
      * Jos sallitaan, palauttaa tyhjan Stringin.
      * Jos ei sallita, palauttaa virheilmoituksen.
      * HUOM: Mockito vaatii, ettei metodi ole final!
-     * @param principal autentikaatiotiedot
-     * @param sessionId sessioId
-     * @param channelIdWithPath channelIdWithPath
+     * @param acc pyynnon tiedot
      * @return virheilmoitus Stringina jos ei sallita pyyntoa.
      */
     public String validateSubscription(
-            final Principal principal,
-            final String sessionId,
-            final String channelIdWithPath
+            final StompHeaderAccessor acc
     ) {
+        Principal principal = acc.getUser();
+        String sessionId = getSessionIdFrom(acc);
+        String channelIdWithPath = acc.getDestination();
         String prefix = "Validate subscription for channel " + channelIdWithPath
                 + " by session id " + sessionId + " ### ";
 

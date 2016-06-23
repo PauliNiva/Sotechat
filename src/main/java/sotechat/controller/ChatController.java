@@ -43,10 +43,9 @@ public class ChatController {
      * @param acc Haetaan session-tiedot taalta.
      * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
      *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
-     *         Spring-magialla lahetetaan viesti kaikille kanavaan
+     *         Spring valittaa viestin kaikille kanavaan
      *         subscribanneille clienteille JSONina. MessageMapping
      *         annotaatiossa polku *palvelimelle* saapuviin viesteihin.
-     * @throws Exception mika poikkeus?
      */
     @MessageMapping("/toServer/chat/{channelId}")
     @SendTo("/toClient/chat/{channelId}")
