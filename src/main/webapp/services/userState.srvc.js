@@ -51,6 +51,10 @@ angular.module('chatApp')
                 return 'queue/userToQueue.tpl.html';
             }
         };
+        
+        function leaveChat() {
+            $http.post("/leave/" + getChannelID());
+        };
 
         /** Hakee get-pyynnöllä palvelimelta käyttäjän tiedot */
         function getVariablesFormServer() {
@@ -72,7 +76,8 @@ angular.module('chatApp')
             getUserState: getUserState,
             getChannelID: getChannelID,
             getUsername: getUsername,
-            getUserID: getUserID
+            getUserID: getUserID,
+            leaveChat: leaveChat
         };
 
         return queue;

@@ -2,8 +2,8 @@
  *  sivulle tulon yhteydessä, sekä sitä pyytäessä
  */
 angular.module('chatApp')
-    .controller('userCtrl', ['$scope', 'userStateService', 'heartBeatService',
-        function ($scope, userStateService) {
+    .controller('userCtrl', ['$scope','$http', 'userStateService', 'heartBeatService',
+        function ($scope, $http, userStateService) {
             $scope.pro = false;
             
             /** Tekee käyttäjän tilan päivityspyynnöt tarvittaessa */
@@ -13,7 +13,9 @@ angular.module('chatApp')
                     $scope.state = userStateService.getUserState();
                 });
             };
+            
             /** Kun controller ladataan päivitetään käyttäjän tila */
             $scope.updateState();
+            
         }]);
         

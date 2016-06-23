@@ -7,8 +7,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 import java.util.Enumeration;
 
-/** Spring Inception: Mocking a Mock Object
- * - sometimes a level 1 mock is just not enough.
+/** Spring Inception: Mocking a Mock Object.
  */
 public class MockMockHttpSession extends MockHttpSession {
 

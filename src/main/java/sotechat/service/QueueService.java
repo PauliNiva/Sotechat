@@ -1,160 +1,228 @@
 package sotechat.service;
 
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
-import sotechat.data.Queue;
-import sotechat.data.QueueItem;
+import sotechat.data.*;
+import sotechat.wrappers.MsgToServer;
+import sotechat.wrappers.QueueItem;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-/** Tarjoaa palvelut jonoon lisaamiseen, jonosta
- * poistamiseen ja jonon tarkasteluun.
+/** Tarjoaa palvelut jonoon lisaamiseen.
+ *  Jonosta poistamiseen ja jonon tarkasteluun.
  * Tata Servicea ei tarvitse synkronisoida, koska queue on jo synkronisoitu.
  */
 @Service
 public class QueueService {
 
-    /** Jono-olio, johon tallennetaan jonottajien tiedot. */
-    private Queue queue;
+    /** Jonottajia kuvaavat oliot sailotaan tanne. */
+    private List<QueueItem> queue;
 
-    /** Konstruktori alustaa jonon parametrina annetulla jono oliolla.
-     * @param pQueue jono-olio, johon jonottavien kayttajien tiedot tallennetaan
-     */
+    /** Mapper. */
     @Autowired
-    public QueueService(final Queue pQueue) {
-        this.queue = pQueue;
+    private Mapper mapper;
+
+    /** Session Repo. */
+    @Autowired
+    private SessionRepo sessionRepo;
+
+    /** Database Service. */
+    @Autowired
+    private DatabaseService databaseService;
+
+    /** Chat Logger. */
+    @Autowired
+    private ChatLogger chatLogger;
+
+    /** Konstruktori. */
+    public QueueService() {
+        this.queue = new ArrayList<>();
     }
 
-    /**
-     * addToQueue -metodi lisaa jonon peralle alkion, jossa tiedot jonottajan
-     * kanavaid:sta keskustelun aihealueesta ja jonottajan kayttajanimesta.
-     * Palauttaa true jos lisays onnistui.
-     * @param channelId jonottajan kanavaid
-     * @param category keskustelun aihealue
-     * @param username jonottajan kayttajanimi
-     * @return true jos lisays onnitui
+    /** Pyynto liittya jonoon, validoitava ennen taman metodin kutsua.
+     * @param request req
+     * @param payload payload
      */
-    public final boolean addToQueue(
+    public final synchronized void joinQueue(
+            final HttpServletRequest request,
+            final JsonObject payload
+    ) {
+        /** Kaivetaan requestista ja payloadista tietoja.*/
+        String sessionId = request.getSession().getId();
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
+        String username = payload.get("username").getAsString();
+        String startMessage = payload.get("startMessage").getAsString();
+
+        /** Siirretaan tehtava overloadatulle metodille. */
+        joinQueue(session, username, startMessage);
+    }
+
+    /** Overloadattu metodi joinQueue testauksen helpottamiseksi.
+     * @param session palvelimelta loytyva sessio-olio
+     * @param username kayttajan antama
+     * @param startMsg kayttajan antama
+     */
+    public final synchronized void joinQueue(
+            final Session session,
+            final String username,
+            final String startMsg
+    ) {
+        String userId = session.get("userId");
+        String channelId = session.get("channelId");
+        String category = session.get("category");
+
+        /** Muistetaan kayttajan valitsema nimimerkki. */
+        session.set("username", username);
+
+        /** Kirjataan kayttajalle oikeus kuunnella kanavaa. */
+        Channel channel = mapper.getChannel(channelId);
+        channel.allowParticipation(session);
+
+        /** Asetetaan kayttaja jonoon odottamaan palvelua. */
+        QueueItem item = new QueueItem(channelId, category, username);
+        queue.add(item);
+
+        /** Asetetaan kayttajan tilaksi "jono". */
+        session.set("state", "queue");
+
+        /** Luodaan tietokantaan uusi keskustelu. */
+        databaseService.createConversation(username, channelId, category);
+
+        /** Luodaan aloitusviestista msgToServer-olio. */
+        MsgToServer msg = MsgToServer.create(userId, channelId, startMsg);
+
+        /** Kirjataan viesti lokeihin, mutta ei laheteta sita viela, koska
+         * kanavalla ei ole ketaan. Kun kanavalle liittyy joku,
+         * sille lahetetaan lokit. */
+        chatLogger.logNewMessage(msg);
+    }
+
+    /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
+     * @param channelId kanavaId
+     * @param accessor taalta autentikaatiotiedot
+     * @throws Exception jos tiettyä kanavaa ei ole luotu, ei siihen löydy
+     * myöskään rekisteröitynyttä hoitajaa. Exceptionin voi siis aiheuttaa
+     * return channel.getAssignedPro();
+     * @return String pro username, kenelle popattu kanava kuuluu
+     */
+    public final synchronized String popQueue(
             final String channelId,
-            final String category,
-            final String username) {
-        return queue.addTo(channelId, category, username);
+            final SimpMessageHeaderAccessor accessor
+    ) {
+        Channel channel = mapper.getChannel(channelId);
+        if (!removeFromQueue(channelId)) {
+            /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
+            return channel.getAssignedPro();
+        }
+
+        String sessionId =  accessor.getSessionAttributes()
+                .get("SPRING.SESSION.ID").toString();
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
+
+        /** Lisataan popattu kanava poppaajan kanaviin. */
+        channel.allowParticipation(session);
+
+        /** Muutetaan popattavan kanavan henkiloiden tilaa. */
+        changeParticipantsState(channelId);
+
+        /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
+        String userId = session.get("userId");
+        databaseService.addPersonToConversation(userId, channelId);
+
+        /** Muistetaan ja palautetaan poppaajan nimi. */
+        String username = session.get("username");
+        channel.setAssignedPro(username);
+        return username;
     }
 
-    /** Palauttaa jonon Stringina, joka nayttaa JSON-ystavalliselta taulukolta.
-     * TODO: esimerkkioutput.
-     * @return string
+    /** Poistaa jonosta alkion, jonka channelId sama kuin parametrissa.
+     * @param channelId haettu channelId
+     * @return true jos poisto onnistui, fail jos alkiota ei loytynyt.
      */
-    @Override
-    public final String toString() {
-        List<QueueItem> list = queue.getQueue();
-        String json = "{\"jono\": [";
-        for (QueueItem item : list) {
-            if (list.indexOf(item) != 0) {
-                json += ", ";
+    public boolean removeFromQueue(
+            final String channelId
+    ) {
+        /** Etsitaan jonosta oikea alkio. */
+        for (int i = 0; i < queue.size(); i++) {
+            QueueItem item = queue.get(i);
+            if (item.getChannelId().equals(channelId)) {
+                /** Loytyi, poistetaan. */
+                queue.remove(i);
+                return true;
             }
-            json += jsonObject(item);
         }
-        json += "]}";
-        return json;
+        /** Ei loytynyt. */
+        return false;
     }
 
-    /**
-     * firstOfQueue -metodi palauttaa jonon ensimmaisen alkion JSON -olion
-     * muodossa ja samalla poistaa sen jonosta tai jos jono on tyhja
-     * palautetaan tyhja String.
-     * @return jonon ensimmainen alkio JSON oliona, jossa muuttujina kanavaid,
-     * keskustelun aihealue (kategoria) seka kayttajanimi
+    /** Muokataan popattavan kanavan normikayttajien sessioiden tilaksi "chat".
+     * @param channelId kanavan id
      */
-    public final String firstOfQueue() {
-        try {
-            QueueItem first = queue.pollFirst();
-            return jsonObject(first);
-        } catch (Exception e) {
-            return "";
+    private void changeParticipantsState(
+            final String channelId
+    ) {
+        Channel channel = mapper.getChannel(channelId);
+        for (Session member : channel.getCurrentSubscribers()) {
+            /** Hoitajan tilan kuuluu aina olla "pro". */
+            if (!member.get("state").equals("pro")) {
+                member.set("state", "chat");
+            }
         }
     }
 
-    /**
-     * firstOfCategory -metodi palauttaa ensimmaisen alkion jonosta parametrina
-     * annetusta kategoriasta JSON olion muodossa ja samalla poistaa sen
-     * jonosta tai jos jono on tyhja palautetaan tyhja String.
-     * @param category aihealue, jonka keskusteluja haetaan
-     * @return jonon ensimmainen alkio haetusta kategoriasta JSON oliona, jossa
-     * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
-     */
-    public final String firstOfCategory(final String category) {
-        try {
-            QueueItem first = queue.pollFirstFrom(category);
-            return jsonObject(first);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    /**
-     * Poistaa jonosta alkion kanavaid:n perusteella ja palauttaa sita
-     * esittavan JSON -olion.
-     * @param channelId kanavaid, jota vastaava alkio halutaan ottaa jonosta
-     * @return haettua kanavaid:ta vastaava alkio JSON -oliona, jossa
-     * muuttujina kanavaid, keskustelun aihealue (kategoria) seka kayttajanimi
-     */
-    public final String removeFromQueue(final String channelId) {
-        try {
-            QueueItem removed = queue.remove(channelId);
-            return jsonObject(removed);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    /**
-     * queueLength -metodi palauttaa jonon pituuden.
-     * @return jonon alkioiden maara
-     */
-    public final int queueLength() {
-        return queue.length();
-    }
-
-    /**
-     * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
-     * alkiota edeltävän jonon pituuden.
-     * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
-     *                  halutaan selvittää
-     * @return  alkioiden määrä, jotka edeltävät haettua alkiota
-     */
-    public final int queueLength(final String channelId) {
-        return queue.itemsBefore(channelId);
-    }
-
-    /**
-     * queueLength -metodi palauttaa parametrina annettua kanavaid:tä vastaavaa
-     * alkiota edeltävän jonon pituuden parametrina annetussa kategoriassa.
+    /** Palauttaa parametrina annettua kanavaid:ta vastaavaa alkiota
+     * edeltavan jonon pituuden parametrina annetussa kategoriassa.
      * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
      *                  halutaan selvittää
      * @param category aihealue, jonka alkiot otetaan laskussa mukaan
-     * @return aihealueeseen kuuluvien alkioiden määrä, jotka edeltävät haettua
-     * alkiota
+     * @return sijainti jonossa, kyseisen kategorian alla, alkaen ykkosesta.
+     * jos haettua alkiota ei loydy, palauttaa -1.
      */
-    public final int queueLength(
+    public final int getPositionInQueue(
             final String channelId,
             final String category
     ) {
-        return queue.itemsBeforeIn(channelId, category);
+        int countItemsOfSameCategory = 1;
+        for (int i = 0; i < queue.size(); i++) {
+            QueueItem item = queue.get(i);
+            if (item.getChannelId().equals(channelId)) {
+                return countItemsOfSameCategory;
+            }
+            if (item.getCategory().equals(category)) {
+                countItemsOfSameCategory++;
+            }
+        }
+        return -1;
+    }
+
+    /** Palauttaa jonon Stringina, joka nayttaa JSON-ystavalliselta taulukolta.
+     * Esim: {"jono": [{"channelId": "xyz", "category": "1", "username": "Ra"}]}
+     * @return string
+     */
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder("{\"jono\": [");
+        for (int i = 0; i < queue.size(); i++) {
+            QueueItem item = queue.get(i);
+            if (i > 0) {
+                output.append(", ");
+            }
+            output.append(item.toString());
+        }
+        output.append("]}");
+        return output.toString();
     }
 
     /**
-     * jsonObject -metodi luo JSON -olio muotoisen String esityksen parametrina
-     * annetusta QueueItemista.
-     * @param item jonon alkio
-     * @return JSON -olio muotoinen esitys jonon alkiosta
+     * Palauttaa jonon pituuden
+     * @return Jonon pituus
      */
-    private String jsonObject(final QueueItem item) {
-        String json = "{";
-        json += "\"channelId\": \"" + item.getChannelId() + "\", ";
-        json += "\"category\": \"" + item.getCategory() + "\", ";
-        json += "\"username\": \"" + item.getUsername() + "\"}";
-        return json;
+    public final int getQueueLength() {
+        return this.queue.size();
     }
-
 }

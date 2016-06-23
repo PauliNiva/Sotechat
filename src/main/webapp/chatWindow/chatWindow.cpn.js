@@ -11,6 +11,7 @@ angular.module('chatProApp').component('proChatWindowComponent', {
     templateUrl: 'chatWindow/chatWindow.tpl.html',
     controller: 'proChatController',
     bindings: {
-        channel: '@' //Välitetään kanavan ID controllerille
+        channel: '@', //Välitetään kanavan ID controllerille
+        status: '&'
     }
 });

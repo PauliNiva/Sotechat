@@ -1,5 +1,7 @@
 package sotechat.controller;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -9,74 +11,73 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-import org.springframework.session.SessionRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-import sotechat.domainService.ConversationService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sotechat.service.QueueService;
+import sotechat.service.ValidatorService;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
-import sotechat.service.StateService;
 
 /** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
 @RestController
 public class StateController {
 
-    /** State Service. */
-    private final StateService stateService;
+    /** Validator Service. */
+    private final ValidatorService validatorService;
 
     /** Session Repository. */
     private final SessionRepo sessionRepo;
 
+    /** QueueService. */
+    private final QueueService queueService;
+
     /** Queue Broadcaster. */
     private final QueueBroadcaster queueBroadcaster;
 
-    /** Testi. */
-    private final ChatLogBroadcaster chatLogBroadcaster;
-
-    /** Conversation service */
-    private final ConversationService conversationService;
+    /** Message Broker. */
+    private final SimpMessagingTemplate broker;
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
-     * @param pStateService stateService
-     * @param pQueueBroadcaster queue Broadcaster
-     * @param pChatLogBroadcaster chatLogBroadcaster
+     * @param pSessionRepo sessionRepo
+     * @param pQueueService queueService
+     * @param pQueueBroadcaster queueBroadCaster
+     * @param pBroker broker
      */
     @Autowired
     public StateController(
-            final StateService pStateService,
+            final ValidatorService pValidatorService,
             final SessionRepo pSessionRepo,
+            final QueueService pQueueService,
             final QueueBroadcaster pQueueBroadcaster,
-            final ChatLogBroadcaster pChatLogBroadcaster,
-            final ConversationService pConversationService
+            final SimpMessagingTemplate pBroker
     ) {
-        this.stateService = pStateService;
+        this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
+        this.queueService = pQueueService;
         this.queueBroadcaster = pQueueBroadcaster;
-        this.chatLogBroadcaster = pChatLogBroadcaster;
-        this.conversationService = pConversationService;
+        this.broker = pBroker;
     }
 
-    /** Kun customerClient haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
+    /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional autentikointitiedot
      * @return JSON-muotoon paketoitu UserStateResponse.
      *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
      *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
      *          kayttajalle.
-     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
             final HttpServletRequest req,
             final Principal professional
-            ) throws Exception {
-
-        System.out.println("Session id = " + req.getSession().getId());
+    ) {
         Session session = sessionRepo.updateSession(req, professional);
         return new UserStateResponse(session);
     }
@@ -88,14 +89,12 @@ public class StateController {
      *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
      *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
      *          kayttajalle.
-     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/proState", method = RequestMethod.GET)
     public final ProStateResponse returnProStateResponse(
             final HttpServletRequest req,
             final Principal professional
-            ) throws Exception {
-
+    ) {
         if (professional == null) {
             /** Hacking attempt? */
             return null;
@@ -104,70 +103,119 @@ public class StateController {
         return new ProStateResponse(session);
     }
 
-
     /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
-     * @param request session tiedot
+     * @param request pyynnon tiedot
      * @param professional autentikaatiotiedot
      * @return JSON {"content":"Denied..."} tai {"content":"OK..."}
      *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
      *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
      *          kayttajalle.
-     * @throws Exception mika poikkeus
      */
     @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
     public final String respondToJoinPoolRequest(
             final HttpServletRequest request,
             final Principal professional
-            ) throws Exception {
-
-        if (professional != null) {
-            /** Hoitaja yrittaa liittya pooliin asiakkaana. */
-            return "{\"content\":\"Denied join "
-                    + "pool request for professional.\"}";
-        }
-        String answer = stateService.respondToJoinPoolRequest(request);
-        queueBroadcaster.broadcastQueue();
-        System.out.println("Returning: " + "{\"content\":\"" + answer + "\"}");
-        return "{\"content\":\"" + answer + "\"}";
+    ) {
+        String response = processJoinPoolReq(request, professional);
+        return "{\"content\":\"" + response + "\"}";
     }
 
-    /** Hoitaja avaa jonosta chatin, JS-WebSocket subscribaa /queue/id/.
-     *  (Tama metodi jostain syysta aktivoituu, vaikka kyseessa ei ole viesti.)
+    /** Validoi pyynto liittya jonoon ja suorita se.
+     * @param req pyynnon tiedot
+     * @param auth autentikaatiotiedot
+     * @return String "OK..." tai "Denied..."
+     */
+    private String processJoinPoolReq(
+            final HttpServletRequest req,
+            final Principal auth
+    ) {
+
+        /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
+        JsonObject payload;
+        try {
+            String jsonString = req.getReader().readLine();
+            JsonParser parser = new JsonParser();
+            payload = parser.parse(jsonString).getAsJsonObject();
+        } catch (Exception e) {
+            return "Denied due to invalid JSON formatting.";
+        }
+
+        /** Validointi. */
+        String error = validatorService.validateJoin(req, payload, auth);
+        if (!error.isEmpty()) {
+            return error;
+        }
+
+        /** Suorittaminen. */
+        queueService.joinQueue(req, payload);
+        queueBroadcaster.broadcastQueue();
+        return "OK, please request new state now.";
+    }
+
+    /** Kun hoitaja yrittaa ottaa jonosta uuden chatin, client lahettaa
+     * subscribe-pyynnon /queue/id/ ja tama metodi aktivoituu.
+     *
      *  Toimenpiteet mita tehdaan:
-     *  - Poistetaan jonosta olio
+     *  - Poistetaan jonosta kyseinen chatti.
      *  - Broadcastataan jonon uusi tila hoitajille
-     *  - Heratellaan avatun kanavan osalliset (eli yksi jonottaja)
+     *  - Kerrotaan kaikille asianomaisille (/queue/id/ subscribaajille),
+     *    kenelle hoitajalle kanava kuuluu. Huomaa palautusarvon selitys!
      * @param channelId channelId
      * @param accessor accessor
-     * @return Joko tyhja String "" tai JSON {"content":"channel activated."}
-     *          Palautusarvo kuljetetaan "jonotuskanavan" kautta jonottajalle.
-     * @throws Exception mika poikkeus
+     * @return Palautusarvo lahetetaan JSONina jonotuskanavalle.
+     *          esim. {"channel assigned to":"Hoitaja Anne"}
+     *          Kayttotapauksia viestille:
+     *          - Kerrotaan jonottajalle, etta chatti on auki
+     *          - Poppausta yrittanyt client saa kuulla, etta poppaus onnistui
+     *          - Poppausta yrittanyt client saa kuulla, etta joku toinen ehti
+     *              juuri popata ennen meita.
      */
     @MessageMapping("/toServer/queue/{channelId}")
     @SendTo("/toClient/queue/{channelId}")
     public final String popClientFromQueue(
             final @DestinationVariable String channelId,
             final SimpMessageHeaderAccessor accessor
-            ) throws Exception {
+    ) {
 
         /** Varmista, etta poppaaja on autentikoitunut. */
         if (accessor.getUser() == null) {
             System.out.println("Hacking attempt?");
             return "";
         }
-        /** Pyydetaan StateServicea suorittamaan poppaus. */
-        String wakeUp = stateService.popQueue(channelId, accessor);
-        if (wakeUp.isEmpty()) {
-            /** Case: Toinen professional ehtikin popata taman ennen meita. */
-            return "";
-        }
-        /** HUOM: Kanavan viestit broadcast, kun kanavalle subscribataan. */
 
-        /** Paivitetaan jonon tila kaikille ammattilaisille. */
+        /** Yritetaan popata ja haetaan username kenelle kanava on popattu. */
+        String assignee = queueService.popQueue(channelId, accessor);
+
+        /** Broadcastataan jonon tila kaikille ammattilaisille.
+         * HUOM: Ei broadcastata viesteja viela. Vasta kun joku subscribaa. */
         queueBroadcaster.broadcastQueue();
 
-        /** Palautetaan poppaajalle tieto, etta poppaus onnistui. */
-        return wakeUp;
+        /** Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
+        return "{\"channelAssignedTo\":\"" + assignee + "\"}";
+    }
+
+    /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
+     * @param req req
+     * @param pro pro
+     * @param channelId channelId
+     */
+    @RequestMapping(value = "/leave/{channelId}", method = RequestMethod.POST)
+    public final void leaveChat(
+            final @PathVariable String channelId,
+            final HttpServletRequest req,
+            final Principal pro
+    ) {
+        String sessionId = req.getSession().getId();
+        if (!validatorService.validateLeave(sessionId, pro, channelId)) {
+            return;
+        }
+        sessionRepo.leaveChannel(channelId, sessionId);
+
+        /** Suljetaan kanava, kun kuka tahansa lahtee.
+         * Jatetaan se kuitenkin auki hoitajan valilehtiin. */
+        String channelIdWithPath = "/toClient/chat/" + channelId;
+        String closedChannelNotice = "{\"notice\":\"chat closed\"}";
+        broker.convertAndSend(channelIdWithPath, closedChannelNotice);
     }
 
 }

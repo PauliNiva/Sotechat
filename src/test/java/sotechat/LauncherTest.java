@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 
 public class LauncherTest {
 
-    Launcher launcher;
+    private Launcher launcher;
 
     @Before
     public void setUp() {

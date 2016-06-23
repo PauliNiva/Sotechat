@@ -1,0 +1,13 @@
+<div class="panel panel-default historyConPanel">
+    <div class="panel-body historyConPanelBody">
+        <div ng-repeat="message in messages | orderBy:'timeStamp':false | limitTo:messageQuantity" class="message"
+             scroll-glue-top>
+            <div ng-include="'chatWindow/message.tpl.html'"></div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-success" ng-click="addMessageQuantity()" ng-show="messagesLeft">Näytä lisää</button>
+        <button class="btn btn-success" ng-click="showLess()" ng-hide="messagesLeft">Näytä vähemmän</button>
+        <span ng-show="showLeft" style="display: inline">Ei enempää viestejä!</span>
+    </div>
+</div>

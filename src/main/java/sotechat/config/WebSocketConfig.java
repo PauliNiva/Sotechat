@@ -1,6 +1,8 @@
 package sotechat.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -8,17 +10,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.ExpiringSession;
 import org.springframework.session.web.socket.config
         .annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import sotechat.controller.Interceptor;
-import sotechat.data.SessionRepoImpl;
+import sotechat.controller.SubscriptionInterceptor;
+import sotechat.data.SessionRepo;
+import sotechat.service.ValidatorService;
 
 
 /** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
  * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
- * Ilmeisesti tassa maaritellaan polut, joihin tulevat/menevat viestit
+ * Maaritellaan polut, joihin tulevat/menevat viestit
  * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan.
  * Lisaksi ohjataan subscriptionien hyvaksyminen interceptorille. */
 @Configuration
@@ -28,10 +30,17 @@ public class WebSocketConfig extends
         AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
     /** SessionRepoImpl taytyy autowireaa tassa, jotta WebSocket-sessiot
-     * onnistutaan sailomaan sinne.
-     */
+     * onnistutaan sailomaan sinne. */
     @Autowired
-    private SessionRepoImpl repository;
+    private SessionRepo repository;
+
+    /** ValidatorService taytyy autowireaa tassa, jotta se voidaan antaa
+     * parametrina luotavalle Interceptorille, joka on pakko maaritella tassa.*/
+    @Autowired
+    private ValidatorService validatorSer;
+
+    @Autowired
+    private ApplicationListener<ApplicationEvent> subscribeEventListener;
 
 
     /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
@@ -41,7 +50,9 @@ public class WebSocketConfig extends
      *               palvelimen ChatController-luokalta asiakasohjelmalle.
      */
     @Override
-    public final void configureMessageBroker(final MessageBrokerRegistry conf) {
+    public final void configureMessageBroker(
+            final MessageBrokerRegistry conf
+    ) {
         conf.enableSimpleBroker("/toClient");
     }
 
@@ -53,17 +64,20 @@ public class WebSocketConfig extends
      *                 asiakasohjelmien viesteille paateosoitteen.
      */
     @Override
-    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
+    public final void configureStompEndpoints(
+            final StompEndpointRegistry reg
+    ) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 
-    /** Subscriptionien hyvaksyminen ohjataan
-     * Interceptor -instanssille.
+    /** Subscriptionien hyvaksyminen ohjataan Interceptor -instanssille.
      * @param registration registration
      */
     @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(new Interceptor());
+    public void configureClientInboundChannel(
+            final ChannelRegistration registration
+    ) {
+        registration.setInterceptors(new SubscriptionInterceptor(validatorSer));
     }
 }
 

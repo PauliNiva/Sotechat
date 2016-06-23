@@ -1,18 +1,12 @@
 package sotechat.controller;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,33 +14,20 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import sotechat.Launcher;
 import sotechat.data.Mapper;
-import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
-import sotechat.data.SessionRepoImpl;
-import sotechat.data.*;
-import sotechat.data.QueueImpl;
-import sotechat.domain.Conversation;
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.MessageService;
-import sotechat.domainService.PersonService;
+
+
 import sotechat.repo.ConversationRepo;
-import sotechat.repo.MessageRepo;
-import sotechat.repo.PersonRepo;
-import sotechat.service.DatabaseService;
 import sotechat.util.MockMockHttpSession;
 import sotechat.util.MockPrincipal;
-import sotechat.service.QueueService;
-import sotechat.service.StateService;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -56,78 +37,37 @@ import static org.springframework.test.web.servlet.result
  * StateControllerTest.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = MockServletContext.class)
+@SpringApplicationConfiguration(classes = Launcher.class)
 @WebAppConfiguration
+@Transactional
 public class StateControllerTest {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     private MockMvc mvc;
     private SessionRepo sessions;
+    private Mapper mapper;
 
-    /**
-     * Before.
+    @Autowired
+    private ConversationRepo conversationRepo;
+
+    /** Before.
      * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
-        ChatLogger chatLogger = new ChatLogger();
-        Mapper mapper = new MapperImpl();
-        SubscribeEventListener listener = new SubscribeEventListener();
-        QueueService qService = new QueueService(new QueueImpl());
-        sessions = new SessionRepoImpl(mapper);
-        ConversationRepo mockConversationRepo = mock(ConversationRepo.class);
-        MessageRepo mockMessageRepo = mock(MessageRepo.class);
-        when(mockConversationRepo.findOne(any(String.class)))
-                .thenReturn(new Conversation());
-        when(mockConversationRepo.getOne(any(String.class)))
-                .thenReturn(new Conversation());
-        PersonRepo mockPersonRepo = mock(PersonRepo.class);
-        ConversationService conversationService = new ConversationService(
-                mockConversationRepo, mockPersonRepo);
-        PersonService personService = new PersonService(mockPersonRepo);
-        MessageService messageService = new MessageService(mockMessageRepo);
-        SimpMessagingTemplate broker = new SimpMessagingTemplate(
-                new MessageChannel() {
-            @Override
-            public boolean send(Message<?> message) {
-                return true;
-            }
-
-            @Override
-            public boolean send(Message<?> message, long l) {
-                return true;
-            }
-        });
-        QueueBroadcaster broadcaster = new QueueBroadcaster(qService, broker);
-        ChatLogBroadcaster logBroadcaster = new ChatLogBroadcaster(
-                chatLogger, broker);
-        DatabaseService databaseService = new DatabaseService(personService,
-                                            conversationService,
-                                            messageService);
-        StateService state = new StateService(
-                mapper,
-                listener,
-                qService,
-                chatLogger,
-                sessions,
-                databaseService);
-        mvc = MockMvcBuilders
-                .standaloneSetup(new StateController(
-                        state,
-                        sessions,
-                        broadcaster,
-                        logBroadcaster,
-                        conversationService))
-                .build();
+        mapper = (Mapper)webApplicationContext.getBean("mapper");
+        sessions = (SessionRepo)webApplicationContext
+                .getBean("sessionRepo");
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
-    /** Get pyynto polkuun "/userState" palauttaa statukseksen OK.
-     * @throws Exception
-     */
-    @Test
-    public void testGetUserStateReturnsOK() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .get("/userState").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+    @After
+    public void tearDown() throws Exception {
+        /* Unohdetaan sessiot, jotta testien valille
+         * ei syntyisi riippuvaisuuksia. */
+        sessions.forgetSessions();
     }
 
     /** GET polkuun /userState palauttaa uskottavat arvot.
@@ -137,6 +77,7 @@ public class StateControllerTest {
     public void testGetUserStateReturnsPlausibleValues() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .get("/userState").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(5)))
                 .andExpect(jsonPath("$.state", is("start")))
                 .andExpect(jsonPath("$.username", is("Anon")))
@@ -146,19 +87,12 @@ public class StateControllerTest {
     }
 
     @Test
-    public void testGetProStateReturnsOK() throws Exception {
-         mvc.perform(MockMvcRequestBuilders
-                .get("/proState").accept(MediaType.APPLICATION_JSON)
-                    .principal(new MockPrincipal("hoitaja")))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void testGetProStateReturnsPlausibleValues() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                     .get("/proState")
                     .accept(MediaType.APPLICATION_JSON)
                         .principal(new MockPrincipal("hoitaja")))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(6)))
                 .andExpect(jsonPath("$.state").isNotEmpty())
                 .andExpect(jsonPath("$.username").isNotEmpty())
@@ -168,9 +102,19 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.channelIds", is("[]")));
     }
 
+    @Test
+    public void testCantAccessProStateWithoutAuthentication() throws Exception {
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get("/proState")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        assertEquals("", content);
+    }
 
     @Test
-    public void joinPoolWithoutProperSessionFails() throws Exception {
+    public void testJoinQueueWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -182,10 +126,10 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolTypicalCaseWorks() throws Exception {
+    public void testJoinQueueTypicalCaseWorks() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
                         .get("/userState")
@@ -193,13 +137,14 @@ public class StateControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        /** Naita ei kayteta. Sailytetaan tulevia testeja varten!
+
+        /* Naita ei kayteta. Sailytetaan tulevia testeja varten!
         String response = result.getResponse().getContentAsString();
         JsonObject jsonObj = new JsonParser().parse(response).getAsJsonObject();
         String channelId = jsonObj.get("channelId").toString();
-        String userId = jsonObj.get("userId").toString(); */
+        String userId = jsonObj.get("userId").toString();*/
 
-        /** Tehdaan sitten samalta 007-sessiolta kelpo /joinPool pyynto. */
+        /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -212,19 +157,19 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithWrongStateFails() throws Exception {
+    public void testJoinQueueWithWrongStateFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
                 .get("/userState")
                 .session(mockSession)
                 .accept(MediaType.APPLICATION_JSON));
 
         /** Asetetaan palvelimella session tilaksi "chat". */
-        sessions.getSessionObj("007").set("state", "chat");
+        sessions.getSessionFromSessionId("007").set("state", "chat");
 
-        /** Tehdaan /joinPool pyynto sessiolta 007, vaikka tila eioo "start". */
+        /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila != "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
@@ -237,26 +182,48 @@ public class StateControllerTest {
     }
 
     @Test
-    public void joinPoolWithReservedScreenNameFails() throws Exception {
+    public void testJoinQueueWithReservedScreennameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        this.mapper.mapProUsernameToUserId("hoitaja", "666");
+
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
-         * alkutilaksi "start", joka mahdollistaa /joinPool pyynnot. */
+         * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
         mvc.perform(MockMvcRequestBuilders
                         .get("/userState")
                         .session(mockSession)
                         .accept(MediaType.APPLICATION_JSON));
 
-        /** Tehdaan sitten samalta 007-sessiolta /joinPool pyynto,
+        /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
-                .contentType(MediaType.APPLICATION_JSON).content(json)
-                .session(mockSession))
+        .contentType(MediaType.APPLICATION_JSON).content(json)
+        .session(mockSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                        is("Denied join pool request due "
-                                + "to reserved username.")));
+                           is("Denied join pool request due "
+                                   + "to reserved username.")));
+    }
+
+    @Test
+    public void testCantJoinQueueIfClientJoinRequestInvalid() throws Exception {
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        mvc.perform(MockMvcRequestBuilders
+                        .get("/userState")
+                        .session(mockSession)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String json = "väärä json";
+
+        mvc.perform(post("/joinPool")
+        .contentType(MediaType.APPLICATION_JSON).content(json)
+        .session(mockSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("Denied due to invalid JSON formatting.")));
     }
 
 }
