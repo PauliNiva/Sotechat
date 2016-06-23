@@ -10,7 +10,8 @@ import java.util.LinkedHashSet;
  */
 public class Session {
 
-    /** Attribuutit, kuten "username", "userId", yms. */
+    /** Attribuutit, kuten "username", "userId", "sessionId" yms.
+     * Huom: normikayttajalla attribuutti "channelId", pro:lla "channelIds". */
     private HashMap<String, String> attributes;
 
     /** Kanavat, joille sessiolla on oikeus osallistua. Myos Channel-oliossa. */
@@ -22,7 +23,12 @@ public class Session {
         channels = new LinkedHashSet<>();
     }
 
-    /** Konstruktori.
+    /** Setteri attribuuteille. Useimpia attribuutteja voi muokata suoraan
+     * taalta, mutta kanavia on tarkoitus kasitella metodien addChannel/
+     * removeChannel kautta. sessionId ja userId saattaa olla myos kirjattuna
+     * muualle, esim. mapperiin - eli jos niita muokkaa taalta, voi olla
+     * etta vanha arvo jaa viela jonnekin muualle. (Todellista kayttotapausta
+     * muokkaamiseen ei ole, relevantti lahinna testeja kirjoittaessa).
      * @param key avain, esim. "username"
      * @param value arvo, esim. "Mikko"
      */

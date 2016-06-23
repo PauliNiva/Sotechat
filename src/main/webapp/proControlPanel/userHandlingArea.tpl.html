@@ -13,10 +13,10 @@
                     </div>
                 </div>
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button id="single-button" type="button" class="btn" uib-dropdown-toggle>
+                    <button  name="menu" id="single-button" type="button" class="btn" uib-dropdown-toggle>
                         <span class="glyphicon glyphicon-cog"></span>
                     </button>
-                    <ul class="dropdown-menu" name="menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
                         <li role="menuitem"><a href="#" name="history" ng-click="showHistory()">Selaa historiaa</a></li>
                         <li role="menuitem"><a href="#" name="logout" ng-click="logout()">Kirjaudu ulos</a></li>
                     </ul>
@@ -31,17 +31,19 @@
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
             <ul class="nav nav-tabs">
-                <li ng-repeat="chat in chats" name="{{chat.title}}" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
+                <li ng-repeat="chat in chats" name="chatTab" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
             </ul>
             <div ng-repeat="chat in chats" ng-show="activeChatTab == chat.index" class="chat-container">
                 <div class="col-lg-9 col-md-8 col-sm-8 proContainer">
-                    <pro-chat-Window-Component channel="{{chat.channel}}"></pro-chat-Window-Component>
+                    <pro-chat-Window-Component channel="{{chat.channel}}" status="userLeavesChat(chat.channel)"></pro-chat-Window-Component>
                 </div>
                 <div class="col-lg-3 col-md-4 col-sm-4">
                     <div class="panel panel-default">
                         <div class="row">
                             <div class="form-group">
-                                <button type="button" class="btn btn-block btn-danger proButton" name="endConversation" ng-click="removeChatTab(chat.channel)">Lopeta keskustelu
+                                <button type="button" ng-show="chat.status == 'online'" class="btn btn-block btn-danger proButton" name="endConversation" ng-click="endConversation(chat.channel)">Lopeta keskustelu
+                                </button>
+                                <button type="button" ng-show="chat.status == 'offline'" class="btn btn-block btn-success proButton" name="closeConversation" ng-click="closeConversation(chat.channel)">Sulje keskustelu
                                 </button>
                             </div>
                         </div>

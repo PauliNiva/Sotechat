@@ -54,7 +54,7 @@ public class Channel {
     /** Kirjataan subscribe ylos, seka /queue/ etta /chat/ tapauksissa.
      * @param session sessio-olio
      */
-    public final synchronized void addSubscriber(
+    public synchronized void addSubscriber(
             final Session session
     ) {
         currentSubscribers.add(session);

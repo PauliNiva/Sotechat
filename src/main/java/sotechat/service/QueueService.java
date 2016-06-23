@@ -105,6 +105,9 @@ public class QueueService {
     /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
+     * @throws Exception jos tiettyä kanavaa ei ole luotu, ei siihen löydy
+     * myöskään rekisteröitynyttä hoitajaa. Exceptionin voi siis aiheuttaa
+     * return channel.getAssignedPro();
      * @return String pro username, kenelle popattu kanava kuuluu
      */
     public final synchronized String popQueue(
@@ -116,6 +119,7 @@ public class QueueService {
             /** Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
             return channel.getAssignedPro();
         }
+
         String sessionId =  accessor.getSessionAttributes()
                 .get("SPRING.SESSION.ID").toString();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
@@ -201,7 +205,7 @@ public class QueueService {
      * @return string
      */
     @Override
-    public final String toString() {
+    public String toString() {
         StringBuilder output = new StringBuilder("{\"jono\": [");
         for (int i = 0; i < queue.size(); i++) {
             QueueItem item = queue.get(i);
@@ -212,5 +216,13 @@ public class QueueService {
         }
         output.append("]}");
         return output.toString();
+    }
+
+    /**
+     * Palauttaa jonon pituuden
+     * @return Jonon pituus
+     */
+    public final int getQueueLength() {
+        return this.queue.size();
     }
 }

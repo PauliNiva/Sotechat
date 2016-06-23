@@ -27,6 +27,7 @@ import sotechat.util.MockPrincipal;
 import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.*;
@@ -101,6 +102,16 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.channelIds", is("[]")));
     }
 
+    @Test
+    public void testCantAccessProStateWithoutAuthentication() throws Exception {
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get("/proState")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        assertEquals("", content);
+    }
 
     @Test
     public void testJoinQueueWithoutProperSessionFails() throws Exception {
@@ -193,6 +204,26 @@ public class StateControllerTest {
                 .andExpect(jsonPath("$.content",
                            is("Denied join pool request due "
                                    + "to reserved username.")));
+    }
+
+    @Test
+    public void testCantJoinQueueIfClientJoinRequestInvalid() throws Exception {
+        MockMockHttpSession mockSession = new MockMockHttpSession("007");
+        mvc.perform(MockMvcRequestBuilders
+                        .get("/userState")
+                        .session(mockSession)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String json = "väärä json";
+
+        mvc.perform(post("/joinPool")
+        .contentType(MediaType.APPLICATION_JSON).content(json)
+        .session(mockSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$.content",
+                        is("Denied due to invalid JSON formatting.")));
     }
 
 }

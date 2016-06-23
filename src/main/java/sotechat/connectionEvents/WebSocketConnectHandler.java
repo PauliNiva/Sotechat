@@ -4,22 +4,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
 
 /**
  * Luokka, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys muodostuu.
  *
  * @param <S> Abstrakti olio.
  */
+@Component
 public class WebSocketConnectHandler<S>
         implements ApplicationListener<SessionConnectEvent> {
 
     /**
-     * ConnectionRepo-olio, jonka perusteella voidaan selvittää, onko
+     * SessionRepo-olio, jonka perusteella voidaan selvittää, onko
      * tietty sessio aktiivinen vai inaktiivinen.
      */
     @Autowired
-    private ConnectionRepo connectionRepo;
+    private SessionRepo sessionRepo;
 
     /**
      * Konstruktori.
@@ -39,6 +43,9 @@ public class WebSocketConnectHandler<S>
        String sessionId = SimpMessageHeaderAccessor
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
-       this.connectionRepo.setSessionStatusToConnected(sessionId);
+ //      this.connectionRepo.setSessionStatusToConnected(sessionId);
+       Session userSession = this.sessionRepo
+               .getSessionFromSessionId(sessionId);
+       userSession.set("connectionStatus", "connected");
     }
 }

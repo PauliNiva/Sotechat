@@ -37,7 +37,7 @@ public class ChatLogger {
      */
     @Autowired
     private DatabaseService databaseService;
-
+    
     /**
      * Konstruktori.
      */
@@ -129,7 +129,7 @@ public class ChatLogger {
      * @param channelId channelId
      * @param broker    broker
      */
-    public final synchronized void broadcast(
+    public synchronized void broadcast(
             final String channelId,
             final SimpMessagingTemplate broker
     ) {

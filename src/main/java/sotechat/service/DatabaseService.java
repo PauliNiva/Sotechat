@@ -6,12 +6,9 @@ import org.springframework.stereotype.Service;
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
-import sotechat.domainService.ConversationService;
-import sotechat.domainService.PersonService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

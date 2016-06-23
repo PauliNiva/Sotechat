@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.service.QueueTimeoutService;
 
 import java.security.Principal;
 
@@ -13,21 +17,22 @@ import java.security.Principal;
  *
  * @param <S> Abstrakti olio.
  */
+@Component
 public class WebSocketDisconnectHandler<S>
         implements ApplicationListener<SessionDisconnectEvent> {
 
     /**
-     * ConnectionRepo-olio, jonka perusteella voidaan selvittää, onko
+     * SessionRepo-olio, jonka perusteella voidaan selvittää, onko
      * tietty sessio aktiivinen vai inaktiivinen.
      */
     @Autowired
-    private ConnectionRepo connectionRepo;
+    private SessionRepo sessionRepo;
 
     /**
      * Olio, jonka vastuuseen kuuluu poistaa inaktiiviset käyttäjät jonosta.
      */
     @Autowired
-    private QueueTimeout queueTimeout;
+    private QueueTimeoutService queueTimeoutService;
 
     /**
      * Konstruktori.
@@ -49,16 +54,13 @@ public class WebSocketDisconnectHandler<S>
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
        Principal user = SimpMessageHeaderAccessor.getUser(headers);
-   /*    if (user != null) {
-           this.connectionHandler
-                   .initiateWaitBeforeScanningForInactiveProfessional(
-                   sessionId);
-       }*/
        if (user == null) {
-           this.queueTimeout
+           this.queueTimeoutService
                    .initiateWaitBeforeScanningForInactiveUsers(
                            sessionId);
        }
-       this.connectionRepo.setSessionStatusToDisconnected(sessionId);
+        Session userSession = this.sessionRepo
+                .getSessionFromSessionId(sessionId);
+       userSession.set("connectionStatus", "disconnected");
     }
 }

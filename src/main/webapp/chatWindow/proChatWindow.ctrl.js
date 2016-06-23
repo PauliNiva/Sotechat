@@ -18,6 +18,7 @@ angular.module('chatProApp')
             $scope.chatText = '';
 
             var channel = this.channel;
+            var status = this.status;
 
             $scope.$on('unSubscribeChat', function (event, args) {
                 if (args.channelID === channel) {
@@ -56,6 +57,13 @@ angular.module('chatProApp')
                 return message;
             };
 
+            var userLeaves = function() {
+                sub.unsubscribe();
+                $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
+                $scope.chatClosed = true;
+                status();
+            };
+
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
@@ -70,7 +78,7 @@ angular.module('chatProApp')
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
                     } else if (message.notice == "chat closed") {
-                        //$scope.closeTab();
+                        userLeaves();
                     }
                 });
             };

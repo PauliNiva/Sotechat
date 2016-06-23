@@ -44,7 +44,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param sessionId sessionId
      * @return sesson-olio
      */
-    public final synchronized Session getSessionFromSessionId(
+    public synchronized Session getSessionFromSessionId(
             final String sessionId
     ) {
         return sessionsBySessionId.get(sessionId);
@@ -62,7 +62,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param channelId p
      * @param sessionId p
      */
-    public final synchronized void leaveChannel(
+    public synchronized void leaveChannel(
             final String channelId,
             final String sessionId
     ) {

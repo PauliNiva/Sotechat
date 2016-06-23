@@ -44,7 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
     protected final void configure(final HttpSecurity http) throws Exception {
-        http.headers().frameOptions().disable(); //TODO; Mikä tää o?
         http
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()

@@ -52,6 +52,25 @@ public class ValidatorService {
             final SimpMessageHeaderAccessor accessor
     ) {
         String sessionId = getSessionIdFrom(accessor);
+        Principal principal = accessor.getUser();
+
+        /* Overloadattu metodi testauksen helpottamiseksi. */
+        return isMessageFraudulent(msgToServer, sessionId, principal);
+    }
+
+    /**
+     * Onko chattiin tuleva viesti vaarennetty?
+     * @param msgToServer p
+     * @param sessionId p
+     * @param principal p
+     * @return tyhja String jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus-String.
+     */
+    public final String isMessageFraudulent(
+            final MsgToServer msgToServer,
+            final String sessionId,
+            final Principal principal
+    ) {
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         if (session == null) {
@@ -64,10 +83,10 @@ public class ValidatorService {
         if (session.isPro()) {
             /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
 
-            if (accessor.getUser() == null) {
+            if (principal == null) {
                 return "ID kuuluu pro:lle, lahettaja ei kirjautunut, hylataan";
             }
-            String username = accessor.getUser().getName();
+            String username = principal.getName();
             String authId = mapper.getIdFromRegisteredName(username);
             if (!userId.equals(authId)) {
                 return "Lahettajaksi merkitty ID eri kuin autentikaation ID";
@@ -85,6 +104,12 @@ public class ValidatorService {
         return "";
     }
 
+    /** Validoi pyynnon hakea lokeja.
+     * @param principal autentikaatiotiedot
+     * @param req pyynto
+     * @param channelId channelId
+     * @return tyhja String, jos sallitaan pyynto. Muuten virheilmoitus.
+     */
     public final String validateLogRequest(
             final Principal principal,
             final HttpServletRequest req,
@@ -96,9 +121,8 @@ public class ValidatorService {
         String sessionId = req.getSession().getId();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
-            return "Can't request logs outside an active session!";
+            return "Invalid session!";
         }
-
         Channel channel = mapper.getChannel(channelId);
         String userId = session.get("userId");
         if (!channel.hasHistoricUser(userId)) {
@@ -113,12 +137,13 @@ public class ValidatorService {
     /** Sallitaanko subscription eli kanavan kuuntelu?.
      * Jos sallitaan, palauttaa tyhjan Stringin.
      * Jos ei sallita, palauttaa virheilmoituksen.
+     * HUOM: Mockito vaatii, ettei metodi ole final!
      * @param principal autentikaatiotiedot
      * @param sessionId sessioId
      * @param channelIdWithPath channelIdWithPath
      * @return virheilmoitus Stringina jos ei sallita pyyntoa.
      */
-    public final String validateSubscription(
+    public String validateSubscription(
             final Principal principal,
             final String sessionId,
             final String channelIdWithPath

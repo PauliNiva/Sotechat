@@ -1,29 +1,29 @@
 package integrationTests.userAcceptanceTests;
 
-
 import com.github.webdriverextensions.junitrunner.WebDriverRunner;
 import com.github.webdriverextensions.junitrunner.annotations.Chrome;
 import integrationTests.util.DriverHandler;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.validation.constraints.AssertTrue;
+
+import static com.github.webdriverextensions.Bot.waitFor;
 import static integrationTests.util.sotechatITCommands.*;
-import static integrationTests.util.sotechatITCommands.endConversationPro;
-import static integrationTests.util.sotechatITCommands.waitChatWindowsAppear;
-import static org.junit.Assert.assertTrue;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class viewingChatHistoriesIT {
+public class userEndConversationIT {
 
-    private WebDriverWait userWait;
     private DriverHandler handler;
+    private WebDriverWait userWait;
     private WebDriverWait proWait;
-
 
     @Before
     public void setUp() throws Exception {
@@ -41,27 +41,29 @@ public class viewingChatHistoriesIT {
     }
 
     /**
-     * User joins a common queue when accessing chat
+     * Professional can end conversation when he/she wants
      */
     @Test
-    public void proSeesChatHistory() {
-        // User has accessed chat pag
-        // Username and a starting message is submitted
+    public void ProPickFirstFromQueue() {
+        // User has accessed queue
         waitAndFillInformation(userWait);
-        // A queueing view is showed to the user
-        // User is added to the pool of customers professionals side
-        proLogin(proWait);
-        waitAndPickFromQueue(proWait);
-        waitChatWindowsAppear(userWait);
+        waitQueueWindowsAppear(userWait);
 
-        waitElementPresent(proWait, By.name("menu"));
-        waitElementClickable(proWait, By.name("menu")).click();
-        waitElementClickable(proWait, By.name("history")).click();
-        assertTrue(waitForTextToAppear(proWait, "Menneet keskustelut"));
-        assertTrue(waitForTextToAppear(proWait, "Testi"));
-        waitElementClickable(proWait, By.name("backToPanel")).click();
-        sendMessageChatWindow(proWait, "He hei!");
-        waitForTextToAppear(userWait, "He hei!");
-        endConversationPro(proWait);
+        // Professional has logged in
+        proLogin(proWait);
+
+        // Professional click´s next in line button
+        waitAndPickFromQueue(proWait);
+
+        // a chat window is opened that has a connection to the customer
+        waitChatWindowsAppear(proWait).isDisplayed();
+        waitChatWindowsAppear(userWait);
+        waitElementClickable(userWait, By.name("userEndConversation")).click();
+        waitElementClickable(userWait, By.name("sure")).click();
+        Assert.assertTrue(waitForTextToAppear(userWait, "Keskustelu on "));
+        Assert.assertTrue(waitForTextToAppear(proWait, "Vastapuoli on "));
+        waitElementClickable(proWait, By.name("closeConversation")).click();
+        Assert.assertEquals(0, tabsCountToBe(proWait, 0));
+
     }
 }
