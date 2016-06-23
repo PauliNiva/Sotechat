@@ -22,13 +22,15 @@ public class CategoryControllerTest {
 
     @Test
     public void test() {
-        when(sessionRepo.updateSession(any(), any())).thenReturn(new Session());
+        Session session = new Session();
+        when(sessionRepo.updateSession(any(), any())).thenReturn(session);
         String category = "hammashoito";
         MockHttpServletRequest req = new MockHttpServletRequest("sessioId09");
         Principal pro = null;
         String response = categoryController
                         .rememberCategoryAndForward(category, req, pro);
         verify(sessionRepo, times(1)).updateSession(any(), any());
+        assertEquals(category, session.get("category"));
         assertEquals("redirect:/", response);
     }
 
