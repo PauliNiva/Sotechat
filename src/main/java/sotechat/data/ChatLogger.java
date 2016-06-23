@@ -37,7 +37,7 @@ public class ChatLogger {
      */
     @Autowired
     private DatabaseService databaseService;
-    
+
     /**
      * Konstruktori.
      */
