@@ -7,10 +7,19 @@ public class ConvInfo {
     private String person;
     private String category;
 
-    public ConvInfo(){}
-
-    public ConvInfo(final String channelId, final String date,
-                    final String person, final String category){
+    /**
+     * Konstruktori.
+     * @param channelId p
+     * @param date p
+     * @param person p
+     * @param category p
+     */
+    public ConvInfo(
+            final String channelId,
+            final String date,
+            final String person,
+            final String category
+    ) {
         this.channelId = channelId;
         this.date = date;
         this.person = person;

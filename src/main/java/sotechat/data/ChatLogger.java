@@ -27,8 +27,7 @@ public class ChatLogger {
     @Autowired
     private DatabaseService databaseService;
 
-    /** Konstruktori.
-     */
+    /** Konstruktori. */
     public ChatLogger() {
         this.logs = new HashMap<>();
     }
