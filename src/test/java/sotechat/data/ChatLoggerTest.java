@@ -32,9 +32,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by varkoi on 22.6.2016.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @Transactional
@@ -131,7 +128,7 @@ public class ChatLoggerTest {
     @Test
     public void removeOldMessagesFromMemoryTest(){
         Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
-        Long tms = System.currentTimeMillis() - 5 * 1000 * 60 * 60 *24;
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
         DateTime time = new DateTime(tms);
         chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
         Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
@@ -142,7 +139,7 @@ public class ChatLoggerTest {
 
     @Test
     public void removeOldMessagesFromMemoryTest2(){
-        Long tms = System.currentTimeMillis() - 5 * 1000 * 60 * 60 *24;
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
         DateTime time = new DateTime(tms);
         chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
         Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
@@ -156,16 +153,14 @@ public class ChatLoggerTest {
     public void removeOldMessagesFromMemoryAndGetLogsTest() {
         DatabaseService mockdb = Mockito.mock(DatabaseService.class);
         chatlogger = new ChatLogger(srepo, mockdb);
-        Long tms = System.currentTimeMillis() - 5 * 1000 * 60 * 60 *24;
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
         DateTime time = new DateTime(tms);
         chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
-        Long tms2 = System.currentTimeMillis() - 3 * 1000 * 60 * 60 * 24;
+        Long tms2 = new DateTime().getMillis() - 3 * 1000 * 60 * 60 * 24;
         DateTime time2 = new DateTime(tms2);
         chatlogger.getLogs("xxx").add(new MsgToClient("456", "Salla", "xxx", time2.toString(), "Hei hei"));
-        Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
         Assert.assertEquals(2, chatlogger.getLogs("xxx").size());
         chatlogger.removeOldMessagesFromMemory(4);
-        Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
         Assert.assertEquals(2, chatlogger.getLogs("xxx").size());
         chatlogger.removeOldMessagesFromMemory(2);
         Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());

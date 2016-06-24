@@ -1,25 +1,28 @@
 package sotechat.data;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
  */
 @Component
 public class ChatLogger {
+
+    /** Kuinka usein siivotaan vanhoja viesteja muistista. */
+    private static final int CLEAN_FREQUENCY_IN_MS = 1000 * 60 * 60 * 24; // 1pv
+
+    /** Siivouksessa poistetaan keskustelut, joiden uusin viesti on
+     * vanhempi kuin tassa muuttujassa maaritelty. */
+    private static final int DAYS_OLD_TO_BE_DELETED = 3;
 
     /**
      * Avain = kanavan id. Arvo = lista viesteja (kanavan lokit).
@@ -190,8 +193,18 @@ public class ChatLogger {
 
     /**
      * Palvelimen ollessa paalla pitkaan muisti voi loppua.
-     * Taman vuoksi tata metodia on kutsuttava esim. kerran viikossa.
-     * Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
+     * Taman vuoksi vanhat viestit on hyva siivota pois muistista esim.
+     * kerran paivassa (jattaen ne kuitenkin tietokantaan).
+     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
+     */
+
+    @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
+    public synchronized void work() {
+        removeOldMessagesFromMemory(DAYS_OLD_TO_BE_DELETED);
+    }
+
+
+    /* Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
      * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
      *
      * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
@@ -200,7 +213,7 @@ public class ChatLogger {
             final int daysOld
     ) {
         try {
-            Long now = System.currentTimeMillis();
+            Long now = DateTime.now().getMillis();
             Long threshold = now - daysOld * 1000 * 60 * 60 * 24;
             Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
                     logs.entrySet().iterator();
@@ -214,8 +227,9 @@ public class ChatLogger {
                     MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
                     DateTime trdate = new DateTime(threshold);
                     DateTime lastdate = DateTime.parse(last.getTimeStamp());
-                    if (lastdate.isBefore(trdate))
+                    if (lastdate.isBefore(trdate)) {
                         logs.remove(channelId);
+                    }
                 }
             }
 
