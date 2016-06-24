@@ -45,10 +45,10 @@ public class QueueTimeoutService {
     /**
      * Muuttujaan talletettu odotusaika millisekunteina, jonka jälkeen
      * tarkistetaan käyttäjän session tilanne. Jos sessio on inaktiivinen,
-     * se poistetaan jonosta.
+     * se poistetaan jonosta. Oletuksena 5 minuuttia.
      */
     private int waitTimeBeforeScanningForNonexistentUsers
-            = 10000;
+            = 1000*60*5;
 
     private Timer timer;
 
