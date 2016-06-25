@@ -5,10 +5,16 @@ angular.module('chatProApp')
     .controller('proCtrl', ['$scope', 'auth',
         function ($scope, auth) {
             var CPTEMPLATE = 'proControlPanel/controlPanel.tpl.html';
+            var ADMINTEMPLATE = 'admin/userHandling.tpl.html'
             var LOGINTEMPLATE = 'login/login.tpl.html';
+            
             $scope.login = function(authenticated) {
                 if (authenticated) {
-                    $scope.authStatus = CPTEMPLATE;
+                    if (auth.getRole() === 'ROLE_ADMIN') {
+                        $scope.authStatus = ADMINTEMPLATE;
+                    } else {
+                        $scope.authStatus = CPTEMPLATE;
+                    }
                     $scope.error = false;
                 } else {
                     $scope.error = true;
@@ -23,7 +29,11 @@ angular.module('chatProApp')
 
             var init  = function() {
                 if (auth.getAuthStatus() !== false) {
-                    $scope.authStatus = CPTEMPLATE;
+                    if (auth.getRole() === 'ROLE_ADMIN') {
+                        $scope.authStatus = ADMINTEMPLATE;
+                    } else {
+                        $scope.authStatus = CPTEMPLATE;
+                    }
                 } else {
                     $scope.error = false;
                     $scope.authStatus = LOGINTEMPLATE;

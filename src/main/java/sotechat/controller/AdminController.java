@@ -2,12 +2,10 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import sotechat.service.AdminService;
+import org.springframework.util.Base64Utils;
 
 @RestController
 public class AdminController {
@@ -17,8 +15,8 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public String addNewUser(String jsonPerson) {
-        adminService.addUser(jsonPerson);
+    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
+        adminService.addUser(new String(Base64Utils.decodeFromString(jsonPerson)));
         return "redirect:/getusers";
     }
 
@@ -38,8 +36,8 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
     public String resetPassword(@PathVariable String id,
-                                String newPassword) throws Exception {
-        if (adminService.changePassword(id, newPassword)) {
+                                @RequestBody String newPassword) throws Exception {
+        if (adminService.changePassword(id, new String(Base64Utils.decodeFromString(newPassword)))) {
             return "{\"status\": \"OK\"}";
         } else {
             return "{\"error\": \"No such user\"}";
