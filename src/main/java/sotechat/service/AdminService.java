@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
@@ -23,6 +24,9 @@ public class AdminService {
     @Autowired
     DatabaseService databaseService;
 
+    @Autowired
+    Mapper mapper;
+
     private Person person;
 
     @Transactional
@@ -30,6 +34,8 @@ public class AdminService {
         Gson gson = new Gson();
         Type type = new TypeToken<Person>(){}.getType();
         this.person = gson.fromJson(jsonPerson, type);
+        this.person.setUserId(mapper.generateNewId());
+        personRepo.save(this.person);
     }
 
     @Transactional
