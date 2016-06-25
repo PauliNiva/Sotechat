@@ -3,6 +3,7 @@ package sotechat.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import sotechat.data.Mapper;
@@ -57,14 +58,24 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteUser(String userId) {
-        personRepo.delete(userId);
+    public boolean deleteUser(String userId) throws Exception {
+        try {
+            personRepo.delete(userId);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @Transactional
-    public void changePassword(String id, String newPassword) {
-        this.person = personRepo.findOne(id);
+    public boolean changePassword(String id, String newPassword) throws Exception {
+        try {
+            this.person = personRepo.findOne(id);
+        } catch (Exception e) {
+            return false;
+        }
         this.person.setPassword(newPassword);
+        return true;
     }
 
     @Transactional

@@ -30,16 +30,20 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable String id) {
+    public String deleteUser(@PathVariable String id) throws Exception {
         adminService.deleteUser(id);
         return "redirect:/getusers";
     }
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
-    public String resetPassword(@PathVariable String id, String newPassword) {
-        adminService.changePassword(id, newPassword);
-        return "redirect:/getusers";
+    public String resetPassword(@PathVariable String id,
+                                String newPassword) throws Exception {
+        if (adminService.changePassword(id, newPassword)) {
+            return "{\"status\": \"OK\"}";
+        } else {
+            return "{\"error\": \"No such user\"}";
+        }
     }
 
     @Secured("ROLE_ADMIN")
