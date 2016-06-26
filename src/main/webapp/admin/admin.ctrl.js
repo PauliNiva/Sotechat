@@ -20,13 +20,13 @@ angular.module('chatProApp')
                     + $scope.newUserLoginName +', "password": '
                     + $scope.newUserPassword+ '}';
                 adminService.createUser(btoa(user), function(response) {
-                    if (response.data.status != 'OK') {
+                    if (response.data.status == 'OK') {
                         $scope.newUserBoolean = false;
                         $scope.newUserUsername = '';
                         $scope.newUserPassword = '';
                         $scope.newUserLoginName = '';
-                        success();
                     }
+                    success(response);
                 })
             };
 

@@ -26,7 +26,7 @@
                 <i class="pull-right glyphicon"
                    ng-class="{'glyphicon-chevron-down': collapsed, 'glyphicon-chevron-right': !collapsed}"></i>
             </div>
-            <div class="panel-collapse collapse" uib-collapse="!collapsed">
+            <div class="panel-collapse collapse" uib-collapse="!collapsed" expanding="openHistoryOf(conversation.channelId)">
                 <div class="panel-body">
                     <history-conversation-component channel="{{conversation.channelId}}"
                                                     myname="{{myUsername}}"></history-conversation-component>

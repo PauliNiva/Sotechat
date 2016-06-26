@@ -13,6 +13,9 @@ angular.module('chatProApp')
 
             $scope.showHistory = function () {
                 $scope.proView = 'proHistories/chatHistory.html';
+                angular.forEach($scope.chats, function(key) {
+                    $scope.$broadcast('unSubscribeChat', {'channelID': key.channel});
+                });
             };
 
             $scope.backToPanel = function () {

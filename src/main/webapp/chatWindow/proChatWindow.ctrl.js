@@ -19,6 +19,7 @@ angular.module('chatProApp')
 
             var channel = this.channel;
             var status = this.status;
+            var subscribet = false;
 
             $scope.$on('unSubscribeChat', function (event, args) {
                 if (args.channelID === channel) {
@@ -67,12 +68,6 @@ angular.module('chatProApp')
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
-                    //TODO: Testaa ettei allaoleva hakkerointi toimi
-                    //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
-
-                    // Lisataan viesti, jos sita ei ole jo entuudestaan.
-                    // Chat Logien broadcastauksen yhteydessa serveri saattaa
-                    // lahettaa meille viesteja, jotka meilla jo on.
                     var message = getMessage(response.body);
                     if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
@@ -84,5 +79,8 @@ angular.module('chatProApp')
             };
 
             /** Alustetaan kanava, kun controlleri ladataan */
-            subscribe();
+            if (angular.isUndefined(sub)){
+                subscribe();
+            }
+
         }]);
