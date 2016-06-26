@@ -29,8 +29,11 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     public String deleteUser(@PathVariable String id) throws Exception {
-        adminService.deleteUser(id);
-        return "redirect:/getusers";
+        if (adminService.deleteUser(id)) {
+            return "{\"status\":\"OK\"}";
+        } else {
+            return "{\"error\":\"No such user\"}";
+        }
     }
 
     @Secured("ROLE_ADMIN")
