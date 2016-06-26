@@ -1,20 +1,28 @@
 package sotechat.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** Forward for /pro.
+/** Uudelleenohjaus polkuun /pro.
  */
 @Controller
 public class ProUrlController {
 
-    /** Forward /pro to /proCp.html
+    /** Uudelleenohjaus /pro to /proCp.html .
      * @return proCP.html
      */
     @RequestMapping(value = "/pro")
     public final String pro() {
         return "forward:/proCP.html";
+    }
+
+    /**
+     * Uudelleenohjaa /login to /pro
+     * @return /pro
+     */
+    @RequestMapping(value = "/login")
+    public final String login() {
+        return "redirect:/pro";
     }
 
 }

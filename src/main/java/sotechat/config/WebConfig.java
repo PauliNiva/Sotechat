@@ -17,6 +17,5 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public final void addResourceHandlers(final ResourceHandlerRegistry reg) {
         reg.addResourceHandler("/resources/**")
                 .addResourceLocations("\"classpath:/webapp/\"");
-        /* Nakojaan toimii. Miksi polku vaatii nuo escapetut hipsut? */
     }
 }

@@ -1,50 +1,166 @@
 package sotechat.data;
 
-/**
- * Jotta Springin Dependency Injection toimisi,
- * Mapperilla taytyy olla oma interface.
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.math.BigInteger;
+
+/** Mapperi muistaa asioita kanaviin ja ID:hen liittyen. Esim:
+ * - Onko jokin username varattu rekisteroityneelle kayttajalle?
+ * - Getteri Channel-olioille parametrilla channelId
  */
-public interface Mapper {
-    /** Metodi, jonka tarkoituksena on tallettaa tietorakenteeseen
-     * avain-arvo pari, jossa kayttajan ID on avain ja kayttajanimi on arvo,
-     * johon avain viittaa.
-     * @param id Kayttajan ID.
-     * @param username Kayttajatunnus
-     */
-    void mapUsernameToId(String id, String username);
+@Component
+public class Mapper {
 
-    /** Metodi, joka mahdollistaa kayttajanimen hakemisen tietorakenteesta
-     * kayttajan id:n perusteella.
-     * @param id Kayttajan ID.
-     * @return Palauttaa kayttajanimen.
-     */
-    String getUsernameFromId(String id);
+    /** Kanava-mappi. Avain channelId, arvo Channel-olio. */
+    private Map<String, Channel> channels;
 
-    /** Metodi joka mahdollistaa rekisteroityneen kayttajan(hoitajan)
-     * kayttajaId:n hakemisen tietorakenteesta kayttajanimen perusteella.
-     * Hoitajan kayttajanimi on uniikki, koska rekisteroityminen vaatii sita.
-     * @param registeredName Rekisteroityneen kayttajan kayttajanimi.
-     * @return Palauttaa rekisteroityneen kayttajan ID:n.
-     */
-    String getIdFromRegisteredName(String registeredName);
+    /** Nopea satunnaismerkkijonogeneraattori (joka kayttaa normi Randomia). */
+    private FastGeneratorForRandomStrings fastGen;
 
-    /** Metodi generoi uniikin id:n kayttajalle.
-     * @return Palauttaa generoidun ID:n.
-     */
-    String generateNewId();
+    /** Muistetaan, mitka generaattorin tuottamat ID:t on jo varattu. */
+    private Set<String> reservedIds;
 
-    /** Metodi tarkistaa, onko tietty kayttajaId jo talletettuna
-     * tietorakenteeseen.
-     * @param id Se kayttajan ID, jonka olemassaolo tietorakenteesta halutaan
-     *           tarkistaa.
-     * @return Palauttaa true, jos kayttaja ID loytyy, ja false, jos ei loydy.
-     */
-    boolean isUserIdMapped(String id);
+    /** Rekisteroityneet kayttajat. Avain username, arvo userId. */
+    private Map<String, String> mapRegisteredUsers;
 
-    /** Metodi tarkistaa, kuuluuko jokin kayttajaID
-     * rekisteroityneelle kayttajalle.
-     * @param id id
-     * @return true, jos kuuluu.
+
+    /** Konstruktori alustaa singleton-instanssin Mapperista. */
+    public Mapper() {
+        this.channels = new HashMap<>();
+        this.fastGen = new FastGeneratorForRandomStrings();
+        this.reservedIds = new HashSet<>();
+        this.mapRegisteredUsers = new HashMap<>();
+        /* TODO: Lataa tietokannasta reservedIds & usernames. */
+    }
+
+    /** Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
+     * @param channelId channelId
+     * @return channel-olio tai null jos ei loydy.
      */
-    boolean isUserProfessional(String id);
+    public Channel getChannel(
+            final String channelId
+    ) {
+        Channel channel = channels.get(channelId);
+        if (channel == null) {
+            //TODO: try loading from db.
+        }
+        return channel;
+    }
+
+    /** Luo uuden kanava-olion, kirjaa sen muistiin ja palauttaa sen.
+     * @return luotu kanava-olio
+     */
+    public Channel createChannel() {
+        String channelId = generateNewId();
+        Channel channel = new Channel(channelId);
+        channels.put(channelId, channel);
+        return channel;
+    }
+
+    /** Puts key userId, value username.
+     * @param username p
+     * @param userId p
+     */
+    public final void mapProUsernameToUserId(
+            final String username,
+            final String userId
+    ) {
+        this.mapRegisteredUsers.put(username, userId);
+    }
+
+    /**
+     * Returns true if username is reserved.
+     * @param username username
+     * @return true if username is reserved
+     */
+    public final synchronized boolean isUsernameReserved(
+            final String username
+    ) {
+        return mapRegisteredUsers.containsKey(username);
+    }
+
+    /** Getteri salaiselle kayttajaID:lle,
+     * parametrina julkinen kayttajanimi.
+     * Huom: mielekasta kayttaa vain rekisteroityjen
+     * kayttajien tapauksessa. Jos kysytaan vaikka
+     * nimimerkin "Anon" ID:ta, on mielivaltaista,
+     * mika ID sielta sattuu tulemaan.
+     * @param username julkinen username
+     * @return id salainen id
+     */
+    public final synchronized String getIdFromRegisteredName(
+            final String username
+    ) {
+        /* Varmistetaan ensin, etta username tunnetaan. */
+        if (username == null
+                || username.isEmpty()
+                || !mapRegisteredUsers.containsKey(username)) {
+            throw new IllegalArgumentException(("Error! Unknown userId for registered name " + username));
+        }
+        return this.mapRegisteredUsers.get(username);
+    }
+
+    /** Tuottaa ja varaa uuden yksilollisen ID:n (userId/channelId).
+     * @return userId
+     */
+    public final synchronized String generateNewId() {
+        String newId;
+        do {
+            newId = getFastRandomString();
+        } while (reservedIds.contains(newId));
+        reservedIds.add(newId);
+        return newId;
+    }
+
+    /** Nopea satunnaismerkkijonotuottaja (kaytossa).
+     *  @return satunnaismerkkijono
+     */
+    public final String getFastRandomString() {
+        return fastGen.nextString();
+    }
+
+    /** Nopea pseudosatunnaismerkkijonotuottaja.
+     * Attribution: http://stackoverflow.com/questions/
+     * 41107/how-to-generate-a-random-alpha-numeric-string
+     */
+    private class FastGeneratorForRandomStrings {
+
+        /** Kaytetaan nopeaa randomia. */
+        private final Random random = new Random();
+        /** Haluttu pituus satunnaismerkkijonoille. */
+        private static final int LENGTH = 16;
+
+        /** Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa. */
+        private final char[] symbols;
+        /** Tilapaistaulukko uuden merkkijonon muodostukseen. */
+        private final char[] buf;
+
+        /** Konstruktori alustaa olion (yksi olio riittaa). */
+        FastGeneratorForRandomStrings() {
+            if (LENGTH < 1) {
+                throw new IllegalArgumentException("length < 1: " + LENGTH);
+            }
+            buf = new char[LENGTH];
+            StringBuilder tmp = new StringBuilder();
+            for (char ch = '0'; ch <= '9'; ++ch) {
+                tmp.append(ch);
+            }
+            for (char ch = 'a'; ch <= 'z'; ++ch) {
+                tmp.append(ch);
+            }
+            symbols = tmp.toString().toCharArray();
+        }
+
+        /** Palauttaa satunnaismerkkijonon.
+         * @return satunnaismerkkijono
+         */
+        public String nextString() {
+            for (int idx = 0; idx < buf.length; ++idx) {
+                buf[idx] = symbols[random.nextInt(symbols.length)];
+            }
+            return new String(buf);
+        }
+    }
+
 }

@@ -1,11 +1,15 @@
 package sotechat.wrappers;
 
+import sotechat.data.Session;
+
+import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
+
 /** Luokan tarkoitus on auttaa JSONin paketoinnissa,
- * kun "tavalliselle kayttajalle" kerrotaan state.
+ * kun "ammattilaiskayttajalle" kerrotaan state.
  */
 public class ProStateResponse {
 
-    /** Tila ("start", "inpool", "chat"). */
+    /** Aina "pro". */
     private String state;
 
     /** Julkinen kayttajanimi. */
@@ -14,31 +18,29 @@ public class ProStateResponse {
     /** Salainen kayttajaID. */
     private String userId;
 
+    /** WebSocket-osoite, johon subscribaamalla saa jonon paivitykset. */
     private String QBCC;
 
+    /** Onko kayttaja merkinnyt itsensa paikallaolevaksi.
+     * "true" tai "false" Stringina JSON paketointia varten. */
     private String online;
 
     /** Salainen kanavaID. */
     private String channelIds;
 
-    /** Konstruktori alustaa olion.
-     * @param pState state
-     * @param pUsername username
-     * @param pUserId userId
-     * @param pQBCC QBCC
-     * @param pOnline online
-     * @param pChannelIds channelId
+    /** Konstruktori asettaa arvoiksi staattisia arvoja
+     * seka session-oliosta kaivettuja arvoja.
+     * @param session oma session-olio
      */
-
-    public ProStateResponse(final String pState, final String pUsername,
-                            final String pUserId, final String pQBCC,
-                            final String pOnline, final String pChannelIds) {
-        this.state = pState;
-        this.username = pUsername;
-        this.userId = pUserId;
-        this.QBCC = pQBCC;
-        this.online = pOnline;
-        this.channelIds = pChannelIds;
+    public ProStateResponse(
+            final Session session
+    ) {
+        this.state = "pro";
+        this.username = session.get("username");
+        this.userId = session.get("userId");
+        this.QBCC = QUEUE_BROADCAST_CHANNEL;
+        this.online = "true"; //TODO: session.get("online");
+        this.channelIds = session.get("channelIds");
     }
 
     /** Antaa tilan.
@@ -69,6 +71,9 @@ public class ProStateResponse {
         return this.QBCC;
     }
 
+    /** getteri online-statukselle.
+     * @return "true" tai "false".
+     */
     public final String getOnline() {
         return this.online;
     }

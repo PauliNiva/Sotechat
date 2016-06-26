@@ -1,4 +1,4 @@
 /**
- * Tama paketti sisaltaa sovelluksen palvelut
+ * Tama paketti sisaltaa sovelluksen palvelut.
  */
 package sotechat.service;

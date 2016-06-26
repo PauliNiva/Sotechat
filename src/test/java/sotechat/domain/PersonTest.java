@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 public class PersonTest {
 
     private Person person;
+    private String role = "USER_ADMIN";
 
     @Before
     public void setUp() {
@@ -15,19 +16,19 @@ public class PersonTest {
     }
 
     @Test
-    public void setAndGetNameTest() {
-        person.setName("Pauli");
-        Assert.assertEquals("Pauli", person.getName());
-        person.setName("iluaP");
-        Assert.assertEquals("iluaP", person.getName());
+    public void setAndGetUserNameTest() {
+        person.setUserName("Pauli");
+        Assert.assertEquals("Pauli", person.getUserName());
+        person.setUserName("iluaP");
+        Assert.assertEquals("iluaP", person.getUserName());
     }
 
     @Test
-    public void setAndGetUsernameTest() {
-        person.setUsername("Pauli");
-        Assert.assertEquals("Pauli", person.getUsername());
-        person.setUsername("iluaP");
-        Assert.assertEquals("iluaP", person.getUsername());
+    public void setAndGetLoginNameTest() {
+        person.setLoginName("Pauli");
+        Assert.assertEquals("Pauli", person.getLoginName());
+        person.setLoginName("iluaP");
+        Assert.assertEquals("iluaP", person.getLoginName());
     }
 
     @Test
@@ -37,8 +38,14 @@ public class PersonTest {
     }
 
     @Test
-    public void setAndGetSaltTest() {
-        person.setSalt("suola");
-        Assert.assertEquals("suola", person.getSalt());
+    public void setAndGetRoleTest() {
+        person.setRole(role);
+        Assert.assertEquals(role, person.getRole());
+    }
+
+    @Test
+    public void getSaltIsNotNullTest() {
+        person.setPassword("0000");
+        Assert.assertNotNull(person.getSalt());
     }
 }

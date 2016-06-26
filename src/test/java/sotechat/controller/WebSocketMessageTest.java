@@ -1,12 +1,15 @@
 package sotechat.controller;
 
 import com.google.gson.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -30,19 +33,21 @@ import org.springframework.web.socket.config.annotation
 import org.springframework.web.socket.config.annotation
         .EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import sotechat.data.MapperImpl;
-import sotechat.util.MsgUtil;
-import sotechat.util.TestChannelInterceptor;
-import sotechat.util.TestPrincipal;
+import sotechat.data.*;
+import sotechat.domain.Conversation;
+import sotechat.repo.ConversationRepo;;
+import sotechat.repo.MessageRepo;
+import sotechat.repo.PersonRepo;
+import sotechat.util.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -51,11 +56,23 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
         WebSocketMessageTest.TestWebSocketConfig.class,
-        WebSocketMessageTest.TestConfig.class
+        WebSocketMessageTest.TestConfig.class,
+        WebSocketMessageTest.TestRepoInitConfig.class
 })
 public class WebSocketMessageTest {
 
-    private MapperImpl mapper;
+    private Mapper mapper;
+
+    private SessionRepo sessionRepo;
+
+    @Autowired
+    private PersonRepo personRepo;
+
+    @Autowired
+    private ConversationRepo conversationRepo;
+
+    @Autowired
+    private MessageRepo messageRepo;
 
     @Autowired
     ApplicationContext context;
@@ -66,28 +83,35 @@ public class WebSocketMessageTest {
     @Autowired
     private AbstractSubscribableChannel brokerChannel;
 
-    private TestChannelInterceptor brokerChannelInterceptor;
+    private MockChannelInterceptor brokerChannelInterceptor;
 
 
     @Before
     public void setUp() throws Exception {
-        this.mapper = (MapperImpl) context.getBean("mapperImpl");
-        this.brokerChannelInterceptor = new TestChannelInterceptor();
+        Mockito.when(conversationRepo.findOne(anyString()))
+                .thenReturn(new Conversation());
+        this.mapper = (Mapper) context.getBean("mapper");
+        this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
+        this.mapper.mapProUsernameToUserId("666", "hoitaja");
+        this.brokerChannelInterceptor = new MockChannelInterceptor();
         this.brokerChannel.addInterceptor(this.brokerChannelInterceptor);
     }
 
-    @Test
-    public void
-    unAuthenticatedUserReceivesCorrectResponseAfterSendingMessage()
-            throws Exception {
-        /**
-         * Luodaan mapperiin avain-arvo -pari (id:676, username:Morko), jotta
-         * ChatController-luokan routeMessage-metodissa loydetaan oikea
-         * kayttaja id:n perusteella, eika metodin suoritus siis keskeydy
-         * siihen, etta mappperista ei loydy oikeaa kayttajaa.
-         */
-        mapper.mapUsernameToId("676", "Morko");
+    @After
+    public void tearDown() {
+        this.sessionRepo.forgetSessions();
+    }
 
+    @Test
+    public void testMessageCanBeSendedAndReceivedThroughWebSockets()
+            throws Exception {
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest("0");
+        Session session = sessionRepo.updateSession(mockRequest, null);
+        String username = session.get("username");
+        String userId = session.get("userId");
+        String channelId = session.get("channelId");
+        subscribeSessionToChannel(session, channelId);
         /**
          * Simuloidaan normaalisti JavaScriptin avulla tapahtuvaa viestien
          * lahetysta clientilta palvelimelle. Asetetaan siis arvot mille
@@ -97,30 +121,33 @@ public class WebSocketMessageTest {
         StompHeaderAccessor headers =
                 setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
 
-
         /**
          * Luodaan lahetettava viesti, vastaa siis normaalisti JavaScriptilla
          * Json-muodossa olevaa viestia, joka palvelimella paketoidaan
          * MsgToServer-luokan sisalle.
          */
         MsgUtil msgUtil = new MsgUtil();
-        msgUtil.add("userId", "676", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
+        msgUtil.add("messageId", "123", true);
+        msgUtil.add("userId", userId, false);
+        msgUtil.add("channelId", channelId, true);
+        msgUtil.add("timeStamp", "sunnuntai", true);
+        msgUtil.add("username", username, true);
         msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "Morko", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
+
         /**
          * Rakennetaan viela edella muodostetusta viestista Message-olio,
          * joka voidaankin sitten lahettaa palvelimelle.
          */
         String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
+        Message<byte[]> message = MessageBuilder
+                .createMessage(messageToBeSendedAsJsonString.getBytes(),
                 headers.getMessageHeaders());
+
         /**
          * Lahetetaan viesti palvelimelle.
          */
         this.clientInboundChannel.send(message);
+
         /**
          * Talletetaan palvelimelta tullut vastaus Message-olioon. Eli siis
          * mita ChatControllerin routeMessage-metodi palauttaa(MsgToClient).
@@ -130,7 +157,7 @@ public class WebSocketMessageTest {
         /**
          * Parsetaan vastauksena saatu string JsonObjectiksi.
          */
-        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
+        JsonObject jsonMessage = parseStringIntoJsonObject(reply);
 
         /**
          * Tarkistetaan, etta vastauksena tullut JsonObject sisaltaa
@@ -142,95 +169,6 @@ public class WebSocketMessageTest {
             String key = entry.getKey().toString();
             assertTrue(msgUtil.getMsgUtilSet().contains(key));
         }
-    }
-
-    @Test
-    public void authenticatedRegistereUserReceivesCorrectResponse()
-            throws Exception {
-        StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
-        /**
-         * Simuloidaan hoitajan kirjautumista.
-         */
-        headers.setUser(new TestPrincipal("Hoitaja"));
-
-        MsgUtil msgUtil = new MsgUtil();
-        msgUtil.add("userId", "666", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
-        msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
-
-        String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
-                headers.getMessageHeaders());
-
-        this.clientInboundChannel.send(message);
-
-        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
-
-        JsonObject jsonMessage = parseMessageIntoJsonObject(reply);
-
-        for (Map.Entry entry : jsonMessage.entrySet()) {
-            String key = entry.getKey().toString();
-            assertTrue(msgUtil.getMsgUtilSet().contains(key));
-        }
-    }
-
-    @Test
-    public void unAuthenticatedRegisteredUserDoesNotReceiveResponse()
-        throws Exception {
-        StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
-
-        MsgUtil msgUtil = new MsgUtil();
-        msgUtil.add("userId", "666", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
-        msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "hoitaja", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
-
-        String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
-                        headers.getMessageHeaders());
-
-        this.clientInboundChannel.send(message);
-
-        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
-        /**
-         * Ei pitaisi tulla vastausta, koska rekisteroityneella kayttajalla
-         * eli hoitajalla ei ole Principal-statusta eli han ei ole kirjautunut.
-         */
-        assertNull(reply);
-    }
-
-    @Test
-    public void serverDoesntAcceptMessageFromUserIfUserIdDoesntExist()
-        throws Exception {
-        StompHeaderAccessor headers =
-                setDefaultHeadersForChannel("/toServer/chat/DEV_CHANNEL");
-
-        MsgUtil msgUtil = new MsgUtil();
-        msgUtil.add("userId", "243", false);
-        msgUtil.add("channelId", "DEV_CHANNEL", true);
-        msgUtil.add("content", "Hei!", true);
-        msgUtil.add("username", "Hoitaja", true);
-        msgUtil.add("timeStamp", "Sunnuntai", true);
-
-        String messageToBeSendedAsJsonString = msgUtil.mapToString();
-        Message<String> message = MessageBuilder
-                .createMessage(messageToBeSendedAsJsonString,
-                        headers.getMessageHeaders());
-
-        this.clientInboundChannel.send(message);
-
-        Message<?> reply = this.brokerChannelInterceptor.awaitMessage(5);
-        /**
-         * Ei pitaisi tulla vastausta, koska userId:ta ei loydy.
-         */
-        assertNull(reply);
     }
 
     /**
@@ -248,7 +186,9 @@ public class WebSocketMessageTest {
         headers.setDestination(channel);
         headers.setSessionId("0");
         headers.setNativeHeader("channelId", "DEV_CHANNEL");
-        headers.setSessionAttributes(new HashMap<String, Object>());
+        HashMap<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("SPRING.SESSION.ID", "0");
+        headers.setSessionAttributes(sessionAttributes);
         return headers;
     }
 
@@ -258,23 +198,47 @@ public class WebSocketMessageTest {
      * @param message Palvelimelta saatu vastausviesti
      * @return
      */
-    public JsonObject parseMessageIntoJsonObject(Message<?> message) {
+    public JsonObject parseStringIntoJsonObject(Message<?> message) {
         String json = new String((byte[]) message.getPayload(),
                 Charset.forName("UTF-8"));
         JsonParser parser = new JsonParser();
-        JsonObject jsonMessage = parser.parse(json).getAsJsonObject();
-        return jsonMessage;
+        return parser.parse(json).getAsJsonObject();
     }
 
+    public void subscribeSessionToChannel(Session session, String channelId) {
+        Channel channel = this.mapper.getChannel(channelId);
+        channel.addSubscriber(session);
+    }
+
+    @Configuration
+    static class TestRepoInitConfig {
+        @Bean
+        public ConversationRepo conversationRepo() {
+            return Mockito.mock(ConversationRepo.class);
+        }
+
+        @Bean
+        public PersonRepo personRepo() {
+            return Mockito.mock(PersonRepo.class);
+        }
+
+        @Bean
+        public MessageRepo messageRepo() {
+            return Mockito.mock(MessageRepo.class);
+        }
+    }
     /**
      * Konfiguroidaan WebSocket testiymparistoon.
      */
     @Configuration
     @EnableScheduling
     @ComponentScan(
-            basePackages="sotechat",
+            basePackages={"sotechat.controller",
+                    "sotechat.data",
+                    "sotechat.service",
+                    "sotechat.domain"},
             excludeFilters = @ComponentScan.Filter(type= FilterType.ANNOTATION,
-                    value = Configuration.class)
+                    value = {Configuration.class})
     )
     @EnableWebSocketMessageBroker
     static class TestWebSocketConfig

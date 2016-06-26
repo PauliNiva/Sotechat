@@ -1,0 +1,18 @@
+<div class="loginForm" ng-controller="loginController as login">
+    <div class="alert alert-danger" ng-show="error">
+        Käyttäjätunnus tai salasana on virheellinen
+    </div>
+    <form class="formBox" role="form" ng-submit="login.login()">
+        <div class="form-group">
+            <label class="loginLabel" for="username">Käyttäjätunnus:</label> <input type="text"
+                                                                 class="form-control" id="username" name="username"
+                                                                 ng-model="login.credentials.username"/>
+        </div>
+        <div class="form-group">
+            <label class="loginLabel"  for="password">Salasana:</label> <input type="password"
+                                                           class="form-control" id="password" name="password"
+                                                           ng-model="login.credentials.password"/>
+        </div>
+        <button type="submit" name="login" class="btn btn-block btn-primary">Kirjaudu sisään</button>
+    </form>
+</div>

@@ -1,0 +1,124 @@
+.queueGroup {
+    margin-bottom: 4px;
+}
+.queueButton {
+    margin-bottom: 10px;
+    width: 50%;
+    min-width: 136px;
+}
+
+.queuer-heading {
+    padding: 5px 10px;
+}
+
+.queue-heading {
+    padding: 7px 15px;
+    height: 43px;
+}
+.queue-title {
+    font-size: 20px;
+}
+
+.proQueueDrop{
+    max-width: 49%;
+    height: 34px;
+    padding: 4px 4px;
+}
+@media (max-width:1225px) {
+    .queueButton {
+        margin-bottom: 2px;
+        width: 100%;
+        min-width: 136px;
+    }
+
+    .proQueueDrop{
+        max-width: 100%;
+        margin-bottom: 10px;
+        height: 34px;
+        padding: 4px 4px;
+    }
+
+}
+.proQueueDropOption {
+    height: 24px;
+    padding: 4px 4px;
+}
+
+.proQueueDropButton{
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+
+
+.pro-left{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.pro-righy{
+    padding-right: 0px;
+}
+
+.poolPro{
+    padding-top: 5px;
+    height: 100%;
+}
+
+.proContainer {
+    height: calc(100% - 10px);
+}
+.pro-chat-panel {
+    height: 100%;
+    margin-bottom: 0px;
+}
+
+.proButton{
+    margin-top: 2px;
+}
+
+.loginForm{
+    max-width: 300px;
+    margin-left: calc(50% - 150px);
+}
+
+.formBox{
+
+}
+
+.loginLabel {
+    font-size: large;
+}
+
+.historyHeader {
+    margin-top: 4px;
+}
+
+.historyConPanel {
+    margin-bottom: 0px;
+}
+
+.historyConPanelBody {
+    overflow-y: auto;
+    max-height: 416px;
+    width: auto;
+}
+
+.historyPanel {
+    margin-bottom: 4px;
+}
+
+.conTopic {
+    margin-bottom: 3px;
+}
+
+.conTopicText {
+    font-weight: bold;
+    text-decoration: underline;
+
+}
+
+
+.logoutAdmin {
+
+}

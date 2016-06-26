@@ -1,65 +1,136 @@
 package sotechat.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
-import org.springframework.format.annotation.DateTimeFormat;
-
 /**
- * Luokka
+ * Luokka yksittaisen keskustelun tietojen tallentamiseen
  */
 @Entity
-public class Conversation extends AbstractPersistable<Long> {
+public class Conversation {
 
+    /** kanavan id */
+    @Id
+    private String channelId;
+
+    /** aikaleima */
     @NotNull
-    @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd.MM.yyyy")
-    private Date date;
+    private String date;
 
-    private String professional;
+    /** keskustelun aihealue */
+    private String category;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "author")
+    /** keskusteluun liittyvat henkilot */
+    @ManyToMany(mappedBy = "conversationsOfPerson")
+    private List<Person> participantsOfConversation;
+
+    /** keskusteluun liittyvat viestit */
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+            mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
+    /**
+     * konstruktorissa alustetaan keskusteluun liittyvat viestit
+     * ja henkilot
+     */
     public Conversation() {
-        messagesOfConversation = new ArrayList<>();
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
     }
 
-    public final Date getDate() {
+    /**
+     * Konstruktorissa alustetaan aikaleimaksi parametrina annettu aikaleima
+     * seka kanavaid:ksi parametrina annettu kanavaid seka alustetaan
+     * keskustelun viestit ja henkilot
+     * @param date aikaleima
+     * @param channelId kanavan id
+     */
+    public Conversation(String channelId, String date) {
+        this.date = date;
+        this.channelId = channelId;
+        this.messagesOfConversation = new ArrayList<>();
+        this.participantsOfConversation = new ArrayList<>();
+    }
+
+    /**
+     * palauttaa viestin aikaleiman
+     * @return aikaleima
+     */
+    public final String getDate() {
         return this.date;
     }
 
-    public final void setDate(final Date pdate) {
+    /**
+     * asettaa viestin aikaleiman parametrina annettuun aikaleimaan
+     * @param pdate viestin aikaleima
+     */
+    public final void setDate(final String pdate) {
         this.date = pdate;
     }
 
-    public final String getProfessional() {
-        return this.professional;
+    /**
+     * Palauttaa listan keskusteluun liittyvista henkiloista
+     * @return lista Person olioista, jotka on liitetty keskusteluun
+     */
+    public final List<Person> getParticipantsOfConversation() {
+        return this.participantsOfConversation;
     }
 
-    public final void setProfessional(final String pProfessional) {
-        this.professional = pProfessional;
-    }
-
+    /**
+     * Palauttaa listan keskustelun viesteista
+     * @return Lista Message olioista, jotka on liitetty keskusteluun
+     */
     public final List<Message> getMessagesOfConversation() {
         return this.messagesOfConversation;
     }
 
-    public final void setMessagesOfConversation(
-            final List<Message> pMessagesOfConversation) {
-        this.messagesOfConversation = pMessagesOfConversation;
+    /**
+     * Lisaa parametrina annetun henkilon keskusteluun
+     * @param pPerson Person olio, joka halutaan liittaa keskusteluun
+     */
+    public final void addPersonToConversation(final Person pPerson) {
+        participantsOfConversation.add(pPerson);
     }
 
-    public final void addMessageToConversation(Message pmessage) {
-        messagesOfConversation.add(pmessage);
+    /**
+     * Lisaa parametrina annetun viestin keskusteluun
+     * @param pMessage Message olio, joka halutaan liittaa keskusteluun
+     */
+    public final void addMessageToConversation(final Message pMessage) {
+        messagesOfConversation.add(pMessage);
+    }
+
+    /**
+     * Palauttaa keskustelun aihealueen
+     * @return keskustelun aihealue
+     */
+    public final String getCategory() {
+        return category;
+    }
+
+    /**
+     * Asettaa keskustelun aihealueeksi parametrina annetun aihealueen
+     * @param category
+     */
+    public final void setCategory(String category) {
+        this.category = category;
+    }
+
+    /**
+     * Palauttaa keskustelun kanavaid:n
+     * @return
+     */
+    public String getChannelId() {
+        return channelId;
+    }
+
+    /**
+     * Asettaa keskustelun kanavaid:ksi parametrina annetun kanavaid:n
+     * @param channelId kanavaid
+     */
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }
