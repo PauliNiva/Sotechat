@@ -81,7 +81,12 @@ angular.module('chatProApp')
                 /** lisataan naytettavien viestien maaraa */
                 $scope.addMessageQuantity = function () {
                     if ((-$scope.messageQuantity) < $scope.messages.length) {
-                        $scope.messageQuantity -= 10;
+                        var diff = $scope.Conversations.length - (-$scope.messageQuantity);
+                        if(diff < 10) {
+                            $scope.messageQuantity -= diff;
+                        } else {
+                            $scope.messageQuantity -= 10;
+                        }
                     } else if ($scope.messagesLeft == false ){
                         $scope.messagesLeft = true;
                     } else {

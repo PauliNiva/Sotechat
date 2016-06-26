@@ -7,7 +7,7 @@ angular.module('chatProApp')
             $scope.left = true;
             /** onko viesteja jaljella naytettavaksi */
             $scope.messagesLeft = true;
-
+            /** Naytetaanko ei enempaa viesteja viesti */
             $scope.showLeft = false;
             /** naytettavat viestit */
             $scope.messages = [];
@@ -30,6 +30,7 @@ angular.module('chatProApp')
                         $scope.startTime = msghistory[0].timeStamp;
                     }else {
                         $scope.messagesLeft = false;
+                        $scope.empty = true;
                     }
                     $scope.showConv = true;
                 });
@@ -38,7 +39,12 @@ angular.module('chatProApp')
             /** lisataan naytettavien viestien maaraa */
             $scope.addMessageQuantity = function () {
                 if ((-$scope.messageQuantity) < $scope.messages.length) {
-                    $scope.messageQuantity -= 7;
+                    var diff = $scope.messages.length - (-$scope.messageQuantity);
+                    if (diff < 7){
+                        $scope.messageQuantity -= diff;
+                    } else {
+                        $scope.messageQuantity -= 7;
+                    }
                 } else if ($scope.messagesLeft == false ){
                     $scope.messagesLeft = true;
                 } else {
@@ -48,8 +54,12 @@ angular.module('chatProApp')
             };
 
             $scope.showLess = function () {
-                if($scope.messageQuantity<=-7){
-                    $scope.messageQuantity += 7;
+                if ($scope.messageQuantity<=-7){
+                    if ($scope.messageQuantity%7!=0) {
+                        $scope.messageQuantity += ($scope.messageQuantity%7);
+                    } else {
+                        $scope.messageQuantity += 7;
+                    }
                     $scope.showLeft = false
                 } else {
                     $scope.messagesLeft = true;
