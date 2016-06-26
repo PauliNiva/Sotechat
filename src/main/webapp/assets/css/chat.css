@@ -133,3 +133,16 @@ html, body {
 .modal-footer {
     border-top: 0px;
 }
+
+.error {
+    display: inline-block;
+    margin: 10px 10px 10px calc(50% - 360px);
+    font-weight: bold;
+    font-size: medium;
+    border: 1px solid;
+    padding: 10px;
+}
+
+.errorButton {
+    margin-left: calc(50% - 200px);
+}
