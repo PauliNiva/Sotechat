@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import sotechat.data.Mapper;
@@ -43,12 +44,8 @@ public class AdminService {
             String passwordToBeSet = person.getPassword();
             person.setPassword(passwordToBeSet);
             person.setRole("ROLE_USER");
-        }
-        try {
             personRepo.save(this.person);
             return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 
