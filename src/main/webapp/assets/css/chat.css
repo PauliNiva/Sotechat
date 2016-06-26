@@ -63,7 +63,6 @@ textarea.form-control {
     height: calc(100% - 42px);
 }
 
-
 .row {
     margin-left: 0px;
     margin-right: 0px;
@@ -74,7 +73,6 @@ textarea.form-control {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: normal;
-    width: 75%;
     padding-top: 8px;
 }
 

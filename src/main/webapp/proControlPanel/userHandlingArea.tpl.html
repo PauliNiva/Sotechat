@@ -1,8 +1,10 @@
-<div class="col-lg-3 col-md-4 col-sm-4 pro-left">
-    <div class="row" style="margin-top: 4px">
-        <div class="form-group" style=" margin-bottom: 0px">
-            <span class="username-title">{{username}}</span>
-            <div class="pull-right">
+<div class="col-lg-3 col-md-4 col-sm-4 col-xs-4  pro-left">
+    <div class="row">
+        <div class="nav navbar-nav nav-justified ">
+            <form class="navbar-form navbar-left">
+            <span class="username-title ">{{username}}</span>
+            </form>
+                <form class="navbar-form navbar-right">
                 <div style="width: 150px;"
                      class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-id-switch-handleWidth bootstrap-switch-animate bootstrap-switch-on">
                     <div style="width: 372px;" class="bootstrap-switch-container">
@@ -12,43 +14,29 @@
                         <input id="switch-handleWidth" data-handle-width="100" type="checkbox">
                     </div>
                 </div>
-                <div class="btn-group" uib-dropdown is-open="status.isopen">
-                    <button  name="menu" id="single-button" type="button" class="btn" uib-dropdown-toggle>
-                        <span class="glyphicon glyphicon-cog"></span>
-                    </button>
-                    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                        <li role="menuitem"><a href="#" name="history" ng-click="showHistory()">Selaa historiaa</a></li>
-                        <li role="menuitem"><a href="#" name="logout" ng-click="logout()">Kirjaudu ulos</a></li>
-                    </ul>
-                </div>
-            </div>
+
+            </form>
+             </div>
+        </div>
+    <div class="row" ng-include="'queue/queueProCP.tpl.html'"></div>
+</div>
+<div class="col-lg-9 col-md-8 col-sm-8 col-xs-8 chat-container">
+    <div class="row">
+        <div class="nav navbar-nav navbar-right">
+        <form class="navbar-form">
+            <button class="btn btn-primary" name="history" ng-click="showHistory()">Näytä keskusteluhistoria</button>
+            <button class="btn btn-default logoutAdmin" name="logout" ng-click="logout()">Kirjaudu ulos</button>
+        </form>
         </div>
     </div>
-    <div class="row" style="margin-top: 4px" ng-include="'queue/queueProCP.tpl.html'"></div>
-</div>
-
-<div class="col-lg-9 col-md-8 col-sm-8 chat-container">
     <div class="panel panel-default pro-chat-panel">
         <div class="row chat-row">
             <ul class="nav nav-tabs">
                 <li ng-repeat="chat in chats" name="chatTab" ng-class="{active:tabIsSelected(chat.index)}"><a href ng-click="changeTab(chat.index)">{{chat.title}}</a></li>
             </ul>
             <div ng-repeat="chat in chats" ng-show="activeChatTab == chat.index" class="chat-container">
-                <div class="col-lg-9 col-md-8 col-sm-8 proContainer">
-                    <pro-chat-Window-Component channel="{{chat.channel}}" status="userLeavesChat(chat.channel)"></pro-chat-Window-Component>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-4">
-                    <div class="panel panel-default">
-                        <div class="row">
-                            <div class="form-group">
-                                <button type="button" ng-show="chat.status == 'online'" class="btn btn-block btn-danger proButton" name="endConversation" ng-click="endConversation(chat.channel)">Lopeta keskustelu
-                                </button>
-                                <button type="button" ng-show="chat.status == 'offline'" class="btn btn-block btn-success proButton" name="closeConversation" ng-click="closeConversation(chat.channel)">Sulje keskustelu
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row" ng-include="'proPhrases/phrasePro.tpl.html'"></div>
-                    </div>
+                <div class="proContainer">
+                    <pro-chat-Window-Component channel="{{chat.channel}}" chatend="endChat(chat.channel)"></pro-chat-Window-Component>
                 </div>
             </div>
         </div>

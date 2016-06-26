@@ -74,7 +74,6 @@ public final class sotechatITCommands {
     }
 
     public static void proLogout(WebDriverWait wait) {
-        waitElementClickable(wait, By.name("menu")).click();
         waitElementClickable(wait, By.name("logout")).click();
     }
 

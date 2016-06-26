@@ -3,8 +3,8 @@
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
 angular.module('chatProApp')
-    .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
-        function ($scope, stompSocket, connectToServer, proStateService) {
+    .controller('proChatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'proStateService',
+        function ($scope, $uibModal, stompSocket, connectToServer, proStateService) {
             $scope.pro = true;
             // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
@@ -18,14 +18,27 @@ angular.module('chatProApp')
             $scope.chatText = '';
 
             var channel = this.channel;
-            var status = this.status;
-            var subscribet = false;
+            var endChat = this.chatend;
 
-            $scope.$on('unSubscribeChat', function (event, args) {
-                if (args.channelID === channel) {
-                    sub.unsubscribe();
-                }
-            });
+            $scope.userLeave = function() {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'common/areUSureModal.tpl.html',
+                    controller: 'AreUSureModalController'
+                });
+
+                modalInstance.result.then(closeChat);
+            };
+
+            var closeChat = function() {
+                sub.unsubscribe();
+                $scope.chatClosed = true;
+                endChat();
+            };
+            
+            $scope.closeConversation = function() {
+                endChat();
+            };
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -62,7 +75,6 @@ angular.module('chatProApp')
                 sub.unsubscribe();
                 $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
                 $scope.chatClosed = true;
-                status();
             };
 
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
