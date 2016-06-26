@@ -15,14 +15,16 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public @ResponseBody String addNewUser(@RequestBody String jsonPerson)
-            throws Exception {
-        if (adminService.addUser(new String(Base64Utils
-                .decodeFromString(jsonPerson)))) {
-            return statusOK();
-        } else {
-            return "{\"error\":\"User could not be added.\"}";
+    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
+        try {
+            adminService.addUser(new String(Base64Utils
+                    .decodeFromString(jsonPerson)));
+        } catch (Exception e) {
+            return "{\"error\":\"Käyttäjää ei voitu lisätä. " +
+                    "Tarkista, että kirjautumisnimi tai palvelunimi eivät " +
+                    "ole jo varattuja.\"}";
         }
+        return statusOK();
     }
 
     @Secured("ROLE_ADMIN")
