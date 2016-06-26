@@ -46,10 +46,10 @@ public class AdminService {
         }
         try {
             personRepo.save(this.person);
-            return true;
         } catch (Exception e) {
             return false;
         }
+        return true;
     }
 
     @Transactional

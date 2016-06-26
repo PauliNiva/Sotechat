@@ -21,7 +21,7 @@ public class Person {
     public String userId;
 
     /** henkilon nimimerkki joka nakyy asiakkaille */
-    //TODO: unique
+    @Column(unique = true)
     private String username;
 
     /** nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan */
