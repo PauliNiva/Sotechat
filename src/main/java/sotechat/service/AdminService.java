@@ -31,12 +31,25 @@ public class AdminService {
     private Person person;
 
     @Transactional
-    public void addUser(String jsonPerson) {
+    public boolean addUser(String jsonPerson) throws Exception {
         Gson gson = new Gson();
         Type type = new TypeToken<Person>(){}.getType();
         this.person = gson.fromJson(jsonPerson, type);
-        this.person.setUserId(mapper.generateNewId());
-        personRepo.save(this.person);
+        if (person.getLoginName().isEmpty() || person.getPassword().isEmpty() ||
+                person.getUserName().isEmpty()) {
+            return false;
+        } else {
+            this.person.setUserId(mapper.generateNewId());
+            String passwordToBeSet = person.getPassword();
+            person.setPassword(passwordToBeSet);
+            person.setRole("ROLE_USER");
+        }
+        try {
+            personRepo.save(this.person);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Transactional

@@ -15,9 +15,14 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
-        adminService.addUser(new String(Base64Utils.decodeFromString(jsonPerson)));
-        return "redirect:/getusers";
+    public @ResponseBody String addNewUser(@RequestBody String jsonPerson)
+            throws Exception {
+        if (adminService.addUser(new String(Base64Utils
+                .decodeFromString(jsonPerson)))) {
+            return statusOK();
+        } else {
+            return "{\"error\":\"User could not be added.\"}";
+        }
     }
 
     @Secured("ROLE_ADMIN")
@@ -30,9 +35,9 @@ public class AdminController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     public String deleteUser(@PathVariable String id) throws Exception {
         if (adminService.deleteUser(id)) {
-            return "{\"status\":\"OK\"}";
+            return statusOK();
         } else {
-            return "{\"error\":\"No such user\"}";
+            return noSuchUser();
         }
     }
 
@@ -41,9 +46,9 @@ public class AdminController {
     public String resetPassword(@PathVariable String id,
                                 @RequestBody String newPassword) throws Exception {
         if (adminService.changePassword(id, new String(Base64Utils.decodeFromString(newPassword)))) {
-            return "{\"status\": \"OK\"}";
+            return statusOK();
         } else {
-            return "{\"error\": \"No such user\"}";
+            return noSuchUser();
         }
     }
 
@@ -54,5 +59,11 @@ public class AdminController {
         return "Tyhjennetaan tietokantaa... Kokeile menna etusivulle.";
     }
 
+    private String statusOK() {
+        return "{\"status\":\"OK\"}";
+    }
 
+    private String noSuchUser() {
+        return "{\"error\": \"No such user\"}";
+    }
 }
