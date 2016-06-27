@@ -5,6 +5,7 @@
 
 # Sotechat
 Sosiaali- ja terveyspalveluiden chat
+
 Project members: [Atte Juvonen](https://github.com/baobabKoodaa), [Leo Kallonen](https://github.com/Lionking93), [Salla-Mari Varkoi](https://github.com/sallav), [Simo Auvinen](https://github.com/Oodi), [Pauli Niva](https://github.com/PauliNiva).
 
 [Product Backlog & Burndown](https://docs.google.com/spreadsheets/d/1EZ8Fifzc0prou_ID6iEhDE1UBWLR6K3_YpwN-ACx0gE/edit?usp=sharing)
