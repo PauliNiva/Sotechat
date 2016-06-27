@@ -72,10 +72,10 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.DELETE)
     public String resetDatabase() {
-        return jsonifyError(adminService.clearHistory());
+        return jsonifiedResponse(adminService.clearHistory());
     }
 
-    private String jsonifyError(final String error) {
+    private String jsonifiedResponse(final String error) {
         if (error.isEmpty()) {
             return statusOK();
         }

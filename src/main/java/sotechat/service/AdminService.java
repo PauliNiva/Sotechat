@@ -102,7 +102,7 @@ public class AdminService {
      */
     @Transactional
     public String clearHistory() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         queueService.clearQueue();
         chatLogger.removeOldMessagesFromMemory(0);
         return databaseService.removeAllConversationsFromDatabase();

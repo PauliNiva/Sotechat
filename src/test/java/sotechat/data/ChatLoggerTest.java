@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sotechat.Launcher;
+import sotechat.controller.MessageBroker;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.DatabaseService;
@@ -94,7 +95,7 @@ public class ChatLoggerTest {
 
     @Test
     public void broadcastTest(){
-        SimpMessagingTemplate mockBroker = Mockito.mock(SimpMessagingTemplate.class);
+        MessageBroker mockBroker = Mockito.mock(MessageBroker.class);
         MsgToClient m1 = chatlogger.logNewMessage(message);
         MsgToClient m2 = chatlogger.logNewMessage(MsgToServer.create(userId, "xxx", "haloo"));
         chatlogger.broadcast("xxx", mockBroker);
