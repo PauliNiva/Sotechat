@@ -5,9 +5,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 
 @Component
 public class MessageBroker {
+
+    @Autowired
+    SessionRepo sessionRepo;
+
+    @Autowired
+    Mapper mapper;
 
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
@@ -21,7 +33,60 @@ public class MessageBroker {
                 channelIdWithPath, closedChannelNotice);
     }
 
-    public void convertAndSend(String path, Object content) {
+    public void convertAndSend(
+            String path,
+            Object content
+    ) {
         simpMessagingTemplate.convertAndSend(path, content);
+    }
+
+    public void sendJoinLeaveNotices(
+            Principal pro,
+            String online
+    ) {
+        String username = pro.getName();
+        String userId = mapper.getIdFromRegisteredName(username);
+        Session session = sessionRepo.getSessionFromUserId(userId);
+        if (online.equals("true")) {
+            sendJoinNotices(session);
+        } else {
+            sendLeaveNotices(session);
+        }
+    }
+
+    public void sendJoinNotices(
+            Session session
+    ) {
+        String username = session.get("username");
+        for (String channelId : session.getChannels()) {
+            String channelIdWithPath = "/toClient/chat/" + channelId;
+            sendJoinNotice(channelIdWithPath, username);
+        }
+    }
+
+    public void sendLeaveNotices(
+            Session session
+    ) {
+        String username = session.get("username");
+        for (String channelId : session.getChannels()) {
+            String channelIdWithPath = "/toClient/chat/" + channelId;
+            sendLeaveNotice(channelIdWithPath, username);
+        }
+    }
+
+    public void sendJoinNotice(
+            String path,
+            String username
+    ) {
+        String joinInfo = "{\"join\":\"" + username + "\"}";
+        simpMessagingTemplate.convertAndSend(path, joinInfo);
+    }
+
+    public void sendLeaveNotice(
+            String path,
+            String username
+    ) {
+        String leaveInfo = "{\"leave\":\"" + username + "\"}";
+        simpMessagingTemplate.convertAndSend(path, leaveInfo);
     }
 }
