@@ -82,7 +82,6 @@ angular.module('chatProApp')
                         $scope.messagesLeft = true;
                     }
                 } else {
-                    $scope.messageQuantity = 0;
                     $scope.messagesLeft = true;
                     $scope.less = false;
                     $scope.showLeft = false;
