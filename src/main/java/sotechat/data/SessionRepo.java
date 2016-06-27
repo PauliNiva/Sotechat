@@ -79,6 +79,7 @@ public class SessionRepo extends MapSessionRepository {
     ) {
         Session session = getSessionFromSessionId(sessionId);
         session.removeChannel(channelId);
+        updateCountOfProsAcceptingNewCustomers();
         Channel channel = mapper.getChannel(channelId);
         channel.setActive(false);
         for (String someUserId : channel.getActiveUserIds()) {
@@ -149,9 +150,12 @@ public class SessionRepo extends MapSessionRepository {
             channel.allowParticipation(session);
         }
 
-        /** Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
         if (chatClosed() && session.get("state").equals("start")) {
+            /** Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
             session.set("state", "closed");
+        } else if (!chatClosed() && session.get("state").equals("closed")) {
+            /** Chat oli joskus suljettu, mutta nyt se on avattu. */
+            session.set("state", "start");
         }
 
         /** Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
@@ -207,6 +211,7 @@ public class SessionRepo extends MapSessionRepository {
         String sessionId = req.getSession().getId();
         Session session = sessionsBySessionId.get(sessionId);
         session.set("online", onlineStatus);
+        updateCountOfProsAcceptingNewCustomers();
     }
 
     /** Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
@@ -227,7 +232,6 @@ public class SessionRepo extends MapSessionRepository {
      * @return true jos uusia asiakkaita ei hyvaksyta.
      */
     public synchronized boolean chatClosed() {
-        // return false; //TODO: kun angular valmis, uncomment allaoleva rivi
         return countOfProsAcceptingNewCustomers == 0;
     }
 
