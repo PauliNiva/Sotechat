@@ -5,6 +5,7 @@ angular.module('chatProApp')
             $scope.alerts = [];
             $scope.resetPsw = '';
             $scope.editPassword = '';
+            $scope.adminView = 'admin/userHandling.tpl.html';
 
             var success = function(response) {
                 if (response.data.status == 'OK') {
@@ -14,19 +15,27 @@ angular.module('chatProApp')
                     $scope.alerts.push({ type: 'danger', msg: 'Toiminto ei onnistunut! ' + response.data.error })
                 }
             };
+
+            $scope.toSettings = function() {
+                $scope.adminView = 'admin/settings.tpl.html';
+            };
+
+            $scope.toUsers = function() {
+                $scope.adminView = 'admin/userHandling.tpl.html';
+            };
             
             $scope.createNewUser = function () {
                 var user = '{"username": '+ $scope.newUserUsername + ', "loginName": '
                     + $scope.newUserLoginName +', "password": '
                     + $scope.newUserPassword+ '}';
                 adminService.createUser(btoa(user), function(response) {
-                    if (response.data.status != 'OK') {
+                    if (response.data.status == 'OK') {
                         $scope.newUserBoolean = false;
                         $scope.newUserUsername = '';
                         $scope.newUserPassword = '';
                         $scope.newUserLoginName = '';
-                        success();
                     }
+                    success(response);
                 })
             };
 
@@ -54,6 +63,18 @@ angular.module('chatProApp')
 
             $scope.cancelEditOrReset = function() {
                 $scope.resetPsw = '';
+            };
+
+            $scope.resetDatabase = function () {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'common/areUSureModal.tpl.html',
+                    controller: 'AreUSureModalController'
+                });
+
+                modalInstance.result.then(function (result) {
+                    adminService.resetDatabase(success);
+                });
             };
 
             $scope.closeAlert = function(index) {

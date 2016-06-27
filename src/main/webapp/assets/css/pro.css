@@ -50,7 +50,6 @@
 }
 
 
-
 .pro-left{
     padding-left: 0px;
     padding-right: 0px;
@@ -66,10 +65,10 @@
 }
 
 .proContainer {
-    height: calc(100% - 10px);
+    height: calc(100% - 4px);
 }
 .pro-chat-panel {
-    height: 100%;
+    height: calc(100% - 50px);
     margin-bottom: 0px;
 }
 
@@ -116,6 +115,10 @@
     font-weight: bold;
     text-decoration: underline;
 
+}
+
+.queueRow {
+    margin-top: 0px;
 }
 
 

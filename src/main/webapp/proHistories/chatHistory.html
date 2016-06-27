@@ -1,13 +1,13 @@
 <div ng-controller="proHistoriesController">
     <h1 class="page-header historyHeader">Menneet keskustelut</h1>
-    <div class="col-md-2 col-lg-2" ng-hide="showConv">
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" ng-hide="showConv">
         <button class="btn btn-default btn-block" name="backToPanel" ng-click="$parent.backToPanel()">
             Takaisin
         </button>
         <button class="btn btn-primary btn-block proButton" ng-click="addQuantity()">Näytä lisää
         </button>
     </div>
-    <div class="col-md-10 col-lg-10" ng-hide="showConv">
+    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" ng-hide="showConv">
         <div ng-hide="left">Ei enempää keskusteluja</div>
         <div ng-show="empty">Ei keskusteluja</div>
         <div class="panel conTopic">
@@ -26,7 +26,7 @@
                 <i class="pull-right glyphicon"
                    ng-class="{'glyphicon-chevron-down': collapsed, 'glyphicon-chevron-right': !collapsed}"></i>
             </div>
-            <div class="panel-collapse collapse" uib-collapse="!collapsed">
+            <div class="panel-collapse collapse" uib-collapse="!collapsed" expanding="openHistoryOf(conversation.channelId)">
                 <div class="panel-body">
                     <history-conversation-component channel="{{conversation.channelId}}"
                                                     myname="{{myUsername}}"></history-conversation-component>

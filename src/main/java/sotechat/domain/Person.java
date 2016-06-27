@@ -21,7 +21,7 @@ public class Person {
     public String userId;
 
     /** henkilon nimimerkki joka nakyy asiakkaille */
-    //TODO: unique
+    @Column(unique = true)
     private String username;
 
     /** nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan */
@@ -133,6 +133,15 @@ public class Person {
     public final void addConversationToPerson(
             final Conversation conversation) {
         this.conversationsOfPerson.add(conversation);
+    }
+
+    /**
+     * Poistaa.
+     * @param conversation Conversation lisattava keskustelu
+     */
+    public final void removeConversation(
+            final Conversation conversation) {
+        this.conversationsOfPerson.remove(conversation);
     }
 
     /**

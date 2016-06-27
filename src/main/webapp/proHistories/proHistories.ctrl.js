@@ -4,12 +4,8 @@ angular.module('chatProApp')
 
                 /** kuinka paljon keskusteluja naytetaan */
                 $scope.quantity = -10;
-                /** kuinka paljon viesteja naytetaan */
-                $scope.messageQuantity = -25;
                 /** onko keskusteluja jaljella naytettavaksi */
                 $scope.left = true;
-                /** onko viesteja jaljella naytettavaksi */
-                $scope.messagesLeft = true;
                 /** naytettavat viestit */
                 $scope.messages = [];
                 /** keskustelujen tiedot */
@@ -20,8 +16,12 @@ angular.module('chatProApp')
                 $scope.view = 'proHistories/conversation.html';
                 /** naytetaanko keskustelunakyma */
                 $scope.showConv = false;
-                
+                /** henkilon kayttajanimi */
                 $scope.myUsername = proStateService.getUsername();
+
+                $scope.openHistoryOf = function(channelID) {
+                    $scope.$broadcast ('openHistory' + channelID);
+                };
 
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
@@ -41,7 +41,7 @@ angular.module('chatProApp')
                     })
                 };
 
-                /** haetaan naytettavat viestit ja siirrytaan ne nayttavalle sivulle */
+                /** haetaan naytettavat viestit ja naytetaan ne */
                 $scope.showConversation = function (channelId) {
                     proHistoryService.getMessages(channelId).then(function(response){
                        var msghistory = response.data;
@@ -59,7 +59,12 @@ angular.module('chatProApp')
                 /** lisataan naytettavien keskustelujen maaraa */
                 $scope.addQuantity = function () {
                     if ((-$scope.quantity) < $scope.Conversations.length) {
-                        $scope.quantity -= 10;
+                        var diff = $scope.Conversations.length - (-$scope.quantity);
+                        if(diff < 10) {
+                            $scope.quantity -= diff;
+                        } else {
+                            $scope.quantity -= 10;
+                        }
                     } else if ($scope.left == false) {
                         $scope.left = true;
                     } else {
@@ -73,27 +78,9 @@ angular.module('chatProApp')
                     $scope.left = true;
                 };
 
-                /** lisataan naytettavien viestien maaraa */
-                $scope.addMessageQuantity = function () {
-                    if ((-$scope.messageQuantity) < $scope.messages.length) {
-                        $scope.messageQuantity -= 10;
-                    } else if ($scope.messagesLeft == false ){
-                        $scope.messagesLeft = true;
-                    } else {
-                        $scope.messagesLeft = false;
-                    }
-                };
-
-                /** resetoidaan naytettavien viestien maara */
-                var resetMessageQuantity = function () {
-                    $scope.messageQuantity = -25;
-                    $scope.messagesLeft = true;
-                };
-
                 /** siirrytaan takaisin keskustelut -sivulle */
                 $scope.backToConversations = function () {
                     resetQuantity();
-                    resetMessageQuantity();
                     $scope.showConv = false;
                 };
                 

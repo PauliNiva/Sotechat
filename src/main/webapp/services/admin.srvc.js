@@ -17,8 +17,8 @@ angular.module('chatProApp')
             $http.post('/resetpassword/' + userID, newPassword).then(callback);
         }
 
-        function resetDataBase(callback) {
-
+        function resetDatabase(callback) {
+            $http.delete('/tuhoaHistoria', {}).then(callback);
         }
 
         var admin = {
@@ -26,7 +26,7 @@ angular.module('chatProApp')
             createUser: createUser,
             delUser: delUser,
             resetPassword: resetPassword,
-            resetDataBase: resetDataBase
+            resetDatabase: resetDatabase
         };
 
         return admin;

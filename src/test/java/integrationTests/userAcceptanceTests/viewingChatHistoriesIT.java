@@ -54,8 +54,6 @@ public class viewingChatHistoriesIT {
         waitAndPickFromQueue(proWait);
         waitChatWindowsAppear(userWait);
 
-        waitElementPresent(proWait, By.name("menu"));
-        waitElementClickable(proWait, By.name("menu")).click();
         waitElementClickable(proWait, By.name("history")).click();
         assertTrue(waitForTextToAppear(proWait, "Menneet keskustelut"));
         assertTrue(waitForTextToAppear(proWait, "Testi"));

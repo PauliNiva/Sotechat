@@ -53,7 +53,7 @@ angular.module('chatApp')
         };
         
         function leaveChat() {
-            $http.post("/leave/" + getChannelID());
+            $http.post("/leave/" + getChannelID(), {});
         };
 
         /** Hakee get-pyynnöllä palvelimelta käyttäjän tiedot */

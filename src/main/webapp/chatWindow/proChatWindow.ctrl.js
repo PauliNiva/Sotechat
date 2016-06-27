@@ -3,8 +3,8 @@
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
 angular.module('chatProApp')
-    .controller('proChatController', ['$scope', 'stompSocket', 'connectToServer', 'proStateService',
-        function ($scope, stompSocket, connectToServer, proStateService) {
+    .controller('proChatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'proStateService',
+        function ($scope, $uibModal, stompSocket, connectToServer, proStateService) {
             $scope.pro = true;
             // Taulukko "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
@@ -18,13 +18,33 @@ angular.module('chatProApp')
             $scope.chatText = '';
 
             var channel = this.channel;
-            var status = this.status;
+            var endChat = this.chatend;
 
             $scope.$on('unSubscribeChat', function (event, args) {
                 if (args.channelID === channel) {
                     sub.unsubscribe();
                 }
             });
+
+            $scope.userLeave = function() {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'common/areUSureModal.tpl.html',
+                    controller: 'AreUSureModalController'
+                });
+
+                modalInstance.result.then(closeChat);
+            };
+
+            var closeChat = function() {
+                sub.unsubscribe();
+                $scope.chatClosed = true;
+                endChat();
+            };
+            
+            $scope.closeConversation = function() {
+                endChat();
+            };
 
             /** Funktio lahettaa servicen avulla tekstikentan
              *  sisallon ja lopuksi tyhjentaa tekstikentan. */
@@ -61,18 +81,12 @@ angular.module('chatProApp')
                 sub.unsubscribe();
                 $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
                 $scope.chatClosed = true;
-                status();
+                proStateService.leaveChannel(channel);
             };
 
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
-                    //TODO: Testaa ettei allaoleva hakkerointi toimi
-                    //sub = connectToServer.subscribe('/toClient/chat/*', function (response) {
-
-                    // Lisataan viesti, jos sita ei ole jo entuudestaan.
-                    // Chat Logien broadcastauksen yhteydessa serveri saattaa
-                    // lahettaa meille viesteja, jotka meilla jo on.
                     var message = getMessage(response.body);
                     if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
@@ -84,5 +98,8 @@ angular.module('chatProApp')
             };
 
             /** Alustetaan kanava, kun controlleri ladataan */
-            subscribe();
+            if (angular.isUndefined(sub)){
+                subscribe();
+            }
+
         }]);

@@ -13,6 +13,9 @@ angular.module('chatProApp')
 
             $scope.showHistory = function () {
                 $scope.proView = 'proHistories/chatHistory.html';
+                angular.forEach($scope.chats, function(key) {
+                    $scope.$broadcast('unSubscribeChat', {'channelID': key.channel});
+                });
             };
 
             $scope.backToPanel = function () {
@@ -22,6 +25,11 @@ angular.module('chatProApp')
             /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
             var initQueue = function () {
                 $scope.$broadcast('connectedToQueue');
+            };
+            
+            $scope.endChat = function(channelID) {
+                proStateService.leaveChannel(channelID);
+                removeTab(channelID);
             };
 
             /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
@@ -37,32 +45,6 @@ angular.module('chatProApp')
 
             $scope.tabIsSelected = function (index) {
                 return index === $scope.activeChatTab;
-            }
-
-            $scope.endConversation = function (channelID) {
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'common/areUSureModal.tpl.html',
-                    controller: 'AreUSureModalController'
-                });
-
-                modalInstance.result.then(function (result) {
-                    $scope.$broadcast('unSubscribeChat', {'channelID': channelID});
-                    $http.post("/leave/" + channelID, {});
-                    removeTab(channelID);
-                });
-            };
-
-            $scope.userLeavesChat = function (channelID) {
-                $http.post("/leave/" + channelID, {});
-                var chatTabIndex = arrayObjectIndexOf($scope.chats, channelID, 'channel');
-                if (chatTabIndex > -1) {
-                    $scope.chats[chatTabIndex].status = 'offline';
-                }
-            };
-
-            $scope.closeConversation = function (channelID) {
-                removeTab(channelID);
             };
 
             var removeTab = function (channelID) {

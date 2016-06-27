@@ -58,7 +58,7 @@ public class userEndConversationIT {
         // a chat window is opened that has a connection to the customer
         waitChatWindowsAppear(proWait).isDisplayed();
         waitChatWindowsAppear(userWait);
-        waitElementClickable(userWait, By.name("userEndConversation")).click();
+        waitElementClickable(userWait, By.name("endConversation")).click();
         waitElementClickable(userWait, By.name("sure")).click();
         Assert.assertTrue(waitForTextToAppear(userWait, "Keskustelu on "));
         Assert.assertTrue(waitForTextToAppear(proWait, "Vastapuoli on "));
