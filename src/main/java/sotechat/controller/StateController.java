@@ -11,9 +11,11 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.QueueService;
@@ -43,6 +45,7 @@ public class StateController {
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
+     * @param pValidatorService validatorService
      * @param pSessionRepo sessionRepo
      * @param pQueueService queueService
      * @param pQueueBroadcaster queueBroadCaster
@@ -235,6 +238,14 @@ public class StateController {
         return jsonifiedResponse(error);
     }
 
+    /**
+     * Metodi, joka muuntaa ValidatorServicen palauttaman String-muotoisen
+     * virheilmoituksen JSON-muotoon, jotta se voidaan lahettaa Clientille
+     * ja Clientin on helppo kasitella sita.
+     *
+     * @param error ValidatorServicen palauttama String-muotoinen virheviesti.
+     * @return Palauttaa JSON-muotoisen virheen.
+     */
     private String jsonifiedResponse(final String error) {
         if (error.isEmpty()) {
             return "{\"status\":\"OK\"}";

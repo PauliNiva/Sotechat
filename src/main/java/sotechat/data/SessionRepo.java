@@ -53,7 +53,7 @@ public class SessionRepo extends MapSessionRepository {
 
     /** Kaivaa sessionId:lla session-olion.
      * @param sessionId sessionId
-     * @return sesson-olio
+     * @return session-olio
      */
     public synchronized Session getSessionFromSessionId(
             final String sessionId
@@ -61,6 +61,12 @@ public class SessionRepo extends MapSessionRepository {
         return sessionsBySessionId.get(sessionId);
     }
 
+    /**
+     * Kaivaa session-olion userId:lla.
+     *
+     * @param userId Kayttajan userId
+     * @return SessionReposta userId:lla haettu session.
+     */
     public final synchronized Session getSessionFromUserId(
             final String userId
     ) {
@@ -227,7 +233,7 @@ public class SessionRepo extends MapSessionRepository {
      * @return true jos uusia asiakkaita ei hyvaksyta.
      */
     public synchronized boolean chatClosed() {
-        return false; //TODO: kun angular valmis, uncomment allaoleva rivi
+        return false; //TODO Kun angular valmis, uncomment allaoleva rivi
         //return countOfProsAcceptingNewCustomers == 0;
     }
 

@@ -11,24 +11,44 @@ import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
+/**
+ * Luokan tarkoituksena on "kovakoodata" kehitysvaiheen tietokantaan arvoja.
+ */
 @Configuration
 @Profile("development")
 public class DevProfile {
 
+    /**
+     * JPA-repositorio, joka hallinnoi henkiloita.
+     */
     @Autowired
-    PersonRepo personRepo;
+    private PersonRepo personRepo;
 
+    /**
+     * JPA-repositorio, joka hallinnoi keskusteluita.
+     */
     @Autowired
-    ConversationRepo conversationRepo;
+    private ConversationRepo conversationRepo;
 
+    /**
+     * JPA-repositorio, joka hallinnoi viesteja.
+     */
     @Autowired
-    MessageRepo messageRepo;
+    private MessageRepo messageRepo;
 
+    /**
+     * Mapper-olio, josta tassa kaytetaan siihen, etta sinne talletetaan
+     * kirjautuneen kayttajan kayttajanimi ja kayttajaId siten, etta kayttaja
+     * voidaan myohemmin hakea Mapper-oliosta kayttajaId:n perusteella.
+     */
     @Autowired
-    Mapper mapper;
+    private Mapper mapper;
 
+    /**
+     * Luo kehitysvaiheen profiiliin kaksi kayttajaa valmiiksi, admin-kayttajan
+     * ja yhden hoitaja-kayttajan.
+     */
     @PostConstruct
     @Transactional
     public void init() {
@@ -50,28 +70,4 @@ public class DevProfile {
         personRepo.save(pro);
         mapper.mapProUsernameToUserId(pro.getUserName(), pro.getUserId());
     }
-
-
-
-
-    /* TODO: Saako poistaa?
-        Conversation conversation = new Conversation("007", "6.6.2016");
-        conversation.setCategory("Hammashoito");
-        conversation.addPersonToConversation(admin);
-        conversationRepo.save(conversation);
-
-        admin.addConversationToPerson(conversation);
-        personRepo.save(admin);
-
-        Message message = new Message();
-        message.setChannelId("007");
-        message.setContent("This project sux ballz!");
-        message.setDate("6.6.2016");
-        message.setSender("pauli");
-        message.setConversation(conversation);
-        messageRepo.save(message);
-
-        conversation.addMessageToConversation(message);
-        conversationRepo.save(conversation);
-        */
 }

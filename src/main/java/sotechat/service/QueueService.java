@@ -4,18 +4,21 @@ import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
-import sotechat.data.*;
+
+import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.data.Channel;
 import sotechat.wrappers.MsgToServer;
 import sotechat.wrappers.QueueItem;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /** Tarjoaa palvelut jonoon lisaamiseen.
  *  Jonosta poistamiseen ja jonon tarkasteluun.
- * Tata Servicea ei tarvitse synkronisoida, koska queue on jo synkronisoitu.
  */
 @Service
 public class QueueService {
@@ -211,7 +214,7 @@ public class QueueService {
     }
 
     /**
-     * Palauttaa jonon pituuden
+     * Palauttaa jonon pituuden.
      * @return Jonon pituus
      */
     public final int getQueueLength() {

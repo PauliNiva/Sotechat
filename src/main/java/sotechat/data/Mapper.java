@@ -2,8 +2,12 @@ package sotechat.data;
 
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.math.BigInteger;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Random;
 
 /** Mapperi muistaa asioita kanaviin ja ID:hen liittyen. Esim:
  * - Onko jokin username varattu rekisteroityneelle kayttajalle?
@@ -31,7 +35,7 @@ public class Mapper {
         this.fastGen = new FastGeneratorForRandomStrings();
         this.reservedIds = new HashSet<>();
         this.mapRegisteredUsers = new HashMap<>();
-        /* TODO: Lataa tietokannasta reservedIds & usernames. */
+        /* TODO Lataa tietokannasta reservedIds & usernames. */
     }
 
     /** Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
@@ -43,7 +47,7 @@ public class Mapper {
     ) {
         Channel channel = channels.get(channelId);
         if (channel == null) {
-            //TODO: try loading from db.
+            //TODO Try loading from db.
         }
         return channel;
     }
@@ -96,7 +100,8 @@ public class Mapper {
         if (username == null
                 || username.isEmpty()
                 || !mapRegisteredUsers.containsKey(username)) {
-            throw new IllegalArgumentException(("Error! Unknown userId for registered name " + username));
+            throw new IllegalArgumentException(("Error! Unknown userId for "
+                    + "registered name " + username));
         }
         return this.mapRegisteredUsers.get(username);
     }

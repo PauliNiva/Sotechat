@@ -17,7 +17,7 @@ public class ProUrlController {
     }
 
     /**
-     * Uudelleenohjaa /login to /pro
+     * Uudelleenohjaa /login to /pro.
      * @return /pro
      */
     @RequestMapping(value = "/login")

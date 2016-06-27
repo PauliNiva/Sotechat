@@ -2,8 +2,14 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.*;
 
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.service.AdminService;
 import org.springframework.util.Base64Utils;
 
@@ -14,18 +20,20 @@ import org.springframework.util.Base64Utils;
 public class AdminController {
 
     @Autowired
-    AdminService adminService;
+    private AdminService adminService;
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
+    @ResponseBody
+    public String addNewUser(
+            @RequestBody final String jsonPerson) {
         try {
             adminService.addUser(new String(Base64Utils
                     .decodeFromString(jsonPerson)));
         } catch (Exception e) {
-            return "{\"error\":\"Käyttäjää ei voitu lisätä. " +
-                    "Tarkista, että kirjautumisnimi tai palvelunimi eivät " +
-                    "ole jo varattuja.\"}";
+            return "{\"error\":\"Käyttäjää ei voitu lisätä. "
+                    + "Tarkista, että kirjautumisnimi tai palvelunimi eivät "
+                    + "ole jo varattuja.\"}";
         }
         return statusOK();
     }
@@ -38,7 +46,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable String id) throws Exception {
+    public String deleteUser(@PathVariable final String id) throws Exception {
         try {
             if (adminService.deleteUser(id)) {
                 return statusOK();
@@ -53,8 +61,8 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
-    public String resetPassword(@PathVariable String id,
-                                @RequestBody String newPassword)
+    public String resetPassword(@PathVariable final String id,
+                                @RequestBody final String newPassword)
             throws Exception {
         try {
             adminService.changePassword(id,

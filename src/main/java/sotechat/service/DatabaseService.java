@@ -12,31 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Luokka tietokantaoperaatioiden toteuttamiseen
+ * Luokka tietokantaoperaatioiden toteuttamiseen.
  */
 @Service
 public class DatabaseService {
 
-    /** Henkiloihin liittyvat palvelut */
+    /** Henkiloihin liittyvat palvelut. */
     private PersonService personService;
 
-    /** Keskusteluihin liittyvat palvelut */
+    /** Keskusteluihin liittyvat palvelut. */
     private ConversationService conversationService;
 
-    /** Viesteihin liittyvat palvelut */
+    /**
+     * Konstruktori.
+     *
+     * @param pPersonService PersonRepon CRUD-operaatioista vastaava palvelu-
+     *                       luokka.
+     * @param pConversationService ConversationRepon CRUD-operaatioista
+     *                             vastaava palveluluokka
+     */
     @Autowired
     public DatabaseService(
-            final PersonService personService,
-            final ConversationService conversationService
+            final PersonService pPersonService,
+            final ConversationService pConversationService
     ) {
-        this.personService = personService;
-        this.conversationService = conversationService;
+        this.personService = pPersonService;
+        this.conversationService = pConversationService;
     }
 
     /**
      * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
      * sekä keskustelun kategoria.
-     * @param sender aloitusviestin lahettaja
+     * @param sender Aloitusviestin lahettaja
      * @param channelId kanavan id
      * @param category keskustelun kategoria
      */
@@ -67,20 +74,22 @@ public class DatabaseService {
      * @param role rooli
      * @param password salasana
      */
-    public final void createNewUser(String userId, String loginName,
-                                    String screenName, String role, String password){
+    public final void createNewUser(final String userId, final String loginName,
+                                    final String screenName, final String role,
+                                    final String password) {
         try {
-            if(userId.isEmpty() || userId == null || loginName.isEmpty()
+            if (userId.isEmpty() || userId == null || loginName.isEmpty()
                     || loginName == null || password.isEmpty()
                     || password == null || screenName.isEmpty()
-                    || screenName == null || role.isEmpty() || role == null)
-                    throw new Exception();
+                    || screenName == null || role.isEmpty() || role == null) {
+                throw new Exception();
+            }
             Person person = new Person(userId);
             person.setUserName(screenName);
             person.setLoginName(loginName);
             person.setRole(role);
             personService.addPerson(person, password);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("DBE on createNewUser! " + e.toString());
         }
     }
@@ -202,7 +211,7 @@ public class DatabaseService {
      * @param message Message luokan ilmentyma
      * @return MsgToClient luokan ilmentyma
      */
-    private MsgToClient wrapMessage(Message message) {
+    private MsgToClient wrapMessage(final Message message) {
         String id = "" + message.getId();
         String name = message.getSender();
         String channelId = message.getChannelId();
@@ -220,7 +229,8 @@ public class DatabaseService {
             List<Conversation> conversations = conversationService.findAll();
             for (Conversation conversation : conversations) {
                 /* Poistaa myos keskusteluun liitetyt viestit. */
-                for (Person person : conversation.getParticipantsOfConversation()) {
+                for (Person person : conversation
+                        .getParticipantsOfConversation()) {
                     person.removeConversation(conversation);
                 }
                 String id = conversation.getChannelId();

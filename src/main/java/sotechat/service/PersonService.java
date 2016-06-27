@@ -11,26 +11,26 @@ import java.util.List;
 
 /**
  * Luokka tietokannassa olevien Person -olioiden tallentamiseen
- * (CRUD -operaatiot)
+ * (CRUD -operaatiot).
  */
 @Service
 public class PersonService {
 
-    /** repositorio */
+    /** Person-olioita kasitteleava JPA-repositorio. */
     @Autowired
     private PersonRepo personRepo;
-
-    /** konstruktoriin injektoidaan repositorio */
 
     /**
      * Lisaa tietokantaan uuden Person -olion ja asettaa talle parametrina
      * annetun salasanan.
      * @param person Tietokantaan lisattava Person -olio
      * @param password Henkilon salasana
-     * @throws Exception
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
      */
     @Transactional
-    public void addPerson(Person person, String password) throws Exception {
+    public void addPerson(final Person person, final String password)
+            throws Exception {
             person.setPassword(password);
             personRepo.save(person);
     }
@@ -45,24 +45,26 @@ public class PersonService {
     }
 
     /**
-     * Poistaa tietokannasta parametrina annettua id:ta vastaavan henkilon
+     * Poistaa tietokannasta parametrina annettua id:ta vastaavan henkilon.
      * @param personId henkilon tunnus
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
      */
     @Transactional
-    public void delete(String personId) throws Exception {
+    public void delete(final String personId) throws Exception {
         personRepo.delete(personId);
     }
 
     /**
-     * Palauttaa parametrina annettua tunnusta vastaavan Person -olion
-     * @param personId henkilon tunnus
-     * @return tunnusta vastaava henkilo (Person olio)
-     * @throws Exception IllegalArgumentException
+     * Palauttaa parametrina annettua tunnusta vastaavan Person -olion.
+     * @param personId Henkilon kayttajaId.
+     * @return Tunnusta vastaava henkilo (Person olio)
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
      */
 
     @Transactional
-    public Person getPerson(String personId) throws Exception {
+    public Person getPerson(final String personId) throws Exception {
         return personRepo.findOne(personId);
     }
 
@@ -70,18 +72,19 @@ public class PersonService {
      * Vaihtaa parametrina annettua tunnusta vastaavan henkilon salasanan
      * parametrina annettuun uuteen salasanaan ja tallentaa muutoksen
      * tietokantaan.
-     * @param personId henkilon id
-     * @param password uusi salasana
+     * @param personId Henkilon id
+     * @param password Uusi salasana
      * @return true, jos salasanan vaihtaminen onnistui, false jos ei
      */
     @Transactional
-    public boolean changePassword(String personId, String password) {
+    public boolean changePassword(final String personId,
+                                  final String password) {
         try {
             Person person = personRepo.findOne(personId);
             person.setPassword(password);
             personRepo.save(person);
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -89,18 +92,18 @@ public class PersonService {
     /**
      * Vaihtaa parametrina annettua tunnusta vastaavan henkilon nimimerkin
      * parametrina annettuun nimeen ja tallentaa muutoksen tietokantaan.
-     * @param personId henkilon id
-     * @param newName uusi nimi
+     * @param personId Henkilon id
+     * @param newName Uusi nimi
      * @return true, jos nimen vaihtaminen onnnistui, false, jos ei
      */
     @Transactional
-    public boolean changeUserName(String personId, String newName) {
+    public boolean changeUserName(final String personId, final String newName) {
         try {
             Person person = personRepo.findOne(personId);
             person.setUserName(newName);
             personRepo.save(person);
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -108,13 +111,14 @@ public class PersonService {
     /**
      * Palauttaa listan kaikista henkilon keskusteluista, eli listan
      * Conversation oliota, jotka on liitetty parametrina annettua henkilon
-     * id:ta vastaavaan Person olioon
-     * @param personId henkikon id
-     * @return lista henkilon keskusteluista Conversation olioina
-     * @throws Exception IllegalArgumentException
+     * id:ta vastaavaan Person olioon.
+     * @param personId Henkilon id
+     * @return Lista henkilon keskusteluista Conversation olioina
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
      */
     @Transactional
-    public List<Conversation> personsConversations(String personId)
+    public List<Conversation> personsConversations(final String personId)
             throws Exception {
         return personRepo.findOne(personId).getConversationsOfPerson();
     }
@@ -123,11 +127,12 @@ public class PersonService {
      * Lisaa keskustelun henkilon keskusteluihin ts. Tallentaa parametrina
      * annetun Conversation -olion parametrina annettua tunnusta vastaavan
      * Person olion listaan.
-     * @param personId henkilon id
-     * @param conv lisattavaa keskustelua vastaava Conversation olio
+     * @param personId Henkilon id
+     * @param conv Lisattavaa keskustelua vastaava Conversation olio
      */
     @Transactional
-    public void addConversation(String personId, Conversation conv) {
+    public void addConversation(final String personId,
+                                final Conversation conv) {
         Person person = personRepo.findOne(personId);
         person.addConversationToPerson(conv);
         personRepo.save(person);
@@ -140,7 +145,8 @@ public class PersonService {
      * @param conv conv
      */
     @Transactional
-    public void removeConversation(String personId, Conversation conv) {
+    public void removeConversation(final String personId,
+                                   final Conversation conv) {
         Person person = personRepo.findOne(personId);
         person.removeConversation(conv);
         personRepo.save(person);
