@@ -20,28 +20,33 @@ angular.module('chatProApp')
             var channelId = this.channel;
             var myname = this.myname;
 
+            var ekstra = 0;
+
             $scope.$on('openHistory' + channelId, function(e) {
+                resetMessageQuantity();
                 init();
             });
 
             /** haetaan naytettavat viestit ja siirrytaan ne nayttavalle sivulle */
             function init() {
-                proHistoryService.getMessages(channelId).then(function(response){
-                    var msghistory = response.data;
-                    if (msghistory.length > 0) {
-                        angular.forEach(msghistory, function (key) {
-                            key.I = key.username === myname;
-                        });
-                        $scope.messagesLeft = true;
-                        $scope.messages = msghistory;
-                        $scope.startTime = msghistory[0].timeStamp;
-                    }else {
-                        $scope.messagesLeft = false;
-                        $scope.empty = true;
-                    }
-                    $scope.showConv = true;
-                    $scope.loaded = true;
-                });
+                if(!$scope.messages.length) {
+                    proHistoryService.getMessages(channelId).then(function (response) {
+                        var msghistory = response.data;
+                        if (msghistory.length > 0) {
+                            angular.forEach(msghistory, function (key) {
+                                key.I = key.username === myname;
+                            });
+                            $scope.messagesLeft = true;
+                            $scope.messages = msghistory;
+                            $scope.startTime = msghistory[0].timeStamp;
+                        } else {
+                            $scope.messagesLeft = false;
+                            $scope.empty = true;
+                        }
+                        $scope.showConv = true;
+                        $scope.loaded = true;
+                    });
+                }
             };
 
             /** lisataan naytettavien viestien maaraa */
@@ -50,8 +55,10 @@ angular.module('chatProApp')
                     var diff = $scope.messages.length - (-$scope.messageQuantity);
                     if (diff < 7){
                         $scope.messageQuantity -= diff;
+                        ekstra = diff;
                     } else {
                         $scope.messageQuantity -= 7;
+                        ekstra = 0;
                     }
                 } else if ($scope.messagesLeft == false ){
                     $scope.messagesLeft = true;
@@ -63,14 +70,21 @@ angular.module('chatProApp')
             };
 
             $scope.showLess = function () {
-                if ($scope.messageQuantity<=-7) {
-                    $scope.messageQuantity += 7;
+                var diff = $scope.messages.length - (-$scope.messageQuantity);
+                if ($scope.messageQuantity<-7) {
+                    if($scope.messageQuantity%7==0) {
+                        $scope.messageQuantity += 7;
+                    }else{
+                        $scope.messageQuantity += ekstra;
+                    }
                     $scope.showLeft = false
-                    if($scope.messageQuantity<$scope.messages.length) $scope.messagesLeft = true;
+                    if ($scope.messageQuantity < $scope.messages.length) $scope.messagesLeft = true;
+
                 } else {
                     $scope.messageQuantity = 0;
                     $scope.messagesLeft = true;
                     $scope.less = false;
+                    $scope.showLeft = false;
                 }
             }
 

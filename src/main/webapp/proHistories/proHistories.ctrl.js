@@ -4,12 +4,8 @@ angular.module('chatProApp')
 
                 /** kuinka paljon keskusteluja naytetaan */
                 $scope.quantity = -10;
-                /** kuinka paljon viesteja naytetaan */
-                $scope.messageQuantity = -10;
                 /** onko keskusteluja jaljella naytettavaksi */
                 $scope.left = true;
-                /** onko viesteja jaljella naytettavaksi */
-                $scope.messagesLeft = true;
                 /** naytettavat viestit */
                 $scope.messages = [];
                 /** keskustelujen tiedot */
@@ -82,32 +78,9 @@ angular.module('chatProApp')
                     $scope.left = true;
                 };
 
-                /** lisataan naytettavien viestien maaraa */
-                $scope.addMessageQuantity = function () {
-                    if ((-$scope.messageQuantity) < $scope.messages.length) {
-                        var diff = $scope.Conversations.length - (-$scope.messageQuantity);
-                        if(diff < 10) {
-                            $scope.messageQuantity -= diff;
-                        } else {
-                            $scope.messageQuantity -= 10;
-                        }
-                    } else if ($scope.messagesLeft == false ){
-                        $scope.messagesLeft = true;
-                    } else {
-                        $scope.messagesLeft = false;
-                    }
-                };
-
-                /** resetoidaan naytettavien viestien maara */
-                var resetMessageQuantity = function () {
-                    $scope.messageQuantity = -10;
-                    $scope.messagesLeft = true;
-                };
-
                 /** siirrytaan takaisin keskustelut -sivulle */
                 $scope.backToConversations = function () {
                     resetQuantity();
-                    resetMessageQuantity();
                     $scope.showConv = false;
                 };
                 
