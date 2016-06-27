@@ -47,14 +47,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
     protected final void configure(final HttpSecurity http) throws Exception {
-        http.headers().frameOptions().disable();
         http
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic().and().csrf().disable()
-                //.csrfTokenRepository(csrfTokenRepository()).and()
-                //.addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+                .httpBasic().and().csrf()
+                .csrfTokenRepository(csrfTokenRepository()).and()
+                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
                 .logout().logoutSuccessUrl("/pro");
 
         // TODO: allaoleva HTTP->HTTPS ohjaus
