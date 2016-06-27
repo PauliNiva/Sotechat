@@ -78,8 +78,9 @@ angular.module('chatProApp')
                         $scope.messageQuantity += ekstra;
                     }
                     $scope.showLeft = false
-                    if ($scope.messageQuantity < $scope.messages.length) $scope.messagesLeft = true;
-
+                    if ($scope.messageQuantity < $scope.messages.length) {
+                        $scope.messagesLeft = true;
+                    }
                 } else {
                     $scope.messageQuantity = 0;
                     $scope.messagesLeft = true;
