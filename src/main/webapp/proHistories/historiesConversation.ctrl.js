@@ -20,8 +20,7 @@ angular.module('chatProApp')
             var channelId = this.channel;
             var myname = this.myname;
 
-            /** listan pituuden jakojaama */
-            var ekstra = 0;
+            var extra = 0;
 
             $scope.$on('openHistory' + channelId, function(e) {
                 resetMessageQuantity();
@@ -56,10 +55,10 @@ angular.module('chatProApp')
                     var diff = $scope.messages.length - (-$scope.messageQuantity);
                     if (diff < 7){
                         $scope.messageQuantity -= diff;
-                        ekstra = diff;
+                        extra = diff;
                     } else {
                         $scope.messageQuantity -= 7;
-                        ekstra = 0;
+                        extra = 0;
                     }
                 } else if ($scope.messagesLeft == false ){
                     $scope.messagesLeft = true;
@@ -76,7 +75,7 @@ angular.module('chatProApp')
                     if($scope.messageQuantity%7==0) {
                         $scope.messageQuantity += 7;
                     }else{
-                        $scope.messageQuantity += ekstra;
+                        $scope.messageQuantity += extra;
                     }
                     $scope.showLeft = false
                     if ($scope.messageQuantity < $scope.messages.length) {
