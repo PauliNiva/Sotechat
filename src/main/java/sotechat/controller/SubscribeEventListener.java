@@ -126,9 +126,8 @@ public class SubscribeEventListener
         if (channelIdWithPath.startsWith(chatPrefix)) {
             /** Lahetetaan kanavan chat-historia kaikille subscribaajille. */
             chatLogger.broadcast(channelId, broker);
-            /** Lahetetaan tieto "uusi keskustelija liittynyt kanavalle". */
-            String joinInfo = "{\"join\":\"" + session.get("username") + "\"}";
-            broker.convertAndSend(channelIdWithPath, joinInfo);
+            /** Ei laheteta tassa tietoa "uusi keskustelija liittynyt kanavalle"
+             * vaan lahetetaan se WebSocketConnectHandlerissa. */
             if (!channel.isActive()) {
                 broker.sendClosedChannelNotice(channelId);
             }
