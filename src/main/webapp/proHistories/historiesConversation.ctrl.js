@@ -20,6 +20,7 @@ angular.module('chatProApp')
             var channelId = this.channel;
             var myname = this.myname;
 
+            /** listan pituuden jakojaama */
             var ekstra = 0;
 
             $scope.$on('openHistory' + channelId, function(e) {
