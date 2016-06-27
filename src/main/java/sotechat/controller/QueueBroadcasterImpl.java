@@ -20,7 +20,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     private final QueueService queueService;
 
     /** Viestien lahetys. */
-    private SimpMessagingTemplate broker;
+    private MessageBroker broker;
 
     /** Ajanhetki edelliselle broadcastille. */
     private Long lastBroadcastTime;
@@ -30,14 +30,14 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
 
     /** Konstruktori.
      * @param pQueueService queueService
-     * @param pSimpMessagingTemplate broker */
+     * @param pMessageBroker broker */
     @Autowired
     public QueueBroadcasterImpl(
             final QueueService pQueueService,
-            final SimpMessagingTemplate pSimpMessagingTemplate
+            final MessageBroker pMessageBroker
     ) {
         this.queueService = pQueueService;
-        this.broker = pSimpMessagingTemplate;
+        this.broker = pMessageBroker;
         this.lastBroadcastTime = 0L;
     }
 

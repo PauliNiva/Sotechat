@@ -214,10 +214,12 @@ public class ValidatorService {
             final JsonObject payload,
             final Principal professional
     ) {
+        if (sessionRepo.chatClosed()) {
+            return "Denied join, no professionals available.";
+        }
         if (professional != null) {
             /** Hoitaja yrittaa liittya pooliin asiakkaana. */
-            return "{\"content\":\"Denied join "
-                    + "pool request for professional.\"}";
+            return "Denied join pool request for professional";
         }
 
         /** Clientin session tarkistus. */
@@ -290,6 +292,34 @@ public class ValidatorService {
         }
 
         return true;
+    }
+
+    /**
+     * Validoi pyynnon muuttaa hoitajan online-tilaa.
+     * @param professional autentikaatiotiedot
+     * @param req pyynnon tiedot
+     * @param onlineStatus asetettava status "true" tai "false" Stringina
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto ok.
+     */
+    public String validateOnlineStatusChangeRequest(
+            final Principal professional,
+            final HttpServletRequest req,
+            final String onlineStatus
+    ) {
+        if (professional == null) {
+            return "Unauthenticated user.";
+        }
+        String sessionId = req.getSession().getId();
+        Session session = sessionRepo.getSessionFromSessionId(sessionId);
+        if (session == null) {
+            return "No session associated.";
+        }
+        if (!onlineStatus.equals("true") && !onlineStatus.equals("false")) {
+            return "You can only set online status to true or false!";
+        }
+
+        /** Hyvaksytaan pyynto. */
+        return "";
     }
 
 

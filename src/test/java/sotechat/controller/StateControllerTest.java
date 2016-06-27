@@ -71,7 +71,7 @@ public class StateControllerTest {
     public void tearDown() throws Exception {
         /* Unohdetaan sessiot, jotta testien valille
          * ei syntyisi riippuvaisuuksia. */
-        sessions.forgetSessions();
+        sessions.forgetAllSessions();
     }
 
     /** GET polkuun /userState palauttaa uskottavat arvot.

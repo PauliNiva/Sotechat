@@ -28,7 +28,7 @@ public class SubscribeEventListenerTest {
     SubscribeEventListener listener;
     QueueBroadcaster qbc;
     ChatLogger chatLogger;
-    SimpMessagingTemplate broker;
+    MessageBroker broker;
     SessionRepo sessionRepo;
     Mapper mapper;
     Channel channel;
@@ -40,7 +40,7 @@ public class SubscribeEventListenerTest {
         /* Mockataan riippuvuudet. */
         qbc = mock(QueueBroadcasterImpl.class);
         chatLogger = mock(ChatLogger.class);
-        broker = mock(SimpMessagingTemplate.class);
+        broker = mock(MessageBroker.class);
         sessionRepo = mock(SessionRepo.class);
         mapper = mock(Mapper.class);
         listener.setQueueBroadcaster(qbc);

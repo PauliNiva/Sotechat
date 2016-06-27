@@ -68,7 +68,8 @@ public class QueueTimeoutService {
      *                  vai pitääkö se poistaa jonosta.
      */
     public void initiateWaitBeforeScanningForInactiveUsers(
-            final String sessionId) {
+            final String sessionId
+    ) {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
