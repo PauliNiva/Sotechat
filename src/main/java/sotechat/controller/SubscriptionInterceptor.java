@@ -44,35 +44,16 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             final Message<?> message,
             final MessageChannel channel
     ) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
-            Principal userPrincipal = headerAccessor.getUser();
-            String sessionId = getSessionIdFrom(headerAccessor);
-            String channelIdWP = headerAccessor.getDestination();
-            String error = validatorService.validateSubscription(
-                    userPrincipal, sessionId, channelIdWP);
+        StompHeaderAccessor acc = StompHeaderAccessor.wrap(message);
+        if (StompCommand.SUBSCRIBE.equals(acc.getCommand())) {
+            String error = validatorService.validateSubscription(acc);
             if (!error.isEmpty()) {
-                throw new IllegalArgumentException("Hacking attempt? " + error);
+                String descriptivePrefix = "Subscription hacking attempt? ";
+                throw new IllegalArgumentException(descriptivePrefix + error);
             }
         }
 
+        /* Sallitaan subscriptionin normaali kasittely. */
         return message;
-    }
-
-    /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.
-     * @param headerAccessor mista id kaivetaan
-     * @return sessionId String
-     */
-    private String getSessionIdFrom(
-            final StompHeaderAccessor headerAccessor
-    ) {
-        try {
-            return headerAccessor
-                    .getSessionAttributes()
-                    .get("SPRING.SESSION.ID")
-                    .toString();
-        } catch (Exception e) {
-            return "";
-        }
     }
 }

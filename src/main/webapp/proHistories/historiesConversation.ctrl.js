@@ -15,9 +15,14 @@ angular.module('chatProApp')
             $scope.messages = [];
             /** onko tietokannassa keskusteluja vai ei */
             $scope.empty = false;
+            $scope.loaded = false;
 
             var channelId = this.channel;
             var myname = this.myname;
+
+            $scope.$on('openHistory' + channelId, function(e) {
+                init();
+            });
 
             /** haetaan naytettavat viestit ja siirrytaan ne nayttavalle sivulle */
             function init() {
@@ -35,6 +40,7 @@ angular.module('chatProApp')
                         $scope.empty = true;
                     }
                     $scope.showConv = true;
+                    $scope.loaded = true;
                 });
             };
 
@@ -75,6 +81,5 @@ angular.module('chatProApp')
                 $scope.less = false;
                 $scope.showLeft = false; 
             };
-            init();
 
         }]);

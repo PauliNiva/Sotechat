@@ -59,9 +59,7 @@ public class LoginControllerTest {
     @Test
     public void testInvalidValidLogin() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .get("/auth")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*", hasSize(0)));
+                .get("/auth"))
+                .andExpect(status().isOk());
     }
 }

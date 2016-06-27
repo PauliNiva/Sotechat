@@ -1,6 +1,7 @@
 angular.module('chatProApp')
     .factory('auth', function ($rootScope, $http) {
         var authenticated = false;
+        var role;
 
         function authenticate(credentials, callback) {
             var headers = credentials && credentials.username ? {
@@ -14,6 +15,7 @@ angular.module('chatProApp')
             }).then(function (response) {
                 if (response.data.name) {
                     authenticated = true;
+                    role = response.data.authorities[0].authority;
                 } else {
                     authenticated = false;
                 }
@@ -26,6 +28,7 @@ angular.module('chatProApp')
 
         function clear(callback) {
             auth.authenticated = false;
+            role = null;
             $http.post('/logout', {}).then(callback);
         }
 
@@ -33,9 +36,14 @@ angular.module('chatProApp')
             return authenticated;
         }
 
+        function getRole() {
+            return role;
+        }
+
         var auth = {
             authenticate: authenticate,
             getAuthStatus: getAuthStatus,
+            getRole: getRole,
             clear: clear
         };
 

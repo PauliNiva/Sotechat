@@ -10,7 +10,7 @@ import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
 /**
- * Luokka, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys muodostuu.
+ * Luokka, jossa maaritellaan mitä tapahtuu, kun WebSocket-yhteys muodostuu.
  *
  * @param <S> Abstrakti olio.
  */
@@ -32,7 +32,7 @@ public class WebSocketConnectHandler<S>
     }
 
     /**
-     * Metodi, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys
+     * Metodi, jossa maaritellaan mita tapahtuu, kun WebSocket-yhteys
      * muodostuu. Siis talletetaan ConnectionRepoon tieto, että tietyn
      * session status on aktiivinen.
      *
@@ -43,7 +43,6 @@ public class WebSocketConnectHandler<S>
        String sessionId = SimpMessageHeaderAccessor
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
- //      this.connectionRepo.setSessionStatusToConnected(sessionId);
        Session userSession = this.sessionRepo
                .getSessionFromSessionId(sessionId);
        userSession.set("connectionStatus", "connected");

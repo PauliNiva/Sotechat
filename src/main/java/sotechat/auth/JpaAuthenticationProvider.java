@@ -22,12 +22,24 @@ import sotechat.repo.PersonRepo;
 @Component
 public class JpaAuthenticationProvider implements AuthenticationProvider {
 
+    /**
+     * Mapper.
+     */
     @Autowired
     private Mapper mapper;
 
+    /**
+     * PersonRepo.
+     */
     @Autowired
     private PersonRepo personRepo;
 
+    /**
+     * Konstruktori.
+     * @param a auth
+     * @return TODO
+     * @throws AuthenticationException TODO
+     */
     @Override
     public final Authentication authenticate(Authentication a)
             throws AuthenticationException {
@@ -53,6 +65,11 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
                 password, grantedAuths);
     }
 
+    /**
+     * TODO
+     * @param person person
+     * @return TODO
+     */
     private List<GrantedAuthority> grantAuthority(Person person) {
         List<GrantedAuthority> grantedAuths = new ArrayList<>();
         if (person.getRole().equals("ROLE_ADMIN")) {
@@ -63,6 +80,11 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
         return grantedAuths;
     }
 
+    /**
+     * TODO
+     * @param type
+     * @return
+     */
     @Override
     public final boolean supports(Class<?> type) {
         return true;

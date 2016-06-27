@@ -52,7 +52,7 @@ public class StateControllerTest {
     @Autowired
     private ConversationRepo conversationRepo;
 
-    /** Before.
+    /** Before each test.
      * @throws Exception
      */
     @Before
@@ -63,6 +63,10 @@ public class StateControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
+    /**
+     * After each test.
+     * @throws Exception
+     */
     @After
     public void tearDown() throws Exception {
         /* Unohdetaan sessiot, jotta testien valille
@@ -91,7 +95,7 @@ public class StateControllerTest {
         mvc.perform(MockMvcRequestBuilders
                     .get("/proState")
                     .accept(MediaType.APPLICATION_JSON)
-                        .principal(new MockPrincipal("hoitaja")))
+                        .principal(new MockPrincipal("Hoitaja")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(6)))
                 .andExpect(jsonPath("$.state").isNotEmpty())
@@ -184,7 +188,6 @@ public class StateControllerTest {
     @Test
     public void testJoinQueueWithReservedScreennameFails() throws Exception {
         MockMockHttpSession mockSession = new MockMockHttpSession("007");
-        this.mapper.mapProUsernameToUserId("hoitaja", "666");
 
         /** Tehdaan aluksi pyynto /userState, jotta saadaan session 007
          * alkutilaksi "start", joka mahdollistaa /joinQueue pyynnot. */
@@ -195,7 +198,7 @@ public class StateControllerTest {
 
         /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
-        String json = "{\"username\":\"hoitaja\",\"startMessage\":\"Hei!\"}";
+        String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
         mvc.perform(post("/joinPool")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))

@@ -128,7 +128,7 @@ public class QueueService {
         channel.allowParticipation(session);
 
         /** Muutetaan popattavan kanavan henkiloiden tilaa. */
-        changeParticipantsState(channelId);
+        mapper.getChannel(channelId).setRegUserSessionStatesToChat();
 
         /** Lisätään poppaaja tietokannassa olevaan keskusteluun */
         String userId = session.get("userId");
@@ -158,21 +158,6 @@ public class QueueService {
         }
         /** Ei loytynyt. */
         return false;
-    }
-
-    /** Muokataan popattavan kanavan normikayttajien sessioiden tilaksi "chat".
-     * @param channelId kanavan id
-     */
-    private void changeParticipantsState(
-            final String channelId
-    ) {
-        Channel channel = mapper.getChannel(channelId);
-        for (Session member : channel.getCurrentSubscribers()) {
-            /** Hoitajan tilan kuuluu aina olla "pro". */
-            if (!member.get("state").equals("pro")) {
-                member.set("state", "chat");
-            }
-        }
     }
 
     /** Palauttaa parametrina annettua kanavaid:ta vastaavaa alkiota

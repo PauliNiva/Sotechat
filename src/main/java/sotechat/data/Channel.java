@@ -51,6 +51,19 @@ public class Channel {
         historicUserIds.add(userId);
     }
 
+    /**
+     * Asettaa kanavan normikayttajien tilaksi "chat".
+     */
+    public void setRegUserSessionStatesToChat() {
+        for (Session member : getCurrentSubscribers()) {
+            /** Hoitajan tilan kuuluu aina olla "pro". */
+            if (!member.get("state").equals("pro")) {
+                member.set("state", "chat");
+            }
+        }
+    }
+
+
     /** Kirjataan subscribe ylos, seka /queue/ etta /chat/ tapauksissa.
      * @param session sessio-olio
      */

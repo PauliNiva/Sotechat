@@ -3,6 +3,12 @@ package sotechat.service;
 import com.google.gson.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.NativeMessageHeaderAccessor;
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
@@ -10,6 +16,12 @@ import sotechat.util.MockHttpServletRequest;
 import sotechat.util.MockPrincipal;
 import sotechat.util.User;
 import sotechat.wrappers.MsgToServer;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static sotechat.util.Asserts.assertSuccess;
 import static sotechat.util.Asserts.assertFail;
 
@@ -24,6 +36,7 @@ public class ValidatorServiceTest {
     Channel chanD;
     User clientA;
     User clientB;
+    User clientC;
     User proA;
     User proB;
 
@@ -45,6 +58,7 @@ public class ValidatorServiceTest {
         /* Alustetaan keskustelijoita. */
         clientA = createRegUser("Henri");
         clientB = createRegUser("Mikko");
+        clientC = createRegUser("Pekka");
         proA = createProUser("ProA");
         proB = createProUser("ProB");
 
@@ -53,12 +67,14 @@ public class ValidatorServiceTest {
         chanA.allowParticipation(proA.session);
         chanA.addSubscriber(clientA.session);
         chanA.addSubscriber(proA.session);
+        chanA.setRegUserSessionStatesToChat();
 
         /* Kanavalla B keskustelee Mikko ja ProB. */
         chanB.allowParticipation(clientB.session);
         chanB.allowParticipation(proB.session);
         chanB.addSubscriber(clientB.session);
         chanB.addSubscriber(proB.session);
+        chanB.setRegUserSessionStatesToChat();
 
         /* Kanavilla C ja D ei viela ole ketaan. */
     }
@@ -303,7 +319,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void joinQueueValidationOkTest() {
-        assertFail(validateJoinQ(clientA));
+        assertSuccess(validateJoinQ(clientC));
     }
 
     /**
@@ -312,6 +328,34 @@ public class ValidatorServiceTest {
     @Test
     public void joinQueueValidationFailForProTest() {
         assertFail(validateJoinQ(proA));
+    }
+
+    /**
+     * Chatissa oleva kayttaja ei voi liittya jonoon kesken chatin.
+     */
+    @Test
+    public void joinQueueValidationFailForAlreadyChattingUserTest() {
+        assertFail(validateJoinQ(clientA));
+    }
+
+    /**
+     * Jonoon ei voi liittya ammattikayttajalle varatulla nimimerkilla.
+     */
+    @Test
+    public void joinQueueValidationFailWithReservedUsername() {
+        clientC.session.set("username", "ProA");
+        assertFail(validateJoinQ(clientC));
+    }
+
+    /**
+     * Samalle kanavalle ei voi liittya nimimerkilla, joka on toisella
+     * kanavan kayttajalla (vaikka eri kanavilla voi olla esim kaksi "Anon").
+     */
+    @Test
+    public void joinQueueValidationFailWithTakenUsername() {
+        clientC.session.set("username", clientA.session.get("username"));
+        clientC.session.addChannel(clientA.session.get("channelId"));
+        assertFail(validateJoinQ(clientC));
     }
 
 
@@ -407,9 +451,37 @@ public class ValidatorServiceTest {
     }
 
     private String validateSubscription(User user, String path) {
-        return validator.validateSubscription(
-                user.principal, user.sessionId, path
-        );
+        Message<?> msg = generateMessage(user, path);
+        StompHeaderAccessor wrapper = StompHeaderAccessor.wrap(msg);
+        return validator.validateSubscription(wrapper);
+    }
+
+    /**
+     * Luo Message-olion imitoimaan subscribe-viestia, joka on lahetetty
+     * WebSocketilla kayttajalta User polkuun path.
+     * @param user
+     * @param path
+     * @return
+     */
+    private Message<?> generateMessage(User user, String path) {
+        String sessionId = user.sessionId;
+        Map<String, List<String>> nativeHeaders = new HashMap<>();
+        nativeHeaders.put("id", Collections.singletonList("sub-0"));
+        nativeHeaders.put("destination", Collections.singletonList(path));
+        Map<String, String> springSessionMap = new HashMap<>();
+        springSessionMap.put("SPRING.SESSION.ID", sessionId);
+        Message<byte[]> msg = MessageBuilder.withPayload("test".getBytes())
+                .setHeader("simpMessageType", SimpMessageType.SUBSCRIBE)
+                .setHeader("stompCommand", StompCommand.SUBSCRIBE)
+                .setHeader(NativeMessageHeaderAccessor.NATIVE_HEADERS, nativeHeaders)
+                .setHeader("simpSessionAttributes", springSessionMap)
+                .setHeader("simpHeartbeat", "[J@2b67932")
+                .setHeader("simpSubscriptionId", "sub-0")
+                .setHeader("simpSessionId", "t049m7e9")
+                .setHeader("simpDestination", path)
+                .setHeader("simpUser", user.principal)
+                .build();
+        return msg;
     }
 
 
@@ -440,7 +512,7 @@ public class ValidatorServiceTest {
         user.req = new MockHttpServletRequest(user.sessionId);
         user.session = sessionRepo.updateSession(user.req, user.principal);
         user.userId = user.session.get("userId");
-
+        user.session.set("username", name);
         return user;
     }
 

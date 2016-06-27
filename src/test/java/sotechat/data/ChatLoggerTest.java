@@ -1,5 +1,6 @@
 package sotechat.data;
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,14 +22,16 @@ import sotechat.wrappers.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-/**
- * Created by varkoi on 22.6.2016.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @Transactional
@@ -124,7 +127,45 @@ public class ChatLoggerTest {
 
     @Test
     public void removeOldMessagesFromMemoryTest(){
-        //ToDo
+        Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
+        DateTime time = new DateTime(tms);
+        chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
+        Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
+        Assert.assertEquals("123", chatlogger.getLogs("xxx").get(0).getMessageId());
+        chatlogger.removeOldMessagesFromMemory(4);
+        Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
     }
 
+    @Test
+    public void removeOldMessagesFromMemoryTest2(){
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
+        DateTime time = new DateTime(tms);
+        chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
+        Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
+        Assert.assertEquals("123", chatlogger.getLogs("xxx").get(0).getMessageId());
+        chatlogger.removeOldMessagesFromMemory(6);
+        Assert.assertFalse(chatlogger.getLogs("xxx").isEmpty());
+        Assert.assertEquals("123", chatlogger.getLogs("xxx").get(0).getMessageId());
+    }
+
+    @Test
+    public void removeOldMessagesFromMemoryAndGetLogsTest() {
+        DatabaseService mockdb = Mockito.mock(DatabaseService.class);
+        chatlogger = new ChatLogger(srepo, mockdb);
+        Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
+        DateTime time = new DateTime(tms);
+        chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));
+        Long tms2 = new DateTime().getMillis() - 3 * 1000 * 60 * 60 * 24;
+        DateTime time2 = new DateTime(tms2);
+        chatlogger.getLogs("xxx").add(new MsgToClient("456", "Salla", "xxx", time2.toString(), "Hei hei"));
+        Assert.assertEquals(2, chatlogger.getLogs("xxx").size());
+        chatlogger.removeOldMessagesFromMemory(4);
+        Assert.assertEquals(2, chatlogger.getLogs("xxx").size());
+        chatlogger.removeOldMessagesFromMemory(2);
+        Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
+        chatlogger.removeOldMessagesFromMemory(2);  //huom yritetaan poistaa tyhjasta
+        Assert.assertTrue(chatlogger.getLogs("xxx").isEmpty());
+        verify(mockdb, times(3)).retrieveMessages("xxx");
+    }
 }

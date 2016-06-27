@@ -3,6 +3,7 @@ package sotechat.data;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
@@ -16,25 +17,41 @@ import java.util.*;
 @Component
 public class ChatLogger {
 
-    /** Avain = kanavan id. Arvo = lista viesteja (kanavan lokit). */
+    /** Kuinka usein siivotaan vanhoja viesteja muistista. */
+    private static final int CLEAN_FREQUENCY_IN_MS = 1000 * 60 * 60 * 24; // 1pv
+
+    /** Siivouksessa poistetaan keskustelut, joiden uusin viesti on
+     * vanhempi kuin tassa muuttujassa maaritelty. */
+    private static final int DAYS_OLD_TO_BE_DELETED = 3;
+
+    /**
+     * Avain = kanavan id. Arvo = lista viesteja (kanavan lokit).
+     */
     private HashMap<String, List<MsgToClient>> logs;
 
-    /** Session Repository. */
+    /**
+     * Session Repository.
+     */
     @Autowired
     private SessionRepo sessionRepo;
 
-    /** Database Service. */
+    /**
+     * Database Service.
+     */
     @Autowired
     private DatabaseService databaseService;
 
-    /** Konstruktori. */
+    /**
+     * Konstruktori.
+     */
     public ChatLogger() {
         this.logs = new HashMap<>();
     }
 
     /**
      * Injektoiva konstruktori testausta varten
-     * @param sessionRepo SessionRepo
+     *
+     * @param sessionRepo     SessionRepo
      * @param databaseService DatabaseService
      */
     public ChatLogger(SessionRepo sessionRepo,
@@ -44,8 +61,10 @@ public class ChatLogger {
         this.logs = new HashMap<>();
     }
 
-    /** Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.
+    /**
+     * Kirjaa viesti lokeihin; seka muistiin etta tietokantaan.
      * Palauttaa viestin clienteille lahetettavassa muodossa.
+     *
      * @param msgToServer msgToServer.
      * @return msgToClient msgToClient.
      */
@@ -72,7 +91,9 @@ public class ChatLogger {
         return msgToClient;
     }
 
-    /** Saves msg to memory.
+    /**
+     * Saves msg to memory.
+     *
      * @param msgToClient msg to be saved.
      */
     private void saveToMemory(
@@ -87,7 +108,9 @@ public class ChatLogger {
         list.add(msgToClient);
     }
 
-    /** Tries to save message to database.
+    /**
+     * Tries to save message to database.
+     *
      * @param msgToClient msgToClient.
      */
     private void saveToDatabase(
@@ -100,12 +123,14 @@ public class ChatLogger {
         databaseService.saveMsg(username, content, timeStamp, channelId);
     }
 
-    /** Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
+    /**
+     * Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
      * Huom: samanaikaisuusongelmien korjaamiseksi samassa
-     *      luokassa logNewMessage -metodin kanssa.
+     * luokassa logNewMessage -metodin kanssa.
      * TODO: Protection against flooding (max 1 broadcast/second/channel).
+     *
      * @param channelId channelId
-     * @param broker broker
+     * @param broker    broker
      */
     public synchronized void broadcast(
             final String channelId,
@@ -117,7 +142,8 @@ public class ChatLogger {
         }
     }
 
-    /** Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
+    /**
+     * Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
      * joilla kayttaja on ollut.
      *
      * @param userId userId
@@ -129,8 +155,10 @@ public class ChatLogger {
         return databaseService.getConvInfoListOfUserId(userId);
     }
 
-    /** Getteri halutun kanavan logeille.
+    /**
+     * Getteri halutun kanavan logeille.
      * Yrittaa hakea ensin muistista, sitten tietokannasta.
+     *
      * @param channelId kanavan id
      * @return lista msgToClient-olioita.
      */
@@ -146,8 +174,10 @@ public class ChatLogger {
         return list;
     }
 
-    /** Antaa seuraavan vapaan ID:n viestille AngularJS varten.
+    /**
+     * Antaa seuraavan vapaan ID:n viestille AngularJS varten.
      * Joka kanavan viestit saapumisjarjestyksessa: 1,2,3...
+     *
      * @param channelId channelId
      * @return messageId
      */
@@ -161,34 +191,52 @@ public class ChatLogger {
         return list.size() + "";
     }
 
-    /** Palvelimen ollessa paalla pitkaan muisti voi loppua.
-     * Taman vuoksi tata metodia on kutsuttava esim. kerran viikossa.
-     * Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
+    /**
+     * Palvelimen ollessa paalla pitkaan muisti voi loppua.
+     * Taman vuoksi vanhat viestit on hyva siivota pois muistista esim.
+     * kerran paivassa (jattaen ne kuitenkin tietokantaan).
+     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
+     */
+
+    @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
+    public synchronized void work() {
+        removeOldMessagesFromMemory(DAYS_OLD_TO_BE_DELETED);
+    }
+
+
+    /* Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
      * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
-     * TODO: Testaa
+     *
      * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
      */
     public final synchronized void removeOldMessagesFromMemory(
             final int daysOld
     ) {
-        Long now = Long.parseLong(new DateTime().toString());
-        Long threshold = now + daysOld * 1000 * 60 * 60 * 24;
-        Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
-                logs.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, List<MsgToClient>> entry = iterator.next();
-            String channelId = entry.getKey();
-            List<MsgToClient> listOfMsgs = entry.getValue();
-            if (listOfMsgs == null || listOfMsgs.isEmpty()) {
-                logs.remove(channelId);
-            } else {
-                MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
-                Long time = Long.parseLong(last.getTimeStamp());
-                if (time < threshold) {
+        try {
+            Long now = DateTime.now().getMillis();
+            Long threshold = now - daysOld * 1000 * 60 * 60 * 24;
+            Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
+                    logs.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, List<MsgToClient>> entry = iterator.next();
+                String channelId = entry.getKey();
+                List<MsgToClient> listOfMsgs = entry.getValue();
+                if (listOfMsgs == null || listOfMsgs.isEmpty()) {
                     logs.remove(channelId);
+                } else {
+                    MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
+                    DateTime trdate = new DateTime(threshold);
+                    DateTime lastdate = DateTime.parse(last.getTimeStamp());
+                    if (lastdate.isBefore(trdate)) {
+                        logs.remove(channelId);
+                    }
                 }
             }
-        }
 
-    }
+        } catch(Exception e) {
+            System.out.println("virhe yritettäessä tyhjentää lokia!");  //tms.
+        }
+}
+
+
 }

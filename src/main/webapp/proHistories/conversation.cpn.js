@@ -3,6 +3,7 @@ angular.module('chatProApp').component('historyConversationComponent', {
     controller: 'historiesConversationController',
     bindings: {
         channel: '@', //Välitetään kanavan ID controllerille
-        myname: '@'
+        myname: '@',
+        init: '&'
     }
 });

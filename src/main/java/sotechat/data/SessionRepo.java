@@ -90,7 +90,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param professional taalta saadaan kirjautumistiedot, voi olla null
      * @return Session-olio
      */
-    public final synchronized Session updateSession(
+    public synchronized Session updateSession(
             final HttpServletRequest req,
             final Principal professional
     ) {
@@ -132,7 +132,7 @@ public class SessionRepo extends MapSessionRepository {
             session.set("username", username);
             session.set("userId", userId);
             session.set("state", "start");
-            session.set("category", "Kategoria"); //TODO
+            session.set("category", "Aihe ei tiedossa");
             Channel channel = mapper.createChannel();
             channel.allowParticipation(session);
         }

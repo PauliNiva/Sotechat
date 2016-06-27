@@ -23,6 +23,10 @@ angular.module('chatProApp')
                 /** henkilon kayttajanimi */
                 $scope.myUsername = proStateService.getUsername();
 
+                $scope.openHistoryOf = function(channelID) {
+                    $scope.$broadcast ('openHistory' + channelID);
+                };
+
                 /** hakee henkilon id:n perusteella keskustelujen tiedot */
                 var showHistory = function () {
                     proHistoryService.getHistory().then(function(response) {

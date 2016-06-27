@@ -137,7 +137,7 @@ public class DatabaseService {
      * @param channelId keskustelun kanavan id
      * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa
      */
-    public final List<MsgToClient> retrieveMessages(
+    public List<MsgToClient> retrieveMessages(
             final String channelId
     ) {
         try {
@@ -210,6 +210,13 @@ public class DatabaseService {
         String content = message.getContent();
         MsgToClient msg = new MsgToClient(id, name, channelId, time, content);
         return msg;
+    }
+
+    /**
+     * Tarkoitettu tietokannan tyhjentamiseen testikaytossa/demoamista varten.
+     */
+    public void resetDatabase() {
+        //TODO:ME
     }
 
 }

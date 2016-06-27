@@ -1,8 +1,9 @@
 <div class="panel panel-default chat-panel">
     <div class="panel-heading chat-heading">
             <h4 class="panel-title pull-left chatTitle">{{chatText}}</h4>
-            <button class="btn btn-danger pull-right" name="userEndConversation"
-                    type="button" ng-click="userLeave()" ng-hide="pro || chatClosed">Lopeta keskustelu</button>
+            <button class="btn btn-danger pull-right" name="endConversation"
+                    type="button" ng-click="userLeave()" ng-hide="chatClosed">Lopeta keskustelu</button>
+            <button type="button" ng-show="chatClosed && pro" class="btn btn-success pull-right" name="closeConversation" ng-click="closeConversation()">Sulje keskustelu</button>
         <div class="clearfix"></div>
     </div>
 
@@ -17,8 +18,6 @@
                 <textarea ng-model="message" ng-enter="sendMessage();" rows="1" class="form-control chat-text"
                           required focus-if name="messageArea" ng-disabled="chatClosed"></textarea>
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-disabled="chatClosed"><span
-                            class="glyphicon glyphicon-file" ></span></button>
                     <button class="btn btn-default" type="submit" name="send" ng-disabled="chatClosed">Laheta</button>
                 </span>
             </div>

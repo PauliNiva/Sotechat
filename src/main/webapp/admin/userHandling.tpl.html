@@ -1,0 +1,76 @@
+<div ng-controller="adminController">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" ng-click="isCollapsed = !isCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-brand" >Ohjelman hallinta</div>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse" uib-collapse="!isCollapsed">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Käyttäjien hallinta</a></li>
+                    <li><a href="#">Tietokannan hallinta</a></li>
+                </ul>
+
+                <div class="nav navbar-nav navbar-right">
+                    <form class="navbar-form" role="search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Hae käyttäjää"  ng-model="searchText">
+                        </div>
+                    <button class="btn btn-success" ng-click="newUserBoolean = true">Uusi käyttäjä</button>
+                    <button class="btn btn-default logoutAdmin" ng-click="logout()">Kirjaudu ulos</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" dismiss-on-timeout="{{alert.dismiss}}">{{alert.msg}}</uib-alert>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Kirjautumisnimi</th>
+            <th>Palvelunimi</th>
+            <th ng-show="resetPsw !== '' || newUserBoolean">Salasana</th>
+            <th>Hallinta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-show="newUserBoolean" ng-form="newUserForm">
+            <td ng-class="{'has-error': newUserForm.loginname.$invalid && newUserForm.loginname.$dirty}">
+                <input type="text" placeholder="Kirjautumisnimi"  class="form-control" name="loginname" ng-model="newUserLoginName" required/>
+            </td>
+            <td ng-class="{'has-error': newUserForm.username.$invalid && newUserForm.username.$dirty}">
+                <input type="text" placeholder="Palvelunimi"  class="form-control" name="username" ng-model="newUserUsername" required/>
+            </td>
+            <td ng-class="{'has-error': newUserForm.password.$invalid && newUserForm.password.$dirty }">
+                <input type="password"placeholder="Salasana" ng-class="{ 'has-error': newUserForm.newUserPassword.$invalid}"
+                       class="form-control" name="password" ng-model="newUserPassword" required/>
+            </td>
+            <td>
+                <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()">Luo uusi käyttäjä</button>
+                <button class="btn btn-sm btn-danger" ng-click="newUserBoolean = false">Peruuta</button>
+            </td>
+        </tr>
+        <tr ng-repeat="user in users | filter:searchText | limitTo : 20">
+            <td>{{user.loginName}}</td>
+            <td>{{user.username}}</td>
+            <td ng-show="'' !== resetPsw || newUserBoolean">
+                <input ng-show="user.userId === resetPsw" type="password"placeholder="Uusi salasana" class="form-control" ng-model="editPassword" required ng-class="{ error: !editPassword.$valid }"/>
+            </td>
+            <td>
+                <div ng-hide="'' !== resetPsw || newUserBoolean" class="btn-group">
+                <button class="btn btn-sm btn-primary" ng-click="rpsw(user.userId)">Vaihda salasana</button>
+                <button class="btn btn-sm btn-danger" ng-click="removeUser(user.userId)">Poista</button>
+                </div>
+                <button ng-show="user.userId === resetPsw" class="btn btn-sm btn-success" ng-disabled="editPassword.$valid" ng-click="doResetPsw(user.userId, editPassword)">Lähetä uusi salasana</button>
+                <button ng-show="user.userId === editID || user.userId === resetPsw" class="btn btn-sm btn-danger" ng-click="cancelEditOrReset()">Peruuta</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <uib-pagination ng-show="users.lenght > 20" total-items="users.lenght" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false"></uib-pagination>
+</div>
