@@ -31,11 +31,14 @@ public class fastGodIT {
         WebDriverWait userWait = handler.getWaitDriver("user");
         WebDriverWait proWait = handler.getWaitDriver("pro");
 
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
+
         /** Kayttaja menee jonoon aloitusviestilla "Moikkamoi!" */
         waitAndFillInformation(userWait);
 
         /** Hoitaja loggaa sisaan ja ottaa kayttajan jonosta. */
-        proLogin(proWait);
+
         waitAndPickFromQueue(proWait);
 
         /** Aloitusviestin nakyminen molemmille.

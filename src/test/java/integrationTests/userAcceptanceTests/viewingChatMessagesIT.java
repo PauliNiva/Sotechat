@@ -45,10 +45,11 @@ public class viewingChatMessagesIT {
      */
     @Test
     public void UserCanSeeAMessages() {
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User to queue
         waitAndFillInformation(userWait);
         // User from queue
-        proLogin(proWait);
         waitAndPickFromQueue(proWait);
 
         // Can send it By Pressing Submit

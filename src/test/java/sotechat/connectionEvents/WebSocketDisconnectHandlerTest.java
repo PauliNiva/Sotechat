@@ -2,15 +2,14 @@ package sotechat.connectionEvents;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
@@ -51,6 +50,9 @@ public class WebSocketDisconnectHandlerTest {
 
     @Mock
     private QueueTimeoutService queueTimeoutService;
+
+    @Spy
+    private MessageBroker broker;
 
     @InjectMocks
     private WebSocketDisconnectHandler webSocketDisconnectHandler = new WebSocketDisconnectHandler();

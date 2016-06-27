@@ -44,12 +44,14 @@ public class accessingChatWindowIT {
      */
     @Test
     public void UserCanSeeAChatWindow() {
+        // A professional has logged in
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User has entered the chat page and submitted a starting message
         waitAndFillInformation(userWait);
         // User sees the queuing view
         assertTrue(waitQueueWindowsAppear(userWait).isDisplayed());
-        // A professional has logged in
-        proLogin(proWait);
+
 
         // A professional chooses the started conversation from a pool
         waitAndPickFromQueue(proWait);

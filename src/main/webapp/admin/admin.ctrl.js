@@ -43,7 +43,7 @@ angular.module('chatProApp')
             };
 
             $scope.doResetPsw = function(userID, newPsw) {
-                adminService.resetPassword(userID, btoa(newPsw), success);
+                adminService.resetPassword(userID, base64.encode(newPsw), success);
                 $scope.resetPsw = '';
                 $scope.editPassword = '';
             };

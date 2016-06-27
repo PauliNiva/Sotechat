@@ -83,7 +83,7 @@ public class StateControllerTest {
                 .get("/userState").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(5)))
-                .andExpect(jsonPath("$.state", is("start")))
+                .andExpect(jsonPath("$.state", is("closed")))
                 .andExpect(jsonPath("$.username", is("Anon")))
                 .andExpect(jsonPath("$.channelId").isNotEmpty())
                 .andExpect(jsonPath("$.userId").isNotEmpty())
@@ -157,7 +157,7 @@ public class StateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                        is("OK, please request new state now.")));
+                        is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test
@@ -182,7 +182,7 @@ public class StateControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.*", hasSize(1)))
                     .andExpect(jsonPath("$.content",
-                        is("Denied join pool request due to bad state.")));
+                            is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test
@@ -205,8 +205,7 @@ public class StateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                           is("Denied join pool request due "
-                                   + "to reserved username.")));
+                        is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test

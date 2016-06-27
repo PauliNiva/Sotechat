@@ -125,3 +125,15 @@
 .logoutAdmin {
 
 }
+
+.switch.extrawide {
+    width:140px;
+}
+
+.switch.extrawide.checked small {
+    left:110px;
+}
+
+.proStatusForm {
+    margin-bottom: 5px;
+}

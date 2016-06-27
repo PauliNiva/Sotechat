@@ -10,12 +10,18 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.util.HashMap;
 
+import static com.github.webdriverextensions.Bot.*;
+import static integrationTests.util.sotechatITCommands.PROADDRESS;
+import static integrationTests.util.sotechatITCommands.proLogin;
+
+
 @RunWith(WebDriverRunner.class)
 @Chrome
 public class DriverHandler {
 
     private HashMap<String, WebDriver> drivers;
     private HashMap<String, WebDriverWait> waitDrivers;
+    private WebDriver openChatdriver;
 
 
     public DriverHandler(String... driverNames) {
@@ -23,7 +29,9 @@ public class DriverHandler {
                 "src", "test", "resources", "firefox", "firefox");
         drivers = new HashMap<>();
         waitDrivers = new HashMap<>();
+        openChat();
         addDrivers(driverNames);
+
     }
 
     public WebDriver addDriver(String name) {
@@ -34,6 +42,13 @@ public class DriverHandler {
         return driver;
     }
 
+    public void openChat() {
+        openChatdriver = new ChromeDriver();
+        openChatdriver.get(PROADDRESS);
+        WebDriverWait waitDriver = new WebDriverWait(openChatdriver, 7);
+        proLogin(waitDriver);
+    }
+
     public void addDrivers(String... names) {
         for (String name : names) {
             addDriver(name);
@@ -41,6 +56,7 @@ public class DriverHandler {
     }
 
     public void closeAll() {
+        openChatdriver.quit();
         for (WebDriver driver : drivers.values()) {
             driver.quit();
         }
