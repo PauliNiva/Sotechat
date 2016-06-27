@@ -6,6 +6,7 @@ angular.module('chatProApp')
             $scope.resetPsw = '';
             $scope.editPassword = '';
             $scope.adminView = 'admin/userHandling.tpl.html';
+            $scope.newUser = {};
 
             var success = function(response) {
                 if (response.data.status == 'OK') {
@@ -25,15 +26,14 @@ angular.module('chatProApp')
             };
             
             $scope.createNewUser = function () {
-                var user = '{"username": '+ $scope.newUserUsername + ', "loginName": '
-                    + $scope.newUserLoginName +', "password": '
-                    + $scope.newUserPassword+ '}';
+                console.log($scope.newUser.Password);
+                var user = '{"username": '+ $scope.newUser.Username + ', "loginName": '
+                    + $scope.newUser.LoginName +', "password": '
+                    + $scope.newUser.Password+ '}';
                 adminService.createUser(btoa(user), function(response) {
                     if (response.data.status == 'OK') {
                         $scope.newUserBoolean = false;
-                        $scope.newUserUsername = '';
-                        $scope.newUserPassword = '';
-                        $scope.newUserLoginName = '';
+                        $scope.newUser = {};
                     }
                     success(response);
                 })

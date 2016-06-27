@@ -10,21 +10,21 @@
     <tbody>
     <tr ng-show="newUserBoolean" ng-form="newUserForm">
         <td ng-class="{'has-error': newUserForm.loginname.$invalid && newUserForm.loginname.$dirty}">
-            <input type="text" placeholder="Kirjautumisnimi"  class="form-control" name="loginname" ng-model="newUserLoginName" required/>
+            <input type="text" placeholder="Kirjautumisnimi"  class="form-control" name="loginname" ng-model="newUser.LoginName" required/>
         </td>
         <td ng-class="{'has-error': newUserForm.username.$invalid && newUserForm.username.$dirty}">
-            <input type="text" placeholder="Palvelunimi"  class="form-control" name="username" ng-model="newUserUsername" required/>
+            <input type="text" placeholder="Palvelunimi"  class="form-control" name="username" ng-model="newUser.Username" required/>
         </td>
         <td ng-class="{'has-error': newUserForm.password.$invalid && newUserForm.password.$dirty }">
             <input type="password"placeholder="Salasana" ng-class="{ 'has-error': newUserForm.newUserPassword.$invalid}"
-                   class="form-control" name="password" ng-model="newUserPassword" required/>
+                   class="form-control" name="password" ng-model="newUser.Password" required/>
         </td>
         <td>
             <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()">Luo uusi käyttäjä</button>
             <button class="btn btn-sm btn-danger" ng-click="newUserBoolean = false">Peruuta</button>
         </td>
     </tr>
-    <tr ng-repeat="user in users | filter:searchText | limitTo : 20" ng-form="resetPswForm">
+    <tr ng-repeat="user in users | filter:searchText | limitTo : 50" ng-form="resetPswForm">
         <td>{{user.loginName}}</td>
         <td>{{user.username}}</td>
         <td ng-show="'' !== resetPsw || newUserBoolean" ng-class="{'has-error': resetPswForm.editPassword.$invalid}">
