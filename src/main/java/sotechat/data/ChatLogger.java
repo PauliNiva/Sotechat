@@ -212,29 +212,24 @@ public class ChatLogger {
     public final synchronized void removeOldMessagesFromMemory(
             final int daysOld
     ) {
-        try {
-            Long now = DateTime.now().getMillis();
-            Long threshold = now - daysOld * 1000 * 60 * 60 * 24;
-            Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
-                    logs.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, List<MsgToClient>> entry = iterator.next();
-                String channelId = entry.getKey();
-                List<MsgToClient> listOfMsgs = entry.getValue();
-                if (listOfMsgs == null || listOfMsgs.isEmpty()) {
-                    logs.remove(channelId);
-                } else {
-                    MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
-                    DateTime trdate = new DateTime(threshold);
-                    DateTime lastdate = DateTime.parse(last.getTimeStamp());
-                    if (lastdate.isBefore(trdate)) {
-                        logs.remove(channelId);
-                    }
+        Long now = DateTime.now().getMillis();
+        Long threshold = now - daysOld * 1000 * 60 * 60 * 24;
+        Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
+                logs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<MsgToClient>> entry = iterator.next();
+            String channelId = entry.getKey();
+            List<MsgToClient> listOfMsgs = entry.getValue();
+            if (listOfMsgs == null || listOfMsgs.isEmpty()) {
+                iterator.remove();
+            } else {
+                MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
+                DateTime trdate = new DateTime(threshold);
+                DateTime lastdate = DateTime.parse(last.getTimeStamp());
+                if (lastdate.isBefore(trdate)) {
+                    iterator.remove();
                 }
             }
-
-        } catch(Exception e) {
-            System.out.println("virhe yritettäessä tyhjentää lokia!");  //tms.
         }
 }
 

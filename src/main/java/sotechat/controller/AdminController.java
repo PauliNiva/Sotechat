@@ -65,11 +65,21 @@ public class AdminController {
         return statusOK();
     }
 
+    /**
+     * Tarkoitettu tehtavaksi vain ennen softan demoamista.
+     * @return tieto onnistumisesta JSONina.
+     */
     @Secured("ROLE_ADMIN")
-    @RequestMapping(value = "/tyhjennaTietokantaDemoamistaVarten", method = RequestMethod.GET)
+    @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.GET)
     public String resetDatabase() {
-        adminService.resetDatabase();
-        return "Tyhjennetaan tietokantaa... Kokeile menna etusivulle.";
+        return jsonifyError(adminService.clearHistory());
+    }
+
+    private String jsonifyError(final String error) {
+        if (error.isEmpty()) {
+            return statusOK();
+        }
+        return "{\"error\": \"" + error + "\"}";
     }
 
     private String statusOK() {

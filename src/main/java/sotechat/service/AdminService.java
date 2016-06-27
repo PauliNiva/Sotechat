@@ -6,7 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
+import sotechat.data.SessionRepo;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
@@ -26,7 +28,16 @@ public class AdminService {
     DatabaseService databaseService;
 
     @Autowired
+    SessionRepo sessionRepo;
+
+    @Autowired
     Mapper mapper;
+
+    @Autowired
+    ChatLogger chatLogger;
+
+    @Autowired
+    QueueService queueService;
 
     private Person person;
 
@@ -84,8 +95,16 @@ public class AdminService {
         this.person.setPassword(newPassword);
     }
 
+    /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
+     * Unohtaa aktiiviset sessiot, tyhjentaa asiakasjonon, unohtaa
+     * keskustelut muistista, unohtaa keskustelut tietokannasta.
+     * @return virheilmoitus Stringina tai tyhja jos ei virhetta
+     */
     @Transactional
-    public void resetDatabase() {
-        databaseService.resetDatabase();
+    public String clearHistory() {
+        sessionRepo.forgetSessions();
+        queueService.clearQueue();
+        chatLogger.removeOldMessagesFromMemory(0);
+        return databaseService.removeAllConversationsFromDatabase();
     }
 }

@@ -133,4 +133,18 @@ public class PersonService {
         personRepo.save(person);
     }
 
+
+    /**
+     * Poistaa keskustelun henkilon keskusteluista.
+     * @param personId henkilon id
+     * @param conv conv
+     */
+    @Transactional
+    public void removeConversation(String personId, Conversation conv) {
+        Person person = personRepo.findOne(personId);
+        person.removeConversation(conv);
+        personRepo.save(person);
+    }
+
+
 }
