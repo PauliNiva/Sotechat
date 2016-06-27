@@ -212,11 +212,25 @@ public class DatabaseService {
         return msg;
     }
 
-    /**
-     * Tarkoitettu tietokannan tyhjentamiseen testikaytossa/demoamista varten.
+    /** Tarkoitettu viestien poistamiseen tietokannasta demoamista varten.
+     * @return Virheilmoitus tai tyhja String jos onnistui.
      */
-    public void resetDatabase() {
-        //TODO:ME
+    public String removeAllConversationsFromDatabase() {
+        try {
+            List<Conversation> conversations = conversationService.findAll();
+            for (Conversation conversation : conversations) {
+                /* Poistaa myos keskusteluun liitetyt viestit. */
+                for (Person person : conversation.getParticipantsOfConversation()) {
+                    person.removeConversation(conversation);
+                }
+                String id = conversation.getChannelId();
+                conversationService.removeConversation(id);
+            }
+            return "";
+        } catch (Exception e) {
+            return "Virhe tietokannan tyhjennyksessa, muutoksia tietokantaan "
+                    + "ei tehty. " + e.toString();
+        }
     }
 
 }

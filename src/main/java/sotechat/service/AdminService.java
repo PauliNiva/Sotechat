@@ -2,12 +2,13 @@ package sotechat.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
+import sotechat.data.SessionRepo;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
@@ -27,7 +28,16 @@ public class AdminService {
     DatabaseService databaseService;
 
     @Autowired
+    SessionRepo sessionRepo;
+
+    @Autowired
     Mapper mapper;
+
+    @Autowired
+    ChatLogger chatLogger;
+
+    @Autowired
+    QueueService queueService;
 
     private Person person;
 
@@ -59,7 +69,7 @@ public class AdminService {
         return gson.toJson(deprecatedPersonList);
     }
 
-    public Person extractInfo(Person person) {
+    private Person extractInfo(Person person) {
         Person personWithDeprecatedAttributes = new Person();
         personWithDeprecatedAttributes.setLoginName(person.getLoginName());
         personWithDeprecatedAttributes.setUserName(person.getUserName());
@@ -69,27 +79,32 @@ public class AdminService {
 
     @Transactional
     public boolean deleteUser(String userId) throws Exception {
-        try {
+        Person personToBeDeleted = personRepo.findOne(userId);
+        if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
+            System.out.println(personToBeDeleted);
+            return false;
+        } else {
             personRepo.delete(userId);
-        } catch (Exception e) {
-            return false;
         }
         return true;
     }
 
     @Transactional
-    public boolean changePassword(String id, String newPassword) throws Exception {
-        try {
-            this.person = personRepo.findOne(id);
-        } catch (Exception e) {
-            return false;
-        }
+    public void changePassword(String id, String newPassword) throws Exception {
+        this.person = personRepo.findOne(id);
         this.person.setPassword(newPassword);
-        return true;
     }
 
+    /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
+     * Unohtaa aktiiviset sessiot, tyhjentaa asiakasjonon, unohtaa
+     * keskustelut muistista, unohtaa keskustelut tietokannasta.
+     * @return virheilmoitus Stringina tai tyhja jos ei virhetta
+     */
     @Transactional
-    public void resetDatabase() {
-        databaseService.resetDatabase();
+    public String clearHistory() {
+        sessionRepo.forgetSessions();
+        queueService.clearQueue();
+        chatLogger.removeOldMessagesFromMemory(0);
+        return databaseService.removeAllConversationsFromDatabase();
     }
 }

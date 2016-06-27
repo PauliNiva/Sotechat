@@ -9,6 +9,8 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 
+import java.util.List;
+
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
  * (CRUD -operaatiot)
@@ -143,6 +145,15 @@ public class ConversationService {
     @Transactional
     public Conversation getConversation(String channelId) throws Exception {
         return conversationRepo.findOne(channelId);
+    }
+
+    /**
+     * Palauttaa listan kaikista tietokannan keskusteluista.
+     * @return lista Conversation-olioista
+     */
+    @Transactional
+    public List<Conversation> findAll() {
+        return conversationRepo.findAll();
     }
 
 }

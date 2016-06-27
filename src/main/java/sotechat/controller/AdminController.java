@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import sotechat.service.AdminService;
 import org.springframework.util.Base64Utils;
 
+/**
+ * Kontrolleriluokka ylläpitäjä toimintoihin.
+ */
 @RestController
 public class AdminController {
 
@@ -36,29 +39,47 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     public String deleteUser(@PathVariable String id) throws Exception {
-        if (adminService.deleteUser(id)) {
-            return statusOK();
-        } else {
+        try {
+            if (adminService.deleteUser(id)) {
+                return statusOK();
+            } else {
+                return "{\"error\": \"Ylläpitäjää ei voi poistaa.\"}";
+            }
+        } catch (Exception e) {
             return noSuchUser();
         }
+
     }
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
     public String resetPassword(@PathVariable String id,
-                                @RequestBody String newPassword) throws Exception {
-        if (adminService.changePassword(id, new String(Base64Utils.decodeFromString(newPassword)))) {
-            return statusOK();
-        } else {
+                                @RequestBody String newPassword)
+            throws Exception {
+        try {
+            adminService.changePassword(id,
+                    new String(Base64Utils.decodeFromString(newPassword)));
+        } catch (Exception e) {
             return noSuchUser();
         }
+        return statusOK();
     }
 
+    /**
+     * Tarkoitettu tehtavaksi vain ennen softan demoamista.
+     * @return tieto onnistumisesta JSONina.
+     */
     @Secured("ROLE_ADMIN")
-    @RequestMapping(value = "/tyhjennaTietokantaDemoamistaVarten", method = RequestMethod.GET)
+    @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.DELETE)
     public String resetDatabase() {
-        adminService.resetDatabase();
-        return "Tyhjennetaan tietokantaa... Kokeile menna etusivulle.";
+        return jsonifyError(adminService.clearHistory());
+    }
+
+    private String jsonifyError(final String error) {
+        if (error.isEmpty()) {
+            return statusOK();
+        }
+        return "{\"error\": \"" + error + "\"}";
     }
 
     private String statusOK() {
@@ -66,6 +87,6 @@ public class AdminController {
     }
 
     private String noSuchUser() {
-        return "{\"error\": \"No such user\"}";
+        return "{\"error\": \"Käyttäjää ei löydy.\"}";
     }
 }

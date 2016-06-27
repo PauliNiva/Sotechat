@@ -136,6 +136,15 @@ public class Person {
     }
 
     /**
+     * Poistaa.
+     * @param conversation Conversation lisattava keskustelu
+     */
+    public final void removeConversation(
+            final Conversation conversation) {
+        this.conversationsOfPerson.remove(conversation);
+    }
+
+    /**
      * Palauttaa kayttajan id:n
      * @return String henkilon id
      */
