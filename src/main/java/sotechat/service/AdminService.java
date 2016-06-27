@@ -2,9 +2,8 @@ package sotechat.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import sotechat.data.Mapper;
@@ -59,7 +58,7 @@ public class AdminService {
         return gson.toJson(deprecatedPersonList);
     }
 
-    public Person extractInfo(Person person) {
+    private Person extractInfo(Person person) {
         Person personWithDeprecatedAttributes = new Person();
         personWithDeprecatedAttributes.setLoginName(person.getLoginName());
         personWithDeprecatedAttributes.setUserName(person.getUserName());
@@ -69,23 +68,20 @@ public class AdminService {
 
     @Transactional
     public boolean deleteUser(String userId) throws Exception {
-        try {
-            personRepo.delete(userId);
-        } catch (Exception e) {
+        Person personToBeDeleted = personRepo.findOne(userId);
+        if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
+            System.out.println(personToBeDeleted);
             return false;
+        } else {
+            personRepo.delete(userId);
         }
         return true;
     }
 
     @Transactional
-    public boolean changePassword(String id, String newPassword) throws Exception {
-        try {
-            this.person = personRepo.findOne(id);
-        } catch (Exception e) {
-            return false;
-        }
+    public void changePassword(String id, String newPassword) throws Exception {
+        this.person = personRepo.findOne(id);
         this.person.setPassword(newPassword);
-        return true;
     }
 
     @Transactional

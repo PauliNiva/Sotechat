@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation
         .authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration
+        .EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation
         .web.configuration.EnableWebSecurity;
@@ -34,6 +36,7 @@ import java.io.IOException;
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -44,13 +47,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
     protected final void configure(final HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic().and().csrf()
-                .csrfTokenRepository(csrfTokenRepository()).and()
-                .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+                .httpBasic().and().csrf().disable()
+                //.csrfTokenRepository(csrfTokenRepository()).and()
+                //.addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
                 .logout().logoutSuccessUrl("/pro");
 
         // TODO: allaoleva HTTP->HTTPS ohjaus
