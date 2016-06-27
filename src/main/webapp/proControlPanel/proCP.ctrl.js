@@ -28,7 +28,7 @@ angular.module('chatProApp')
             };
             
             $scope.endChat = function(channelID) {
-                $http.post("/leave/" + channelID, {});
+                proStateService.leaveChannel(channelID);
                 removeTab(channelID);
             };
 

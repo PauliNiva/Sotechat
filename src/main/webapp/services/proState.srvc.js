@@ -76,6 +76,10 @@ angular.module('chatProApp')
             setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
         };
+        
+        function leaveChannel(channelID) {
+            $http.post("/leave/" + channelID, {});
+        }
 
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
@@ -84,7 +88,8 @@ angular.module('chatProApp')
             getChannelIDs: getChannelIDs,
             getUsername: getUsername,
             getUserID: getUserID,
-            getOnline: getOnline
+            getOnline: getOnline,
+            leaveChannel: leaveChannel
         };
 
         return pro;
