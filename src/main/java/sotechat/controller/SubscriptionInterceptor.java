@@ -8,7 +8,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.stereotype.Component;
 import sotechat.service.ValidatorService;
-import java.security.Principal;
 
 
 /**

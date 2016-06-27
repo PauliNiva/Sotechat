@@ -2,8 +2,6 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,13 +10,12 @@ import sotechat.data.SessionRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Map;
 
 @Controller
 public class CategoryController {
 
     /** Session Repo. */
-    SessionRepo sessionRepo;
+    private SessionRepo sessionRepo;
 
     /** Konstruktori.
      *

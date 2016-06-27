@@ -9,27 +9,39 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 
+import java.util.List;
+
 /**
- * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
+ * Luokka tietokannassa olevien keskustelujen hallinnoimiseen.
  * (CRUD -operaatiot)
  */
 @Service
 public class ConversationService {
 
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Message-luokan olioita.
+     */
     @Autowired
     private MessageRepo messageRepo;
 
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Conversation-luokan olioita.
+     */
     @Autowired
     private ConversationRepo conversationRepo;
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
-     * keskusteluun parametrina annettu viesti
+     * keskusteluun parametrina annettu viesti.
      * @param conv lisättävä keskustelu
+     * @throws Exception Poikkeus, joka heitetaan jos tietokantaan tallettaminen
+     * epaonnistuu.
      */
     @Transactional
-    public void addConversation(Conversation conv)
+    public void addConversation(final Conversation conv)
             throws Exception {
             conversationRepo.save(conv);
     }
@@ -40,10 +52,11 @@ public class ConversationService {
      * henkiloihin.
      * @param person Person luokan oli, joka halutaan lisata keskusteluun
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void addPerson(Person person, String channelId)
+    public void addPerson(final Person person, final String channelId)
             throws Exception {
                 Conversation conv = conversationRepo.findOne(channelId);
                 conv.addPersonToConversation(person);
@@ -52,32 +65,35 @@ public class ConversationService {
 
     /**
      * Liittaa parametrina annettulla kanavaid:lla tietokannasta loytyvan
-     * keskustelun kategoriaksi parametrina annetun aihealueen
+     * keskustelun kategoriaksi parametrina annetun aihealueen.
      * @param category keskustelun aihealue
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void setCategory(String category, String channelId) throws Exception {
+    public void setCategory(final String category, final String channelId)
+            throws Exception {
             Conversation conv = conversationRepo.findOne(channelId);
             conv.setCategory(category);
             conversationRepo.save(conv);
     }
 
     /**
-     * Lisaa parametrina annetun Message -luokan olion parametrina annetun
-     * Conversation -olion listaan, ts liittaa viestin keskusteluun.
+     * Lisaa parametrina annetun Message-luokan olion parametrina annetun
+     * Conversation-olion listaan, ts. liittaa viestin keskusteluun.
      * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
      * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
      * kertaan.
-     * @param message Message -luokan olio, jossa on kayttajan viesti
-     * @param conv Conversation -luokan oli, joka edustaa keskustelua, johon
+     * @param message Message-luokan olio, jossa on kayttajan viesti
+     * @param conv Conversation-luokan oli, joka edustaa keskustelua, johon
      *             viesti liittyy
-     * @throws Exception NullPointerException
+     * @return Palauttaa keskusteluun lisatyn viestin Message-oliona.
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
-
     @Transactional
-    public Message addMessage(Message message, Conversation conv)
+    public Message addMessage(final Message message, final Conversation conv)
             throws Exception {
             message.setConversation(conv);
             Message messageToBeAddedToConversation = messageRepo.save(message);
@@ -87,28 +103,6 @@ public class ConversationService {
     }
 
     /**
-     * Lisaa parametrina annetun Message olion keskusteluun, joka etsitaan
-     * tietokannasta parametrina annetun kanava id:n perusteella.
-     * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
-     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
-     * kertaan.
-     * @param message Message lisattava viesti
-     * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
-     *                  lisata
-     */
-    /*
-    @Transactional
-    public Message addMessage(Message message, String channelId) {
-        Conversation conv = conversationRepo.findOne(channelId);
-        message.setConversation(conv);
-        Message messageToBeAddedToConversation = messageRepo.save(message);
-        conv.addMessageToConversation(message);
-        conversationRepo.save(conv);
-        return messageToBeAddedToConversation;
-    }
-    */
-
-    /**
      * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
      * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
      * muutoksen tietokantaan.
@@ -116,7 +110,7 @@ public class ConversationService {
      *                messageServicesta)
      */
     @Transactional
-    public void removeMessage(Message message) {
+    public void removeMessage(final Message message) {
         String channelId = message.getConversation().getChannelId();
         Conversation conv = conversationRepo.findOne(channelId);
         conv.getMessagesOfConversation().remove(message);
@@ -128,21 +122,34 @@ public class ConversationService {
      * kanavaid:ta vastaavaa keskustelua edustavan Conversation luokan olion
      * tietokannasta.
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void removeConversation(String channelId) throws Exception {
+    public void removeConversation(final String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
 
     /**
-     * Palauttaa parametrina annettua channel id:tä vastaavan keskustelun
+     * Palauttaa parametrina annettua channel id:tä vastaavan keskustelun.
      * @param channelId haetun keskustelun kanavaid
      * @return Conversation olio, jolla pyydetty kanavaid
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public Conversation getConversation(String channelId) throws Exception {
+    public Conversation getConversation(final String channelId)
+            throws Exception {
         return conversationRepo.findOne(channelId);
+    }
+
+    /**
+     * Palauttaa listan kaikista tietokannan keskusteluista.
+     * @return lista Conversation-olioista
+     */
+    @Transactional
+    public List<Conversation> findAll() {
+        return conversationRepo.findAll();
     }
 
 }

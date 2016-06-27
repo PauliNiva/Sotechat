@@ -8,9 +8,16 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import sotechat.data.*;
+import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.data.Channel;
 
-import java.util.*;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
@@ -22,7 +29,18 @@ import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
 
+    /**
+     * Aika millisekunteina, joka odotetaan, ennen kuin suoritetaan Timer-
+     * ajastimen määrittämän TimerTask-olion run-metodi.
+     */
     private static final int TIMER_DELAY_MS = 10;
+
+    /**
+     * Kun jäsennetään Http-osoite String-taulukoksi handleSubscribe-metodissa,
+     * tulee taulukosta ottaa alkio, joka on tämän muuttujan arvon mukaisessa
+     * kohdassa taulukkoa.
+     */
+    private static final int POSITION_OF_ELEMENT_IN_HTTP_ADDRESS_ARRAY = 3;
 
     /** Session Repository. */
     @Autowired
@@ -117,7 +135,8 @@ public class SubscribeEventListener
         /** Add session to list of subscribers to channel.
          * HUOM: Aktivoituu seka /queue/ etta /chat/ subscribesta. */
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
-        String channelId = channelIdWithPath.split("/")[3];
+        String channelId = channelIdWithPath.split("/")
+                [POSITION_OF_ELEMENT_IN_HTTP_ADDRESS_ARRAY];
         Channel channel = mapper.getChannel(channelId);
         channel.addSubscriber(session);
 

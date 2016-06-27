@@ -21,7 +21,7 @@ public class LoginController {
      */
     @RequestMapping("/auth")
     @ResponseBody
-    public Principal user(Principal user) {
+    public Principal user(final Principal user) {
         return user;
     }
 

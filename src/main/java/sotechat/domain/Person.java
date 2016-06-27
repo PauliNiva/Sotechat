@@ -11,30 +11,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Luokka henkilon tietojen tallentamiseen
+ * Luokka henkilon tietojen tallentamiseen.
  */
 @Entity
 public class Person {
 
-    /** henkilon id */
+    /** Henkilon id . */
     @Id
-    public String userId;
+    private String userId;
 
-    /** henkilon nimimerkki joka nakyy asiakkaille */
+    /** Henkilon nimimerkki joka nakyy asiakkaille. */
     @Column(unique = true)
     private String username;
 
-    /** nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan */
+    /** Nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan. */
     @Column(unique = true)
     private String loginName;
 
-    /** henkilon salasana */
+    /** Henkilon salasana. */
     private String password;
 
-    /** salasanan suola */
+    /** Salasanan suola. */
     private String salt;
 
-    /** henkilon keskustelut */
+    /** Henkilon keskustelut. */
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
 
@@ -42,7 +42,7 @@ public class Person {
     private String role;
 
     /**
-     * Konstruktori alustaa henkilon keskustelut
+     * Konstruktori alustaa henkilon keskustelut.
      */
     public Person() {
         this.conversationsOfPerson = new ArrayList<>();
@@ -50,16 +50,16 @@ public class Person {
 
     /**
      * Konstruktori asettaa kayttajan id:ksi parametrina annetun id:n
-     * ja alustaa henkilon keskustelut
+     * ja alustaa henkilon keskustelut.
      * @param pUserId String kayttajan id
      */
-    public Person(String pUserId) {
+    public Person(final String pUserId) {
         this.userId = pUserId;
         this.conversationsOfPerson = new ArrayList<>();
     }
 
     /**
-     * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille
+     * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille.
      * @return String nimimerkki, joka nakyy asiakkaille
      */
     public final String getUserName() {
@@ -67,15 +67,15 @@ public class Person {
     }
 
     /**
-     * Asettaa parametrina annetun nimimerkin kayttajan nimimerkiksi
-     * @param pname nimimerkki, joka nakyy asiakkaille
+     * Asettaa parametrina annetun nimimerkin kayttajan nimimerkiksi.
+     * @param pName nimimerkki, joka nakyy asiakkaille
      */
-    public final void setUserName(final String pname) {
-        this.username = pname;
+    public final void setUserName(final String pName) {
+        this.username = pName;
     }
 
     /**
-     * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan
+     * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan.
      * @return kirjautumisnimi
      */
     public final String getLoginName() {
@@ -83,7 +83,7 @@ public class Person {
     }
 
     /**
-     * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen
+     * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen.
      * @param pLoginName String kirjautumisnimi
      */
     public final void setLoginName(final String pLoginName) {
@@ -91,7 +91,7 @@ public class Person {
     }
 
     /**
-     * Palauttaa salasanan hajautusarvon
+     * Palauttaa salasanan hajautusarvon.
      * @return String kryptattu salasana
      */
     public final String getPassword() {
@@ -110,7 +110,7 @@ public class Person {
     }
 
     /**
-     * Palauttaa salasanan suolan
+     * Palauttaa salasanan suolan.
      * @return String salasanan suola
      */
     public final String getSalt() {
@@ -118,8 +118,8 @@ public class Person {
     }
 
     /**
-     * Palauttaa listan henkilon keskusteluista
-     * @return List<Conversation> henkilon keskustelut
+     * Palauttaa listan henkilon keskusteluista.
+     * @return List<Conversation> Henkilon keskustelut
      */
     public final List<Conversation> getConversationsOfPerson() {
         return this.conversationsOfPerson;
@@ -127,7 +127,7 @@ public class Person {
 
     /**
      * Liittaa parametrina annetun keskustelun (Conversation olion)
-     * henkilon keskusteluihin
+     * henkilon keskusteluihin.
      * @param conversation Conversation lisattava keskustelu
      */
     public final void addConversationToPerson(
@@ -136,7 +136,16 @@ public class Person {
     }
 
     /**
-     * Palauttaa kayttajan id:n
+     * Poistaa henkiloon liittyvan parametrina annettavan keskustelun.
+     * @param conversation Poistettava keskustelu
+     */
+    public final void removeConversation(
+            final Conversation conversation) {
+        this.conversationsOfPerson.remove(conversation);
+    }
+
+    /**
+     * Palauttaa kayttajan id:n.
      * @return String henkilon id
      */
     public String getUserId() {
@@ -144,11 +153,11 @@ public class Person {
     }
 
     /**
-     * Asettaa henkilon id:ksi parametrina annetun id:n
-     * @param userId kayttajan id
+     * Asettaa henkilon id:ksi parametrina annetun id:n.
+     * @param pUserId kayttajan id
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserId(final String pUserId) {
+        this.userId = pUserId;
     }
 
     /**
@@ -160,10 +169,10 @@ public class Person {
     }
 
     /**
-     * Asettaa hemkilon roolin.
-     * @param pRole henkilän rooli merkkijonona.
+     * Asettaa henkilon roolin.
+     * @param pRole henkilon rooli merkkijonona.
      */
-    public final void setRole(String pRole) {
+    public final void setRole(final String pRole) {
         this.role = pRole;
     }
 }

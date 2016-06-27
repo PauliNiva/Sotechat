@@ -45,7 +45,9 @@ public class Session {
      */
     public final String get(final String key) {
         String value = attributes.get(key);
-        if (value == null) return "";
+        if (value == null) {
+            return "";
+        }
         return value;
     }
 

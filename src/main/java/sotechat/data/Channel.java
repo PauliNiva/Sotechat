@@ -116,7 +116,7 @@ public class Channel {
     }
 
     /**
-     * Getteri channelId:lle
+     * Getteri channelId:lle.
      * @return channelId
      */
     public final synchronized String getId() {

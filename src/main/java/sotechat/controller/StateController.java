@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -46,6 +45,7 @@ public class StateController {
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
+     * @param pValidatorService validatorService
      * @param pSessionRepo sessionRepo
      * @param pQueueService queueService
      * @param pQueueBroadcaster queueBroadCaster

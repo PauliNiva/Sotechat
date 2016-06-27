@@ -3,11 +3,11 @@ package sotechat.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
+import sotechat.data.SessionRepo;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
@@ -21,18 +21,27 @@ import java.util.List;
 public class AdminService {
 
     @Autowired
-    PersonRepo personRepo;
+    private PersonRepo personRepo;
 
     @Autowired
-    DatabaseService databaseService;
+    private DatabaseService databaseService;
 
     @Autowired
-    Mapper mapper;
+    private SessionRepo sessionRepo;
+
+    @Autowired
+    private Mapper mapper;
+
+    @Autowired
+    private ChatLogger chatLogger;
+
+    @Autowired
+    private QueueService queueService;
 
     private Person person;
 
     @Transactional
-    public boolean addUser(String jsonPerson) throws Exception {
+    public boolean addUser(final String jsonPerson) throws Exception {
         Gson gson = new Gson();
         Type type = new TypeToken<Person>(){}.getType();
         this.person = gson.fromJson(jsonPerson, type);
@@ -59,7 +68,7 @@ public class AdminService {
         return gson.toJson(deprecatedPersonList);
     }
 
-    public Person extractInfo(Person person) {
+    public Person extractInfo(final Person person) {
         Person personWithDeprecatedAttributes = new Person();
         personWithDeprecatedAttributes.setLoginName(person.getLoginName());
         personWithDeprecatedAttributes.setUserName(person.getUserName());
@@ -68,7 +77,7 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean deleteUser(String userId) throws Exception {
+    public boolean deleteUser(final String userId) throws Exception {
         try {
             personRepo.delete(userId);
         } catch (Exception e) {
@@ -78,7 +87,8 @@ public class AdminService {
     }
 
     @Transactional
-    public boolean changePassword(String id, String newPassword) throws Exception {
+    public boolean changePassword(final String id, final String newPassword)
+            throws Exception {
         try {
             this.person = personRepo.findOne(id);
         } catch (Exception e) {
@@ -88,8 +98,16 @@ public class AdminService {
         return true;
     }
 
+    /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
+     * Unohtaa aktiiviset sessiot, tyhjentaa asiakasjonon, unohtaa
+     * keskustelut muistista, unohtaa keskustelut tietokannasta.
+     * @return virheilmoitus Stringina tai tyhja jos ei virhetta
+     */
     @Transactional
-    public void resetDatabase() {
-        databaseService.resetDatabase();
+    public String clearHistory() {
+        sessionRepo.forgetSessions();
+        queueService.clearQueue();
+        chatLogger.removeOldMessagesFromMemory(0);
+        return databaseService.removeAllConversationsFromDatabase();
     }
 }

@@ -10,7 +10,11 @@ import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
 
 /** Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
  */
@@ -49,15 +53,15 @@ public class ChatLogger {
     }
 
     /**
-     * Injektoiva konstruktori testausta varten
+     * Injektoiva konstruktori testausta varten.
      *
-     * @param sessionRepo     SessionRepo
-     * @param databaseService DatabaseService
+     * @param pSessionRepo     SessionRepo
+     * @param pDatabaseService DatabaseService
      */
-    public ChatLogger(SessionRepo sessionRepo,
-                      DatabaseService databaseService) {
-        this.sessionRepo = sessionRepo;
-        this.databaseService = databaseService;
+    public ChatLogger(final SessionRepo pSessionRepo,
+                      final DatabaseService pDatabaseService) {
+        this.sessionRepo = pSessionRepo;
+        this.databaseService = pDatabaseService;
         this.logs = new HashMap<>();
     }
 
@@ -127,7 +131,7 @@ public class ChatLogger {
      * Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
      * Huom: samanaikaisuusongelmien korjaamiseksi samassa
      * luokassa logNewMessage -metodin kanssa.
-     * TODO: Protection against flooding (max 1 broadcast/second/channel).
+     * TODO Protection against flooding (max 1 broadcast/second/channel).
      *
      * @param channelId channelId
      * @param broker    broker
@@ -195,7 +199,7 @@ public class ChatLogger {
      * Palvelimen ollessa paalla pitkaan muisti voi loppua.
      * Taman vuoksi vanhat viestit on hyva siivota pois muistista esim.
      * kerran paivassa (jattaen ne kuitenkin tietokantaan).
-     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
+     * TODO Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
      */
 
     @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
@@ -204,7 +208,7 @@ public class ChatLogger {
     }
 
 
-    /* Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
+    /** Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
      * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
      *
      * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
@@ -212,29 +216,24 @@ public class ChatLogger {
     public final synchronized void removeOldMessagesFromMemory(
             final int daysOld
     ) {
-        try {
-            Long now = DateTime.now().getMillis();
-            Long threshold = now - daysOld * 1000 * 60 * 60 * 24;
-            Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
-                    logs.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, List<MsgToClient>> entry = iterator.next();
-                String channelId = entry.getKey();
-                List<MsgToClient> listOfMsgs = entry.getValue();
-                if (listOfMsgs == null || listOfMsgs.isEmpty()) {
-                    logs.remove(channelId);
-                } else {
-                    MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
-                    DateTime trdate = new DateTime(threshold);
-                    DateTime lastdate = DateTime.parse(last.getTimeStamp());
-                    if (lastdate.isBefore(trdate)) {
-                        logs.remove(channelId);
-                    }
+        Long now = DateTime.now().getMillis();
+        Long threshold = now - daysOld * CLEAN_FREQUENCY_IN_MS;
+        Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
+                logs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<MsgToClient>> entry = iterator.next();
+            String channelId = entry.getKey();
+            List<MsgToClient> listOfMsgs = entry.getValue();
+            if (listOfMsgs == null || listOfMsgs.isEmpty()) {
+                iterator.remove();
+            } else {
+                MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
+                DateTime trdate = new DateTime(threshold);
+                DateTime lastdate = DateTime.parse(last.getTimeStamp());
+                if (lastdate.isBefore(trdate)) {
+                    iterator.remove();
                 }
             }
-
-        } catch(Exception e) {
-            System.out.println("virhe yritettäessä tyhjentää lokia!");  //tms.
         }
 }
 

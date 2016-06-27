@@ -160,6 +160,13 @@ public class QueueService {
         return false;
     }
 
+    /**
+     * Tyhjentaa jonon.
+     */
+    public void clearQueue() {
+        queue.clear();
+    }
+
     /** Palauttaa parametrina annettua kanavaid:ta vastaavaa alkiota
      * edeltavan jonon pituuden parametrina annetussa kategoriassa.
      * @param channelId kanavaid, jota vastaavaa alkiota edeltävän jonon pituus
