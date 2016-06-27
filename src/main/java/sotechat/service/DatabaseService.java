@@ -70,6 +70,11 @@ public class DatabaseService {
     public final void createNewUser(String userId, String loginName,
                                     String screenName, String role, String password){
         try {
+            if(userId.isEmpty() || userId == null || loginName.isEmpty()
+                    || loginName == null || password.isEmpty()
+                    || password == null || screenName.isEmpty()
+                    || screenName == null || role.isEmpty() || role == null)
+                    throw new Exception();
             Person person = new Person(userId);
             person.setUserName(screenName);
             person.setLoginName(loginName);

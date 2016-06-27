@@ -254,9 +254,28 @@ public class DatabaseServiceTest {
     }
 
     @Test
-    Transactional
+    @Transactional
     public void createNewUserTest(){
-        
+        databaseService.createNewUser("yxz345", "hoitaja", "Hoitaja", "hoitaja", "salasana");
+        Assert.assertNotNull(personRepo.findOne("yxz345"));
+        Person person = personRepo.findOne("yxz345");
+        Assert.assertEquals("hoitaja", person.getLoginName());
+        Assert.assertEquals("Hoitaja", person.getUserName());
+        Assert.assertEquals("hoitaja", person.getRole());
+    }
+
+    @Test
+    @Transactional
+    public void InvalidDataCreatePersonTest(){
+        databaseService.createNewUser("yxz456", null, null, null, null);
+        Assert.assertNull(personRepo.findOne("yxz456"));
+    }
+
+    @Test
+    @Transactional
+    public void InvalidDataCreatePersonTest2(){
+        databaseService.createNewUser(null, "hoitaja", "hoitaja", "hoitaja", "salasana");
+        Assert.assertNull(personRepo.findOne("yxz456"));
     }
 
 }
