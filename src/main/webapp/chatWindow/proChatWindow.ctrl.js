@@ -20,6 +20,12 @@ angular.module('chatProApp')
             var channel = this.channel;
             var endChat = this.chatend;
 
+            $scope.$on('unSubscribeChat', function (event, args) {
+                if (args.channelID === channel) {
+                    sub.unsubscribe();
+                }
+            });
+
             $scope.userLeave = function() {
                 var modalInstance = $uibModal.open({
                     animation: true,
@@ -75,6 +81,7 @@ angular.module('chatProApp')
                 sub.unsubscribe();
                 $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
                 $scope.chatClosed = true;
+                proStateService.leaveChannel(channel);
             };
 
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
