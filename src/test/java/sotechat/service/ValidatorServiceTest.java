@@ -141,7 +141,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void logReqValidationFailsInvalidSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateLogRequest(proA, chanA));
     }
 
@@ -186,7 +186,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void messageValidationFailsWithInvalidSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateMsg(clientA, chanA));
         assertFail(validateMsg(proA, chanA));
     }
@@ -272,7 +272,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void subscriptionValidationFailWithoutProperSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateSubscription(proB, "queue", chanB));
         assertFail(validateSubscription(proB, "chat", chanB));
         assertFail(validateSubscription(clientB, "queue", chanB));
@@ -381,7 +381,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void leaveValidationFailWithBadSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateLeave(proA, chanA));
     }
 

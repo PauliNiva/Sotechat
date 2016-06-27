@@ -24,6 +24,10 @@ public class SessionRepo extends MapSessionRepository {
      * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
     private HashMap<String, Session> proUserSessions;
 
+    /** Lukumaara kirjautuneita ammattilaisia, jotka ovat valmiita
+     * vastaanottamaan uusia asiakkaita. Liittyy chatin sulkemiseen. */
+    private int countOfProsAcceptingNewCustomers;
+
     /** Mapper. */
     private final Mapper mapper;
 
@@ -34,10 +38,17 @@ public class SessionRepo extends MapSessionRepository {
     public SessionRepo(
             final Mapper pMapper
     ) {
+        this.mapper = pMapper;
+        initialize();
+    }
+
+    /** Alustaminen, jota kutsutaan seka olion
+     * luonnissa etta sessioiden unohtamisessa. */
+    private void initialize() {
         this.sessionsBySessionId = new HashMap<>();
         this.sessionsByUserId = new HashMap<>();
         this.proUserSessions = new HashMap<>();
-        this.mapper = pMapper;
+        this.countOfProsAcceptingNewCustomers = 0;
     }
 
     /** Kaivaa sessionId:lla session-olion.
@@ -75,6 +86,7 @@ public class SessionRepo extends MapSessionRepository {
         Session session = getSessionFromSessionId(sessionId);
         session.removeChannel(channelId);
         Channel channel = mapper.getChannel(channelId);
+        channel.setActive(false);
         for (String someUserId : channel.getActiveUserIds()) {
             Session someSession = getSessionFromUserId(someUserId);
             String someSessionId = someSession.get("sessionId");
@@ -102,10 +114,10 @@ public class SessionRepo extends MapSessionRepository {
     ) {
         String sessionId = req.getSession().getId();
 
-        /** Paivityslogiikka jaettu kahteen metodiin, alla kutsut. */
         Session session = updateSessionObjectMapping(sessionId, professional);
         updateSessionAttributes(session, professional);
         session.set("sessionId", sessionId);
+        updateCountOfProsAcceptingNewCustomers();
 
         return session;
     }
@@ -114,7 +126,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
-    public final void updateSessionAttributes(
+    public void updateSessionAttributes(
             final Session session,
             final Principal professional
     ) {
@@ -141,6 +153,11 @@ public class SessionRepo extends MapSessionRepository {
             session.set("category", "Aihe ei tiedossa");
             Channel channel = mapper.createChannel();
             channel.allowParticipation(session);
+        }
+
+        /** Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
+        if (chatClosed() && session.get("state").equals("start")) {
+            session.set("state", "closed");
         }
 
         /** Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
@@ -170,6 +187,7 @@ public class SessionRepo extends MapSessionRepository {
         if (session == null) {
             /** Sessio edelleen tuntematon, luodaan uusi sessio. */
             session = new Session();
+            session.set("online", "true");
         }
 
         /** Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
@@ -183,13 +201,44 @@ public class SessionRepo extends MapSessionRepository {
         return session;
     }
 
+    /** Asettaa ammattilaisen online-statukseksi "true" tai "false".
+     * Oletettavasti pyynto on validoitu ennen taman metodin kutsua.
+     * @param req sessioId taalta
+     * @param onlineStatus asettava onlineStatus
+     */
+    public synchronized void setOnlineStatus(
+            final HttpServletRequest req,
+            final String onlineStatus
+    ) {
+        String sessionId = req.getSession().getId();
+        Session session = sessionsBySessionId.get(sessionId);
+        session.set("online", onlineStatus);
+    }
 
+    /** Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
+     * jotka hyvaksyvat uusia asiakkaita. Jos kirjautuneita ammattilaisia
+     * voi olla yli 1000, metodi olisi hyva kirjoittaa tehokkaammin. */
+    private synchronized void updateCountOfProsAcceptingNewCustomers() {
+        countOfProsAcceptingNewCustomers = 0;
+        for (Session session : proUserSessions.values()) {
+            if (session.get("online").equals("true")) {
+                countOfProsAcceptingNewCustomers++;
+            }
+        }
+    }
 
+    /** Onko chat suljettu? Tarkoitettu kaytettavaksi siihen liittyen,
+     * hyvaksytaanko uusia asiakkaita enaa jonoon (tai edes aloitussivulle).
+     * Vanhat asiakkaat on tarkoitus kasitella, vaikka chat olisikin "suljettu".
+     * @return true jos uusia asiakkaita ei hyvaksyta.
+     */
+    public synchronized boolean chatClosed() {
+        return false; //TODO: kun angular valmis, uncomment allaoleva rivi
+        //return countOfProsAcceptingNewCustomers == 0;
+    }
 
     /** Testausta helpottamaan metodi sessioiden unohtamiseen. */
-    public final void forgetSessions() {
-        this.sessionsBySessionId.clear();
-        this.sessionsByUserId.clear();
-        this.proUserSessions.clear();
+    public void forgetAllSessions() {
+        initialize();
     }
 }

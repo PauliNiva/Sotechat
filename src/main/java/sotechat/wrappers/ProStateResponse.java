@@ -39,7 +39,7 @@ public class ProStateResponse {
         this.username = session.get("username");
         this.userId = session.get("userId");
         this.QBCC = QUEUE_BROADCAST_CHANNEL;
-        this.online = "true"; //TODO: session.get("online");
+        this.online = session.get("online");
         this.channelIds = session.get("channelIds");
     }
 

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import sotechat.controller.MessageBroker;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
@@ -138,7 +139,7 @@ public class ChatLogger {
      */
     public synchronized void broadcast(
             final String channelId,
-            final SimpMessagingTemplate broker
+            final MessageBroker broker
     ) {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {

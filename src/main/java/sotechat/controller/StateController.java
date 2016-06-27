@@ -12,12 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import sotechat.service.QueueService;
 import sotechat.service.ValidatorService;
 import sotechat.wrappers.ProStateResponse;
@@ -41,7 +40,7 @@ public class StateController {
     private final QueueBroadcaster queueBroadcaster;
 
     /** Message Broker. */
-    private final SimpMessagingTemplate broker;
+    private final MessageBroker broker;
 
 
     /** Spring taikoo tassa Singleton-instanssit palveluista.
@@ -57,7 +56,7 @@ public class StateController {
             final SessionRepo pSessionRepo,
             final QueueService pQueueService,
             final QueueBroadcaster pQueueBroadcaster,
-            final SimpMessagingTemplate pBroker
+            final MessageBroker pBroker
     ) {
         this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
@@ -196,6 +195,8 @@ public class StateController {
     }
 
     /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
+     * (Jos normikayttaja on poistunut, halutaan jattaa kanavava suljettuna
+     * nakyviin hoitajan valilehtiin.)
      * @param req req
      * @param pro pro
      * @param channelId channelId
@@ -211,12 +212,36 @@ public class StateController {
             return;
         }
         sessionRepo.leaveChannel(channelId, sessionId);
+        broker.sendClosedChannelNotice(channelId);
+    }
 
-        /** Suljetaan kanava, kun kuka tahansa lahtee.
-         * Jatetaan se kuitenkin auki hoitajan valilehtiin. */
-        String channelIdWithPath = "/toClient/chat/" + channelId;
-        String closedChannelNotice = "{\"notice\":\"chat closed\"}";
-        broker.convertAndSend(channelIdWithPath, closedChannelNotice);
+    /** Pyynto asettaa ammattilaisen online-tilaksi true/false.
+     * Esimerkiksi /setStatus/?online=true
+     * @param online joko String "true" tai "false"
+     * @param req req
+     * @param professional autentikaatiotiedot
+     * @return vastaus pyyntoon
+     */
+    @RequestMapping(value = "/setStatus/", method = RequestMethod.POST)
+    public final String setStatusOfProUser(
+            final @RequestParam String online,
+            final HttpServletRequest req,
+            final Principal professional
+    ) {
+        String error = validatorService.validateOnlineStatusChangeRequest(
+                professional, req, online
+        );
+        if (error.isEmpty()) {
+            sessionRepo.setOnlineStatus(req, online);
+        }
+        return jsonifiedResponse(error);
+    }
+
+    private String jsonifiedResponse(final String error) {
+        if (error.isEmpty()) {
+            return "{\"status\":\"OK\"}";
+        }
+        return "{\"error\": \"" + error + "\"}";
     }
 
 }

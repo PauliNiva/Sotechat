@@ -99,7 +99,7 @@ public class WebSocketMessageTest {
 
     @After
     public void tearDown() {
-        this.sessionRepo.forgetSessions();
+        this.sessionRepo.forgetAllSessions();
     }
 
     @Test

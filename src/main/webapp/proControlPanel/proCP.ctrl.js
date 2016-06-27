@@ -28,12 +28,13 @@ angular.module('chatProApp')
             };
             
             $scope.endChat = function(channelID) {
-                $http.post("/leave/" + channelID, {});
+                proStateService.leaveChannel(channelID);
                 removeTab(channelID);
             };
 
             /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
             $scope.addChatTab = function (channelID) {
+                proStateService.addChannel(channelID);
                 $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: channelID, status: 'online'});
                 $scope.activeChatTab = tabCount;
                 tabCount++;
@@ -68,6 +69,8 @@ angular.module('chatProApp')
             /** Avaa kaikki amamttilaisen avoimet välilehdet */
             var updateChannels = function () {
                 $scope.chats = [];
+                tabCount = 0;
+                $scope.activeChatTab = tabCount;
                 angular.forEach(proStateService.getChannelIDs(), function (key) {
                     $scope.chats.push({index: tabCount, title: 'Chat' + tabCount, channel: key, status: 'online'});
                     tabCount++;
@@ -90,6 +93,7 @@ angular.module('chatProApp')
                     connectToServer.connect(answer);
                 });
             };
+
 
             /** Pyytää alustusta kun kontrolleri ladataan */
             $scope.updateProStatus();

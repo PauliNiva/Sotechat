@@ -97,6 +97,10 @@ public class Session {
         return channels.contains(channelId);
     }
 
+    public LinkedHashSet<String> getChannels() {
+        return channels;
+    }
+
     /** Liittyyko sessio ammattilaiskayttajaan?
      * @return true jos liittyy
      */

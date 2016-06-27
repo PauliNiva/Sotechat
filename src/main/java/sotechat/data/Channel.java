@@ -26,6 +26,9 @@ public class Channel {
     /** String of pro username assigned to this Channel. */
     private String assignedPro;
 
+    /** Onko kanava kaytossa viela?. */
+    private boolean active;
+
     /** Konstruktori.
      * @param pChannelId channelId/
      */
@@ -37,6 +40,7 @@ public class Channel {
         activeUserIds = new HashSet<>();
         historicUserIds = new HashSet<>();
         this.assignedPro = "";
+        this.active = true;
     }
 
     /** Kirjaa Channel-olioon ja Session-olioon oikeuden osallistua kanavalle.
@@ -160,5 +164,13 @@ public class Channel {
             final String username
     ) {
         assignedPro = username;
+    }
+
+    public void setActive(final boolean val) {
+        this.active = val;
+    }
+
+    public boolean isActive() {
+        return this.active;
     }
 }

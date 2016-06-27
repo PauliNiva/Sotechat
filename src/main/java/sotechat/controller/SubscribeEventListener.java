@@ -52,7 +52,7 @@ public class SubscribeEventListener
 
     /** Viestien lahetys. */
     @Autowired
-    private SimpMessagingTemplate broker;
+    private MessageBroker broker;
 
     /** Chat Logger (broadcastaa). */
     @Autowired
@@ -148,6 +148,9 @@ public class SubscribeEventListener
             /** Lahetetaan tieto "uusi keskustelija liittynyt kanavalle". */
             String joinInfo = "{\"join\":\"" + session.get("username") + "\"}";
             broker.convertAndSend(channelIdWithPath, joinInfo);
+            if (!channel.isActive()) {
+                broker.sendClosedChannelNotice(channelId);
+            }
         }
     }
 
@@ -180,7 +183,7 @@ public class SubscribeEventListener
      * @param pBroker p
      */
     public synchronized void setBroker(
-            final SimpMessagingTemplate pBroker
+            final MessageBroker pBroker
     ) {
         this.broker = pBroker;
     }

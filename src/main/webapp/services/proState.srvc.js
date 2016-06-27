@@ -76,6 +76,25 @@ angular.module('chatProApp')
             setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
         };
+        
+        function leaveChannel(channelID) {
+            $http.post("/leave/" + channelID, {});
+            var index = arrayIndexOf(channelIDs, channelID, 'channel');
+            if (index > -1) {
+                channelIDs.splice(index, 1);
+            }
+        }
+
+        function addChannel(channelID) {
+            channelIDs.push(channelID);
+        }
+
+        var arrayIndexOf = function (myArray, searchTerm) {
+            for (var i = 0, len = myArray.length; i < len; i++) {
+                if (myArray[i] === searchTerm) return i;
+            }
+            return -1;
+        };
 
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
@@ -84,7 +103,9 @@ angular.module('chatProApp')
             getChannelIDs: getChannelIDs,
             getUsername: getUsername,
             getUserID: getUserID,
-            getOnline: getOnline
+            getOnline: getOnline,
+            leaveChannel: leaveChannel,
+            addChannel: addChannel
         };
 
         return pro;
