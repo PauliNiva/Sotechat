@@ -129,6 +129,9 @@ public class DatabaseService {
             final String channelId
     ) {
         try {
+            if(content.isEmpty() || content == null || channelId.isEmpty()
+                    || channelId == null || username.isEmpty()
+                    || username == null) throw new Exception();
             Message message = new Message(username, content, time);
             Conversation conv = conversationService.getConversation(channelId);
             message.setChannelId(channelId);
