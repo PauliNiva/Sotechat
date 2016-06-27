@@ -2,13 +2,10 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
-
 import sotechat.service.AdminService;
-import java.util.Base64;
 
-import java.nio.charset.Charset;
 
 /**
  * Kontrolleriluokka ylläpitäjä toimintoihin.
@@ -21,21 +18,13 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
-        System.out.println(jsonPerson);
-        System.out.println(Base64.getDecoder().decode(jsonPerson.getBytes()));
-        System.out.printf(new String(Base64.getDecoder().decode(jsonPerson.getBytes())));
-
-        System.out.printf(new String(Base64.getDecoder().decode(jsonPerson.getBytes()), Charset.forName("UTF8")));
-        System.out.printf(new String(Base64.getDecoder().decode(jsonPerson.getBytes()), Charset.forName("UTF-8")));
-
-
+    public
+    @ResponseBody
+    String addNewUser(@RequestBody String jsonPerson) {
         try {
-            System.out.printf(new String(Base64.getDecoder().decode(jsonPerson.getBytes()), "utf-8"));
-         //   System.out.println(new String(Base64.getDecoder().decodeFromString(jsonPerson)));
-         //   System.out.println(new String(Base64Utils.decodeFromString(jsonPerson), Charset.forName("UTF8")));
-           // adminService.addUser(new String(Base64Utils
-          //          .decodeFromString(jsonPerson), "UTF-8"));
+
+            adminService.addUser(new String(Base64Utils
+                    .decodeFromString(jsonPerson), "UTF-8"));
         } catch (Exception e) {
             return "{\"error\":\"Käyttäjää ei voitu lisätä. " +
                     "Tarkista, että kirjautumisnimi tai palvelunimi eivät " +
@@ -71,8 +60,8 @@ public class AdminController {
                                 @RequestBody String newPassword)
             throws Exception {
         try {
-         //   adminService.changePassword(id,
-          //          new String(Base64Utils.decodeFromString(newPassword)));
+            adminService.changePassword(id,
+                    new String(Base64Utils.decodeFromString(newPassword)));
         } catch (Exception e) {
             return noSuchUser();
         }
@@ -81,6 +70,7 @@ public class AdminController {
 
     /**
      * Tarkoitettu tehtavaksi vain ennen softan demoamista.
+     *
      * @return tieto onnistumisesta JSONina.
      */
     @Secured("ROLE_ADMIN")

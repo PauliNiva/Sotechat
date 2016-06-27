@@ -5,17 +5,8 @@
             <span class="username-title ">{{username}}</span>
             </form>
                 <form class="navbar-form navbar-right">
-                <div style="width: 150px;"
-                     class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-id-switch-handleWidth bootstrap-switch-animate bootstrap-switch-on">
-                    <div style="width: 372px;" class="bootstrap-switch-container">
-                    <span style="width: 74px;"
-                          class="bootstrap-switch-handle-on bootstrap-switch-success">Paikalla</span>
-                        <span style="width: 74px;" class="bootstrap-switch-label">&nbsp;</span>
-                        <input id="switch-handleWidth" data-handle-width="100" type="checkbox">
-                    </div>
-                </div>
-
-            </form>
+                    <switch name="yesNo" ng-model="present.yesNo" on="Paikalla" off="Poissa" class="wide" ng-change="changeStatus"></switch>
+                </form>
              </div>
         </div>
     <div class="row" ng-include="'queue/queueProCP.tpl.html'"></div>

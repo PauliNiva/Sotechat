@@ -75,6 +75,12 @@ angular.module('chatProApp')
             setUserID(response.data.userId);
             setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
+
+            if (response.data.online === 'true') {
+                online = true;
+            } else {
+                online = false;
+            }
         }
         
         function leaveChannel(channelID) {
@@ -105,6 +111,7 @@ angular.module('chatProApp')
             }
             return -1;
         };
+        
 
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
