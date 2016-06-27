@@ -11,11 +11,13 @@
                     <span style="width: 74px;"
                           class="bootstrap-switch-handle-on bootstrap-switch-success">Paikalla</span>
                         <span style="width: 74px;" class="bootstrap-switch-label">&nbsp;</span>
-                        <input id="switch-handleWidth" data-handle-width="100" type="checkbox">
+                   <!--     <input id="switch-handleWidth" data-handle-width="100" type="checkbox" ng-switch="changeStatus()"> -->
                     </div>
                 </div>
+                    <toggle-switch ng-model="switchStatus" class="switch-success" on-label="Paikalla" off-label="Poissa" ng-click="changeStatus()"></toggle-switch>
+                    <input type="checkbox" ng-model="mymodel.mystate" bootstrap-switch ng-true-value="changeStatus()" ng-false-value="changeStatus() "/>
 
-            </form>
+                </form>
              </div>
         </div>
     <div class="row" ng-include="'queue/queueProCP.tpl.html'"></div>

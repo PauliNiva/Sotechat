@@ -96,6 +96,16 @@ angular.module('chatProApp')
             return -1;
         };
 
+        /** Lahettaa palvelimelle post -pyyntona tiedon siita onko ammattilainen paikalla (true tai false) */
+        var setStatus = function (status){
+            var data = $.param( {
+                json: JSON.stringify({
+                    online : status
+                })
+            });
+          return $http.post('/setStatus/', data);
+        };
+
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
             setAllVariables: setAllVariables,
@@ -105,7 +115,8 @@ angular.module('chatProApp')
             getUserID: getUserID,
             getOnline: getOnline,
             leaveChannel: leaveChannel,
-            addChannel: addChannel
+            addChannel: addChannel,
+            setStatus: setStatus
         };
 
         return pro;
