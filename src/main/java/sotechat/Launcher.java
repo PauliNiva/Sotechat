@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class Launcher {
 
-    public ApplicationContext launch(String[] args) {
+    public ApplicationContext launch(final String[] args) {
         ApplicationContext ctx = SpringApplication.run(Launcher.class, args);
         return ctx;
     }

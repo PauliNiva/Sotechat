@@ -92,14 +92,21 @@ public class HibernateConfig {
      */
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL =
             "hibernate.show_sql";
+
     /**
      * Missä muodossa tietokantaoperaatiot näytetään.
      */
     private static final String PROPERTY_NAME_HIBERNATE_FORMAT_SQL =
             "hibernate.format_sql";
+
+    /**
+     * Maksimipituus, joka voi olla tuotantotietokannan osoitteella.
+     */
+    private static final int LENGTH_OF_PRODUCTION_DBURL = 128;
+
     /**
      * Määritellään ympäristömuuttuja, josta voidaan hakea esim. salaiset
-     * tietokanna kirjautumistiedot.
+     * tietokannan kirjautumistiedot.
      */
     @Resource
     private Environment env;
@@ -108,7 +115,8 @@ public class HibernateConfig {
      * Luodaan yhteys tuotantotietokantaan.
      *
      * @return Palautaa tietokantayhteyksistä vastaavaa HikariDataSourceen.
-     * @throws URISyntaxException
+     * @throws URISyntaxException Virheilmoitus joka aiheutuu, jos
+     * haettua Stringiä ei tunnisteta URI-osoitteeksi.
      */
     @Profile("production")
     @Bean(destroyMethod = "close")
@@ -120,7 +128,7 @@ public class HibernateConfig {
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
 
-        StringBuilder dbUrl = new StringBuilder(128);
+        StringBuilder dbUrl = new StringBuilder(LENGTH_OF_PRODUCTION_DBURL);
         dbUrl.append("jdbc:postgresql://")
                 .append(dbUri.getHost())
                 .append(":")
@@ -220,8 +228,10 @@ public class HibernateConfig {
      * kantaoperaatioista, kuten tietokantaan talletuksista, ja tietokannasta
      * hauista.
      *
-     * @param entityManagerFactory
-     * @return
+     * @param entityManagerFactory Olio, joka sisältää kaikki JPA Entity-oliot.
+     * @return Palautetaan JpaTransactionManager-olio, joka vastaa siitä,
+     * että JPA-olioihin tehdyt tietokantaoperaatiot toteutetaan myös
+     * tietokantaan.
      */
     @Bean
     JpaTransactionManager transactionManager(

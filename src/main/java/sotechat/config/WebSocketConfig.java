@@ -39,6 +39,10 @@ public class WebSocketConfig extends
     @Autowired
     private ValidatorService validatorSer;
 
+    /**
+     * Olio, joka "kuuntelee" WebSocket-yhteyden kautta tapahtuvia kanaville
+     * tehtyja listautumispyyntoja.
+     */
     @Autowired
     private ApplicationListener<ApplicationEvent> subscribeEventListener;
 

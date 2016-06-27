@@ -61,7 +61,7 @@ public class WebSocketDisconnectHandler<S>
        }
         Session userSession = this.sessionRepo
                 .getSessionFromSessionId(sessionId);
-        if (userSession != null) { //TODO:Muuta?
+        if (userSession != null) { //TODO Muuta?
             userSession.set("connectionStatus", "disconnected");
         }
 

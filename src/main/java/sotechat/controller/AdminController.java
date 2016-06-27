@@ -11,18 +11,19 @@ import org.springframework.util.Base64Utils;
 public class AdminController {
 
     @Autowired
-    AdminService adminService;
+    private AdminService adminService;
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
-    public @ResponseBody String addNewUser(@RequestBody String jsonPerson) {
+    public @ResponseBody String addNewUser(
+            @RequestBody final String jsonPerson) {
         try {
             adminService.addUser(new String(Base64Utils
                     .decodeFromString(jsonPerson)));
         } catch (Exception e) {
-            return "{\"error\":\"Käyttäjää ei voitu lisätä. " +
-                    "Tarkista, että kirjautumisnimi tai palvelunimi eivät " +
-                    "ole jo varattuja.\"}";
+            return "{\"error\":\"Käyttäjää ei voitu lisätä. "
+                    + "Tarkista, että kirjautumisnimi tai palvelunimi eivät "
+                    + "ole jo varattuja.\"}";
         }
         return statusOK();
     }
@@ -35,7 +36,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable String id) throws Exception {
+    public String deleteUser(@PathVariable final String id) throws Exception {
         if (adminService.deleteUser(id)) {
             return statusOK();
         } else {
@@ -45,9 +46,11 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
-    public String resetPassword(@PathVariable String id,
-                                @RequestBody String newPassword) throws Exception {
-        if (adminService.changePassword(id, new String(Base64Utils.decodeFromString(newPassword)))) {
+    public String resetPassword(@PathVariable final String id,
+                                @RequestBody final String newPassword)
+            throws Exception {
+        if (adminService.changePassword(id, new String(Base64Utils
+                .decodeFromString(newPassword)))) {
             return statusOK();
         } else {
             return noSuchUser();
@@ -55,7 +58,8 @@ public class AdminController {
     }
 
     @Secured("ROLE_ADMIN")
-    @RequestMapping(value = "/tyhjennaTietokantaDemoamistaVarten", method = RequestMethod.GET)
+    @RequestMapping(value = "/tyhjennaTietokantaDemoamistaVarten",
+            method = RequestMethod.GET)
     public String resetDatabase() {
         adminService.resetDatabase();
         return "Tyhjennetaan tietokantaa... Kokeile menna etusivulle.";

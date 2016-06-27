@@ -53,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
                 .logout().logoutSuccessUrl("/pro");
 
-        // TODO: allaoleva HTTP->HTTPS ohjaus
+        // TODO Allaoleva HTTP:stä HTTPS:ään ohjaus.
         // http.requiresChannel().anyRequest().requiresSecure();
     }
 
