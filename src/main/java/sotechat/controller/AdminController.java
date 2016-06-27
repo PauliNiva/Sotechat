@@ -70,7 +70,7 @@ public class AdminController {
      * @return tieto onnistumisesta JSONina.
      */
     @Secured("ROLE_ADMIN")
-    @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.GET)
+    @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.DELETE)
     public String resetDatabase() {
         return jsonifyError(adminService.clearHistory());
     }

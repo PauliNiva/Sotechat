@@ -18,7 +18,7 @@ angular.module('chatProApp')
         }
 
         function resetDatabase(callback) {
-            $http.get('/tyhjennaTietokantaDemoamistaVarten', {}).then(callback);
+            $http.delete('/tuhoaHistoria', {}).then(callback);
         }
 
         var admin = {
