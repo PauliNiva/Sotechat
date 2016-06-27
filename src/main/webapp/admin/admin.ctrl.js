@@ -5,6 +5,7 @@ angular.module('chatProApp')
             $scope.alerts = [];
             $scope.resetPsw = '';
             $scope.editPassword = '';
+            $scope.adminView = 'admin/userHandling.tpl.html';
 
             var success = function(response) {
                 if (response.data.status == 'OK') {
@@ -13,6 +14,14 @@ angular.module('chatProApp')
                 } else {
                     $scope.alerts.push({ type: 'danger', msg: 'Toiminto ei onnistunut! ' + response.data.error })
                 }
+            };
+
+            $scope.toSettings = function() {
+                $scope.adminView = 'admin/settings.tpl.html';
+            };
+
+            $scope.toUsers = function() {
+                $scope.adminView = 'admin/userHandling.tpl.html';
             };
             
             $scope.createNewUser = function () {
@@ -54,6 +63,18 @@ angular.module('chatProApp')
 
             $scope.cancelEditOrReset = function() {
                 $scope.resetPsw = '';
+            };
+
+            $scope.resetDatabase = function () {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'common/areUSureModal.tpl.html',
+                    controller: 'AreUSureModalController'
+                });
+
+                modalInstance.result.then(function (result) {
+                    adminService.resetDatabase(success);
+                });
             };
 
             $scope.closeAlert = function(index) {

@@ -5,7 +5,7 @@ angular.module('chatProApp')
     .controller('proCtrl', ['$scope', 'auth',
         function ($scope, auth) {
             var CPTEMPLATE = 'proControlPanel/controlPanel.tpl.html';
-            var ADMINTEMPLATE = 'admin/userHandling.tpl.html'
+            var ADMINTEMPLATE = 'admin/adminCP.tpl.html'
             var LOGINTEMPLATE = 'login/login.tpl.html';
             
             $scope.login = function(authenticated) {
