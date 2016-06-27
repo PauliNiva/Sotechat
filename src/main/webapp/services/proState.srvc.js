@@ -15,39 +15,39 @@ angular.module('chatProApp')
         /** Getterit ja setterit */
         function setUsername(value) {
             username = value;
-        };
+        }
 
         function setUserID(value) {
             userID = value;
-        };
+        }
 
         function setOnline(value) {
             online = value;
-        };
+        }
 
         function setQueueBroadcastChannel(value) {
             qbcc = value;
-        };
+        }
 
         function getOnline() {
             return online;
-        };
+        }
 
         function getQueueBroadcastChannel() {
             return qbcc;
-        };
+        }
 
         function getChannelIDs() {
             return channelIDs;
-        };
+        }
 
         function getUsername() {
             return username;
-        };
+        }
 
         function getUserID() {
             return userID;
-        };
+        }
 
         /**
          * Asettaa ammattilaisen avonaiset kanavat halutuiksi
@@ -55,7 +55,7 @@ angular.module('chatProApp')
          */
         function addAllChannels(values) {
             channelIDs = JSON.parse(values);
-        };
+        }
 
         /**
          * Hakee palvelimelta ammattilaisen tilatiedoit
@@ -63,7 +63,7 @@ angular.module('chatProApp')
          */
         function getVariablesFormServer() {
             return $http.get(PROSTATEURL);
-        };
+        }
 
         /**
          * Alustaa tilatiedot annettun vastauksen mukaan
@@ -75,7 +75,7 @@ angular.module('chatProApp')
             setUserID(response.data.userId);
             setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
-        };
+        }
         
         function leaveChannel(channelID) {
             $http.post("/leave/" + channelID, {});
@@ -87,6 +87,16 @@ angular.module('chatProApp')
 
         function addChannel(channelID) {
             channelIDs.push(channelID);
+        }
+        
+        function setStatusOnline() {
+            online = true;
+            $http.post('/setStatus/?online=true', {});
+        }
+
+        function setStatusOffline() {
+            online = false;
+            $http.post('/setStatus/?online=false', {});
         }
 
         var arrayIndexOf = function (myArray, searchTerm) {
@@ -105,7 +115,9 @@ angular.module('chatProApp')
             getUserID: getUserID,
             getOnline: getOnline,
             leaveChannel: leaveChannel,
-            addChannel: addChannel
+            addChannel: addChannel,
+            setStatusOnline: setStatusOnline,
+            setStatusOffline: setStatusOffline
         };
 
         return pro;

@@ -82,6 +82,7 @@ angular.module('chatProApp')
                 initQueue();
                 $scope.username = proStateService.getUsername();
                 updateChannels();
+                proStateService.setStatusOnline();
             };
 
             /** Päivittää ammattilaisen tiedot serveriltä

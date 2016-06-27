@@ -46,8 +46,9 @@ angular.module('chatApp')
                 return 'chatWindow/userInChat.tpl.html'
             } else if (userState === 'pro') {
                 return 'staticErrorPages/sameBrowserError.html'
-            }
-            else {
+            } else if (userState === 'closed') {
+                return 'common/chatClosed.tpl.html'
+            } else {
                 return 'queue/userToQueue.tpl.html';
             }
         };
