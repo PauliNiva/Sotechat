@@ -19,7 +19,6 @@ angular.module('chatProApp')
             };
 
             $scope.backToPanel = function () {
-                updateChannels();
                 $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
             };
 
@@ -94,7 +93,7 @@ angular.module('chatProApp')
                     connectToServer.connect(answer);
                 });
             };
-            
+
 
             /** Pyytää alustusta kun kontrolleri ladataan */
             $scope.updateProStatus();

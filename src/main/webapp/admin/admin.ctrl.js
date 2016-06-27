@@ -26,7 +26,6 @@ angular.module('chatProApp')
             };
             
             $scope.createNewUser = function () {
-                console.log($scope.newUser.Password);
                 var user = '{"username": '+ $scope.newUser.Username + ', "loginName": '
                     + $scope.newUser.LoginName +', "password": '
                     + $scope.newUser.Password+ '}';
@@ -60,8 +59,13 @@ angular.module('chatProApp')
                     adminService.delUser(userID, success);
                 });
             };
+            
+            $scope.newUserBoolTrue = function() {
+                $scope.newUserBoolean = true;
+            }
 
             $scope.cancelEditOrReset = function() {
+                $scope.newUserBoolean = false;
                 $scope.resetPsw = '';
             };
 

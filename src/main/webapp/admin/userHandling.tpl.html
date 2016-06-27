@@ -21,7 +21,7 @@
         </td>
         <td>
             <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()">Luo uusi käyttäjä</button>
-            <button class="btn btn-sm btn-danger" ng-click="newUserBoolean = false">Peruuta</button>
+            <button class="btn btn-sm btn-danger" ng-click="cancelEditOrReset()">Peruuta</button>
         </td>
     </tr>
     <tr ng-repeat="user in users | filter:searchText | limitTo : 50" ng-form="resetPswForm">

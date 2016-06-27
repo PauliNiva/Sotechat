@@ -81,7 +81,6 @@ angular.module('chatProApp')
                 sub.unsubscribe();
                 $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
                 $scope.chatClosed = true;
-                proStateService.leaveChannel(channel);
             };
 
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */

@@ -21,7 +21,7 @@
                         <div class="input-group" ng-hide="adminView != 'admin/userHandling.tpl.html'">
                             <input type="text" class="form-control" placeholder="Hae käyttäjää"  ng-model="searchText">
                         </div>
-                        <button class="btn btn-success" ng-click="newUserBoolean = true" ng-hide="adminView != 'admin/userHandling.tpl.html'">Uusi käyttäjä</button>
+                        <button class="btn btn-success" ng-click="newUserBoolTrue()" ng-hide="adminView != 'admin/userHandling.tpl.html'">Uusi käyttäjä</button>
                         <button class="btn btn-default logoutAdmin" ng-click="logout()">Kirjaudu ulos</button>
                     </form>
                 </div>
