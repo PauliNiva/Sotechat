@@ -72,12 +72,6 @@ public class QueueTimeOutServiceTest {
     }
 
     @Test
-    public void testWaitTimeCanBeAltered() {
-        this.queueTimeoutService.setWaitTimeBeforeScanningForNonexistentUsers(5);
-        assertEquals(5, this.queueTimeoutService.getWaitTimeBeforeScanningForNonexistentUsers());
-    }
-
-    @Test
     public void testQueueRemovalIsInitiatedAfterWait() {
         Timer timer = Mockito.mock(Timer.class);
 

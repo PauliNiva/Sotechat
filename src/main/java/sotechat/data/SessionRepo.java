@@ -233,7 +233,7 @@ public class SessionRepo extends MapSessionRepository {
      * @return true jos uusia asiakkaita ei hyvaksyta.
      */
     public synchronized boolean chatClosed() {
-        return false; //TODO: kun angular valmis, uncomment allaoleva rivi
+        return false; //TODO Kun angular valmis, uncomment allaoleva rivi
         //return countOfProsAcceptingNewCustomers == 0;
     }
 

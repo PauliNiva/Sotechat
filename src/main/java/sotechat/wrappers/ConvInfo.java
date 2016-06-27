@@ -9,21 +9,21 @@ public class ConvInfo {
 
     /**
      * Konstruktori.
-     * @param channelId p
-     * @param date p
-     * @param person p
-     * @param category p
+     * @param pChannelId p
+     * @param pDate p
+     * @param pPerson p
+     * @param pCategory p
      */
     public ConvInfo(
-            final String channelId,
-            final String date,
-            final String person,
-            final String category
+            final String pChannelId,
+            final String pDate,
+            final String pPerson,
+            final String pCategory
     ) {
-        this.channelId = channelId;
-        this.date = date;
-        this.person = person;
-        this.category = category;
+        this.channelId = pChannelId;
+        this.date = pDate;
+        this.person = pPerson;
+        this.category = pCategory;
     }
 
     public final String getChannelId() {

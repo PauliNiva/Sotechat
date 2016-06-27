@@ -13,7 +13,6 @@ import sotechat.wrappers.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Set;
 
 import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
@@ -28,6 +27,16 @@ public class ValidatorService {
     /** Session Repo. */
     private SessionRepo sessionRepo;
 
+    /**
+     * WebSocket-osoitteessa olevien kauttaviivalla eroteltujen osien lukumaara.
+     */
+    private static final int CHANNEL_PATH_LENGTH = 4;
+
+    /**
+     * Kuinka mones alkio channelId on taulukossa, joka on muodostettu
+     * WebSocket-osoitteesta kauttaviivan perusteella erottelemalla.
+     */
+    private static final int POSITION_OF_CHANNEL_ID_IN_CHANNEL_PATH = 3;
     /**
      * Konstruktori.
      * @param pMapper mapper
@@ -97,7 +106,7 @@ public class ValidatorService {
         /** Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
         Channel channel = mapper.getChannel(channelId);
-        if (!channel.hasActiveUser(userId)) { //TODO:NULL
+        if (!channel.hasActiveUser(userId)) { //TODO NULL.
             return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
@@ -178,9 +187,10 @@ public class ValidatorService {
          * /toClient/queue/channelId
          * /toClient/chat/channelId
          * Tarkistetaan, onko kayttajalla/pro:lla oikeutta kanavalle.
-         * TODO: Refaktoroi regexilla. */
+         * TODO Refaktoroi regexilla.
+         * */
         String[] splitted = channelIdWithPath.split("/");
-        if (splitted.length != 4) {
+        if (splitted.length != CHANNEL_PATH_LENGTH) {
             return prefix + "Invalid channel path (1): " + channelIdWithPath;
         }
         if (!"toClient".equals(splitted[1])) {
@@ -190,7 +200,7 @@ public class ValidatorService {
                 && !"chat".equals(splitted[2])) {
             return prefix + "Invalid channel path (3): " + channelIdWithPath;
         }
-        String channelId = splitted[3];
+        String channelId = splitted[POSITION_OF_CHANNEL_ID_IN_CHANNEL_PATH];
 
         if (!session.hasAccessToChannel(channelId)) {
             return prefix

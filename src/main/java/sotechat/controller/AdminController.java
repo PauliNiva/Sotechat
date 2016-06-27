@@ -46,7 +46,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable String id) throws Exception {
+    public String deleteUser(@PathVariable final String id) throws Exception {
         try {
             if (adminService.deleteUser(id)) {
                 return statusOK();
@@ -61,8 +61,8 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
-    public String resetPassword(@PathVariable String id,
-                                @RequestBody String newPassword)
+    public String resetPassword(@PathVariable final String id,
+                                @RequestBody final String newPassword)
             throws Exception {
         try {
             adminService.changePassword(id,

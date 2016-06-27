@@ -85,11 +85,15 @@ public class  MsgToClient implements Comparable<MsgToClient> {
      * @param other MsgToClient olio johon verrataan
      * @return -1, 1 tai 0
      */
-    public final int compareTo(MsgToClient other) {
+    public final int compareTo(final MsgToClient other) {
         int thistime = Integer.parseInt(this.timeStamp);
         int othertime = Integer.parseInt(other.getTimeStamp());
-        if(thistime<othertime) return -1;
-        else if(othertime<thistime) return 1;
-        else return 0;
+        if (thistime < othertime) {
+            return -1;
+        } else if (othertime < thistime) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

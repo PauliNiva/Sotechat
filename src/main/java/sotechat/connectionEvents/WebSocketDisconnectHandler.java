@@ -38,7 +38,7 @@ public class WebSocketDisconnectHandler<S>
      * Konstruktori.
      */
     public WebSocketDisconnectHandler() {
-        //TODO: Laheta "join" notice kaikille kanaville joilla kayttaja on
+        //TODO Laheta "join" notice kaikille kanaville joilla kayttaja on
     }
 
     /**
@@ -64,7 +64,7 @@ public class WebSocketDisconnectHandler<S>
                 .getSessionFromSessionId(sessionId);
         if (userSession != null) {
             userSession.set("connectionStatus", "disconnected");
-            //TODO: Laheta "leave" notice kaikille kanaville joilla kayttaja on
+            //TODO Laheta "leave" notice kaikille kanaville joilla kayttaja on
         }
 
     }
