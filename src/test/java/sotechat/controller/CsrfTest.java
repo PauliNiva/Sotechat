@@ -62,7 +62,7 @@ public class CsrfTest {
     @Test
     public void testCsrfInValid() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .post("/toServer/heartBeat").with(csrf().asHeader().useInvalidToken())
+                .post("/getusers").with(csrf().asHeader().useInvalidToken())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
