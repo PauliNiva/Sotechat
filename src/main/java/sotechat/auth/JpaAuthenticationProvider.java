@@ -46,8 +46,9 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * @return Palautettava valtuus, jossa argumentteina
      * <code>person</code>-olion kayttajanimi, salasana ja lista annetuista
      * valtuuksista.
-     * @throws AuthenticationException Heitettava poikkeus. Heitetaan kayttajan
-     * ollessa tyhja tai salasana ei vastaa tallessa olevaa salasanaa.
+     * @throws AuthenticationException Heitettava poikkeus jos valtuutus
+     * epaonnistuu. Heitetaan kayttajan ollessa <code>null</code> tai salasana
+     * ei vastaa tallessa olevaa salasanaa.
      */
     @Override
     public final Authentication authenticate(final Authentication a)
@@ -92,7 +93,18 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * {@link org.springframework.security.authentication.AuthenticationProvider}
+     * Palauttaa <code>true</code>, jos <code>AuthenticationProvider</code>
+     * tukee viitattua <code>Authentication</code>-oliota.
+     * <p>
+     * <code>true</code>:n palautus ei takaa, etta
+     * <code>AuthenticationProvider</code> pystyy valtuuttamaan sille esitetyn
+     * <code>Authentication</code>-luokan ilmentyman.
+     * <code>AuthenticationProvider</code> voi edelleen palauttaa arvon
+     * <code>null</code>, vaikka <code>supports</code>-metodi palauttaisi
+     * <code>true</code>. Talloin on kokeiltava toista
+     * <code>AuthenticationProvider</code>:ia.
+     * @param type tyyppi.
+     * @return <code>true</code>, jos viitattu olio on tuettu.
      */
     @Override
     public final boolean supports(final Class<?> type) {
