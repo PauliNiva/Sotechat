@@ -47,7 +47,7 @@ public class ValidatorServiceTest {
         sessionRepo = new SessionRepo(mapper);
 
         /** Testattava luokka. */
-        validator = new ValidatorService(mapper, sessionRepo, null);
+        validator = new ValidatorService(mapper, sessionRepo);
 
         /* Alustetaan kanavia. */
         chanA = mapper.createChannel();

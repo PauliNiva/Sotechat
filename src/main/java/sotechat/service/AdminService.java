@@ -54,7 +54,8 @@ public class AdminService {
     @Transactional
     public String addUser(final String encodedPersonJson) {
         /* Validoidaan pyynto. */
-        String error = validatorService.validateAddUserReq(encodedPersonJson);
+        String error = validatorService
+                .validateAddUserReq(encodedPersonJson, personRepo);
         if (!error.isEmpty()) {
             /* Palautetaan virheilmoitus. */
             return error;

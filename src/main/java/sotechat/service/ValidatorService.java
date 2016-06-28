@@ -29,9 +29,6 @@ public class ValidatorService {
     /** Session Repo. */
     private SessionRepo sessionRepo;
 
-    /** Person Repo. */
-    private PersonRepo personRepo;
-
     /**
      * WebSocket-osoitteessa olevien kauttaviivalla eroteltujen osien lukumaara.
      */
@@ -50,12 +47,10 @@ public class ValidatorService {
     @Autowired
     public ValidatorService(
             final Mapper pMapper,
-            final SessionRepo pSessionRepo,
-            final PersonRepo pPersonRepo
+            final SessionRepo pSessionRepo
     ) {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
-        this.personRepo = pPersonRepo;
     }
 
     /** Onko chattiin tuleva viesti vaarennetty?
@@ -341,9 +336,14 @@ public class ValidatorService {
 
     /** Validoi admininin pyynnon lisata uusi ammattilaiskayttaja.
      * @param encodedPersonJson lisattavan tiedot encoodattuna jsonina.
+     * @param personRepo spring hajoaa, jos tama on luokkainstanssin
+     *                   dependency eika parametri
      * @return virheilmoitus String tai tyhja String jos pyynto hyvaksytaan.
      */
-    public String validateAddUserReq(final String encodedPersonJson) {
+    public String validateAddUserReq(
+            final String encodedPersonJson,
+            final PersonRepo personRepo
+    ) {
         Person person = AdminService.makePersonFrom(encodedPersonJson);
         if (person == null) {
             return "Virheellinen muotoilu (joko encoodaus tai itse JSON)";
