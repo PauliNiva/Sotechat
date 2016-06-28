@@ -1,6 +1,5 @@
 package sotechat.service;
 
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class PersonService {
     @Transactional
     public void addPerson(final Person person, final String password)
             throws Exception {
-            person.encryptAndSaltPassword(password);
+            person.hashPasswordWithSalt(password);
             personRepo.save(person);
     }
 
@@ -82,7 +81,7 @@ public class PersonService {
                                   final String password) {
         try {
             Person person = personRepo.findOne(personId);
-            person.encryptAndSaltPassword(password);
+            person.hashPasswordWithSalt(password);
             personRepo.save(person);
             return true;
         } catch (Exception e) {

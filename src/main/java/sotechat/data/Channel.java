@@ -166,11 +166,14 @@ public class Channel {
         assignedPro = username;
     }
 
-    public void setActive(final boolean val) {
-        this.active = val;
-    }
-
     public boolean isActive() {
         return this.active;
     }
+
+    public void setInactive() {
+        this.active = false;
+    }
+
+
+
 }

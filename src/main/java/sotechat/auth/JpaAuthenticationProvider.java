@@ -21,6 +21,7 @@ import sotechat.repo.PersonRepo;
 
 /**
  * Luokka <code>JPA</code>-pohjaiseen kayttajan todentamiseen.
+ * Koskee ammattilais- ja admin-kayttajia. Normikayttajia ei todenneta.
  * Toteuttaa rajapinnan <code>AuthenticationProvider</code>.
  */
 @Component
@@ -43,9 +44,8 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * vastaa <code>PersonRepo</code>:ssa tallessa olevaa salasanaa.
      *
      * @param a <code>Authentication</code>-olio.
-     * @return Palautettava valtuus, jossa argumentteina
-     * <code>person</code>-olion kayttajanimi, salasana ja lista annetuista
-     * valtuuksista.
+     * @return Valtuus, jossa argumentteina <code>person</code>-olion
+     * kayttajanimi, salasana ja lista annetuistavaltuuksista.
      * @throws AuthenticationException Heitettava poikkeus jos todentaminen
      * epaonnistuu. Heitetaan kayttajan ollessa <code>null</code> tai salasana
      * ei vastaa tallessa olevaa salasanaa.
@@ -63,7 +63,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
             };
         }
         if (!BCrypt.hashpw(password, person.getSalt())
-                .equals(person.getPassword())) {
+                .equals(person.getHashOfPasswordAndSalt())) {
             throw new AuthenticationException(
                     "Unable to authenticate user " + loginName) {
             };
@@ -78,6 +78,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     /**
      * Antaa kayttajalle valtuudeksi joko roolin "ADMIN" tai roolin "USER".
+     * Rooli "USER" viittaa rekisteröityneeseen ammattilaiskäyttäjään.
      *
      * @param person kirjautuva henkilo.
      * @return kayttajan rooli listana.
@@ -95,6 +96,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     /**
      * Palauttaa <code>true</code>, jos <code>AuthenticationProvider</code>
      * tukee viitattua <code>Authentication</code>-oliota.
+     * TODO: Selvennys, tuetaanko muitakin kuin Principal-tyyppisiä olioita?
      * <p>
      * <code>true</code>:n palautus ei takaa, etta
      * <code>AuthenticationProvider</code> pystyy valtuuttamaan sille esitetyn

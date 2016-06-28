@@ -103,7 +103,11 @@ public class AdminService {
         if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
             return "Ylläpitäjää ei voi poistaa.";
         }
+        String username = personToBeDeleted.getUserName();
+        mapper.removeMappingForUsername(username);
         personRepo.delete(userId);
+        sessionRepo.forgetSession(userId);
+        //TODO: broker.sendClosedChannelNoticeToallChannelsOfDeletedUser
         return "";
     }
 
@@ -123,7 +127,7 @@ public class AdminService {
         if (person == null) {
             return "Käyttäjää ei löydy.";
         }
-        person.encryptAndSaltPassword(decodedPassword);
+        person.hashPasswordWithSalt(decodedPassword);
         return "";
     }
 
@@ -151,7 +155,7 @@ public class AdminService {
             String decodedPersonJson = decode(encodedPersonJson);
             Gson gson = new Gson();
             Person person = gson.fromJson(decodedPersonJson, Person.class);
-            person.encryptAndSaltPassword(person.getPassword());
+            person.hashPasswordWithSalt(person.getHashOfPasswordAndSalt());
             person.setRole("ROLE_USER");
             return person;
         } catch (Exception ex) {

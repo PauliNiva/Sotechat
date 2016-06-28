@@ -12,34 +12,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Luokka yksittaisen keskustelun tietojen tallentamiseen.
+ * Luokka keskustelun tietojen tallentamiseen. Tästä luokasta luodaan
+ * tietokantaan <code>Conversation</code>-taulu, jonka riveinä ovat luokan
+ * ilmentymamuuttujat.
  */
 @Entity
 public class Conversation {
 
-    /** Keskustelun kanavan id. */
+    /**
+     * Keskustelun kanavatunnus. Toimii tietokantataulun <code>id</code>:nä.
+     */
     @Id
     private String channelId;
 
-    /** Keskustelun aikaleima. */
+    /**
+     * Keskustelun aikaleima. Ei voi olla arvoltaan <code>null</code>.
+     */
     @NotNull
     private String date;
 
-    /** Keskustelun aihealue. */
+    /**
+     * Keskustelun aihealue.
+     */
     private String category;
 
-    /** Keskusteluun liittyvat henkilot. */
+    /**
+     * Keskusteluun liittyvat <code>Person</code>-oliot listana. Tietokannassa
+     * monesta moneen suhde, jonka avain loytyy <code>Person</code>-taulun
+     * <code>conversationsOfPerson</code> rivilta.
+     */
     @ManyToMany(mappedBy = "conversationsOfPerson")
     private List<Person> participantsOfConversation;
 
-    /** Keskusteluun liittyvat viestit. */
+    /**
+     * Keskusteluun liittyvien <code>Message</code>-oliot listana. Tietokannassa
+     * yhdesta moneen suhde, jonka avain loytyy <code>Message</code>-taulun
+     * <code>conversation</code> rivilta. Hakutapa on <code>EAGER</code>, eli
+     * kaikki listalla olevat <code>Message</code>-oliot haetaan heti, kun
+     * kyseisen listan omaava <code>Conversation</code>-olio haetaan.
+     */
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
             mappedBy = "conversation")
     private List<Message> messagesOfConversation;
 
     /**
-     * Konstruktorissa alustetaan keskusteluun liittyvat viestit.
-     * ja henkilot
+     * Konstruktori. Alustaa listat keskusteluun liittyville viesteille ja
+     * henkiloille.
      */
     public Conversation() {
         this.messagesOfConversation = new ArrayList<>();
@@ -47,11 +65,13 @@ public class Conversation {
     }
 
     /**
-     * Konstruktorissa alustetaan aikaleimaksi parametrina annettu aikaleima
-     * seka kanavaid:ksi parametrina annettu kanavaid seka alustetaan
-     * keskustelun viestit ja henkilot.
-     * @param pDate aikaleima
-     * @param pChannelId kanavan id
+     * Konstruktori. Asettaa aikaleimaksi argumenttina annetun
+     * <code>pDate</code> nimisen muuttujan ja kanavatunnukseksi
+     * <code>pChannelId</code> nimisen muuttujan sekä alustaa listat
+     * keskusteluun liittyville viesteille ja henkiloille.
+     *
+     * @param pDate Aikaleima.
+     * @param pChannelId Kanavan tunnus.
      */
     public Conversation(final String pChannelId, final String pDate) {
         this.date = pDate;
@@ -62,47 +82,57 @@ public class Conversation {
 
     /**
      * Palauttaa viestin aikaleiman.
-     * @return aikaleima
+     *
+     * @return Aikaleima.
      */
     public final String getDate() {
         return this.date;
     }
 
     /**
-     * Asettaa viestin aikaleiman parametrina annettuun aikaleimaan.
-     * @param pDate viestin aikaleima
+     * Asettaa viestin aikaleiman argumenttina annetuksi aikaleimaksi.
+     *
+     * @param pDate Viestin aikaleima.
      */
     public final void setDate(final String pDate) {
         this.date = pDate;
     }
 
     /**
-     * Palauttaa listan keskusteluun liittyvista henkiloista.
-     * @return lista Person olioista, jotka on liitetty keskusteluun
+     * Palauttaa listan keskusteluun liittyvista <code>Person</code>-olioista.
+     *
+     * @return Lista <code>Person</code>-olioista, jotka on liitetty
+     * keskusteluun.
      */
     public final List<Person> getParticipantsOfConversation() {
         return this.participantsOfConversation;
     }
 
     /**
-     * Palauttaa listan keskustelun viesteista.
-     * @return Lista Message olioista, jotka on liitetty keskusteluun
+     * Palauttaa listan keskustelun <code>Message</code>-olioista.
+     *
+     * @return Lista <code>Message</code>-olioista, jotka on liitetty
+     * keskusteluun.
      */
     public final List<Message> getMessagesOfConversation() {
         return this.messagesOfConversation;
     }
 
     /**
-     * Lisaa parametrina annetun henkilon keskusteluun.
-     * @param pPerson Person olio, joka halutaan liittaa keskusteluun
+     * Lisaa argumenttina annetun <code>Person</code>-olion keskusteluun
+     * liittyvien henkiloiden listaan.
+     *
+     * @param pPerson <code>Person</code>-olio, joka liitetaam keskusteluun.
      */
     public final void addPersonToConversation(final Person pPerson) {
         participantsOfConversation.add(pPerson);
     }
 
     /**
-     * Lisaa parametrina annetun viestin keskusteluun.
-     * @param pMessage Message olio, joka halutaan liittaa keskusteluun
+     * Lisaa argumenttina annetun <code>Message</code>-olion keskusteluun
+     * liittyvien viestien listaan.
+     *
+     * @param pMessage <code>Message</code>-olio, joka liitetaan keskusteluun.
      */
     public final void addMessageToConversation(final Message pMessage) {
         messagesOfConversation.add(pMessage);
@@ -110,31 +140,38 @@ public class Conversation {
 
     /**
      * Palauttaa keskustelun aihealueen.
-     * @return keskustelun aihealue
+     *
+     * @return Keskustelun aihealue.
      */
     public final String getCategory() {
         return category;
     }
 
     /**
-     * Asettaa keskustelun aihealueeksi parametrina annetun aihealueen.
-     * @param pCategory Keskustelulle annettava kategoria Stringina.
+     * Asettaa keskustelun aihealueeksi argumenttina annetun aihealueen.
+     *
+     * @param pCategory Keskustelulle annettava kategoria
+     *                  <code>String</code>-oliona.
      */
     public final void setCategory(final String pCategory) {
         this.category = pCategory;
     }
 
     /**
-     * Palauttaa keskustelun kanavaId:n.
-     * @return Palauttaa keskustelun kanavaId:n Stringina.
+     * Palauttaa keskustelun kanavatunnuksen.
+     *
+     * @return Palauttaa keskustelun kanavatunnuksen
+     * <code>String</code>-oliona.
      */
     public String getChannelId() {
         return channelId;
     }
 
     /**
-     * Asettaa keskustelun kanavaid:ksi parametrina annetun kanavaid:n.
-     * @param pChannelId kanavaid
+     * Asettaa keskustelun kanavatunnukseksi argumenttina annetun
+     * kanavatunnuksen.
+     *
+     * @param pChannelId Kanavatunnus.
      */
     public void setChannelId(final String pChannelId) {
         this.channelId = pChannelId;
