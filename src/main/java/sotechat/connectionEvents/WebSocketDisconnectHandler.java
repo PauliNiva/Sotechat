@@ -6,6 +6,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.QueueTimeoutService;
@@ -34,11 +35,13 @@ public class WebSocketDisconnectHandler<S>
     @Autowired
     private QueueTimeoutService queueTimeoutService;
 
+    @Autowired
+    private MessageBroker broker;
+
     /**
      * Konstruktori.
      */
     public WebSocketDisconnectHandler() {
-        //TODO Laheta "join" notice kaikille kanaville joilla kayttaja on
     }
 
     /**
@@ -64,7 +67,7 @@ public class WebSocketDisconnectHandler<S>
                 .getSessionFromSessionId(sessionId);
         if (userSession != null) {
             userSession.set("connectionStatus", "disconnected");
-            //TODO Laheta "leave" notice kaikille kanaville joilla kayttaja on
+            broker.sendLeaveNotices(userSession);
         }
 
     }

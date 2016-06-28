@@ -49,10 +49,12 @@ public class sendingMessageIT {
      */
     @Test
     public void UserCanWriteAndSendAMessage() {
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User to queue
         waitAndFillInformation(userWait);
         // User from queue
-        proLogin(proWait);
+
         waitAndPickFromQueue(proWait);
 
         // User can write message

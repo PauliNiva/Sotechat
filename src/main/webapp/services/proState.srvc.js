@@ -15,39 +15,39 @@ angular.module('chatProApp')
         /** Getterit ja setterit */
         function setUsername(value) {
             username = value;
-        };
+        }
 
         function setUserID(value) {
             userID = value;
-        };
+        }
 
         function setOnline(value) {
             online = value;
-        };
+        }
 
         function setQueueBroadcastChannel(value) {
             qbcc = value;
-        };
+        }
 
         function getOnline() {
             return online;
-        };
+        }
 
         function getQueueBroadcastChannel() {
             return qbcc;
-        };
+        }
 
         function getChannelIDs() {
             return channelIDs;
-        };
+        }
 
         function getUsername() {
             return username;
-        };
+        }
 
         function getUserID() {
             return userID;
-        };
+        }
 
         /**
          * Asettaa ammattilaisen avonaiset kanavat halutuiksi
@@ -55,7 +55,7 @@ angular.module('chatProApp')
          */
         function addAllChannels(values) {
             channelIDs = JSON.parse(values);
-        };
+        }
 
         /**
          * Hakee palvelimelta ammattilaisen tilatiedoit
@@ -63,7 +63,7 @@ angular.module('chatProApp')
          */
         function getVariablesFormServer() {
             return $http.get(PROSTATEURL);
-        };
+        }
 
         /**
          * Alustaa tilatiedot annettun vastauksen mukaan
@@ -75,7 +75,13 @@ angular.module('chatProApp')
             setUserID(response.data.userId);
             setQueueBroadcastChannel(response.data.qbcc);
             setOnline(response.data.online);
-        };
+
+            if (response.data.online === 'true') {
+                online = true;
+            } else {
+                online = false;
+            }
+        }
         
         function leaveChannel(channelID) {
             $http.post("/leave/" + channelID, {});
@@ -88,6 +94,16 @@ angular.module('chatProApp')
         function addChannel(channelID) {
             channelIDs.push(channelID);
         }
+        
+        function setStatusOnline() {
+            online = true;
+            $http.post('/setStatus/?online=true', {});
+        }
+
+        function setStatusOffline() {
+            online = false;
+            $http.post('/setStatus/?online=false', {});
+        }
 
         var arrayIndexOf = function (myArray, searchTerm) {
             for (var i = 0, len = myArray.length; i < len; i++) {
@@ -95,16 +111,7 @@ angular.module('chatProApp')
             }
             return -1;
         };
-
-        /** Lahettaa palvelimelle post -pyyntona tiedon siita onko ammattilainen paikalla (true tai false) */
-        var setStatus = function (status){
-            var data = $.param( {
-                json: JSON.stringify({
-                    online : status
-                })
-            });
-          return $http.post('/setStatus/', data);
-        };
+        
 
         var pro = {
             getVariablesFormServer: getVariablesFormServer,
@@ -116,7 +123,8 @@ angular.module('chatProApp')
             getOnline: getOnline,
             leaveChannel: leaveChannel,
             addChannel: addChannel,
-            setStatus: setStatus
+            setStatusOnline: setStatusOnline,
+            setStatusOffline: setStatusOffline
         };
 
         return pro;

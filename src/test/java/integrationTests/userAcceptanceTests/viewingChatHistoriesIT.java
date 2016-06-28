@@ -45,12 +45,14 @@ public class viewingChatHistoriesIT {
      */
     @Test
     public void proSeesChatHistory() {
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User has accessed chat pag
         // Username and a starting message is submitted
         waitAndFillInformation(userWait);
         // A queueing view is showed to the user
         // User is added to the pool of customers professionals side
-        proLogin(proWait);
+
         waitAndPickFromQueue(proWait);
         waitChatWindowsAppear(userWait);
 

@@ -45,12 +45,12 @@ public class userEndConversationIT {
      */
     @Test
     public void ProPickFirstFromQueue() {
+        // Professional has logged in
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User has accessed queue
         waitAndFillInformation(userWait);
         waitQueueWindowsAppear(userWait);
-
-        // Professional has logged in
-        proLogin(proWait);
 
         // Professional click´s next in line button
         waitAndPickFromQueue(proWait);

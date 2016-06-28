@@ -96,4 +96,10 @@ public class  MsgToClient implements Comparable<MsgToClient> {
             return 0;
         }
     }
+
+    @Override
+    public String toString() {
+        return "MessageID " + messageId + ", username " + username + ", "
+                + channelId + ", timeStamp " + timeStamp + ", content " + content;
+    }
 }

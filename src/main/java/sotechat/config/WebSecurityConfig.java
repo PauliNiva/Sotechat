@@ -51,9 +51,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic().and().csrf()
+                .httpBasic().and().csrf().ignoringAntMatchers("/toServer/**")
                 .csrfTokenRepository(csrfTokenRepository()).and()
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+                .headers().frameOptions().sameOrigin().and()
                 .logout().logoutSuccessUrl("/pro");
 
         // TODO Allaoleva HTTP:stä HTTPS:ään ohjaus.

@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="panel panel-default historyPanel"
-             ng-repeat="conversation in Conversations | orderBy:'date':false | limitTo:quantity">
+             ng-repeat="conversation in Conversations | orderBy:'date':true | limitTo:quantity">
             <div class="panel-heading historyHeading row" name="conversation" ng-click="collapsed = !collapsed">
                 <div class="col-md-2">{{conversation.date | date:'dd.MM.yyyy' }}</div>
                 <div class="col-md-2">{{ conversation.person }}</div>

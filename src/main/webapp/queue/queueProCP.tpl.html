@@ -14,7 +14,7 @@
             </select>
         </div>
         <div class="row">
-            <div class="panel-group queueGroup" id="accordion" ng-repeat="queueObject in queue">
+            <div class="panel-group queueGroup" id="accordion" ng-repeat="queueObject in queue | limitTo : 50">
                 <div ng-include="'queue/queueProBlock.tpl.html'"></div>
             </div>
         </div>

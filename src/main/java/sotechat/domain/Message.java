@@ -23,8 +23,8 @@ public class Message extends AbstractPersistable<Long> {
     /** Viestin lahettaja. */
     private String sender;
 
-    /** Keskustelu, johon viesti liittyy. */
-    @ManyToOne(fetch = FetchType.LAZY)
+    /** keskustelu, johon viesti liittyy */
+    @ManyToOne(fetch = FetchType.EAGER)
     private Conversation conversation;
 
     /** Keskustelun kanavaid johon viesti liittyy. */

@@ -38,6 +38,10 @@ angular.module('chatApp')
             return userID;
         };
 
+        function getState() {
+            return userState;
+        }
+
         /** Palauttaa käyttäjän tilaavastaavan templaten osoitteen */
         function getUserState() {
             if (userState === 'queue') {
@@ -46,8 +50,9 @@ angular.module('chatApp')
                 return 'chatWindow/userInChat.tpl.html'
             } else if (userState === 'pro') {
                 return 'staticErrorPages/sameBrowserError.html'
-            }
-            else {
+            } else if (userState === 'closed') {
+                return 'common/chatClosed.tpl.html'
+            } else {
                 return 'queue/userToQueue.tpl.html';
             }
         };
@@ -77,7 +82,8 @@ angular.module('chatApp')
             getChannelID: getChannelID,
             getUsername: getUsername,
             getUserID: getUserID,
-            leaveChat: leaveChat
+            leaveChat: leaveChat,
+            getState: getState
         };
 
         return queue;

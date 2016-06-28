@@ -38,6 +38,8 @@ angular.module('chatApp')
                             err = "Kayttajanimi on varattu. Kokeile toista nimea.";
                         } else if (response.data.content == "Denied join pool request. Username already on channel.") {
                             err = "Kanavalla on jo kayttaja samalla kayttajanimella. Kokeile toista nimea.";
+                        } else if (response.data.content == "Denied join, no professionals available.") {
+                            err = "Ammattilaisia ei ole juuri nyt paikalla.";
                         }
                         alert(err);
                     }

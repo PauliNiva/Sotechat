@@ -232,10 +232,12 @@ public class StateController {
         String error = validatorService.validateOnlineStatusChangeRequest(
                 professional, req, online
         );
-        if (error.isEmpty()) {
-            sessionRepo.setOnlineStatus(req, online);
+        if (!error.isEmpty()) {
+            return jsonifiedResponse(error);
         }
-        return jsonifiedResponse(error);
+        sessionRepo.setOnlineStatus(req, online);
+        broker.sendJoinLeaveNotices(professional, online);
+        return jsonifiedResponse("");
     }
 
     /**

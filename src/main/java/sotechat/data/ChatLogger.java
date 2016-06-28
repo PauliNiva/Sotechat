@@ -190,9 +190,11 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
-            return "0";
+            return "1";
         }
-        return list.size() + "";
+        /** Huom: ID ei saa alkaa nollasta, koska tietokantaimplementaatiossa
+         * ID:t alkavat myos ykkosesta. */
+        return (1 + list.size()) + "";
     }
 
     /**

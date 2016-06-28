@@ -52,6 +52,8 @@ public class proHandlesManyUsersIT {
      */
     @Test
     public void KillerTest() throws InterruptedException {
+        proWait = handler.getWaitDriver("pro");
+        proLogin(proWait);
 
         /** All customers join the queue. */
         for (WebDriver customer : customers) {
@@ -61,8 +63,7 @@ public class proHandlesManyUsersIT {
         }
 
         /** Pro logs in and for each customer: polls from queue, sends msg. */
-        proWait = handler.getWaitDriver("pro");
-        proLogin(proWait);
+
         for (int i = 0; i < MAX_CUSTOMERS; i++) {
             waitAndPickFromQueue(proWait);
             assertEquals(i +1,tabsCountToBe(proWait, i+1));

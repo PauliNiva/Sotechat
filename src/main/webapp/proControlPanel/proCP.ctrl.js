@@ -11,7 +11,8 @@ angular.module('chatProApp')
             $scope.activeChatTab = tabCount;
             $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
             /** onko ammattilainen paikalla */
-            $scope.present = true;
+            $scope.present = {};
+
 
             $scope.showHistory = function () {
                 $scope.proView = 'proHistories/chatHistory.html';
@@ -83,6 +84,7 @@ angular.module('chatProApp')
             var answer = function () {
                 initQueue();
                 $scope.username = proStateService.getUsername();
+                $scope.present.yesNo = proStateService.getOnline();
                 updateChannels();
             };
 
@@ -97,8 +99,11 @@ angular.module('chatProApp')
             };
 
             $scope.changeStatus = function() {
-                $scope.present = !$scope.present;
-                proStateService.setStatus($scope.present);
+               if ($scope.present.yesNo) {
+                   proStateService.setStatusOnline();
+               } else {
+                   proStateService.setStatusOffline();
+               }
             };
 
             /** Pyytää alustusta kun kontrolleri ladataan */

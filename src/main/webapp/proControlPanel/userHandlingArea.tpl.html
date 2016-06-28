@@ -4,19 +4,8 @@
             <form class="navbar-form navbar-left">
             <span class="username-title ">{{username}}</span>
             </form>
-                <form class="navbar-form navbar-right">
-                <div style="width: 150px;"
-                     class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-id-switch-handleWidth bootstrap-switch-animate bootstrap-switch-on">
-                    <div style="width: 372px;" class="bootstrap-switch-container">
-                    <span style="width: 74px;"
-                          class="bootstrap-switch-handle-on bootstrap-switch-success">Paikalla</span>
-                        <span style="width: 74px;" class="bootstrap-switch-label">&nbsp;</span>
-                   <!--     <input id="switch-handleWidth" data-handle-width="100" type="checkbox" ng-switch="changeStatus()"> -->
-                    </div>
-                </div>
-                    <toggle-switch ng-model="switchStatus" class="switch-success" on-label="Paikalla" off-label="Poissa" ng-click="changeStatus()"></toggle-switch>
-                    <input type="checkbox" ng-model="mymodel.mystate" bootstrap-switch ng-true-value="changeStatus()" ng-false-value="changeStatus()"/>
-
+                <form class="navbar-form navbar-right proStatusForm">
+                    <switch name="yesNo" ng-model="present.yesNo" on="Paikalla" off="Poissa" class="extrawide" ng-change="changeStatus"></switch>
                 </form>
              </div>
         </div>

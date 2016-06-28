@@ -1,6 +1,6 @@
 angular.module('chatProApp')
-    .controller('adminController', ['$scope', '$http', '$uibModal', 'adminService',
-        function ($scope, $http, $uibModal, adminService) {
+    .controller('adminController', ['$scope', '$http', '$uibModal','base64', 'adminService',
+        function ($scope, $http, $uibModal, base64, adminService) {
             $scope.users = [];
             $scope.alerts = [];
             $scope.resetPsw = '';
@@ -29,7 +29,7 @@ angular.module('chatProApp')
                 var user = '{"username": '+ $scope.newUser.Username + ', "loginName": '
                     + $scope.newUser.LoginName +', "password": '
                     + $scope.newUser.Password+ '}';
-                adminService.createUser(btoa(user), function(response) {
+                adminService.createUser(base64.encode(user), function(response) {
                     if (response.data.status == 'OK') {
                         $scope.newUserBoolean = false;
                         $scope.newUser = {};
@@ -43,7 +43,7 @@ angular.module('chatProApp')
             };
 
             $scope.doResetPsw = function(userID, newPsw) {
-                adminService.resetPassword(userID, btoa(newPsw), success);
+                adminService.resetPassword(userID, base64.encode(newPsw), success);
                 $scope.resetPsw = '';
                 $scope.editPassword = '';
             };

@@ -6,6 +6,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
+import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
@@ -25,6 +26,9 @@ public class WebSocketConnectHandler<S>
     @Autowired
     private SessionRepo sessionRepo;
 
+    @Autowired
+    private MessageBroker broker;
+
     /**
      * Konstruktori.
      */
@@ -33,8 +37,7 @@ public class WebSocketConnectHandler<S>
 
     /**
      * Metodi, jossa maaritellaan mita tapahtuu, kun WebSocket-yhteys
-     * muodostuu. Siis talletetaan ConnectionRepoon tieto, että tietyn
-     * session status on aktiivinen.
+     * muodostuu.
      *
      * @param event Yhteyden muodostumistapahtuma.
      */
@@ -46,5 +49,6 @@ public class WebSocketConnectHandler<S>
        Session userSession = this.sessionRepo
                .getSessionFromSessionId(sessionId);
        userSession.set("connectionStatus", "connected");
+       broker.sendJoinNotices(userSession);
     }
 }

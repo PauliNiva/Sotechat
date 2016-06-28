@@ -2,8 +2,7 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-
-
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import sotechat.service.AdminService;
-import org.springframework.util.Base64Utils;
+
 
 /**
  * Kontrolleriluokka ylläpitäjä toimintoihin.
@@ -26,10 +25,12 @@ public class AdminController {
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
     @ResponseBody
     public String addNewUser(
-            @RequestBody final String jsonPerson) {
+            @RequestBody final String jsonPerson
+    ) {
         try {
+
             adminService.addUser(new String(Base64Utils
-                    .decodeFromString(jsonPerson)));
+                    .decodeFromString(jsonPerson), "UTF-8"));
         } catch (Exception e) {
             return "{\"error\":\"Käyttäjää ei voitu lisätä. "
                     + "Tarkista, että kirjautumisnimi tai palvelunimi eivät "
@@ -46,7 +47,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteUser(@PathVariable final String id) throws Exception {
+    public String deleteUser(@PathVariable final String id) {
         try {
             if (adminService.deleteUser(id)) {
                 return statusOK();
@@ -62,8 +63,8 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
     public String resetPassword(@PathVariable final String id,
-                                @RequestBody final String newPassword)
-            throws Exception {
+                                @RequestBody final String newPassword
+    ) {
         try {
             adminService.changePassword(id,
                     new String(Base64Utils.decodeFromString(newPassword)));
@@ -75,6 +76,7 @@ public class AdminController {
 
     /**
      * Tarkoitettu tehtavaksi vain ennen softan demoamista.
+     *
      * @return tieto onnistumisesta JSONina.
      */
     @Secured("ROLE_ADMIN")

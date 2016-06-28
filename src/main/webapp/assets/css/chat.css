@@ -74,14 +74,13 @@ textarea.form-control {
     text-overflow: ellipsis;
     line-height: normal;
     padding-top: 8px;
+    width: calc(100% - 141px);
 }
 
 .username-title {
     font-weight: bold;
     font-size: large;
 }
-
-
 
 .userToPool-panel {
     max-width: 350px;
@@ -145,4 +144,72 @@ html, body {
 
 .errorButton {
     margin-left: calc(50% - 200px);
+}
+
+.chatClosed {
+    border-radius: 20px;
+    width: calc(100vh - 60px);
+    height: calc(100vh - 60px);
+    min-height: 300px;
+    min-width: 300px;
+    max-height: 400px;
+    max-width: 400px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 400px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border: 2px solid black;
+}
+
+.chatClosedText {
+
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    font-size: medium;
+}
+
+@media (max-width:440px) {
+    .chatClosed {
+        border-radius: 20%;
+        width: 290px;
+        height: 290px;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 300px;
+    }
+
+    .chatClosedText {
+        display: inline-block;
+        vertical-align: middle;
+        line-height: normal;
+    }
+
+}
+
+.greenBg-add, .greenBg-remove,
+.redBg-add, .redBg-remove,
+.blueBg-add, .blueBg-remove,
+.whiteBg-add, .whiteBg-remove {
+    transition: background-color 2000ms linear;
+}
+
+.greenBg,
+.greenBg-add.greenBg-add-active {
+    background-color: #00ff00;
+}
+.redBg,
+.redBg-add.redBg-add-active {
+    background-color: #ff5050;
+}
+.blueBg,
+.blueBg-add.blueBg-add-active {
+    background-color: #3399ff;
+}
+.whiteBg,
+.whiteBg-add.whiteBg-add-active {
+    background-color: #ffffff;
 }

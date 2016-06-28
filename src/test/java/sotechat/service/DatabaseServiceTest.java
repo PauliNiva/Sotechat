@@ -289,8 +289,8 @@ public class DatabaseServiceTest {
         Assert.assertEquals(1, conversationRepo.findAll().size());
         databaseService.removeAllConversationsFromDatabase();
         Assert.assertNull(conversationRepo.findOne("xyzo"));
-        Assert.assertTrue(person.getConversationsOfPerson().isEmpty());
-//        Assert.assertTrue(conversationRepo.findAll().isEmpty()); //ToDo: miksi virhetta?
+        Assert.assertTrue(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
+        Assert.assertTrue(conversationRepo.findAll().isEmpty()); //ToDo: miksi virhetta?
     }
 
 }
