@@ -30,7 +30,9 @@ angular.module('chatProApp')
             if (category === "") return queue;
             var subQueue = [];
             for (var i = 0; i < queue.length; i++) {
-                if (queue[i].category === category) subQueue.push(queue[i]);
+                if (queue[i].category === category) {
+                    subQueue.push(queue[i]);
+                }
             }
             return subQueue;
         };
@@ -42,7 +44,9 @@ angular.module('chatProApp')
          */
         var checkChannelID = function (channelID) {
             for (var i = 0; i < queue.length; i++) {
-                if (queue[i].channelID === channelID) return queue[i].channelID;
+                if (queue[i].channelID === channelID) {
+                    return queue[i].channelID;
+                }
             }
             return null;
         };
@@ -54,7 +58,9 @@ angular.module('chatProApp')
         var addCategory = function (category) {
             var boolean = true;
             for (var i = 0; i < categories.length; i++) {
-                if (categories[i] === category) boolean = false;
+                if (categories[i] === category) {
+                    boolean = false;
+                }
             }
             if (boolean) {
                 categories.push(category);

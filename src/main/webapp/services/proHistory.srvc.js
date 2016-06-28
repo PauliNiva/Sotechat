@@ -1,3 +1,6 @@
+/**
+ * Hakee palvelimelta keskustelu historiat ja sen viestit.
+ */
 angular.module('chatProApp')
     .factory('proHistoryService', ['$http', function ($http) {
         

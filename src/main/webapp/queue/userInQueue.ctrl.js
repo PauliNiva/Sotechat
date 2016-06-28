@@ -8,10 +8,8 @@ angular.module('chatApp')
             var QUEUEADDRESS = '/toClient/queue/';
             /** Muuttuja johon tallennetaan yhteys kanavaan */
             var subscribeToQueue;
-
             $scope.color = 'blueBg';
-
-            $interval(function() {
+            var iBackGround = $interval(function() {
                 if ($scope.color === 'whiteBg') {
                     $scope.color = 'blueBg';
                 } else {
@@ -25,6 +23,7 @@ angular.module('chatApp')
              */
             var onMessage = function () {
                     subscribeToQueue.unsubscribe();
+                    $interval.cancel(iBackGround);
                     $scope.updateState();
             };
 

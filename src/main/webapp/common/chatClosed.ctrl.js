@@ -1,3 +1,6 @@
+/**
+ * Kontrolleri keskustelun kiinni olemis näkymälle.
+ */
 angular.module('chatApp')
     .controller('chatClosedController', function ($scope, $interval, userStateService) {
         $scope.color = 'redBg';
@@ -8,6 +11,9 @@ angular.module('chatApp')
             $interval.cancel(iCheckStatus);
         };
         var init = function() {
+            /**
+             * Vaihtelee taustan väriä 4 s välein.
+             */
             iCheckStatus = $interval(function() {
                 if ($scope.color === 'whiteBg') {
                     $scope.color = 'redBg';
@@ -15,14 +21,15 @@ angular.module('chatApp')
                     $scope.color = 'whiteBg';
                 }
             }, 4000);
-
+            /**
+             * Tarkistaa chatin tilan 20s välein, kunnes se ei ole enää suljettu.
+             */
             iBackGround = $interval(function() {
                 $scope.updateState();
                 if (userStateService.getState() !== 'closed') {
                     stop();
                 }
-            }, 10000);
+            }, 20000);
         };
         init();
-
     });

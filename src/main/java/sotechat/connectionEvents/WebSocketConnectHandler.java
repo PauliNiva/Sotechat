@@ -48,7 +48,9 @@ public class WebSocketConnectHandler<S>
                .get("SPRING.SESSION.ID").toString();
        Session userSession = this.sessionRepo
                .getSessionFromSessionId(sessionId);
-       userSession.set("connectionStatus", "connected");
-       broker.sendJoinNotices(userSession);
+       if (userSession != null) {
+           userSession.set("connectionStatus", "connected");
+           broker.sendJoinNotices(userSession);
+       }
     }
 }

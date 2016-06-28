@@ -14,35 +14,45 @@ angular.module('chatProApp')
             // viesteja, jotka meilla jo on.
             var messageIds = {};
             var sub;
-            // Maaritellaan chatin nimi templateen, talla hetkella kovakoodattu
+            // Maaritellaan chatin nimi templateen
             $scope.chatText = '';
 
             var channel = this.channel;
             var endChat = this.chatend;
 
+            /**
+             * Kuuntelee ja odottaa unsubscribe pyyntöä.
+             * Jos tapahtuma kuuluu tälle komponentille,
+             * katkaisee kanavan tilauksen.
+             */
             $scope.$on('unSubscribeChat', function (event, args) {
                 if (args.channelID === channel) {
                     sub.unsubscribe();
                 }
             });
 
-            $scope.userLeave = function() {
+            /**
+             * Ammattilainen klikkaa poist keskustelusta nappia.
+             */
+            $scope.userLeave = function () {
                 var modalInstance = $uibModal.open({
                     animation: true,
                     templateUrl: 'common/areUSureModal.tpl.html',
                     controller: 'AreUSureModalController'
                 });
 
-                modalInstance.result.then(closeChat);
+                modalInstance.result.then(function () {
+                    sub.unsubscribe();
+                    $scope.chatClosed = true;
+                    endChat();
+                });
             };
 
-            var closeChat = function() {
-                sub.unsubscribe();
-                $scope.chatClosed = true;
-                endChat();
-            };
-            
-            $scope.closeConversation = function() {
+            /**
+             * Käyttäjä on lopettanut keskustelun.
+             * Pyydetään välilehteä sulkiessa.
+             */
+            $scope.closeConversation = function () {
                 endChat();
             };
 
@@ -77,12 +87,6 @@ angular.module('chatProApp')
                 return message;
             };
 
-            var userLeaves = function() {
-                sub.unsubscribe();
-                $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
-                $scope.chatClosed = true;
-            };
-
             /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
@@ -91,14 +95,13 @@ angular.module('chatProApp')
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
                     } else if (message.notice == "chat closed") {
-                        userLeaves();
+                        sub.unsubscribe();
+                        $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
+                        $scope.chatClosed = true;
                     }
                 });
             };
 
             /** Alustetaan kanava, kun controlleri ladataan */
-            if (angular.isUndefined(sub)){
-                subscribe();
-            }
-
+            subscribe();
         }]);

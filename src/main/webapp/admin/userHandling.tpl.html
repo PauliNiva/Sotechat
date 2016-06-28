@@ -10,18 +10,18 @@
     <tbody>
     <tr ng-show="newUserBoolean" ng-form="newUserForm">
         <td ng-class="{'has-error': newUserForm.loginname.$invalid && newUserForm.loginname.$dirty}">
-            <input type="text" placeholder="Kirjautumisnimi"  class="form-control" name="loginname" ng-model="newUser.LoginName" required/>
+            <input type="text" placeholder="Kirjautumisnimi"  class="form-control" name="loginname" ng-model="newUser.loginName" required/>
         </td>
         <td ng-class="{'has-error': newUserForm.username.$invalid && newUserForm.username.$dirty}">
-            <input type="text" placeholder="Palvelunimi"  class="form-control" name="username" ng-model="newUser.Username" required/>
+            <input type="text" placeholder="Palvelunimi"  class="form-control" name="username" ng-model="newUser.username" required/>
         </td>
         <td ng-class="{'has-error': newUserForm.password.$invalid && newUserForm.password.$dirty }">
             <input type="password"placeholder="Salasana" ng-class="{ 'has-error': newUserForm.newUserPassword.$invalid}"
-                   class="form-control" name="password" ng-model="newUser.Password" required/>
+                   class="form-control" name="password" ng-model="newUser.password" required/>
         </td>
         <td>
             <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()">Luo uusi käyttäjä</button>
-            <button class="btn btn-sm btn-danger" ng-click="cancelEditOrReset()">Peruuta</button>
+            <button class="btn btn-sm btn-danger" ng-click="cancelNewOrReset()">Peruuta</button>
         </td>
     </tr>
     <tr ng-repeat="user in users | filter:searchText | limitTo : 50" ng-form="resetPswForm">
@@ -36,9 +36,8 @@
                 <button class="btn btn-sm btn-danger" ng-click="removeUser(user.userId)">Poista</button>
             </div>
             <button ng-show="user.userId === resetPsw" class="btn btn-sm btn-success" ng-disabled="resetPswForm.editPassword.$invalid" ng-click="doResetPsw(user.userId, editPassword)">Lähetä uusi salasana</button>
-            <button ng-show="user.userId === editID || user.userId === resetPsw" class="btn btn-sm btn-danger" ng-click="cancelEditOrReset()">Peruuta</button>
+            <button ng-show="user.userId === resetPsw" class="btn btn-sm btn-danger" ng-click="cancelNewOrReset()">Peruuta</button>
         </td>
     </tr>
     </tbody>
 </table>
-<uib-pagination ng-show="users.lenght > 20" total-items="users.lenght" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true" rotate="false"></uib-pagination>

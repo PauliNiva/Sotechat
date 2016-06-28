@@ -3,8 +3,8 @@
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
 angular.module('chatApp')
-    .controller('chatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'userStateService', '$http',
-        function ($scope, $uibModal, stompSocket, connectToServer, userStateService, $http) {
+    .controller('chatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'userStateService',
+        function ($scope, $uibModal, stompSocket, connectToServer, userStateService) {
             // "messages" sisaltaa chat-ikkunassa nakyvat viestit.
             $scope.messages = [];
             // "messageIds" sisaltaa messageId:t viesteille, jotta samaa
@@ -13,19 +13,24 @@ angular.module('chatApp')
             // viesteja, jotka meilla jo on.
             var messageIds = {};
             var sub;
-            // Alustetaan ChatName tyhjäksi
             $scope.chatText = 'Tervetuloa!';
 
+            /**
+             * Käyttäjän sulkiessa keskustelun kysytään varmistus,
+             * jonka jälkeen kutsutaan chatin sulkemista.
+             */
             $scope.userLeave = function() {
                 var modalInstance = $uibModal.open({
                     animation: true,
                     templateUrl: 'common/areUSureModal.tpl.html',
                     controller: 'AreUSureModalController'
                 });
-
                 modalInstance.result.then(closeChat);
             };
 
+            /**
+             * Functio muokkaa käyttöliittymän suljetuksi, kun keskustelusuljetaan.
+             */
             var closeChat = function() {
                 userStateService.leaveChat();
                 sub.unsubscribe();
@@ -74,7 +79,7 @@ angular.module('chatApp')
                     if (message.messageId && !messageIds[message.messageId]) {
                         messageIds[message.messageId] = true;
                         $scope.messages.push(getMessage(response.body));
-                    } else if (message.notice == "chat closed") {
+                    } else if (message.notice === "chat closed") {
                         closeChat();
                     }
                 });
