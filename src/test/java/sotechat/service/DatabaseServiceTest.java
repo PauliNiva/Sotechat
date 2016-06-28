@@ -282,15 +282,18 @@ public class DatabaseServiceTest {
     @Transactional
     public void removeAllConversationsFromDatabaseTest(){
         Assert.assertTrue(conversationRepo.findAll().isEmpty());
-        conversation.addPersonToConversation(personRepo.findOne("xxd"));
-        personRepo.findOne("xxd").addConversationToPerson(conversation);
+        Assert.assertTrue(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
         conversationRepo.save(conversation);
+        conversation.addPersonToConversation(personRepo.findOne("xxd"));
+        personRepo.findOne("xxd").addConversationToPerson(conversationRepo.findOne("xyzo"));
+        conversationRepo.save(conversation);
+        Assert.assertFalse(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
         Assert.assertNotNull(conversationRepo.findOne("xyzo"));
         Assert.assertEquals(1, conversationRepo.findAll().size());
         databaseService.removeAllConversationsFromDatabase();
         Assert.assertNull(conversationRepo.findOne("xyzo"));
         Assert.assertTrue(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
-        Assert.assertTrue(conversationRepo.findAll().isEmpty()); //ToDo: miksi virhetta?
+        Assert.assertTrue(conversationRepo.findAll().isEmpty());
     }
 
 }

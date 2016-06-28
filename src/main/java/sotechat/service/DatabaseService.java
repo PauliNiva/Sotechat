@@ -234,7 +234,7 @@ public class DatabaseService {
                 /* Poistaa myos keskusteluun liitetyt viestit. */
                 for (Person person : conversation
                         .getParticipantsOfConversation()) {
-                    person.removeConversation(conversation);
+                    personService.removeConversation(person, conversation);
                 }
                 String id = conversation.getChannelId();
                 conversationService.removeConversation(id);
