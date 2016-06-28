@@ -74,6 +74,7 @@ textarea.form-control {
     text-overflow: ellipsis;
     line-height: normal;
     padding-top: 8px;
+    width: calc(100% - 141px);
 }
 
 .username-title {
