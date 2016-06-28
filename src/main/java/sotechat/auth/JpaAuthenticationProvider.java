@@ -41,7 +41,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * @throws AuthenticationException TODO
      */
     @Override
-    public final Authentication authenticate(Authentication a)
+    public final Authentication authenticate(final Authentication a)
             throws AuthenticationException {
         String loginName = a.getPrincipal().toString();
         String password = a.getCredentials().toString();
@@ -70,7 +70,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * @param person person
      * @return TODO
      */
-    private List<GrantedAuthority> grantAuthority(Person person) {
+    private List<GrantedAuthority> grantAuthority(final Person person) {
         List<GrantedAuthority> grantedAuths = new ArrayList<>();
         if (person.getRole().equals("ROLE_ADMIN")) {
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
@@ -86,7 +86,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * @return
      */
     @Override
-    public final boolean supports(Class<?> type) {
+    public final boolean supports(final Class<?> type) {
         return true;
     }
 }

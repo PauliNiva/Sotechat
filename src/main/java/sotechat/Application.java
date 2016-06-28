@@ -8,7 +8,7 @@ public class Application {
         launcher.launch(args);
     }
 
-    static void setLauncher(Launcher plauncher) {
+    static void setLauncher(final Launcher plauncher) {
         Application.launcher = plauncher;
     }
 }

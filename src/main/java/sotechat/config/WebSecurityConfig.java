@@ -57,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().sameOrigin().and()
                 .logout().logoutSuccessUrl("/pro");
 
-        // TODO: allaoleva HTTP->HTTPS ohjaus
+        // TODO Allaoleva HTTP:stä HTTPS:ään ohjaus.
         // http.requiresChannel().anyRequest().requiresSecure();
     }
 

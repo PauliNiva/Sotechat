@@ -10,7 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- *TODO: Hoitajan inaktiivisuuden käsittely.
+ *TODO Hoitajan inaktiivisuuden käsittely.
  **/
 
 /**
@@ -47,13 +47,17 @@ public class QueueTimeoutService {
      * tarkistetaan käyttäjän session tilanne. Jos sessio on inaktiivinen,
      * se poistetaan jonosta. Oletuksena 5 minuuttia.
      */
-    private int waitTimeBeforeScanningForNonexistentUsers
-            = 1000*60*5;
+    private final static int WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT_USERS
+            = 1000 * 60 * 5;
 
+    /**
+     * Ajastinolio, jonka avulla voidaan ajastaa jonon tyhjennys tapahtumaan
+     * tietyn ajan kuluttua.
+     */
     private Timer timer;
 
     /**
-     * Konstruktori
+     * Konstruktori.
      */
     public QueueTimeoutService() {
         this.timer = new Timer();
@@ -75,7 +79,7 @@ public class QueueTimeoutService {
             public void run() {
                 removeInactiveUsersFromQueue(sessionId);
             }
-        }, waitTimeBeforeScanningForNonexistentUsers);
+        }, WAIT_TIME_BEFORE_SCANNING_FOR_NONEXISTENT_USERS);
     }
 
     /**
@@ -107,14 +111,13 @@ public class QueueTimeoutService {
         }
     }
 
-    public void setWaitTimeBeforeScanningForNonexistentUsers(final int time) {
-        this.waitTimeBeforeScanningForNonexistentUsers = time;
-    }
-
-    public int getWaitTimeBeforeScanningForNonexistentUsers() {
-        return this.waitTimeBeforeScanningForNonexistentUsers;
-    }
-
+    /**
+     * Testausta helpottava setteri ajastinoliolle.
+     *
+     * @param pTimer Parametrina annettava ajastinolio, joka annetaan
+     *               QueueTimeoutServicessa oliomuuttujana olevalle ajastimelle
+     *               arvoksi.
+     */
     public void setTimer(final Timer pTimer) {
         this.timer = pTimer;
     }

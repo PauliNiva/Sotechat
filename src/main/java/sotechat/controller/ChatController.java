@@ -61,7 +61,6 @@ public class ChatController {
         }
         /** Viesti ok, kirjataan se ylos ja valitetaan muokattuna kanavalle. */
         MsgToClient msgToClients = chatLogger.logNewMessage(msgToServer);
-        System.out.println("MSG TO CLIENTS " + msgToClients);
         return msgToClients;
     }
 

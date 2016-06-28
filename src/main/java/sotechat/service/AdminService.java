@@ -22,32 +22,32 @@ import java.util.List;
 public class AdminService {
 
     @Autowired
-    PersonRepo personRepo;
+    private PersonRepo personRepo;
 
     @Autowired
-    DatabaseService databaseService;
+    private DatabaseService databaseService;
 
     @Autowired
-    SessionRepo sessionRepo;
+    private SessionRepo sessionRepo;
 
     @Autowired
-    Mapper mapper;
+    private Mapper mapper;
 
     @Autowired
-    ChatLogger chatLogger;
+    private ChatLogger chatLogger;
 
     @Autowired
-    QueueService queueService;
+    private QueueService queueService;
 
     private Person person;
 
     @Transactional
-    public boolean addUser(String jsonPerson) throws Exception {
+    public boolean addUser(final String jsonPerson) throws Exception {
         Gson gson = new Gson();
-        Type type = new TypeToken<Person>(){}.getType();
+        Type type = new TypeToken<Person>() { }.getType();
         this.person = gson.fromJson(jsonPerson, type);
-        if (person.getLoginName().isEmpty() || person.getPassword().isEmpty() ||
-                person.getUserName().isEmpty()) {
+        if (person.getLoginName().isEmpty() || person.getPassword().isEmpty()
+                || person.getUserName().isEmpty()) {
             return false;
         } else {
             this.person.setUserId(mapper.generateNewId());
@@ -63,22 +63,22 @@ public class AdminService {
     public String listAllPersonsAsJsonList() {
         List<Person> personList = personRepo.findAll();
         List<Person> deprecatedPersonList = new ArrayList<>();
-        personList.forEach(person->deprecatedPersonList
-                .add(extractInfo(person)));
+        personList.forEach(p->deprecatedPersonList
+                .add(extractInfo(p)));
         Gson gson = new Gson();
         return gson.toJson(deprecatedPersonList);
     }
 
-    private Person extractInfo(Person person) {
+    private Person extractInfo(final Person pPerson) {
         Person personWithDeprecatedAttributes = new Person();
-        personWithDeprecatedAttributes.setLoginName(person.getLoginName());
-        personWithDeprecatedAttributes.setUserName(person.getUserName());
-        personWithDeprecatedAttributes.setUserId(person.getUserId());
+        personWithDeprecatedAttributes.setLoginName(pPerson.getLoginName());
+        personWithDeprecatedAttributes.setUserName(pPerson.getUserName());
+        personWithDeprecatedAttributes.setUserId(pPerson.getUserId());
         return personWithDeprecatedAttributes;
     }
 
     @Transactional
-    public boolean deleteUser(String userId) throws Exception {
+    public boolean deleteUser(final String userId) throws Exception {
         Person personToBeDeleted = personRepo.findOne(userId);
         if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
             System.out.println(personToBeDeleted);
@@ -90,7 +90,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void changePassword(String id, String newPassword) throws Exception {
+    public void changePassword(final String id, final String newPassword)
+            throws Exception {
         this.person = personRepo.findOne(id);
         this.person.setPassword(newPassword);
     }
