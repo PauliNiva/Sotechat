@@ -19,26 +19,35 @@ import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
+/**
+ * Luokka <code>JPA</code>-pohjaiseen kayttajan todentamiseen.
+ * Toteuttaa rajapinnan <code>AuthenticationProvider</code>.
+ */
 @Component
 public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     /**
-     * Mapper.
+     * <code>Mapper</code>-olio.
      */
     @Autowired
     private Mapper mapper;
 
     /**
-     * PersonRepo.
+     * Säilö <code>person</code>-olioille.
      */
     @Autowired
     private PersonRepo personRepo;
 
     /**
-     * Konstruktori.
-     * @param a auth
-     * @return TODO
-     * @throws AuthenticationException TODO
+     * Todentaa kayttajan tarkistamalla, etta kirjautuvan kayttajan salasana
+     * vastaa <code>PersonRepo</code>:ssa tallessa olevaa salasanaa.
+     *
+     * @param a <code>Authentication</code>-olio.
+     * @return Palautettava valtuus, jossa argumentteina
+     * <code>person</code>-olion kayttajanimi, salasana ja lista annetuista
+     * valtuuksista.
+     * @throws AuthenticationException Heitettava poikkeus. Heitetaan kayttajan
+     * ollessa tyhja tai salasana ei vastaa tallessa olevaa salasanaa.
      */
     @Override
     public final Authentication authenticate(final Authentication a)
@@ -61,14 +70,16 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
         List<GrantedAuthority> grantedAuths = grantAuthority(person);
         mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());
+
         return new UsernamePasswordAuthenticationToken(person.getUserName(),
                 password, grantedAuths);
     }
 
     /**
-     * TODO
-     * @param person person
-     * @return TODO
+     * Antaa kayttajalle valtuudeksi joko roolin "admin" tai roolin "user".
+     *
+     * @param person kirjautuva henkilo.
+     * @return kayttajan rooli listana.
      */
     private List<GrantedAuthority> grantAuthority(final Person person) {
         List<GrantedAuthority> grantedAuths = new ArrayList<>();
@@ -81,9 +92,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * TODO
-     * @param type
-     * @return
+     * {@link org.springframework.security.authentication.AuthenticationProvider}
      */
     @Override
     public final boolean supports(final Class<?> type) {
