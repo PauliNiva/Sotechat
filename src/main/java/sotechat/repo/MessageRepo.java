@@ -4,10 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sotechat.domain.Message;
 
 /**
- * JPA-repositorio, joka toimii sovelluksen ja tietokannan valisena rajapintana.
- * Mahdollistaa Message-muotoisten Java-olioiden tallentamisen tietokantaan, ja
- * vastaavasti tietokannan Message-taulusta rivien hakemisen ja tallentamisen
- * Message-olioiksi.
+ * <code>JPA</code>-sailo, joka toimii sovelluksen ja tietokannan valisena
+ * rajapintana. Sailo mahdollistaa <code>Message</code>-olioiden
+ * tallentamisen tietokantaan ja vastaavasti rivien hakemisen tietokannan
+ * <code>Message</code>-taulusta ja naiden tallentamisen
+ * <code>Message</code>-olioiksi.
  */
 public interface MessageRepo extends JpaRepository<Message, Long> {
+
 }

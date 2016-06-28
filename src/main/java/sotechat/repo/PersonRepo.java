@@ -4,19 +4,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sotechat.domain.Person;
 
 /**
- * JPA-repositorio, joka toimii sovelluksen ja tietokannan valisena rajapintana.
- * Mahdollistaa Person-muotoisten Java-olioiden tallentamisen tietokantaan, ja
- * vastaavasti tietokannan Person-taulusta rivien hakemisen ja tallentamisen
- * Person-olioiksi.
+ * <code>JPA</code>-sailo, joka toimii sovelluksen ja tietokannan valisena
+ * rajapintana. Sailo mahdollistaa <code>Person</code>-olioiden
+ * tallentamisen tietokantaan ja vastaavasti rivien hakemisen tietokannan
+ * <code>Person</code>-taulusta ja naiden tallentamisen
+ * <code>Person</code>-olioiksi.
  */
 public interface PersonRepo extends JpaRepository<Person, String> {
+
     /**
-     * Erikseen maaritelty hakumetodi, jolla voidaan hakea JPA-repositoriosta
-     * kayttajan kirjautumistunnuksen perusteella Person-olio.
+     * Hakee <code>loginName</code>:n perusteella <code>Person</code>-olion.
      *
-     * @param loginName Kayttajan kirjautumistunnus.
-     * @return JPA-repositoriosta loydetty Person-olio.
+     * @param loginName Kirjautumistunnus.
+     * @return <code>JPA</code>-sailosta loydetty <code>Person</code>-olio.
      */
     Person findByLoginName(String loginName);
 }
-
