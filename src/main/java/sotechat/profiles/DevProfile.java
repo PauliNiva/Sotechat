@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
+
 import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
@@ -13,41 +14,41 @@ import sotechat.repo.PersonRepo;
 import javax.annotation.PostConstruct;
 
 /**
- * Luokan tarkoituksena on "kovakoodata" kehitysvaiheen tietokantaan arvoja.
+ * Kehitysprofiili.
  */
 @Configuration
 @Profile("development")
 public class DevProfile {
 
     /**
-     * JPA-repositorio, joka hallinnoi henkiloita.
+     * <code>JPA</code>-sailo, joka sailoo <code>person</code>-olioita.
      */
     @Autowired
     private PersonRepo personRepo;
 
     /**
-     * JPA-repositorio, joka hallinnoi keskusteluita.
+     * <code>JPA</code>-sailo, joka sailoo <code>Conversation</code>-olioita.
      */
     @Autowired
     private ConversationRepo conversationRepo;
 
     /**
-     * JPA-repositorio, joka hallinnoi viesteja.
+     * <code>JPA</code>-sailo, joka sailoo <code>Message</code>-olioita.
      */
     @Autowired
     private MessageRepo messageRepo;
 
     /**
-     * Mapper-olio, josta tassa kaytetaan siihen, etta sinne talletetaan
-     * kirjautuneen kayttajan kayttajanimi ja kayttajaId siten, etta kayttaja
-     * voidaan myohemmin hakea Mapper-oliosta kayttajaId:n perusteella.
+     * <code>Mapper</code>-olio, jonne talletetaan kirjautuneen kayttajan
+     * <code>username</code> ja <code>userId</code>, jotta kayttaja voidaan
+     * hakea <code>Mapper</code>-oliosta <code>userId</code>:n perusteella.
      */
     @Autowired
     private Mapper mapper;
 
     /**
-     * Luo kehitysvaiheen profiiliin kaksi kayttajaa valmiiksi, admin-kayttajan
-     * ja yhden hoitaja-kayttajan.
+     * Luo kaksi kayttajaa valmiiksi, joista toisella on rooli "ADMIN" ja
+     * toisella rooli "USER".
      */
     @PostConstruct
     @Transactional
@@ -70,4 +71,5 @@ public class DevProfile {
         personRepo.save(pro);
         mapper.mapProUsernameToUserId(pro.getUserName(), pro.getUserId());
     }
+
 }

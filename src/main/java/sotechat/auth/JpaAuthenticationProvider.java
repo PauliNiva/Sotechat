@@ -77,7 +77,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * Antaa kayttajalle valtuudeksi joko roolin "admin" tai roolin "user".
+     * Antaa kayttajalle valtuudeksi joko roolin "ADMIN" tai roolin "USER".
      *
      * @param person kirjautuva henkilo.
      * @return kayttajan rooli listana.
