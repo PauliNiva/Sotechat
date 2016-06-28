@@ -53,45 +53,14 @@ public class DatabaseService {
             final String category
     ) {
         try {
-            DateTime time = new DateTime();
-            Conversation conversation = new Conversation(channelId,
-                    time.toString());
+            String timeStamp = new DateTime().toString();
+            Conversation conversation = new Conversation(channelId, timeStamp);
             conversationService.addConversation(conversation);
             conversationService.setCategory(category, channelId);
         } catch (Exception e) {
             System.out.println("DBE on createConversation! " + e.toString());
         }
 
-    }
-
-    /**
-     * Luo uuden kayttajatilin ts. Person olion tietokantaan ja asettaa tälle
-     * parametrina annetut nimimerkin, login-nimen, salasanan ja roolin sekä
-     * käyttäjäid:n.
-     * @param userId kayttajan id
-     * @param loginName login-nimi
-     * @param screenName niminerkki
-     * @param role rooli
-     * @param password salasana
-     */
-    public final void createNewUser(final String userId, final String loginName,
-                                    final String screenName, final String role,
-                                    final String password) {
-        try {
-            if (userId.isEmpty() || userId == null || loginName.isEmpty()
-                    || loginName == null || password.isEmpty()
-                    || password == null || screenName.isEmpty()
-                    || screenName == null || role.isEmpty() || role == null) {
-                throw new Exception();
-            }
-            Person person = new Person(userId);
-            person.setUserName(screenName);
-            person.setLoginName(loginName);
-            person.setRole(role);
-            personService.addPerson(person, password);
-        } catch (Exception e) {
-            System.out.println("DBE on createNewUser! " + e.toString());
-        }
     }
 
     /**

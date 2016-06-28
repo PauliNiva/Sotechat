@@ -1,5 +1,6 @@
 package sotechat.service;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +11,8 @@ import sotechat.repo.PersonRepo;
 import java.util.List;
 
 /**
- * Luokka tietokannassa olevien Person -olioiden tallentamiseen
- * (CRUD -operaatiot).
+ * Luokka Person-olioiden kasittelyyn (CRUD-operaatiot)
+ * ja sailyttamiseen tietokannassa.
  */
 @Service
 public class PersonService {
@@ -31,7 +32,7 @@ public class PersonService {
     @Transactional
     public void addPerson(final Person person, final String password)
             throws Exception {
-            person.setPassword(password);
+            person.encryptAndSaltPassword(password);
             personRepo.save(person);
     }
 
@@ -81,7 +82,7 @@ public class PersonService {
                                   final String password) {
         try {
             Person person = personRepo.findOne(personId);
-            person.setPassword(password);
+            person.encryptAndSaltPassword(password);
             personRepo.save(person);
             return true;
         } catch (Exception e) {

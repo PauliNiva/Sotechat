@@ -33,7 +33,7 @@ public class PersonTest {
 
     @Test
     public void setAndGetPasswordTest() {
-        person.setPassword("0000");
+        person.encryptAndSaltPassword("0000");
         Assert.assertTrue(BCrypt.checkpw("0000", person.getPassword()));
     }
 
@@ -45,7 +45,7 @@ public class PersonTest {
 
     @Test
     public void getSaltIsNotNullTest() {
-        person.setPassword("0000");
+        person.encryptAndSaltPassword("0000");
         Assert.assertNotNull(person.getSalt());
     }
 }

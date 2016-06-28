@@ -9,6 +9,8 @@ import sotechat.data.Channel;
 import sotechat.data.Mapper;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
+import sotechat.domain.Person;
+import sotechat.repo.PersonRepo;
 import sotechat.wrappers.MsgToServer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,9 @@ public class ValidatorService {
 
     /** Session Repo. */
     private SessionRepo sessionRepo;
+
+    /** Person Repo. */
+    private PersonRepo personRepo;
 
     /**
      * WebSocket-osoitteessa olevien kauttaviivalla eroteltujen osien lukumaara.
@@ -45,10 +50,12 @@ public class ValidatorService {
     @Autowired
     public ValidatorService(
             final Mapper pMapper,
-            final SessionRepo pSessionRepo
+            final SessionRepo pSessionRepo,
+            final PersonRepo pPersonRepo
     ) {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
+        this.personRepo = pPersonRepo;
     }
 
     /** Onko chattiin tuleva viesti vaarennetty?
@@ -332,6 +339,33 @@ public class ValidatorService {
         return "";
     }
 
+    /** Validoi admininin pyynnon lisata uusi ammattilaiskayttaja.
+     * @param encodedPersonJson lisattavan tiedot encoodattuna jsonina.
+     * @return virheilmoitus String tai tyhja String jos pyynto hyvaksytaan.
+     */
+    public String validateAddUserReq(final String encodedPersonJson) {
+        Person person = AdminService.makePersonFrom(encodedPersonJson);
+        if (person == null) {
+            return "Virheellinen muotoilu (joko encoodaus tai itse JSON)";
+        }
+        String loginName = person.getLoginName();
+        String userName = person.getUserName();
+        if (loginName == null
+                || loginName.isEmpty()
+                || person.getPassword() == null
+                || person.getPassword().isEmpty()
+                || userName == null
+                || userName.isEmpty()
+                || mapper.isUsernameReserved(userName)
+                || personRepo.findByLoginName(loginName) != null) {
+            return "Käyttäjää ei voitu lisätä. "
+                    + "Tarkista, että kirjautumisnimi tai"
+                    + "palvelunimi eivät ole jo varattuja.";
+        }
+
+        /* Hyvaksytaan pyynto. */
+        return "";
+    }
 
     /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.
      * @param headerAccessor mista id kaivetaan
@@ -349,4 +383,6 @@ public class ValidatorService {
             return "";
         }
     }
+
+
 }

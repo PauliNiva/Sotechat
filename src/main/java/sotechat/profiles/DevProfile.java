@@ -54,7 +54,7 @@ public class DevProfile {
     public void init() {
         Person admin = new Person("admin");
         admin.setUserName("pauli");
-        admin.setPassword("0000");
+        admin.encryptAndSaltPassword("0000");
         admin.setLoginName("admin");
         admin.setUserId("admin");
         admin.setRole("ROLE_ADMIN");
@@ -63,7 +63,7 @@ public class DevProfile {
 
         Person pro = new Person("666");
         pro.setUserName("Hoitaja");
-        pro.setPassword("salasana");
+        pro.encryptAndSaltPassword("salasana");
         pro.setLoginName("hoitaja");
         pro.setUserId("666");
         pro.setRole("ROLE_USER");

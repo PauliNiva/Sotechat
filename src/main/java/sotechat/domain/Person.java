@@ -61,6 +61,7 @@ public class Person {
     /**
      * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille.
      * @return String nimimerkki, joka nakyy asiakkaille
+     * TODO: dokumentoi mita palauttaa jos ei loydy
      */
     public final String getUserName() {
         return username;
@@ -76,7 +77,7 @@ public class Person {
 
     /**
      * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan.
-     * @return kirjautumisnimi
+     * @return kirjautumisnimi TODO: dokumentoi mita palauttaa jos ei loydy
      */
     public final String getLoginName() {
         return loginName;
@@ -93,25 +94,25 @@ public class Person {
     /**
      * Palauttaa salasanan hajautusarvon.
      * @return String kryptattu salasana
+     * TODO: dokumentoi mita palauttaa jos ei loydy
      */
     public final String getPassword() {
         return password;
     }
 
-    /**
-     * Asettaa salasanaksi parametrina annetun salasanan ja lisaa siihen suolan.
-     * Tallentaa salasana muuttujaan salasanasta ja suolasta saadun
-     * hajautusarvon.
-     * @param pPassword kayttajan salasana
+    /** Tallentaa parametrina annetun selkokielisen salasanan kryptattuna
+     * ja suolattuna attribuuttiin "password" ja kaytetyn suolan attr. "salt".
+     * @param plainTextPassword selkokielinen salasana
      */
-    public final void setPassword(final String pPassword) {
+    public final void encryptAndSaltPassword(final String plainTextPassword) {
         this.salt = BCrypt.gensalt();
-        this.password = BCrypt.hashpw(pPassword, this.salt);
+        this.password = BCrypt.hashpw(plainTextPassword, this.salt);
     }
 
     /**
      * Palauttaa salasanan suolan.
      * @return String salasanan suola
+     * TODO: dokumentoi mita palauttaa jos ei loydy
      */
     public final String getSalt() {
         return salt;

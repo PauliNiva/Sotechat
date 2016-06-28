@@ -1,11 +1,11 @@
 package sotechat.service;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.Base64Utils;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;
@@ -14,7 +14,7 @@ import sotechat.repo.PersonRepo;
 
 import javax.transaction.Transactional;
 
-import java.lang.reflect.Type;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,24 +39,35 @@ public class AdminService {
     @Autowired
     private QueueService queueService;
 
+    @Autowired
+    private ValidatorService validatorService;
+
+    //TODO: Selvitä miksi viimeisimmäksi käsitelty person halutaan jättää tähän?
     private Person person;
 
+    /** Lisaa uuden ammattilaisen.
+     * @param encodedPersonJson merkkijono muotoa eyJ1c2Vybm...
+     *        decoded personJson: {"username": mikko ... }
+     *        TODO: JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
     @Transactional
-    public boolean addUser(final String jsonPerson) throws Exception {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Person>() { }.getType();
-        this.person = gson.fromJson(jsonPerson, type);
-        if (person.getLoginName().isEmpty() || person.getPassword().isEmpty()
-                || person.getUserName().isEmpty()) {
-            return false;
-        } else {
-            this.person.setUserId(mapper.generateNewId());
-            String passwordToBeSet = person.getPassword();
-            person.setPassword(passwordToBeSet);
-            person.setRole("ROLE_USER");
-            personRepo.save(this.person);
-            return true;
+    public String addUser(final String encodedPersonJson) {
+        /* Validoidaan pyynto. */
+        String error = validatorService.validateAddUserReq(encodedPersonJson);
+        if (!error.isEmpty()) {
+            /* Palautetaan virheilmoitus. */
+            return error;
         }
+
+        /* Pyynto validoitu, tallennetaan tiedot uudesta personista. */
+        person = makePersonFrom(encodedPersonJson);
+        person.setUserId(mapper.generateNewId());
+        personRepo.save(this.person);
+        mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());
+
+        /* Palautetaan tyhja String merkiksi onnistuneesta pyynnosta. */
+        return "";
     }
 
     @Transactional
@@ -77,23 +88,41 @@ public class AdminService {
         return personWithDeprecatedAttributes;
     }
 
+    /** Poistaa ammattilaiskäyttäjän annetulla userId:lla.
+     * @param userId userId
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
     @Transactional
-    public boolean deleteUser(final String userId) throws Exception {
+    public String deleteUser(final String userId) {
         Person personToBeDeleted = personRepo.findOne(userId);
-        if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
-            System.out.println(personToBeDeleted);
-            return false;
-        } else {
-            personRepo.delete(userId);
+        if (personToBeDeleted == null) {
+            return "Käyttäjää ei löydy.";
         }
-        return true;
+        if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
+            return "Ylläpitäjää ei voi poistaa.";
+        }
+        personRepo.delete(userId);
+        return "";
     }
 
+    /** Vaihtaa salasanan.
+     * @param userId userId kenen salasana vaihdetaan
+     * @param encodedPassword haluttu uusi salasana encodattuna
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
     @Transactional
-    public void changePassword(final String id, final String newPassword)
-            throws Exception {
-        this.person = personRepo.findOne(id);
-        this.person.setPassword(newPassword);
+    public String changePassword(
+            final String userId,
+            final String encodedPassword
+    ) {
+        String decodedPassword = new String(
+                Base64Utils.decodeFromString(encodedPassword));
+        person = personRepo.findOne(userId);
+        if (person == null) {
+            return "Käyttäjää ei löydy.";
+        }
+        person.encryptAndSaltPassword(decodedPassword);
+        return "";
     }
 
     /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
@@ -108,4 +137,36 @@ public class AdminService {
         chatLogger.removeOldMessagesFromMemory(0);
         return databaseService.removeAllConversationsFromDatabase();
     }
+
+
+    /** Yrittaa luoda Person-olion encoodatusta JSON-stringista.
+     * HUOM: oliota ei tallenneta tietokantaan metodin sisalla.
+     * @param encodedPersonJson encoodattu person Json Stringina
+     * @return Person-olio tai null jos virheellinen syote.
+     */
+    public static Person makePersonFrom(final String encodedPersonJson) {
+        try {
+            String decodedPersonJson = decode(encodedPersonJson);
+            Gson gson = new Gson();
+            Person person = gson.fromJson(decodedPersonJson, Person.class);
+            person.encryptAndSaltPassword(person.getPassword());
+            person.setRole("ROLE_USER");
+            return person;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    /** Annettuna encoodattu Stringi, palauttaa selkokielisen Stringin.
+     * HUOM: Kyseessa ylimaarainen suojaus, kaikki liikenne tulisi
+     * silti kuljettaa HTTPS yhteyden sisalla!
+     * @param encodedData String encoodattua dataa
+     * @return String decoodattua dataa
+     * @throws UnsupportedEncodingException jos muotoilu on vaarin
+     */
+    private static String decode(
+            final String encodedData) throws UnsupportedEncodingException {
+        return new String(Base64Utils.decodeFromString(encodedData), "UTF-8");
+    }
+
 }
