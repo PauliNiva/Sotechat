@@ -45,6 +45,7 @@ public class SessionRepo extends MapSessionRepository {
     /** Alustaminen, jota kutsutaan seka olion
      * luonnissa etta sessioiden unohtamisessa. */
     private void initialize() {
+
         this.sessionsBySessionId = new HashMap<>();
         this.sessionsByUserId = new HashMap<>();
         this.proUserSessions = new HashMap<>();
@@ -76,6 +77,7 @@ public class SessionRepo extends MapSessionRepository {
     /** Kanavalta poistuminen. Kutsutaan tapauksissa:
      * - Kun keskustelija painaa nappia "Poistu"
      * - Kun keskustelija on kadonnut eika tule takaisin pian (timeout)
+     * - Kun admin poistaa ammattilaiskayttajan, jolla on aktiivisia kanavia.
      * @param channelId p
      * @param sessionId p
      */
@@ -87,7 +89,15 @@ public class SessionRepo extends MapSessionRepository {
         session.removeChannel(channelId);
         updateCountOfProsAcceptingNewCustomers();
         Channel channel = mapper.getChannel(channelId);
-        channel.setActive(false);
+        disableChannel(channel);
+        channel.removeSubscriber(session);
+        channel.removeActiveUserId(session.get("userId"));
+    }
+
+    public void disableChannel(
+            final Channel channel
+    ) {
+        channel.setInactive();
         for (String someUserId : channel.getActiveUserIds()) {
             Session someSession = getSessionFromUserId(someUserId);
             String someSessionId = someSession.get("sessionId");
@@ -98,9 +108,8 @@ public class SessionRepo extends MapSessionRepository {
                 sessionsBySessionId.remove(someSessionId);
             }
         }
-        channel.removeSubscriber(session);
-        channel.removeActiveUserId(session.get("userId"));
     }
+
 
     /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
      *      - Paivittaa mappayksia "sessioId liittyy tahan sessio-olioon" yms.
@@ -239,6 +248,29 @@ public class SessionRepo extends MapSessionRepository {
      */
     public synchronized boolean chatClosed() {
         return countOfProsAcceptingNewCustomers == 0;
+    }
+
+    /** Unohtaa kaiken, mikä liittyy käyttäjään annetulla userId:llä.
+     * Tarkoitettu käytettäväksi käyttäjän poiston yhteydessä.
+     * @param userId userId
+     */
+    public void forgetSession(final String userId) {
+        Session session = getSessionFromUserId(userId);
+        if (session == null) {
+            /* Käyttäjään ei liity sessiota. */
+            return;
+        }
+        for (String channelId : session.getChannels()) {
+            Channel channel = mapper.getChannel(channelId);
+            disableChannel(channel);
+            /* Note: ei haittaa että WS yhteys kanavalle jää auki, sillä
+             * kukaan ei pysty enää lähettämään viestejä kanavalle. */
+        }
+        sessionsByUserId.remove(userId);
+        String sessionId = session.get("sessionId");
+        sessionsBySessionId.remove(sessionId);
+        proUserSessions.remove(session.get("username"));
+        updateCountOfProsAcceptingNewCustomers();
     }
 
     /** Testausta helpottamaan metodi sessioiden unohtamiseen. */

@@ -103,7 +103,11 @@ public class AdminService {
         if (personToBeDeleted.getRole().equals("ROLE_ADMIN")) {
             return "Ylläpitäjää ei voi poistaa.";
         }
+        String username = personToBeDeleted.getUserName();
+        mapper.removeMappingForUsername(username);
         personRepo.delete(userId);
+        sessionRepo.forgetSession(userId);
+        //TODO: broker.sendClosedChannelNoticeToallChannelsOfDeletedUser
         return "";
     }
 

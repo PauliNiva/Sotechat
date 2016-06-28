@@ -21,6 +21,7 @@ import sotechat.repo.PersonRepo;
 
 /**
  * Luokka <code>JPA</code>-pohjaiseen kayttajan todentamiseen.
+ * Koskee ammattilais- ja admin-kayttajia. Normikayttajia ei todenneta.
  * Toteuttaa rajapinnan <code>AuthenticationProvider</code>.
  */
 @Component
@@ -77,6 +78,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     /**
      * Antaa kayttajalle valtuudeksi joko roolin "ADMIN" tai roolin "USER".
+     * Rooli "USER" viittaa rekisteröityneeseen ammattilaiskäyttäjään.
      *
      * @param person kirjautuva henkilo.
      * @return kayttajan rooli listana.
@@ -94,6 +96,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     /**
      * Palauttaa <code>true</code>, jos <code>AuthenticationProvider</code>
      * tukee viitattua <code>Authentication</code>-oliota.
+     * TODO: Selvennys, tuetaanko muitakin kuin Principal-tyyppisiä olioita?
      * <p>
      * <code>true</code>:n palautus ei takaa, etta
      * <code>AuthenticationProvider</code> pystyy valtuuttamaan sille esitetyn

@@ -74,6 +74,16 @@ public class Mapper {
     }
 
     /**
+     * Unohtaa, että jokin username oli varattu. Käyttäjän poiston yhteydessä.
+     * @param username username
+     */
+    public final void removeMappingForUsername(
+            final String username
+    ) {
+        this.mapRegisteredUsers.remove(username);
+    }
+
+    /**
      * Returns true if username is reserved.
      * @param username username
      * @return true if username is reserved
