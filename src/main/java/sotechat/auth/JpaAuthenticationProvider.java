@@ -63,7 +63,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
             };
         }
         if (!BCrypt.hashpw(password, person.getSalt())
-                .equals(person.getPassword())) {
+                .equals(person.getHashOfPasswordAndSalt())) {
             throw new AuthenticationException(
                     "Unable to authenticate user " + loginName) {
             };

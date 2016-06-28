@@ -352,8 +352,8 @@ public class ValidatorService {
         String userName = person.getUserName();
         if (loginName == null
                 || loginName.isEmpty()
-                || person.getPassword() == null
-                || person.getPassword().isEmpty()
+                || person.getHashOfPasswordAndSalt() == null
+                || person.getHashOfPasswordAndSalt().isEmpty()
                 || userName == null
                 || userName.isEmpty()
                 || mapper.isUsernameReserved(userName)

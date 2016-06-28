@@ -28,8 +28,8 @@ public class Person {
     @Column(unique = true)
     private String loginName;
 
-    /** Henkilon salasana. */
-    private String password;
+    /** Hajautusarvo salasanan ja suolan yhdistelmasta. */
+    private String authenticationHash;
 
     /** Salasanan suola. */
     private String salt;
@@ -91,22 +91,31 @@ public class Person {
         this.loginName = pLoginName;
     }
 
-    /**
-     * Palauttaa salasanan hajautusarvon.
-     * @return String kryptattu salasana
+    /** Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmästä.
+     * @return hajautusarvo Stringinä
      * TODO: dokumentoi mita palauttaa jos ei loydy
      */
-    public final String getPassword() {
-        return password;
+    public final String getHashOfPasswordAndSalt() {
+        return authenticationHash;
     }
 
-    /** Tallentaa parametrina annetun selkokielisen salasanan kryptattuna
-     * ja suolattuna attribuuttiin "password" ja kaytetyn suolan attr. "salt".
+    /** Tallentaa parametrina annetusta selkokielisestä salasanasta
+     * hajautusarvon, jonka avulla voidaan autentikoida tulevia
+     * kirjautumisia. Hajautusarvo luodaan seuraavasti: aluksi
+     * lisätään selkokieliseen salasanaan suola, joka on satunnainen
+     * merkkijono. Suola tallennetaan selkokielisenä tietokantaan
+     * Person-olion mukana. Salasanan ja suolan yhdistelmästä luodaan
+     * hajautusarvo, joka myös tallennetaan Person-olioon. Kun käyttäjä
+     * myöhemmin kirjautuu, käyttäjän kirjautuessa antamaan salasanaan
+     * lisätään Person-oliosta löytyvä suola, ja tästä yhdistelmästä
+     * lasketaan hajautusarvo samalla algoritmillä. Saatua hajautusarvoa
+     * vertaillaan Person-oliosta löytyvään hajautusarvoon ja
+     * kirjautuminen sallitaan, jos ne ovat samat.
      * @param plainTextPassword selkokielinen salasana
      */
-    public final void encryptAndSaltPassword(final String plainTextPassword) {
+    public final void hashPasswordWithSalt(final String plainTextPassword) {
         this.salt = BCrypt.gensalt();
-        this.password = BCrypt.hashpw(plainTextPassword, this.salt);
+        this.authenticationHash = BCrypt.hashpw(plainTextPassword, this.salt);
     }
 
     /**
