@@ -61,7 +61,8 @@
 
 .poolPro{
     padding-top: 5px;
-    height: 100%;
+    height: calc(100vh - 104px);
+    overflow-y: auto;
 }
 
 .proContainer {
@@ -136,4 +137,8 @@
 
 .proStatusForm {
     margin-bottom: 5px;
+}
+
+.queuePanel {
+    margin-bottom: 0px;
 }
