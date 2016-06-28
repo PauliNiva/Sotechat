@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.Base64Utils;
+
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
 import sotechat.data.SessionRepo;

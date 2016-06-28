@@ -110,4 +110,5 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     public final boolean supports(final Class<?> type) {
         return true;
     }
+
 }
