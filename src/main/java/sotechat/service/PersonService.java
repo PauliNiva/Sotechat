@@ -141,13 +141,12 @@ public class PersonService {
 
     /**
      * Poistaa keskustelun henkilon keskusteluista.
-     * @param personId henkilon id
+     * @param person Person olio
      * @param conv conv
      */
     @Transactional
-    public void removeConversation(final String personId,
+    public void removeConversation(final Person person,
                                    final Conversation conv) {
-        Person person = personRepo.findOne(personId);
         person.removeConversation(conv);
         personRepo.save(person);
     }
