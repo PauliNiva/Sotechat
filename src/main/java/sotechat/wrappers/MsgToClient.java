@@ -92,4 +92,10 @@ public class  MsgToClient implements Comparable<MsgToClient> {
         else if(othertime<thistime) return 1;
         else return 0;
     }
+
+    @Override
+    public String toString() {
+        return "MessageID " + messageId + ", username " + username + ", "
+                + channelId + ", timeStamp " + timeStamp + ", content " + content;
+    }
 }

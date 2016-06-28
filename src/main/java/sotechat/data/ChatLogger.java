@@ -166,6 +166,10 @@ public class ChatLogger {
     public final synchronized List<MsgToClient> getLogs(
             final String channelId
     ) {
+
+        /* Testataan, etta haetaan aina tietokannasta! */
+        if (1==1) return databaseService.retrieveMessages(channelId);
+
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */
@@ -187,9 +191,11 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
-            return "0";
+            return "1";
         }
-        return list.size() + "";
+        /** Huom: ID ei saa alkaa nollasta, koska tietokantaimplementaatiossa
+         * ID:t alkavat myos ykkosesta. */
+        return (1 + list.size()) + "";
     }
 
     /**
