@@ -46,7 +46,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * @return Palautettava valtuus, jossa argumentteina
      * <code>person</code>-olion kayttajanimi, salasana ja lista annetuista
      * valtuuksista.
-     * @throws AuthenticationException Heitettava poikkeus jos valtuutus
+     * @throws AuthenticationException Heitettava poikkeus jos todentaminen
      * epaonnistuu. Heitetaan kayttajan ollessa <code>null</code> tai salasana
      * ei vastaa tallessa olevaa salasanaa.
      */
