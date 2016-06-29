@@ -44,11 +44,5 @@ public class MessageTest {
         message.setDate(date);
         Assert.assertNotNull(message.getDate());
     }
-
- /*   @Test
-    public void getChannelIdTest() {
-        message.setChannelId(new Conversation("666", "sunnuntai")
-                .getChannelId());
-        Assert.assertEquals("666", message.getConversation().getChannelId());
-    }*/
+    
 }

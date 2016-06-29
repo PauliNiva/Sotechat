@@ -100,7 +100,6 @@ public class DatabaseService {
         try {
             Message message = new Message(username, content, time);
             Conversation conv = conversationService.getConversation(channelId);
-      //      message.setChannelId(channelId);
             message.setConversation(conv);
             conversationService.addMessage(message, conv);
         } catch (Exception e) {
