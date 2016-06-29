@@ -65,7 +65,11 @@ public class AdminService {
         /* Pyynto validoitu, tallennetaan tiedot uudesta personista. */
         person = makePersonFrom(encodedPersonJson);
         person.setUserId(mapper.generateNewId());
-        personRepo.save(this.person);
+        try {
+            personRepo.save(this.person);
+        } catch (Exception databaseException) {
+            return "Tietokantavirhe henkilön tallennusta yrittäessä!";
+        }
         mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());
 
         /* Palautetaan tyhja String merkiksi onnistuneesta pyynnosta. */
@@ -96,7 +100,13 @@ public class AdminService {
      */
     @Transactional
     public String deleteUser(final String userId) {
-        Person personToBeDeleted = personRepo.findOne(userId);
+        Person personToBeDeleted;
+        try {
+            personToBeDeleted = personRepo.findOne(userId);
+        } catch (Exception e) {
+            return "Tietokantavirhe hakiessa henkilöä!";
+        }
+
         if (personToBeDeleted == null) {
             return "Käyttäjää ei löydy.";
         }
@@ -105,9 +115,19 @@ public class AdminService {
         }
         String username = personToBeDeleted.getUserName();
         mapper.removeMappingForUsername(username);
-        personRepo.delete(userId);
+        try {
+            personRepo.delete(userId);
+        } catch (Exception databaseException) {
+            return "Tietokantavirhe yrittäessä poistaa käyttäjää!";
+        }
         sessionRepo.forgetSession(userId);
-        //TODO: broker.sendClosedChannelNoticeToallChannelsOfDeletedUser
+
+        /* TODO:
+         * broker.sendClosedChannelNoticeToallChannelsOfDeletedUser
+         * Merkitysta harvinaisessa tilanteessa, jossa halutaan
+         * potkia ulos pro-kayttaja, jolla on aktiivisia kanavia.
+         * Silloin haluttaisiin lahettaa kanaville ilmoitus. */
+
         return "";
     }
 
@@ -121,14 +141,19 @@ public class AdminService {
             final String userId,
             final String encodedPassword
     ) {
-        String decodedPassword = new String(
-                Base64Utils.decodeFromString(encodedPassword));
-        person = personRepo.findOne(userId);
-        if (person == null) {
-            return "Käyttäjää ei löydy.";
+        try {
+            String decodedPassword = decode(encodedPassword);
+            person = personRepo.findOne(userId);
+            if (person == null) {
+                return "Käyttäjää ei löydy.";
+            }
+            person.hashPasswordWithSalt(decodedPassword);
+            return "";
+        } catch (Exception exception) {
+            return "Virhe salasanan kääntämisessä selkokieliseen muotoon"
+                    + "tai hakiessa henkilöä tietokannasta!";
         }
-        person.hashPasswordWithSalt(decodedPassword);
-        return "";
+
     }
 
     /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
