@@ -100,7 +100,7 @@ public class DatabaseService {
         try {
             Message message = new Message(username, content, time);
             Conversation conv = conversationService.getConversation(channelId);
-            message.setChannelId(channelId);
+      //      message.setChannelId(channelId);
             message.setConversation(conv);
             conversationService.addMessage(message, conv);
         } catch (Exception e) {
@@ -183,7 +183,7 @@ public class DatabaseService {
     private MsgToClient wrapMessage(final Message message) {
         String id = "" + message.getId();
         String name = message.getSender();
-        String channelId = message.getChannelId();
+        String channelId = message.getConversation().getChannelId();
         String time = message.getDate();
         String content = message.getContent();
         MsgToClient msg = new MsgToClient(id, name, channelId, time, content);

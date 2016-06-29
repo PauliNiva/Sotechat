@@ -28,7 +28,7 @@ public class Message extends AbstractPersistable<Long> {
     private Conversation conversation;
 
     /** Keskustelun kanavaid johon viesti liittyy. */
-    private String channelId;
+  //  private String channelId;
 
     /** Konstruktori. */
     public Message() {
@@ -110,22 +110,22 @@ public class Message extends AbstractPersistable<Long> {
     public final void setConversation(final Conversation pConversation) {
 
         this.conversation = pConversation;
-        this.channelId = pConversation.getChannelId();
+   //     this.channelId = pConversation.getChannelId();
     }
 
     /**
      * Palauttaa viestiin liittyvan kanavaid:n.
      * @return keskustelun kanavaid
      */
-    public String getChannelId() {
+ /*   public String getChannelId() {
         return channelId;
-    }
+    }*/
 
     /**
      * Asettaa keskustelun kanavaid:ksi parametrina annetun id:n.
      * @param pChannelId keskustelun kanavaid
      */
-    public void setChannelId(final String pChannelId) {
+  /*  public void setChannelId(final String pChannelId) {
         this.channelId = pChannelId;
-    }
+    }*/
 }
