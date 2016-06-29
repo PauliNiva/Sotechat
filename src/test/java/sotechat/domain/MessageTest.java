@@ -44,5 +44,5 @@ public class MessageTest {
         message.setDate(date);
         Assert.assertNotNull(message.getDate());
     }
-    
+
 }
