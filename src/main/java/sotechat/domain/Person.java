@@ -16,42 +16,59 @@ import java.util.List;
 @Entity
 public class Person {
 
-    /** Henkilon id . */
+    /**
+     * Henkilon Id.
+     */
     @Id
     private String userId;
 
-    /** Henkilon nimimerkki joka nakyy asiakkaille. */
+    /**
+     * Henkilon nimimerkki joka nakyy asiakkaille. Tietokannassa rivin on oltava
+     * yksilollinen.
+     */
     @Column(unique = true)
     private String username;
 
-    /** Nimimerkki jolla henkilo voi kirjautua sisaan jarjestelmaan. */
+    /**
+     * Nimimerkki jolla henkilo kirjautuu sisaan jarjestelmaan.
+     * Tietokannassa rivin on oltava yksilollinen.
+     */
     @Column(unique = true)
     private String loginName;
 
-    /** Hajautusarvo salasanan ja suolan yhdistelmasta. */
+    /**
+     * Hajautusarvo salasanan ja suolan yhdistelmasta.
+     */
     private String authenticationHash;
 
-    /** Salasanan suola. */
+    /**
+     * Salasanan suola.
+     */
     private String salt;
 
-    /** Henkilon keskustelut. */
+    /**
+     * Henkilon keskustelut listana. Tietokannassa monesta moneen suhde.
+     */
     @ManyToMany
     private List<Conversation> conversationsOfPerson;
 
-    /** Henkilon rooli. */
+    /**
+     * Henkilon rooli.
+     */
     private String role;
 
     /**
-     * Konstruktori alustaa henkilon keskustelut.
+     * Konstruktori alustaa listan henkilon keskusteluille.
      */
     public Person() {
         this.conversationsOfPerson = new ArrayList<>();
     }
 
     /**
-     * Konstruktori asettaa kayttajan id:ksi parametrina annetun id:n
-     * ja alustaa henkilon keskustelut.
-     * @param pUserId String kayttajan id
+     * Konstruktori asettaa kayttajan id:ksi argumenttina annetun id:n
+     * ja alustaa listan henkilon keskusteluille.
+     *
+     * @param pUserId Kayttajan id.
      */
     public Person(final String pUserId) {
         this.userId = pUserId;
@@ -60,7 +77,8 @@ public class Person {
 
     /**
      * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille.
-     * @return String nimimerkki, joka nakyy asiakkaille
+     *
+     * @return nimimerkki, joka nakyy asiakkaille
      * TODO: dokumentoi mita palauttaa jos ei loydy
      */
     public final String getUserName() {
@@ -99,7 +117,8 @@ public class Person {
         return authenticationHash;
     }
 
-    /** Tallentaa parametrina annetusta selkokielisestä salasanasta
+    /**
+     * Tallentaa parametrina annetusta selkokielisestä salasanasta
      * hajautusarvon, jonka avulla voidaan autentikoida tulevia
      * kirjautumisia. Hajautusarvo luodaan seuraavasti: aluksi
      * lisätään selkokieliseen salasanaan suola, joka on satunnainen

@@ -13,29 +13,41 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Message extends AbstractPersistable<Long> {
 
     /**
-     * Aikaleima muodossa DateTime.toString().
-     * */
+     * Aikaleima.
+     */
     private String date;
 
-    /** Viestin sisalto. */
+    /**
+     * Viestin sisalto.
+     */
     private String content;
 
-    /** Viestin lahettaja. */
+    /**
+     * Viestin lahettaja.
+     */
     private String sender;
 
-    /** keskustelu, johon viesti liittyy */
+    /**
+     * Keskustelu, johon viesti liittyy. Tietokannassa monen suhde yhteen.
+     * Hakutapa on <code>EAGER</code>, eli kaikki keskustelu haetaan heti, kun
+     * jokin sen viesteistä haetaan.
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     private Conversation conversation;
 
-    /** Konstruktori. */
+    /**
+     * Konstruktori.
+     */
     public Message() {
     }
 
-    /** Konstruktori asettaa parametreina annetut lahettajan, viestin sisallon
+    /**
+     * Konstruktori asettaa argumentteina annetun lahettajan, viestin sisallon
      * ja aikaleiman.
-     * @param pSender lahettajan nimi
-     * @param pContent viestin sisalto
-     * @param pDate aikaleima
+     *
+     * @param pSender Lahettajan nimi.
+     * @param pContent Viestin sisalto.
+     * @param pDate Aikaleima.
      */
     public Message(final String pSender, final String pContent,
                    final String pDate) {
@@ -46,15 +58,17 @@ public class Message extends AbstractPersistable<Long> {
 
     /**
      * Palauttaa viestin aikaleiman.
-     * @return viestin aikaleima
+     *
+     * @return Viestin aikaleima.
      */
     public final String getDate() {
         return this.date;
     }
 
     /**
-     * Asettaa viestin aikaleimaksi parametrina annetun ajan.
-     * @param pDate viestin aikaleima
+     * Asettaa viestin aikaleimaksi argumenttina annetun ajan.
+     *
+     * @param pDate Viestin aikaleima.
      */
     public final void setDate(final String pDate) {
         this.date = pDate;
@@ -62,7 +76,8 @@ public class Message extends AbstractPersistable<Long> {
 
     /**
      * Palauttaa viestin sisallon.
-     * @return viestin sisalto
+     *
+     * @return Viestin sisalto.
      */
     public final String getContent() {
         return this.content;
@@ -70,7 +85,8 @@ public class Message extends AbstractPersistable<Long> {
 
     /**
      * Asettaa viestin sisalloksi parametrina annetun tekstin.
-     * @param pContent viestin sisalto
+     *
+     * @param pContent Viestin sisalto.
      */
     public final void setContent(final String pContent) {
         this.content = pContent;
@@ -78,23 +94,26 @@ public class Message extends AbstractPersistable<Long> {
 
     /**
      * Palauttaa viestin lahettajan.
-     * @return viestin lahettaja
+     *
+     * @return Viestin lahettaja.
      */
     public final String getSender() {
         return this.sender;
     }
 
     /**
-     * Asettaa viestin lahettajaksi parametrina annetun kayttajanimen.
-     * @param pSender viestin lahettaja
+     * Asettaa viestin lahettajaksi argumenttina annetun lahettanjan.
+     *
+     * @param pSender Viestin lahettaja.
      */
     public final void setSender(final String pSender) {
         this.sender = pSender;
     }
 
     /**
-     * Palauttaa viestin keskustelun.
-     * @return viestiin liitetty Conversation olio
+     * Palauttaa keskustelun johon viesti kuuluu.
+     *
+     * @return Viestiin liitetty <code>Conversation</code>-olio.
      */
     public final Conversation getConversation() {
         return this.conversation;
@@ -106,7 +125,6 @@ public class Message extends AbstractPersistable<Long> {
      * @param pConversation Viestiin liittyva keskustelu.
      */
     public final void setConversation(final Conversation pConversation) {
-
         this.conversation = pConversation;
     }
 
