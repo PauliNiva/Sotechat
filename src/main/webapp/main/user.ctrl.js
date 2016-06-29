@@ -16,6 +16,5 @@ angular.module('chatApp')
             
             /** Kun controller ladataan päivitetään käyttäjän tila */
             $scope.updateState();
-            
         }]);
         

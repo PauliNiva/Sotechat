@@ -14,8 +14,19 @@ angular.module('chatProApp')
             $scope.queueStatus = $scope.inQueue === 0;
             $scope.inQueue = 0;
 
+            /** Yhteyden muodustettua alustetaan jono
+             * ja päivitetään sen tila oikeaksi aina kun tila päivitys tulee
+             */
+            var queue = function (response) {
+                queueProService.clear();
+                angular.forEach(JSON.parse(response.body).jono, function (key) {
+                    queueProService.addToQueue(key);
+                });
+                $scope.selectedItemChanged();
+            };
+
             /** Odottaa parent conrollerilta serverin yhdistys eventtiä ja toimii sen saapuessa */
-            $scope.$on('connectedToQueue', function (e) {
+            $scope.$on('connectedToQueue', function () {
                 connectToServer.subscribe(QUEUEADDRESS + proStateService.getQueueBroadcastChannel(), queue);
             });
 
@@ -55,16 +66,4 @@ angular.module('chatProApp')
                     stompSocket.send('/toServer/queue/' + checkChannelID, {}, '');
                 }
             };
-
-            /** Yhteyden muodustettua alustetaan jono 
-             * ja päivitetään sen tila oikeaksi aina kun tila päivitys tulee 
-             */
-            var queue = function (response) {
-                queueProService.clear();
-                angular.forEach(JSON.parse(response.body).jono, function (key) {
-                    queueProService.addToQueue(key);
-                });
-                $scope.selectedItemChanged();
-            };
-
         }]);

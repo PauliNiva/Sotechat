@@ -2,32 +2,52 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar" ng-click="isCollapsed = !isCollapsed">
+                <button type="button" class="navbar-toggle collapsed"
+                        data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false" aria-controls="navbar"
+                        ng-click="isCollapsed = !isCollapsed">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <div class="navbar-brand" >Ohjelman hallinta</div>
+                <div class="navbar-brand">Ohjelman hallinta</div>
             </div>
-            <div id="navbar" class="navbar-collapse collapse" uib-collapse="!isCollapsed">
+            <div id="navbar" class="navbar-collapse collapse"
+                 uib-collapse="!isCollapsed">
                 <ul class="nav navbar-nav">
-                    <li ng-class="{active : adminView == 'admin/userHandling.tpl.html'}"><a href ng-click="toUsers()">Käyttäjien hallinta</a></li>
-                    <li ng-class="{active : adminView == 'admin/settings.tpl.html'}"><a href ng-click="toSettings()">Tietokannan hallinta</a></li>
+                    <li ng-class="{active : adminView == 'admin/userHandling.tpl.html'}">
+                        <a href ng-click="toUsers()">Käyttäjien hallinta</a>
+                    </li>
+                    <li ng-class="{active : adminView == 'admin/settings.tpl.html'}">
+                        <a href ng-click="toSettings()">Tietokannan hallinta</a>
+                    </li>
                 </ul>
 
                 <div class="nav navbar-nav navbar-right">
                     <form class="navbar-form" role="search">
-                        <div class="input-group" ng-hide="adminView != 'admin/userHandling.tpl.html'">
-                            <input type="text" class="form-control" placeholder="Hae käyttäjää"  ng-model="searchText">
+                        <div class="input-group"
+                             ng-hide="adminView != 'admin/userHandling.tpl.html'">
+                            <input type="text" class="form-control"
+                                   placeholder="Hae käyttäjää"
+                                   ng-model="searchText">
                         </div>
-                        <button class="btn btn-success" ng-click="newUserBoolTrue()" ng-hide="adminView != 'admin/userHandling.tpl.html'">Uusi käyttäjä</button>
-                        <button class="btn btn-default logoutAdmin" ng-click="logout()">Kirjaudu ulos</button>
+                        <button class="btn btn-success"
+                                ng-click="newUserBoolTrue()"
+                                ng-hide="adminView != 'admin/userHandling.tpl.html'">
+                            Uusi käyttäjä
+                        </button>
+                        <button class="btn btn-default logoutAdmin"
+                                ng-click="logout()">Kirjaudu ulos
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </nav>
-    <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" dismiss-on-timeout="{{alert.dismiss}}">{{alert.msg}}</uib-alert>
+    <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}"
+               close="closeAlert($index)"
+               dismiss-on-timeout="{{alert.dismiss}}">{{alert.msg}}
+    </uib-alert>
     <div ng-include="adminView"></div>
 </div>

@@ -1,5 +1,5 @@
-/** Controlleri huolehtii käyttäjän tilan pyyntämisestä
- *  sivulle tulon yhteydessä, sekä sitä pyytäessä
+/** Kontrolleri huolehtii ammattilaisen kirjautumistilan tarkastelusta.
+ * Ja oikean näkymän näyttämisestä.
  */
 angular.module('chatProApp')
     .controller('proCtrl', ['$scope', 'auth',
@@ -7,7 +7,11 @@ angular.module('chatProApp')
             var CPTEMPLATE = 'proControlPanel/controlPanel.tpl.html';
             var ADMINTEMPLATE = 'admin/adminCP.tpl.html'
             var LOGINTEMPLATE = 'login/login.tpl.html';
-            
+
+            /**
+             * Näyttää näkymän riippuen onko ammattilainen kirjautunut vai ei.
+             * @param authenticated Tieto siitä onko käyttäjä kirjautunut.
+             */
             $scope.login = function(authenticated) {
                 if (authenticated) {
                     if (auth.getRole() === 'ROLE_ADMIN') {
@@ -20,13 +24,20 @@ angular.module('chatProApp')
                     $scope.error = true;
                 }
             };
-            
+
+            /**
+             * Uloskirjauttaa käyttäjän
+             */
             $scope.logout = function() {
                 auth.clear(function() {
                     auth.authenticate([], init);
                 });
             };
 
+            /**
+             * Tarkastetaan kirjautumistiedot sivun ladatessa, mutta ei näytetä
+             * virheviestehjä
+             */
             var init  = function() {
                 if (auth.getAuthStatus() !== false) {
                     if (auth.getRole() === 'ROLE_ADMIN') {

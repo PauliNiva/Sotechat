@@ -30,7 +30,6 @@
         width: 100%;
         min-width: 136px;
     }
-
     .proQueueDrop{
         max-width: 100%;
         margin-bottom: 10px;
@@ -48,7 +47,6 @@
     padding-top: 3px;
     padding-bottom: 3px;
 }
-
 
 .pro-left{
     padding-left: 0px;
@@ -115,16 +113,10 @@
 .conTopicText {
     font-weight: bold;
     text-decoration: underline;
-
 }
 
 .queueRow {
     margin-top: 0px;
-}
-
-
-.logoutAdmin {
-
 }
 
 .switch.extrawide {

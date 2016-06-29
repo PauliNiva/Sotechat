@@ -6,7 +6,6 @@
             <button type="button" ng-show="chatClosed && pro" class="btn btn-success pull-right" name="closeConversation" ng-click="closeConversation()">Sulje keskustelu</button>
         <div class="clearfix"></div>
     </div>
-
     <div class="panel-body chat-body" scroll-glue>
         <div ng-repeat="message in messages | orderBy:'timeStamp':false" class="message">
             <div ng-include="'chatWindow/message.tpl.html'"></div>

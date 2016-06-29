@@ -3,12 +3,13 @@
  *  kontrollerien välillä liikkuessa
  */
 angular.module('commonMod')
-    .service('connectToServer', ['stompSocket', '$timeout', function (stompSocket, $timeout) {
+    .service('connectToServer', ['stompSocket', '$timeout', '$window',
+        function (stompSocket, $timeout, $window) {
         /** Serverin mappaukset */
         var WEBSOCKETURL = '/toServer';
         /** Yhteyden tila */
         var connectionStatus = false;
-        
+        var reconnectMulti = 1;
         /** Yhteyden muodostamis pyyntö 
          *  Parametrina functio jota kutsutaan 
          *  kun yhteys muodostettu
@@ -16,14 +17,17 @@ angular.module('commonMod')
         function connect(answer) {
             if (!connectionStatus) {
                 stompSocket.init(WEBSOCKETURL);
-                stompSocket.connect(function (frame) {
+                stompSocket.connect(function () {
                     connectionStatus = true;
                     answer();
-                }, function (error) {
-                    connectionStatus = false; //TODO: RECONNECT
-                   // $timeout(function() {
-                   //     connect(answer);
-                   // }, 10000);
+                }, function () {
+                    connectionStatus = false;
+                    reconnectMulti *= 2 ;
+                    $timeout(function() {
+                        connect(function() {
+                            $window.location.reload();
+                        });
+                    }, 10000 * reconnectMulti);
                 });
             } else {
                 answer();

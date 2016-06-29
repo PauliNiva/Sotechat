@@ -1,10 +1,19 @@
+/**
+ * Kontrolleri varmistus modalille.
+ */
 angular.module('commonMod')
     .controller('AreUSureModalController', function ($scope, $uibModalInstance) {
-    $scope.ok = function () {
-        $uibModalInstance.close(true);
-    };
+        /**
+         * Käytäjä hyväksyy
+         */
+        $scope.ok = function () {
+            $uibModalInstance.close(true);
+        };
 
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
+        /**
+         * Käyttäjä hylkää
+         */
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
