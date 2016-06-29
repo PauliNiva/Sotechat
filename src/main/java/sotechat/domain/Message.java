@@ -101,8 +101,9 @@ public class Message extends AbstractPersistable<Long> {
     }
 
     /**
-     * Asettaa viestin keskusteluksi parametrina annetun keskustelun.
-     * @param pConversation viestiin liittyva keskustelu
+     * Asettaa viestin keskusteluksi argumenttina annetun keskustelun.
+     *
+     * @param pConversation Viestiin liittyva keskustelu.
      */
     public final void setConversation(final Conversation pConversation) {
 
