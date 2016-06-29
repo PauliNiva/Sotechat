@@ -120,6 +120,10 @@ public class StateControllerTest {
     @Test
     public void testJoinQueueWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
+        mvc.perform(MockMvcRequestBuilders
+                .get("/proState")
+                .accept(MediaType.APPLICATION_JSON)
+                .principal(new MockPrincipal("Hoitaja")));
         mvc.perform(post("/joinPool")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
         )
