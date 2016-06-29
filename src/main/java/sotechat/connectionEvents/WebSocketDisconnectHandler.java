@@ -6,6 +6,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
 import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -14,7 +15,7 @@ import sotechat.service.QueueTimeoutService;
 import java.security.Principal;
 
 /**
- * Luokka, jossa määritellään mitä tapahtuu, kun WebSocket-yhteys katkeaa.
+ * Maarittelee mitä tapahtuu, kun <code>WebSocket</code>-yhteys katkeaa.
  *
  * @param <S> Abstrakti olio.
  */
@@ -23,18 +24,21 @@ public class WebSocketDisconnectHandler<S>
         implements ApplicationListener<SessionDisconnectEvent> {
 
     /**
-     * SessionRepo-olio, jonka perusteella voidaan selvittää, onko
+     * <code>SessionRepo</code>-olio, jonka perusteella voidaan selvittaa, onko
      * tietty sessio aktiivinen vai inaktiivinen.
      */
     @Autowired
     private SessionRepo sessionRepo;
 
     /**
-     * Olio, jonka vastuuseen kuuluu poistaa inaktiiviset käyttäjät jonosta.
+     * Olio, jonka vastuuseen kuuluu poistaa inaktiiviset kayttajat jonosta.
      */
     @Autowired
     private QueueTimeoutService queueTimeoutService;
 
+    /**
+     * Viestienvalittaja.
+     */
     @Autowired
     private MessageBroker broker;
 
@@ -45,12 +49,10 @@ public class WebSocketDisconnectHandler<S>
     }
 
     /**
-     * Mitä tapahtuu, kun WebSocket-yhteys katkeaa. Eli käynnistetään odotus,
-     * jonka jälkeen inaktiiviset sessiot poistetaan jonosta. Lisäksi
-     * asetetaan WebSocket-yhteyden katkeamiseen liittyneen sessionin tilaksi
-     * disconnected ConnectionRepo-olioon.
+     * Kaynnistaa <code>WebSocket</code>-yhteyden katketessa odotuksen.
+     * Odotuksen jalkeen inaktiiviset sessiot poistetaan jonosta.
      *
-     * @param event Yhteyden katkeamistapahtuma.
+     * @param event Yhteydenkatkeamistapahtuma.
      */
     public final void onApplicationEvent(final SessionDisconnectEvent event) {
        MessageHeaders headers = event.getMessage().getHeaders();

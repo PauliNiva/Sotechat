@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Random;
 
-/** Mapperi muistaa asioita kanaviin ja ID:hen liittyen. Esim:
+/**
+ * Mapperi muistaa asioita kanaviin ja ID:hen liittyen. Esim:
  * - Onko jokin username varattu rekisteroityneelle kayttajalle?
  * - Getteri Channel-olioille parametrilla channelId
  */

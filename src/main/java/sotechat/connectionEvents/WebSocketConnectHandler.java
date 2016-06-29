@@ -6,12 +6,13 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
+
 import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
 /**
- * Luokka, jossa maaritellaan mitä tapahtuu, kun WebSocket-yhteys muodostuu.
+ * Maarittelee mitä tapahtuu, kun WebSocket-yhteys muodostuu.
  *
  * @param <S> Abstrakti olio.
  */
@@ -20,12 +21,15 @@ public class WebSocketConnectHandler<S>
         implements ApplicationListener<SessionConnectEvent> {
 
     /**
-     * SessionRepo-olio, jonka perusteella voidaan selvittää, onko
+     * <code>SessionRepo</code>-olio, jonka perusteella voidaan selvittaa, onko
      * tietty sessio aktiivinen vai inaktiivinen.
      */
     @Autowired
     private SessionRepo sessionRepo;
 
+    /**
+     * Viestienvalittaja.
+     */
     @Autowired
     private MessageBroker broker;
 
@@ -36,10 +40,10 @@ public class WebSocketConnectHandler<S>
     }
 
     /**
-     * Metodi, jossa maaritellaan mita tapahtuu, kun WebSocket-yhteys
-     * muodostuu.
+     * Maarittelee ylimaaraisen toiminnallisuuden
+     * <code>WebSocket</code>-yhteyden muodostuessa.
      *
-     * @param event Yhteyden muodostumistapahtuma.
+     * @param event <code>SessionConnectEvent</code>-olio.
      */
    public final void onApplicationEvent(final SessionConnectEvent event) {
        MessageHeaders headers = event.getMessage().getHeaders();

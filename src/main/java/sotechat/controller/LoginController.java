@@ -7,17 +7,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 /**
- * Kiintopiste, josta UI tarkastaa onko käyttäjä kirjautunut.
- * Sekä lähettää kirjautumistiedot HTTPBasicAuthentikationin mukaan.
+ * Client tarkastaa onko kayttaja kirjautunut, seka
+ * lahettaa kirjautumistiedot <code>HTTPBasicAuthentication</code>:in mukaan.
  */
 @RestController
 public class LoginController {
 
     /**
-     * Liittää /auth polun kirjautumista ja sen tarkistamista varten.
-     * @param user Security principal, joka liittyy evästeesen.
-     *             Null, jos ei kirjautuneena.
-     * @return Käyttäjän principal, jos kirjautunut, muuten null.
+     * Vastaa kayttajalle JSON-muodossa kirjautumistiedot tai tyhjalla
+     * viestilla, jos kayttaja ei ole kirjautunut.
+     *
+     * @param user Security Principal.
+     * @return Käyttäjän principal JSON-muodossa, jos kirjautunut,
+     * muuten tyhja vastaus.
      */
     @RequestMapping("/auth")
     @ResponseBody

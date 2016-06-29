@@ -21,7 +21,7 @@ import sotechat.repo.PersonRepo;
 
 /**
  * Luokka <code>JPA</code>-pohjaiseen kayttajan todentamiseen.
- * Koskee ammattilais- ja admin-kayttajia. Normikayttajia ei todenneta.
+ * Koskee vain ammattilais- ja <code>admin</code>-kayttajia.
  * Toteuttaa rajapinnan <code>AuthenticationProvider</code>.
  */
 @Component
@@ -43,7 +43,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * Todentaa kayttajan tarkistamalla, etta kirjautuvan kayttajan salasana
      * vastaa <code>PersonRepo</code>:ssa tallessa olevaa salasanaa.
      *
-     * @param a <code>Authentication</code>-olio.
+     * @param auth <code>Authentication</code>-olio.
      * @return Valtuus, jossa argumentteina <code>person</code>-olion
      * kayttajanimi, salasana ja lista annetuistavaltuuksista.
      * @throws AuthenticationException Heitettava poikkeus jos todentaminen
@@ -51,10 +51,10 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      * ei vastaa tallessa olevaa salasanaa.
      */
     @Override
-    public final Authentication authenticate(final Authentication a)
+    public final Authentication authenticate(final Authentication auth)
             throws AuthenticationException {
-        String loginName = a.getPrincipal().toString();
-        String password = a.getCredentials().toString();
+        String loginName = auth.getPrincipal().toString();
+        String password = auth.getCredentials().toString();
         Person person = personRepo.findByLoginName(loginName);
 
         if (person == null) {
@@ -78,10 +78,10 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     /**
      * Antaa kayttajalle valtuudeksi joko roolin "ADMIN" tai roolin "USER".
-     * Rooli "USER" viittaa rekisteröityneeseen ammattilaiskäyttäjään.
+     * Rooli "USER" viittaa rekisteroityyn ammattilaiskayttajaan.
      *
-     * @param person kirjautuva henkilo.
-     * @return kayttajan rooli listana.
+     * @param person Kirjautuva henkilo.
+     * @return Kayttajan rooli listana.
      */
     private List<GrantedAuthority> grantAuthority(final Person person) {
         List<GrantedAuthority> grantedAuths = new ArrayList<>();

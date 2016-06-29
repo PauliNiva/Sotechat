@@ -1,4 +1,3 @@
-
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+
 import sotechat.service.AdminService;
 
 
@@ -18,12 +18,20 @@ import sotechat.service.AdminService;
 @RestController
 public class AdminController {
 
-    /** Logiikka pyyntojen kasittelyyn. */
+    /**
+     * Palvelu pyyntojen kasittelyyn.
+     */
     @Autowired
     private AdminService adminService;
 
-    /** Pyynto ammattilaiskayttajien listaamiseen.
-     * @return Listaus JSON-taulukkona. Esimerkki: [{"userId":"admin","username":"pauli","loginName":"admin","conversationsOfPerson":[]},{"userId":"666","username":"Hoitaja","loginName":"hoitaja","conversationsOfPerson":[]}]
+    /**
+     * Pyynto ammattilaiskayttajien listaamiseen.
+     * Esimerkki vastaus: [{"userId":"admin","username":"pauli",
+     * "loginName":"admin","conversationsOfPerson":[]},
+     * {"userId":"666","username":"Hoitaja",
+     * "loginName":"hoitaja","conversationsOfPerson":[]}]
+     *
+     * @return Listaus JSON-taulukkona.
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/getusers", method = RequestMethod.GET)
@@ -31,9 +39,12 @@ public class AdminController {
         return adminService.listAllPersonsAsJsonList();
     }
 
-    /** Pyynto uuden ammattilaiskayttajan luomiseen.
-     * @param encodedJsonPerson encodattu json luotavan kayttajan tiedoista
-     * @return json {"status":"OK"} tai {"error":"reason"}
+    /**
+     * Pyynto uuden ammattilaiskayttajan luomiseksi.
+     *
+     * @param encodedJsonPerson <code>Base64</code>-koodattuna JSON
+     *                          luotavan kayttajan tiedoista.
+     * @return JSON {"status":"OK"} tai {"error":"reason"}.
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/newuser", method = RequestMethod.POST)
@@ -42,9 +53,11 @@ public class AdminController {
         return jsonifiedResponse(adminService.addUser(encodedJsonPerson));
     }
 
-    /** Pyynto ammattilaiskayttajan tilin poistamiseen.
-     * @param id poistettavan kayttajan userId
-     * @return json {"status":"OK"} tai {"error":"reason"}
+    /**
+     * Pyynto ammattilaiskayttajan tilin poistamiseksi.
+     *
+     * @param id Poistettavan kayttajan <code>userId</code>.
+     * @return JSON {"status":"OK"} tai {"error":"reason"}.
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
@@ -52,10 +65,12 @@ public class AdminController {
         return jsonifiedResponse(adminService.deleteUser(id));
     }
 
-    /** Adminin tekema pyynto ammattilaiskayttajan salasanan vaihtamiseksi.
-     * @param id userId vaihdon kohteelle (voi olla eri kuin pyynnon tekija)
-     * @param encodedPass uusi salasana encodattuna
-     * @return json {"status":"OK"} tai {"error":"reason"}
+    /**
+     * Adminin tekema pyynto ammattilaiskayttajan salasanan vaihtamiseksi.
+     *
+     * @param id <code>userId</code> vaihdon kohteelle (voi olla eri kuin pyynnon tekija)
+     * @param encodedPass Uusi salasana <code>Base64</code>-koodattuna.
+     * @return JSON {"status":"OK"} tai {"error":"reason"}.
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
@@ -66,8 +81,10 @@ public class AdminController {
         return jsonifiedResponse(adminService.changePassword(id, encodedPass));
     }
 
-    /** Tarkoitettu tehtavaksi vain ennen softan demoamista.
-     * @return json {"status":"OK"} tai {"error":"reason"}
+    /**
+     * Tarkoitettu tehtavaksi vain ennen ohjelmiston demoamista.
+     *
+     * @return JSON {"status":"OK"} tai {"error":"reason"}.
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/tuhoaHistoria", method = RequestMethod.DELETE)
@@ -75,9 +92,11 @@ public class AdminController {
         return jsonifiedResponse(adminService.clearHistory());
     }
 
-    /** Muotoilee lahetettavan vastauksen.
-     * @param error virheilmoitus Stringina tai tyhja String jos kaikki ok.
-     * @return JSON muotoiltu vastaus {"status":"OK"} tai {"error":"bla"}
+    /**
+     * Muotoilee lahetettavan vastauksen.
+     *
+     * @param error Virheilmoitus Stringina tai tyhja String jos kaikki ok.
+     * @return JSON {"status":"OK"} tai {"error":"bla"}.
      */
     private String jsonifiedResponse(final String error) {
         if (error.isEmpty()) {

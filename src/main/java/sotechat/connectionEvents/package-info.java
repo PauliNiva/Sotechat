@@ -1,5 +1,5 @@
-/** Sisaltaa esim. luokkia, joilla voidaan lisata toiminnallisuutta siihen
- * kohtaan ohjelman suoritusta, kun muodostetaan WebSocket-yhteys, ja siihen,
- * jossa yhteys katkaistaa.
- **/
+/**
+ * Sisaltaa luokkia toiminnallisuuden lisaamiseksi <code>WebSocket</code>-yhteyksia
+ * muodostettaessa tai katkaistessa.
+ */
 package sotechat.connectionEvents;

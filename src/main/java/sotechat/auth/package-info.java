@@ -1,5 +1,5 @@
 /**
- * Tämä paketti sisältää luokan, joka käsittelee rekisteröityneen käyttäjän
+ * Tama paketti sisaltaa luokan, joka kasittelee rekisteroityneen kayttajan
  * kirjautumisen.
  */
 package sotechat.auth;

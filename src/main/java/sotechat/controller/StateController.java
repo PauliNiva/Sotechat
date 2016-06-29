@@ -2,20 +2,21 @@ package sotechat.controller;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.service.QueueService;
@@ -23,28 +24,41 @@ import sotechat.service.ValidatorService;
 import sotechat.wrappers.ProStateResponse;
 import sotechat.wrappers.UserStateResponse;
 
-/** Reititys tilaan liittyville pyynnoille (GET, POST, WS).
+/**
+ * Reititys tilaan liittyville pyynnoille (GET, POST, WS).
  */
 @RestController
 public class StateController {
 
-    /** Validator Service. */
+    /**
+     * Pyyntojen validointi.
+     */
     private final ValidatorService validatorService;
 
-    /** Session Repository. */
+    /**
+     * Sessioiden kasittely.
+     */
     private final SessionRepo sessionRepo;
 
-    /** QueueService. */
+    /**
+     * Jonon kasittely.
+     */
     private final QueueService queueService;
 
-    /** Queue Broadcaster. */
+    /**
+     * Jonon tiedottaminen.
+     */
     private final QueueBroadcaster queueBroadcaster;
 
-    /** Message Broker. */
+    /**
+     * Viestien lahetys.
+     */
     private final MessageBroker broker;
 
 
-    /** Spring taikoo tassa Singleton-instanssit palveluista.
+    /**
+     * Konstruktori.
+     *
      * @param pValidatorService validatorService
      * @param pSessionRepo sessionRepo
      * @param pQueueService queueService
@@ -66,7 +80,9 @@ public class StateController {
         this.broker = pBroker;
     }
 
-    /** Kun normikayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
+    /**
+     * Kun asiakaskayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
+     *
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional autentikointitiedot
      * @return JSON-muotoon paketoitu UserStateResponse.
@@ -83,7 +99,9 @@ public class StateController {
         return new UserStateResponse(session);
     }
 
-    /** Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
+    /**
+     * Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
+     *
      * @param req taalta paastaan session-olioon kasiksi.
      * @param professional kirjautumistiedot
      * @return JSON-muotoon paketoitu ProStateResponse (tai null).
@@ -104,7 +122,9 @@ public class StateController {
         return new ProStateResponse(session);
     }
 
-    /** Kun client lahettaa avausviestin ja haluaa liittya pooliin.
+    /**
+     * Kun client lahettaa avausviestin ja haluaa liittya pooliin.
+     *
      * @param request pyynnon tiedot
      * @param professional autentikaatiotiedot
      * @return JSON {"content":"Denied..."} tai {"content":"OK..."}
@@ -121,7 +141,9 @@ public class StateController {
         return "{\"content\":\"" + response + "\"}";
     }
 
-    /** Validoi pyynto liittya jonoon ja suorita se.
+    /**
+     * Validoi pyynto liittya jonoon ja suorita se.
+     * 
      * @param req pyynnon tiedot
      * @param auth autentikaatiotiedot
      * @return String "OK..." tai "Denied..."

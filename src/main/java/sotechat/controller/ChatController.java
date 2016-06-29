@@ -11,20 +11,27 @@ import sotechat.service.ValidatorService;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
-/** Reitittaa chattiin kirjoitetut viestit.
+/**
+ * Reitittaa chattiin kirjoitetut viestit.
  */
 @RestController
 public class ChatController {
 
-    /** Chat Logger. */
+    /**
+     *  Muistaa viestit.
+     */
     private final ChatLogger chatLogger;
 
-    /** Validator Service. */
+    /**
+     * Validoi pyynnot.
+     */
     private final ValidatorService validatorService;
 
-    /** Konstruktori.
-     * @param pChatLogger chatLogger
-     * @param pValidatorService validatorServie
+    /**
+     * Konstruktori.
+     *
+     * @param pChatLogger p
+     * @param pValidatorService p
      */
     @Autowired
     public ChatController(
@@ -35,17 +42,17 @@ public class ChatController {
         this.validatorService = pValidatorService;
     }
 
-    /** Reitittaa chattiin kirjoitetut viestit muokattuna
-     * - tai null, jos viesti hylataan eika sita valiteta kanavalle.
+    /**
+     * Validoi, muokkaa ja reitittää chattiin kirjoitettuja viesteja.
      *
-     * @param msgToServer Asiakasohjelman JSON-muodossa lahettama viesti,
+     * @param msgToServer Clientin JSON-muodossa lahettama viesti,
      *                    joka on paketoitu MsgToServer-olion sisalle.
      * @param acc Haetaan session-tiedot taalta.
      * @return Palautusarvoa ei kayteta kuten yleensa, vaan SendTo-
-     *         annotaatiossa on polku *clienteille* lahetettaviin viesteihin.
-     *         Spring valittaa viestin kaikille kanavaan
-     *         subscribanneille clienteille JSONina. MessageMapping
-     *         annotaatiossa polku *palvelimelle* saapuviin viesteihin.
+     * annotaatiossa on polku clienteille lahetettaviin viesteihin.
+     * Spring valittaa viestin kaikille kanavan
+     * tilanneille clienteille JSONina. MessageMapping
+     * annotaatiossa polku palvelimelle saapuviin viesteihin.
      */
     @MessageMapping("/toServer/chat/{channelId}")
     @SendTo("/toClient/chat/{channelId}")
@@ -59,7 +66,7 @@ public class ChatController {
             System.out.println("Jokin viesti hylattiin syysta: " + error);
             return null;
         }
-        /** Viesti ok, kirjataan se ylos ja valitetaan muokattuna kanavalle. */
+        /* Viesti ok, kirjataan se ylos ja valitetaan muokattuna kanavalle. */
         MsgToClient msgToClients = chatLogger.logNewMessage(msgToServer);
         return msgToClients;
     }
