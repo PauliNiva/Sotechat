@@ -78,16 +78,16 @@ public class Person {
     /**
      * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille.
      *
-     * @return nimimerkki, joka nakyy asiakkaille
-     * TODO: dokumentoi mita palauttaa jos ei loydy
+     * @return Nimimerkki, joka nakyy asiakkaille.
      */
     public final String getUserName() {
         return username;
     }
 
     /**
-     * Asettaa parametrina annetun nimimerkin kayttajan nimimerkiksi.
-     * @param pName nimimerkki, joka nakyy asiakkaille
+     * Asettaa argumenttina annetun nimimerkin kayttajan nimimerkiksi.
+     *
+     * @param pName Nimimerkki, joka nakyy asiakkaille.
      */
     public final void setUserName(final String pName) {
         this.username = pName;
@@ -95,7 +95,8 @@ public class Person {
 
     /**
      * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan.
-     * @return kirjautumisnimi TODO: dokumentoi mita palauttaa jos ei loydy
+     *
+     * @return Kirjautumisnimi.
      */
     public final String getLoginName() {
         return loginName;
@@ -103,34 +104,32 @@ public class Person {
 
     /**
      * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen.
-     * @param pLoginName String kirjautumisnimi
+     *
+     * @param pLoginName Kirjautumisnimi.
      */
     public final void setLoginName(final String pLoginName) {
         this.loginName = pLoginName;
     }
 
-    /** Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmästä.
-     * @return hajautusarvo Stringinä
-     * TODO: dokumentoi mita palauttaa jos ei loydy
+    /**
+     * Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmästä.
+     *
+     * @return Hajautusarvo merkkijonona.
      */
     public final String getHashOfPasswordAndSalt() {
         return authenticationHash;
     }
 
     /**
-     * Tallentaa parametrina annetusta selkokielisestä salasanasta
-     * hajautusarvon, jonka avulla voidaan autentikoida tulevia
-     * kirjautumisia. Hajautusarvo luodaan seuraavasti: aluksi
-     * lisätään selkokieliseen salasanaan suola, joka on satunnainen
+     * Luo argumenttina annetusta selkokielisestä salasanasta
+     * hajautusarvon kirjautumisten tunnistautumiseen.
+     * <p>
+     * Aluksi selkokieliseen salasanaan lisataan suola, joka on satunnainen
      * merkkijono. Suola tallennetaan selkokielisenä tietokantaan
-     * Person-olion mukana. Salasanan ja suolan yhdistelmästä luodaan
-     * hajautusarvo, joka myös tallennetaan Person-olioon. Kun käyttäjä
-     * myöhemmin kirjautuu, käyttäjän kirjautuessa antamaan salasanaan
-     * lisätään Person-oliosta löytyvä suola, ja tästä yhdistelmästä
-     * lasketaan hajautusarvo samalla algoritmillä. Saatua hajautusarvoa
-     * vertaillaan Person-oliosta löytyvään hajautusarvoon ja
-     * kirjautuminen sallitaan, jos ne ovat samat.
-     * @param plainTextPassword selkokielinen salasana
+     * <code>Person</code>-olion mukana. Salasanan ja suolan yhdistelmästä
+     * luodaan hajautusarvo, joka myös tallennetaan <code>Person-olioon</code>.
+     *
+     * @param plainTextPassword Selkokielinen salasana.
      */
     public final void hashPasswordWithSalt(final String plainTextPassword) {
         this.salt = BCrypt.gensalt();
@@ -139,8 +138,8 @@ public class Person {
 
     /**
      * Palauttaa salasanan suolan.
-     * @return String salasanan suola
-     * TODO: dokumentoi mita palauttaa jos ei loydy
+     *
+     * @return Salasanan suola merkkijonona.
      */
     public final String getSalt() {
         return salt;
@@ -148,15 +147,17 @@ public class Person {
 
     /**
      * Palauttaa listan henkilon keskusteluista.
-     * @return List<Conversation> Henkilon keskustelut
+     *
+     * @return Henkilon keskustelut listana.
      */
     public final List<Conversation> getConversationsOfPerson() {
         return this.conversationsOfPerson;
     }
 
     /**
-     * Liittaa parametrina annetun keskustelun (Conversation olion)
+     * Liittaa argumenttina annetun <code>Conversation</code>-olion
      * henkilon keskusteluihin.
+     *
      * @param conversation Conversation lisattava keskustelu
      */
     public final void addConversationToPerson(
@@ -165,8 +166,9 @@ public class Person {
     }
 
     /**
-     * Poistaa henkiloon liittyvan parametrina annettavan keskustelun.
-     * @param conversation Poistettava keskustelu
+     * Poistaa henkiloon liittyvan argumenttina annettavan keskustelun.
+     *
+     * @param conversation Poistettava keskustelu.
      */
     public final void removeConversation(
             final Conversation conversation) {
@@ -175,15 +177,17 @@ public class Person {
 
     /**
      * Palauttaa kayttajan id:n.
-     * @return String henkilon id
+     *
+     * @return Henkilon id.
      */
     public String getUserId() {
         return userId;
     }
 
     /**
-     * Asettaa henkilon id:ksi parametrina annetun id:n.
-     * @param pUserId kayttajan id
+     * Asettaa henkilon id:ksi argumenttina annetun id:n.
+     *
+     * @param pUserId Kayttajan id.
      */
     public void setUserId(final String pUserId) {
         this.userId = pUserId;
@@ -191,7 +195,8 @@ public class Person {
 
     /**
      * Palauttaa henkilon roolin.
-     * @return String henkilon rooli
+     *
+     * @return Henkilon rooli merkkijonona.
      */
     public final String getRole() {
         return this.role;
@@ -199,7 +204,8 @@ public class Person {
 
     /**
      * Asettaa henkilon roolin.
-     * @param pRole henkilon rooli merkkijonona.
+     *
+     * @param pRole Henkilon rooli.
      */
     public final void setRole(final String pRole) {
         this.role = pRole;
