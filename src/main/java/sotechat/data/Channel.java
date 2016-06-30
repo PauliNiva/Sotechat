@@ -15,7 +15,7 @@ public class Channel {
     private String channelId;
 
     /**
-     * Kanavan taman hetkiset tilaajat, eli kaikki kenella on aktiivinen
+     * Kanavan tamanhetkiset tilaajat, eli kaikki kenella on aktiivinen
      * <code>WebSocket</code>-yhteys.
      */
     private Set<Session> currentSubscribers;
@@ -36,7 +36,7 @@ public class Channel {
     private String assignedPro;
 
     /**
-     * Onko kanava vielka kaytossa.
+     * Onko kanava viela kaytossa.
      */
     private boolean active;
 
