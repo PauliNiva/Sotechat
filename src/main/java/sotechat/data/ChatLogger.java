@@ -179,11 +179,11 @@ public class ChatLogger {
     }
 
     /**
-     * Antaa seuraavan vapaan ID:n viestille AngularJS varten.
+     * Antaa seuraavan vapaan ID:n viestille AngularJS:aa varten.
      * Joka kanavan viestit saapumisjarjestyksessa: 1,2,3...
      *
-     * @param channelId channelId
-     * @return messageId
+     * @param channelId <code>channelId</code>.
+     * @return <code>MessageId</code>.
      */
     private synchronized String pollNextFreeMessageIdFor(
             final String channelId
@@ -192,28 +192,28 @@ public class ChatLogger {
         if (list == null) {
             return "1";
         }
-        /** Huom: ID ei saa alkaa nollasta, koska tietokantaimplementaatiossa
-         * ID:t alkavat myos ykkosesta. */
+        /* Huom: ID ei saa alkaa nollasta, koska tietokantaimplementaatiossa
+        ID:t alkavat myos ykkosesta. */
         return (1 + list.size()) + "";
     }
 
     /**
-     * Palvelimen ollessa paalla pitkaan muisti voi loppua.
-     * Taman vuoksi vanhat viestit on hyva siivota pois muistista esim.
-     * kerran paivassa (jattaen ne kuitenkin tietokantaan).
+     * Poistaa vanhan viestit muistista. Palvelimen ollessa paalla pitkaan
+     * muisti voi loppua. Taman vuoksi vanhat viestit on hyva siivota pois
+     * muistista esim. kerran paivassa (jattaen ne kuitenkin tietokantaan).
      * TODO Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
      */
-
     @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
     public synchronized void work() {
         removeOldMessagesFromMemory(DAYS_OLD_TO_BE_DELETED);
     }
 
 
-    /** Siivoaa ChatLoggerin muistista vanhat viestit, jattaen ne tietokantaan.
-     * Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
+    /**
+     * Siivoaa <code>ChatLogger</code>:in muistista vanhat viestit, jattaen ne
+     * tietokantaan. Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
      *
-     * @param daysOld kuinka monta paivaa vanhat keskustelut poistetaan
+     * @param daysOld Kuinka monta paivaa vanhat keskustelut poistetaan.
      */
     public final synchronized void removeOldMessagesFromMemory(
             final int daysOld
