@@ -1,4 +1,4 @@
-package sotechat.connectionEvents;
+package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;

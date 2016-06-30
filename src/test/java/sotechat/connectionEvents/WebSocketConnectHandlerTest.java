@@ -11,7 +11,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
-import sotechat.connectionEvents.WebSocketConnectHandler;
+import sotechat.controller.WebSocketConnectHandler;
 import sotechat.controller.MessageBroker;
 import sotechat.data.*;
 import java.util.HashMap;
