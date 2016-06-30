@@ -60,9 +60,7 @@ public class Channel {
      *
      * @param session <code>Session</code>-olio.
      */
-    public final synchronized void allowParticipation(
-            final Session session
-    ) {
+    public final synchronized void allowParticipation(final Session session) {
         session.addChannel(channelId);
         String userId = session.get("userId");
         activeUserIds.add(userId);
@@ -70,7 +68,7 @@ public class Channel {
     }
 
     /**
-     * Asettaa kanavan normikayttajien tilaksi "chat".
+     * Asettaa kanavan tavallisten kayttajien tilaksi "chat".
      */
     public void setRegUserSessionStatesToChat() {
         for (Session member : getCurrentSubscribers()) {
@@ -82,112 +80,131 @@ public class Channel {
     }
 
 
-    /** Kirjataan subscribe ylos, seka /queue/ etta /chat/ tapauksissa.
-     * @param session sessio-olio
+    /**
+     * Kirjataan tilaus ylos "/queue/", seka "/chat/" tapauksissa.
+     *
+     * @param session <code>Session</code>-olio.
      */
-    public synchronized void addSubscriber(
-            final Session session
-    ) {
+    public synchronized void addSubscriber(final Session session) {
         currentSubscribers.add(session);
         String userId = session.get("userId");
         activeUserIds.add(userId);
         historicUserIds.add(userId);
     }
 
-    /** Kutsutaan, kun WS yhteys disconnectaa, seka poistu-nappia painettaessa.
-     * @param session p
+    /**
+     * Kutsutaan <code>WebSocket</code>-yhteyden katketessa, seka poistu-nappia
+     * painettaessa.
+     *
+     * @param session p.
      */
-    public final synchronized void removeSubscriber(
-            final Session session
-    ) {
+    public final synchronized void removeSubscriber(final Session session) {
         currentSubscribers.remove(session);
     }
 
-    /** Kutsutaan, kun WS yhteys on ollut pitkaan disconnectissa (timeout)
+    /**
+     * Kutsutaan <code>WebSocket</code>-yhteyden ollessa pitkaan katkenneena,
      * seka poistu-nappia painettaessa.
-     * @param userId p
+     *
+     * @param userId p.
      */
-    public final synchronized void removeActiveUserId(
-            final String userId
-    ) {
+    public final synchronized void removeActiveUserId(final String userId) {
         activeUserIds.remove(userId);
     }
 
-    /** Palauttaa true jos annettu userId on lahiaikoina ollut kanavalla.
-     * @param userId userId
-     * @return true jos on lahiaikoina ollut kanavalla
+    /**
+     * Palauttaa <code>true</code> jos annettu kayttajaId on lahiaikoina ollut
+     * kanavalla.
+     *
+     * @param userId Kayttajan Id.
+     * @return <code>true</code> jos kayttajaId on ollut lahiaikoina kanavalla.
      */
-    public final synchronized boolean hasActiveUser(
-            final String userId
-    ) {
+    public final synchronized boolean hasActiveUser(final String userId) {
         return activeUserIds.contains(userId);
     }
 
-    /** Palauttaa true jos annettu userId on lahiaikoina ollut kanavalla.
-     * @param userId userId
-     * @return true jos on lahiaikoina ollut kanavalla
+    /**
+     * Palauttaa <code>true</code> jos kayttajaId on joskus ollut kanavalla.
+     * @param userId kayttajaId.
+     * @return <code>true</code> jos on kayttajaId on joskus ollut kanavalla.
      */
-    public final synchronized boolean hasHistoricUser(
-            final String userId
-    ) {
+    public final synchronized boolean hasHistoricUser(final String userId) {
         return historicUserIds.contains(userId);
     }
 
     /**
-     * Getteri channelId:lle.
-     * @return channelId
+     * Hakee kanavatunnuksen.
+     *
+     * @return Kanavatunnus.
      */
     public final synchronized String getId() {
         return this.channelId;
     }
 
-    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
-     * @return lista sessioita
+    /**
+     * Palauttaa listan <code>Session</code>-olioita jotka ovat tilanneet
+     * kanavatunnuksen.
+     *
+     * @return Lista <code>Session</code>-olioita.
      */
     public final synchronized Set<Session> getCurrentSubscribers() {
         return currentSubscribers;
     }
 
-    /** Palauttaa listan userId:ta, jotka lasketaan aktiivisiksi kanavalle.
-     * Hetkeksi dropannut henkilo lasketaan aktiiviseksi timeouttiin saakka.
-     * @return lista sessioita
+    /**
+     * Palauttaa listan kayttajaId:eita, jotka lasketaan aktiivisiksi kanavalle.
+     * Hetkeksi yhteyden katkaissut tai menettänyt henkilo lasketaan
+     * aktiiviseksi aikakatkaisuun saakka.
+     *
+     * @return Lista kayttajaId:eita.
      */
     public final synchronized Set<String> getActiveUserIds() {
         return activeUserIds;
     }
 
-    /** Palauttaa listan userId:ta, jotka ovat joskus olleet kanavalla.
-     * Kaytetaan validoidessa lokienhakupyyntoa.
-     * @return lista sessioita
+    /**
+     * Palauttaa listan kayttajaId:eita, jotka ovat joskus olleet kanavalla.
+     * Kaytetaan validoitaessa lokitietojenhakupyyntoa.
+     *
+     * @return Lista <code>Session</code>-olioita.
      */
     public final synchronized Set<String> getHistoricUserIds() {
         return historicUserIds;
     }
 
-    /** Palauttaa usernamen, kenelle pro:lle kanava on assignattu.
-     * @return String
+    /**
+     * Hakee ammattilaisen kayttajanimen joka kuuluu kanavalle.
+     *
+     * @return Kanavan ammattilaisen kayttajanimi.
      */
     public final String getAssignedPro() {
         return assignedPro;
     }
 
-    /** Asettaa parametrina annetun usernamen taman kavan pro:ksi.
-     * @param username pro
+    /**
+     * Asettaa argumenttina annetun kayttajanimen kanavan ammattilaiseksi.
+     *
+     * @param username Ammattilaisen kayttajanimi.
      */
-    public final void setAssignedPro(
-            final String username
-    ) {
+    public final void setAssignedPro(final String username) {
         assignedPro = username;
     }
 
+    /**
+     * Tarkistaa onko kanava aktiivinen.
+     *
+     * @return <code>true</code>, jos kanava on aktiivien, <code>false</code>
+     * muutoin.
+     */
     public boolean isActive() {
         return this.active;
     }
 
+    /**
+     * Asettaa kanavan inaktiiviseksi.
+     */
     public void setInactive() {
         this.active = false;
     }
-
-
 
 }

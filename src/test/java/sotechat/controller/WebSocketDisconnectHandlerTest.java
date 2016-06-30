@@ -1,4 +1,4 @@
-package sotechat.connectionEvents;
+package sotechat.controller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,29 +7,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import sotechat.controller.MessageBroker;
+import sotechat.controller.WebSocketDisconnectHandler;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-
-import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
-import sotechat.connectionEvents.WebSocketConnectHandler;
-import sotechat.data.*;
 import sotechat.service.QueueTimeoutService;
 import sotechat.util.MockPrincipal;
 

@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
 
-/** Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
+/**
+ * Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
  */
 @Component
 public class ChatLogger {
