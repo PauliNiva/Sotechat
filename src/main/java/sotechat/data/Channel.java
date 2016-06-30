@@ -125,6 +125,7 @@ public class Channel {
 
     /**
      * Palauttaa <code>true</code> jos kayttajaId on joskus ollut kanavalla.
+     *
      * @param userId kayttajaId.
      * @return <code>true</code> jos on kayttajaId on joskus ollut kanavalla.
      */
