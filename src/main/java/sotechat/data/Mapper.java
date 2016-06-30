@@ -1,13 +1,12 @@
 package sotechat.data;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sotechat.service.DatabaseService;
+import sotechat.wrappers.MsgToClient;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Mapper muistaa asioita kanaviin ja ID:hen liittyen. Esimerkiksi:
@@ -23,7 +22,7 @@ public class Mapper {
     private Map<String, Channel> channels;
 
     /**
-     * Nopea satunnaismerkkijonogeneraattori (joka kayttaa normi Randomia).
+     * Satunnaismerkkijonogeneraattori.
      */
     private FastGeneratorForRandomStrings fastGen;
 
@@ -37,9 +36,15 @@ public class Mapper {
      */
     private Map<String, String> mapRegisteredUsers;
 
+    /**
+     * Tietokantapalvelut.
+     */
+    @Autowired
+    private DatabaseService databaseService;
+
 
     /**
-     * Konstruktori alustaa singleton-instanssin Mapperista.
+     * Konstruktori.
      */
     public Mapper() {
         this.channels = new HashMap<>();
@@ -59,7 +64,20 @@ public class Mapper {
     ) {
         Channel channel = channels.get(channelId);
         if (channel == null) {
-            //TODO: Lataa tietokannasta (poikkeuksellinen kayttotapaus).
+            /* Kanavaa ei loydy muistista, luodaan se. */
+            channel = new Channel(channelId);
+            channels.put(channelId, channel);
+            /* Haetaan kanavan lokit tietokannasta (tai tyhja lista). */
+            List<MsgToClient> logs = databaseService.retrieveMessages(channelId);
+            for (MsgToClient msg : logs) {
+                String username = msg.getUsername();
+                if (isUsernameReserved(username)) {
+                    /* Loydettiin ammattilaisen kirjoittama viesti, joten
+                     * lisataan kirjoittaja historiallisiin kayttajiin. */
+                    String userId = getIdFromRegisteredName(username);
+                    channel.addHistoricUserId(userId);
+                }
+            }
         }
         return channel;
     }
@@ -74,6 +92,16 @@ public class Mapper {
         Channel channel = new Channel(channelId);
         channels.put(channelId, channel);
         return channel;
+    }
+
+    /**
+     * Poistaa kanavan, joka vastaa parametrina annettua channelId:ta.
+     * Jos palvelin on pitkaan paalla, halutaan vapauttaa vanhojen
+     * kanavien tietoja muistista.
+     * @param channelId channelId
+     */
+    public void forgetChannel(final String channelId) {
+        channels.remove(channelId);
     }
 
     /**

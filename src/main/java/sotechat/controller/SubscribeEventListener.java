@@ -118,9 +118,6 @@ public class SubscribeEventListener
 
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
-        if (channelIdWithPath.isEmpty()) {
-            return;
-        }
 
         /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
         if (channelIdWithPath.equals("/toClient/QBCC")) {

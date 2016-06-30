@@ -54,6 +54,12 @@ public class ChatLogger {
     private SessionRepo sessionRepo;
 
     /**
+     * Mapper.
+     */
+    @Autowired
+    private Mapper mapper;
+
+    /**
      * Tietokantapalvelut.
      */
     @Autowired
@@ -259,7 +265,7 @@ public class ChatLogger {
      * Poistaa vanhan viestit muistista. Palvelimen ollessa paalla pitkaan
      * muisti voi loppua. Taman vuoksi vanhat viestit on hyva siivota pois
      * muistista esim. kerran paivassa (jattaen ne kuitenkin tietokantaan).
-     * TODO Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
+     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
      */
     @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
     public synchronized void work() {
@@ -278,19 +284,23 @@ public class ChatLogger {
     ) {
         Long now = DateTime.now().getMillis();
         Long threshold = now - daysOld * CLEAN_FREQUENCY_IN_MS;
+        DateTime trdate = new DateTime(threshold);
         Iterator<Map.Entry<String, List<MsgToClient>>> iterator =
                 logs.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, List<MsgToClient>> entry = iterator.next();
+            String channelId = entry.getKey();
             List<MsgToClient> listOfMsgs = entry.getValue();
             if (listOfMsgs == null || listOfMsgs.isEmpty()) {
                 iterator.remove();
             } else {
                 MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);
-                DateTime trdate = new DateTime(threshold);
                 DateTime lastdate = DateTime.parse(last.getTimeStamp());
                 if (lastdate.isBefore(trdate)) {
+                    /* Poistetaan ChatLoggerin logeista. */
                     iterator.remove();
+                    /* Poistetaan myos Mapperin kanavista. */
+                    mapper.forgetChannel(channelId);
                 }
             }
         }
