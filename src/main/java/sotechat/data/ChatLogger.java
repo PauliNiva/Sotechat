@@ -237,6 +237,6 @@ public class ChatLogger {
                 }
             }
         }
-}
+    }
 
 }
