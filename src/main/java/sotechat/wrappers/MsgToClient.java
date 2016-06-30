@@ -40,11 +40,11 @@ public class  MsgToClient implements Comparable<MsgToClient> {
     /**
      * Konstruktori alustaa olion annetuilla parametreilla.
      *
-     * @param pMessageId messageId
-     * @param pUsername username
-     * @param pChannelId channelId
-     * @param pTimeStamp timeStamp
-     * @param pContent content
+     * @param pMessageId Viestin Id.
+     * @param pUsername KayttajaNimi.
+     * @param pChannelId Kanavatunnus.
+     * @param pTimeStamp Aikaleima.
+     * @param pContent Viestin sisalto.
      */
     public MsgToClient(final String pMessageId, final String pUsername,
                        final String pChannelId, final String pTimeStamp,
