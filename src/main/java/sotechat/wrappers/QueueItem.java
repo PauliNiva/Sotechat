@@ -1,57 +1,71 @@
 package sotechat.wrappers;
 
 /**
- * Wrapperi jonottajalle.
+ * <code>Wrapper</code>-luokka jonottajalle.
  */
 public class QueueItem {
 
-    /** Jonottavan kanavan id.  */
+    /**
+     * Jonottavan kanavan tunnus.
+     */
     private String channelId;
 
-    /** Keskustelun aihealue. */
+    /**
+     * Keskustelun aihealue.
+     */
     private String category;
 
-    /** Jonottavan kayttajan nimi. */
+    /**
+     * Jonottavan kayttajan kayttajanimi.
+     */
     private String username;
 
-    /** Konstruktori alustaa olion annetuilla parametreilla.
-     * @param pChannelId jonottavan henkilon kanavan id
-     * @param pCategory keskustelun aihealue
-     * @param pUsername jonottavan kayttajan nimi
+    /**
+     * Konstruktori alustaa olion annetuilla parametreilla.
+     *
+     * @param pChannelId Jonottavan henkilon kanavatunnus.
+     * @param pCategory Keskustelun aihealue.
+     * @param pUsername Jonottavan kayttajan kayttajanimi.
      */
-    public QueueItem(
-            final String pChannelId,
-            final String pCategory,
-            final String pUsername
-    ) {
+    public QueueItem(final String pChannelId, final String pCategory,
+            final String pUsername) {
         this.channelId = pChannelId;
         this.category = pCategory;
         this.username = pUsername;
     }
 
-    /** Palauttaa jonottavan henkilon kanavan id:n.
-     * @return  kanavan id
+    /**
+     * Palauttaa jonottavan henkilon kanavan tunnuksen.
+     *
+     * @return  Kanavan tunnus.
      */
     public final String getChannelId() {
         return channelId;
     }
 
-    /** Palauttaa jonottavan henkilon keskustelun aihealueen.
-     * @return keskustelun aihealue
+    /**
+     * Palauttaa jonottavan henkilon keskustelun aihealueen.
+     *
+     * @return Keskustelun aihealue.
      */
     public final String getCategory() {
         return category;
     }
 
-    /** Palauttaa jonottavan henkilon nimen.
-     * @return henkilon nimi
+    /**
+     * Palauttaa jonottavan henkilon kayttajanimen.
+     *
+     * @return Henkilon kayttajanimi.
      */
     public final String getUsername() {
         return username;
     }
 
-    /** Palauttaa Stringin, joka on JSON-muotoon muotoiltu.
-     * @return JSON as String
+    /**
+     * Palauttaa <code>String</code>-olion, joka on muotoiltu
+     * <code>JSON</code>-muotoon.
+     *
+     * @return <code>JSON</code> merkkijonona.
      */
     @Override
     public final String toString() {

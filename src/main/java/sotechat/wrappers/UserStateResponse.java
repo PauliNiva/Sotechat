@@ -2,28 +2,43 @@ package sotechat.wrappers;
 
 import sotechat.data.Session;
 
-/** Luokan tarkoitus on auttaa JSONin paketoinnissa,
- * kun "tavalliselle kayttajalle" kerrotaan state.
+/**
+ * Luokka auttamaan JSONin paketoinnissa,
+ * kun "tavalliselle kayttajalle" kerrotaan tila.
  */
 public class UserStateResponse {
 
-    /** Tila ("start", "inpool", "chat"). */
+    /**
+     * Tila ("start", "inpool" tai "chat").
+     */
     private String state;
-    /** Julkinen kayttajanimi. */
+
+    /**
+     * Julkinen kayttajanimi.
+     */
     private String username;
-    /** Salainen kayttajaID. */
+
+    /**
+     * Salainen kayttajatunnus.
+     */
     private String userId;
-    /** Kategoria (esim. "mielenterveys"). */
+
+    /**
+     * Aihealue (esimerkiksi "mielenterveys").
+     */
     private String category;
-    /** Salainen kanavaID. */
+
+    /**
+     * Salainen kanavatunnus.
+     */
     private String channelId;
 
-    /** Konstruktori alustaa olion.
-     * @param session oma session-olio
+    /**
+     * Konstruktori alustaa olion.
+     *
+     * @param session Kayttajan <code>Session</code>-olio.
      */
-    public UserStateResponse(
-            final Session session
-    ) {
+    public UserStateResponse(final Session session) {
         this.state = session.get("state");
         this.username = session.get("username");
         this.userId = session.get("userId");
@@ -31,38 +46,49 @@ public class UserStateResponse {
         this.channelId = session.get("channelId");
     }
 
-    /** Antaa tilan.
-     * @return state.
+    /**
+     * Palauttaa kayttajan tilan.
+     *
+     * @return Tila, jossa kayttaja on.
      */
     public final String getState() {
         return this.state;
     }
 
-    /** Palauttaa julkisen kayttajanimen.
-     * @return Palauttaa julkisen kayttajanimen.
+    /**
+     * Palauttaa julkisen kayttajanimen.
+     *
+     * @return Julkinen kayttajanimi.
      */
     public final String getUsername() {
         return this.username;
     }
 
-    /** Palauttaa salaisen kayttajaID:n.
-     * @return Palauttaa salaisen kayttajaID:n.
+    /**
+     * Palauttaa salaisen kayttajatunnuksen.
+     *
+     * @return Salainen kayttajatunnus.
      */
     public final String getUserId() {
         return this.userId;
     }
 
-    /** Palauttaa kategorian, esim "mielenterveys".
-     * @return Palauttaa kategorian.
+    /**
+     * Palauttaa aihealueen.
+     *
+     * @return Aihealue johon käyttäjä kuuluu.
      */
     public final String getCategory() {
         return this.category;
     }
 
-    /** Palauttaa salaisen kanavaID:n.
-     * @return Palauttaa salaisen kanavaID:n.
+    /**
+     * Palauttaa salaisen kanavatunnuksen.
+     *
+     * @return Salainen kanavatunnus.
      */
     public final String getChannelId() {
         return this.channelId;
     }
+
 }
