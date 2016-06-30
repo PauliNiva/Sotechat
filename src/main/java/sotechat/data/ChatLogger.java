@@ -9,6 +9,7 @@ import java.util.*;
 import org.joda.time.DateTime;
 
 import sotechat.controller.MessageBroker;
+import sotechat.domain.Person;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
@@ -71,13 +72,42 @@ public class ChatLogger {
     public ChatLogger() {
         this.logs = new HashMap<>();
         this.lastBroadcast = new HashMap<>();
+        waitAndTryToInitializeDependencies();
     }
 
-    // TODO: Selita
-    @Scheduled(fixedRate = 1000)
-    public void dependencyHelper() {
-        if (mapper != null && databaseService != null) {
-            mapper.setDatabaseService(databaseService);
+    /**
+     * TODO: Selita.
+     */
+    public void waitAndTryToInitializeDependencies() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                tryToInitializeDependencies();
+            }
+        }, 100);
+    }
+
+    /**
+     * TODO: Selita.
+     */
+    public void tryToInitializeDependencies() {
+        if (mapper == null || databaseService == null) {
+            waitAndTryToInitializeDependencies();
+            return;
+        }
+        mapper.setDatabaseService(databaseService);
+        List<Person> persons = databaseService.getAllPersons();
+        for (Person person : persons) {
+            String username = person.getUserName();
+            String userId = person.getUserId();
+            mapper.mapProUsernameToUserId(username, userId);
+            mapper.reserveId(userId);
+            List<ConvInfo> list = databaseService.getConvInfoListOfUserId(userId);
+            for (ConvInfo conv : list) {
+                String channelId = conv.getChannelId();
+                mapper.reserveId(channelId);
+            }
         }
     }
 

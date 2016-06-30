@@ -120,6 +120,13 @@ public class MapperImpl implements Mapper {
         this.mapRegisteredUsers.put(username, userId);
     }
 
+    @Override
+    public synchronized void reserveId(
+            final String someId
+    ) {
+        this.reservedIds.add(someId);
+    }
+
     /**
      * Unohtaa, että jokin username oli varattu. Käyttäjän poiston yhteydessä.
      *
@@ -178,7 +185,7 @@ public class MapperImpl implements Mapper {
         do {
             newId = getFastRandomString();
         } while (reservedIds.contains(newId));
-        reservedIds.add(newId);
+        reserveId(newId);
         return newId;
     }
 

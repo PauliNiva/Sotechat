@@ -230,7 +230,7 @@ public class SessionRepo extends MapSessionRepository {
 
     /** Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
      * jotka hyvaksyvat uusia asiakkaita. Jos kirjautuneita ammattilaisia
-     * voi olla yli 1000, metodi olisi hyva kirjoittaa tehokkaammin. */
+     * voi olla yli 1000, paivitys olisi hyva hoitaa tehokkaammin. */
     private synchronized void updateCountOfProsAcceptingNewCustomers() {
         countOfProsAcceptingNewCustomers = 0;
         for (Session session : proUserSessions.values()) {

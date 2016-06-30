@@ -66,7 +66,7 @@ public class ChatLoggerTest {
         dbservice.addPersonToConversation("666", "xxx");
         chatlogger = new ChatLogger(srepo, dbservice);
         chatlogger.setMapper(mapper);
-        chatlogger.dependencyHelper();
+        chatlogger.tryToInitializeDependencies();
     }
 
     private boolean equals(MsgToClient first, MsgToClient second){
@@ -155,7 +155,7 @@ public class ChatLoggerTest {
         DatabaseService mockdb = Mockito.mock(DatabaseService.class);
         chatlogger = new ChatLogger(srepo, mockdb);
         chatlogger.setMapper(mapper);
-        chatlogger.dependencyHelper();
+        chatlogger.tryToInitializeDependencies();
         Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
         DateTime time = new DateTime(tms);
         chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));

@@ -133,6 +133,14 @@ public class DatabaseService {
 
     }
 
+    /**
+     * 
+     * @return
+     */
+    public List<Person> getAllPersons() {
+        return personService.findAll();
+    }
+
     /** Palauttaa listan ConvInfo-olioita.
      * @param userId userId
      * @return lista convInfo-olioita

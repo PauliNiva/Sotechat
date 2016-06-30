@@ -19,6 +19,9 @@ public interface Mapper {
             final String username,
             final String userId
     );
+    public void reserveId(
+            final String someId
+    );
     public void removeMappingForUsername(
             final String username
     );
