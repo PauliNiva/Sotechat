@@ -28,10 +28,10 @@ public class ConvInfo {
     /**
      * Konstruktori.
      *
-     * @param pChannelId p
-     * @param pDate p
-     * @param pPerson p
-     * @param pCategory p
+     * @param pChannelId p.
+     * @param pDate p.
+     * @param pPerson p.
+     * @param pCategory p.
      */
     public ConvInfo(final String pChannelId, final String pDate,
                     final String pPerson, final String pCategory) {
