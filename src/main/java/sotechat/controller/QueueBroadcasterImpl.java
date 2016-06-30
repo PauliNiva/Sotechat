@@ -9,7 +9,6 @@ import java.util.TimerTask;
 import org.joda.time.DateTime;
 
 import sotechat.service.QueueService;
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /**
  * Tiedottaa jonon tilanteesta kaikille ammattilaisille
@@ -94,9 +93,8 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
      * QBCC-kanavan tilaajille (hoitajille).
      */
     private synchronized void actuallyBroadcast() {
-        String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
         String qAsJson = queueService.toString();
-        broker.convertAndSend(qbcc, qAsJson);
+        broker.convertAndSend("/toClient/QBCC", qAsJson);
     }
 
 }

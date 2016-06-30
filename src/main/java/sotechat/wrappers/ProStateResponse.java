@@ -2,8 +2,6 @@ package sotechat.wrappers;
 
 import sotechat.data.Session;
 
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
-
 /**
  * Luokka auttamaan <code>JSON</code>:in paketoinnissa,
  * kun "ammattilaiskayttajalle" kerrotaan tila.
@@ -51,7 +49,7 @@ public class ProStateResponse {
         this.state = "pro";
         this.username = session.get("username");
         this.userId = session.get("userId");
-        this.QBCC = QUEUE_BROADCAST_CHANNEL;
+        this.QBCC = "QBCC";
         this.online = session.get("online");
         this.channelIds = session.get("channelIds");
     }

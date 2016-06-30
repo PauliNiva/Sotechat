@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.Random;
 
 /**
- * Mapperi muistaa asioita kanaviin ja ID:hen liittyen. Esim:
+ * Mapper muistaa asioita kanaviin ja ID:hen liittyen. Esimerkiksi:
  * - Onko jokin username varattu rekisteroityneelle kayttajalle?
  * - Getteri Channel-olioille parametrilla channelId
  */
@@ -46,21 +46,20 @@ public class Mapper {
         this.fastGen = new FastGeneratorForRandomStrings();
         this.reservedIds = new HashSet<>();
         this.mapRegisteredUsers = new HashMap<>();
-        /* TODO Lataa tietokannasta reservedIds & usernames. */
     }
 
     /**
-     * Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
+     * Palauttaa <code>Channel</code>-olion.
      *
      * @param channelId channelId.
-     * @return <code>channel</code>-olio tai <code>null</code> jos ei loydy.
+     * @return <code>Channel</code>-olio tai <code>null</code> jos ei loydy.
      */
     public Channel getChannel(
             final String channelId
     ) {
         Channel channel = channels.get(channelId);
         if (channel == null) {
-            //TODO Try loading from db.
+            //TODO: Lataa tietokannasta (poikkeuksellinen kayttotapaus).
         }
         return channel;
     }

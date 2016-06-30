@@ -17,8 +17,6 @@ import sotechat.data.Channel;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
-
 /** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
  *  - kun joku subscribaa QBCC kanavalle, pyytaa QueueBroadcasteria castaamaan.
@@ -125,8 +123,7 @@ public class SubscribeEventListener
         }
 
         /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
-        String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
-        if (channelIdWithPath.equals(qbcc)) {
+        if (channelIdWithPath.equals("/toClient/QBCC")) {
             queueBroadcaster.broadcastQueue();
             return;
         }

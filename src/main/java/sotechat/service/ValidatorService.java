@@ -16,7 +16,6 @@ import sotechat.wrappers.MsgToServer;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
 
 /** Luokan tehtava on validoida netista tuleva data.
  *  (hyvaksya/siivota/kieltaytya vastaanottamasta). */
@@ -174,9 +173,9 @@ public class ValidatorService {
             if (principal == null) {
                 return prefix + "Session belongs to pro but user not auth'd";
             }
-            String qbcc = "/toClient/" + QUEUE_BROADCAST_CHANNEL;
-            if (channelIdWithPath.equals(qbcc)) {
-                /** Sallitaan - ammattilaiskayttaja saa kuunnella QBCC. */
+            if (channelIdWithPath.equals("/toClient/QBCC")) {
+                /** Sallitaan jonon tilannepaivityskanavan kuuntelu
+                 * ammattilaiskayttajalle. */
                 return "";
             }
             if (channelIdWithPath.startsWith("/toClient/queue/")) {

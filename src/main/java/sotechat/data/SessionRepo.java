@@ -45,7 +45,6 @@ public class SessionRepo extends MapSessionRepository {
     /** Alustaminen, jota kutsutaan seka olion
      * luonnissa etta sessioiden unohtamisessa. */
     private void initialize() {
-
         this.sessionsBySessionId = new HashMap<>();
         this.sessionsByUserId = new HashMap<>();
         this.proUserSessions = new HashMap<>();
