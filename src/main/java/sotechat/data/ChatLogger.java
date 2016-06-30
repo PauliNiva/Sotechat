@@ -58,8 +58,10 @@ public class ChatLogger {
      * @param pSessionRepo     SessionRepo
      * @param pDatabaseService DatabaseService
      */
-    public ChatLogger(final SessionRepo pSessionRepo,
-                      final DatabaseService pDatabaseService) {
+    public ChatLogger(
+            final SessionRepo pSessionRepo,
+            final DatabaseService pDatabaseService
+    ) {
         this.sessionRepo = pSessionRepo;
         this.databaseService = pDatabaseService;
         this.logs = new HashMap<>();
@@ -129,8 +131,6 @@ public class ChatLogger {
 
     /**
      * Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
-     * Huom: samanaikaisuusongelmien korjaamiseksi samassa
-     * luokassa logNewMessage -metodin kanssa.
      * TODO Protection against flooding (max 1 broadcast/second/channel).
      *
      * @param channelId channelId
