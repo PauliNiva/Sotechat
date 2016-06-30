@@ -4,8 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Luokka sisaltaa kanavan tiedot. Tietoa yllapidetaan myos
- * <code>Session</code>-olioissa hakuoperaatioiden nopeuttamiseksi.
+ * Kanava-oliot ovat olemassa kanaviin liittyvan tiedon keskittamiseksi.
  */
 public class Channel {
 
@@ -22,6 +21,8 @@ public class Channel {
 
     /**
      * Aktiiviset kayttajatunnukset.
+     * Tietoa yllapidetaan myos
+     * <code>Session</code>-olioissa hakuoperaatioiden nopeuttamiseksi.
      */
     private Set<String> activeUserIds;
 
