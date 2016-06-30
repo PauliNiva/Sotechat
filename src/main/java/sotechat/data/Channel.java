@@ -5,6 +5,11 @@ import java.util.Set;
 
 /**
  * Kanava-oliot ovat olemassa kanaviin liittyvan tiedon keskittamiseksi.
+ * Miten keskeiset jasenyyskasitteet eroavat toisistaan:
+ * - Current subscribers: juuri nyt aktiiviset WS yhteydet kanavalle.
+ * - Active userIds: oikeus kuunnella ja lahettaa viesteja kanavalle.
+ *      HUOM: Yllapidetaan tietoa myos Session-olioissa (jotta O(1) haut).
+ * - Historic userIds: koskaan kanavalla olleet.
  */
 public class Channel {
 
@@ -14,30 +19,32 @@ public class Channel {
     private String channelId;
 
     /**
-     * Kanavan tamanhetkiset tilaajat, eli kaikki kenella on aktiivinen
-     * <code>WebSocket</code>-yhteys.
+     * Sessiot, joilla on aukioleva <code>WebSocket</code>-yhteys kanavalle.
      */
     private Set<Session> currentSubscribers;
 
     /**
-     * Aktiiviset kayttajatunnukset.
+     * Aktiiviset kayttajatunnukset tarkoittavat niita, joilla on oikeus avata
+     * <code>WebSocket</code>-yhteys kanavalle.
      * Tietoa yllapidetaan myos
      * <code>Session</code>-olioissa hakuoperaatioiden nopeuttamiseksi.
      */
     private Set<String> activeUserIds;
 
     /**
-     * Historia kaikista kanavalla joskus olleista kayttajatunnuksista.
+     * Historialliset kayttajatunnukset tarkoittavat niita, jotka ovat joskus
+     * olleet kanavalla. Historiallisilla ammattilaiskayttajilla on oikeus
+     * hakea kanavan lokitietoja.
      */
     private Set<String> historicUserIds;
 
     /**
-     * Kanavaan liittyvan ammattilaisen kayttajatunnus.
+     * Kanavaan mahdollisesti liittyvan ammattilaisen <code>username</code>.
      */
     private String assignedPro;
 
     /**
-     * Onko kanava viela kaytossa.
+     * False, jos kanava on suljettu.
      */
     private boolean active;
 
@@ -56,8 +63,9 @@ public class Channel {
     }
 
     /**
-     * Kirjaa <code>Channel</code>-olioon ja <code>Session</code>-olioon
-     * oikeuden osallistua kanavalle.
+     * Sallii parametrina annetun Sessionin osallistua kanavalle.
+     * Tarkemmin ilmaistuna: kirjaa <code>Channel</code>-olioon ja
+     * <code>Session</code>-olioon oikeuden osallistua kanavalle.
      *
      * @param session <code>Session</code>-olio.
      */
@@ -69,11 +77,11 @@ public class Channel {
     }
 
     /**
-     * Asettaa kanavan tavallisten kayttajien tilaksi "chat".
+     * Asettaa kanavan asiakaskayttajien tilaksi "chat".
      */
     public void setRegUserSessionStatesToChat() {
         for (Session member : getCurrentSubscribers()) {
-            /** Hoitajan tilan kuuluu aina olla "pro". */
+            /* Hoitajan tilan kuuluu aina olla "pro". */
             if (!member.get("state").equals("pro")) {
                 member.set("state", "chat");
             }
@@ -82,7 +90,10 @@ public class Channel {
 
 
     /**
-     * Kirjataan tilaus ylos "/queue/", seka "/chat/" tapauksissa.
+     * Kirjaa uuden tilaajan ylos kanavan tietoihin.
+     * Kutsuttava seka tapauksissa, joissa asiakaskayttaja liittyy jonoon
+     * eli tilaa polun /toClient/queue/{kanavaId}, etta tapauksessa,
+     * jossa jokin kayttaja tilaa varsinaisen kanavan /toClient/chat/{kanavaId}.
      *
      * @param session <code>Session</code>-olio.
      */
@@ -104,6 +115,7 @@ public class Channel {
     }
 
     /**
+     * Poistaa parametrina annetun userId:n osallistumisoikeuden kanavalle.
      * Kutsutaan <code>WebSocket</code>-yhteyden ollessa pitkaan katkenneena,
      * seka poistu-nappia painettaessa.
      *
@@ -114,11 +126,11 @@ public class Channel {
     }
 
     /**
-     * Palauttaa <code>true</code> jos annettu kayttajaId on lahiaikoina ollut
-     * kanavalla.
+     * Palauttaa <code>true</code> jos annetulla userId:lla on oikeus
+     * osallistua kanavalle.
      *
-     * @param userId Kayttajan Id.
-     * @return <code>true</code> jos kayttajaId on ollut lahiaikoina kanavalla.
+     * @param userId userId
+     * @return <code>true</code> jos oikeus osallistua kanavalle.
      */
     public final synchronized boolean hasActiveUser(final String userId) {
         return activeUserIds.contains(userId);
@@ -143,47 +155,50 @@ public class Channel {
     }
 
     /**
-     * Palauttaa listan <code>Session</code>-olioita jotka ovat tilanneet
-     * kanavatunnuksen.
+     * Palauttaa setin <code>Session</code>-olioista, joilla on
+     * aukioleva <code>WebSocket</code>-yhteys kanavalle.
      *
-     * @return Lista <code>Session</code>-olioita.
+     * @return Setti <code>Session</code>-olioita.
      */
     public final synchronized Set<Session> getCurrentSubscribers() {
         return currentSubscribers;
     }
 
     /**
-     * Palauttaa listan kayttajaId:eita, jotka lasketaan aktiivisiksi kanavalle.
+     * Palauttaa setin <code>userId</code>:ta, joilla on oikeus
+     * avata <code>WebSocket</code>-yhteys kanavalle.
      * Hetkeksi yhteyden katkaissut tai menettänyt henkilo lasketaan
      * aktiiviseksi aikakatkaisuun saakka.
      *
-     * @return Lista kayttajaId:eita.
+     * @return Setti <code>userId</code>:ta.
      */
     public final synchronized Set<String> getActiveUserIds() {
         return activeUserIds;
     }
 
     /**
-     * Palauttaa listan kayttajaId:eita, jotka ovat joskus olleet kanavalla.
-     * Kaytetaan validoitaessa lokitietojenhakupyyntoa.
+     * Palauttaa setin <code>userId</code>:ta, jotka ovat joskus olleet
+     * kanavalla. Kaytetaan validoitaessa lokitietojenhakupyyntoa.
      *
-     * @return Lista <code>Session</code>-olioita.
+     * @return Setti <code>Session</code>-olioita.
      */
     public final synchronized Set<String> getHistoricUserIds() {
         return historicUserIds;
     }
 
     /**
-     * Hakee ammattilaisen kayttajanimen joka kuuluu kanavalle.
+     * Palauttaa <code>username</code>:n ammattilaiselle, jolle tama kanava
+     * kuuluu, tai tyhjan merkkijonon jos kanava ei viela kuulu kenellekaan.
      *
-     * @return Kanavan ammattilaisen kayttajanimi.
+     * @return username
      */
     public final String getAssignedPro() {
         return assignedPro;
     }
 
     /**
-     * Asettaa argumenttina annetun kayttajanimen kanavan ammattilaiseksi.
+     * Asettaa argumenttina annetun <code>username</code>:n
+     * kanavan ammattilaiseksi.
      *
      * @param username Ammattilaisen kayttajanimi.
      */
@@ -192,17 +207,17 @@ public class Channel {
     }
 
     /**
-     * Tarkistaa onko kanava aktiivinen.
+     * Tarkistaa onko kanava aktiivinen vai suljettu.
      *
      * @return <code>true</code>, jos kanava on aktiivien, <code>false</code>
-     * muutoin.
+     * jos kanava on suljettu.
      */
     public boolean isActive() {
         return this.active;
     }
 
     /**
-     * Asettaa kanavan inaktiiviseksi.
+     * Sulkee kanavan.
      */
     public void setInactive() {
         this.active = false;
