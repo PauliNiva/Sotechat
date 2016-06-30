@@ -3,38 +3,49 @@ package sotechat.data;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Kanavaan liittyvat tiedot keskitetty kanava-olioon. Kasitteiden selitykset:
- * - Current subscribers: juuri nyt aktiiviset WS yhteydet kanavalle.
- * - Active userIds: oikeus kuunnella ja lahettaa viesteja kanavalle.
- *      HUOM: Yllapidetaan tietoa myos Session-olioissa (jotta O(1) haut).
- * - Historic userIds: koskaan kanavalla olleet.
+/**
+ * Luokka sisaltaa kanavan tiedot. Tietoa yllapidetaan myos
+ * <code>Session</code>-olioissa hakuoperaatioiden nopeuttamiseksi.
  */
 public class Channel {
 
-    /** ChannelId. */
+    /**
+     * Kanavatunnus.
+     */
     private String channelId;
 
-    /** Current Subscribers. */
+    /**
+     * Kanavan taman hetkiset tilaajat, eli kaikki kenella on aktiivinen
+     * <code>WebSocket</code>-yhteys.
+     */
     private Set<Session> currentSubscribers;
 
-    /** Active User Ids (oikeus osallistua, myos Session-olioissa). */
+    /**
+     * Aktiiviset kayttajatunnukset.
+     */
     private Set<String> activeUserIds;
 
-    /** Historic User Ids. */
+    /**
+     * Historia kaikista kanavalla joskus olleista kayttajatunnuksista.
+     */
     private Set<String> historicUserIds;
 
-    /** String of pro username assigned to this Channel. */
+    /**
+     * Kanavaan liittyvan ammattilaisen kayttajatunnus.
+     */
     private String assignedPro;
 
-    /** Onko kanava kaytossa viela?. */
+    /**
+     * Onko kanava vielka kaytossa.
+     */
     private boolean active;
 
-    /** Konstruktori.
-     * @param pChannelId channelId/
+    /**
+     * Konstruktori.
+     *
+     * @param pChannelId Kanavatunnus.
      */
-    public Channel(
-            final String pChannelId
-    ) {
+    public Channel(final String pChannelId) {
         this.channelId = pChannelId;
         currentSubscribers = new HashSet<>();
         activeUserIds = new HashSet<>();
@@ -43,8 +54,11 @@ public class Channel {
         this.active = true;
     }
 
-    /** Kirjaa Channel-olioon ja Session-olioon oikeuden osallistua kanavalle.
-     * @param session session-olio
+    /**
+     * Kirjaa <code>Channel</code>-olioon ja <code>Session</code>-olioon
+     * oikeuden osallistua kanavalle.
+     *
+     * @param session <code>Session</code>-olio.
      */
     public final synchronized void allowParticipation(
             final Session session
