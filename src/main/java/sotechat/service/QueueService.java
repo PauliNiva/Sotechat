@@ -108,9 +108,6 @@ public class QueueService {
     /** Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
      * @param channelId kanavaId
      * @param accessor taalta autentikaatiotiedot
-     * @throws Exception jos tiettyä kanavaa ei ole luotu, ei siihen löydy
-     * myöskään rekisteröitynyttä hoitajaa. Exceptionin voi siis aiheuttaa
-     * return channel.getAssignedPro();
      * @return String pro username, kenelle popattu kanava kuuluu
      */
     public final synchronized String popQueue(

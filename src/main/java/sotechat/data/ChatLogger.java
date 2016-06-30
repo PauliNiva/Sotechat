@@ -73,6 +73,18 @@ public class ChatLogger {
         this.lastBroadcast = new HashMap<>();
     }
 
+    // TODO: Selita
+    @Scheduled(fixedRate = 1000)
+    public void dependencyHelper() {
+        if (mapper != null && databaseService != null) {
+            mapper.setDatabaseService(databaseService);
+        }
+    }
+
+    public void setMapper(final Mapper pMapper) {
+        this.mapper = pMapper;
+    }
+
     /**
      * Konstruktori testausta varten.
      *

@@ -96,7 +96,7 @@ public class StateControllerQueueTest {
                 .thenReturn(new Conversation());
         this.accessor = Mockito.mock(SimpMessageHeaderAccessor.class);
         this.stateController = (StateController) context.getBean("stateController");
-        this.mapper = (Mapper) context.getBean("mapper");
+        this.mapper = (Mapper) context.getBean("mapperImpl");
         this.queueService = (QueueService) context.getBean("queueService");
 
         this.mapper.mapProUsernameToUserId("hoitaja", "666");
@@ -157,12 +157,13 @@ public class StateControllerQueueTest {
         assertEquals(0, this.queueService.getQueueLength());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void professionalCantPopFromEmptyQueue() throws Exception {
         Mockito.when(this.accessor.getUser()).thenReturn(new MockPrincipal("hoitaja"));
 
-        this.stateController
-                .popClientFromQueue("DEV_CHANNEL", this.accessor);
+        JsonObject response = parseStringIntoJsonObject(this.stateController
+                .popClientFromQueue("DEV_CHANNEL", this.accessor));
+        assertEquals("", response.get("channelAssignedTo").getAsString());
     }
 
     @Test
