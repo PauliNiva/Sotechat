@@ -32,8 +32,8 @@ public class WebSocketConfig extends
 
     /**
      * Sailo erilaisille <code>Session</code>-olioille.
-     * HUOMAUTUS <code>@Autowired</code>-notaatio ja luokkamuuttuja ovat pakollisia
-     * tassa.
+     * HUOMAUTUS <code>@Autowired</code>-notaatio ja luokkamuuttuja ovat
+     * pakollisia tassa.
      */
     @Autowired
     private SessionRepo repository;

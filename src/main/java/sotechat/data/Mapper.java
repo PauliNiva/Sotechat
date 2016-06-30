@@ -17,20 +17,30 @@ import java.util.Random;
 @Component
 public class Mapper {
 
-    /** Kanava-mappi. Avain channelId, arvo Channel-olio. */
+    /**
+     * Kanava-mappi. Avain channelId, arvo Channel-olio.
+     */
     private Map<String, Channel> channels;
 
-    /** Nopea satunnaismerkkijonogeneraattori (joka kayttaa normi Randomia). */
+    /**
+     * Nopea satunnaismerkkijonogeneraattori (joka kayttaa normi Randomia).
+     */
     private FastGeneratorForRandomStrings fastGen;
 
-    /** Muistetaan, mitka generaattorin tuottamat ID:t on jo varattu. */
+    /**
+     * Muistetaan, mitka generaattorin tuottamat ID:t on jo varattu.
+     */
     private Set<String> reservedIds;
 
-    /** Rekisteroityneet kayttajat. Avain username, arvo userId. */
+    /**
+     * Rekisteroityneet kayttajat. Avain username, arvo userId.
+     */
     private Map<String, String> mapRegisteredUsers;
 
 
-    /** Konstruktori alustaa singleton-instanssin Mapperista. */
+    /**
+     * Konstruktori alustaa singleton-instanssin Mapperista.
+     */
     public Mapper() {
         this.channels = new HashMap<>();
         this.fastGen = new FastGeneratorForRandomStrings();
@@ -39,9 +49,11 @@ public class Mapper {
         /* TODO Lataa tietokannasta reservedIds & usernames. */
     }
 
-    /** Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
-     * @param channelId channelId
-     * @return channel-olio tai null jos ei loydy.
+    /**
+     * Palauttaa channel-olion. Yrittaa ensin muistista, sitten db.
+     *
+     * @param channelId channelId.
+     * @return <code>channel</code>-olio tai <code>null</code> jos ei loydy.
      */
     public Channel getChannel(
             final String channelId
@@ -53,8 +65,10 @@ public class Mapper {
         return channel;
     }
 
-    /** Luo uuden kanava-olion, kirjaa sen muistiin ja palauttaa sen.
-     * @return luotu kanava-olio
+    /**
+     * Luo uuden kanava-olion, kirjaa sen muistiin ja palauttaa sen.
+     *
+     * @return luotu kanava-olio.
      */
     public Channel createChannel() {
         String channelId = generateNewId();
@@ -63,9 +77,11 @@ public class Mapper {
         return channel;
     }
 
-    /** Puts key userId, value username.
-     * @param username p
-     * @param userId p
+    /**
+     * Liittaa ammattilaisen kayttajanimen ja kayttajatunnuksen toisiinsa.
+     *
+     * @param username p.
+     * @param userId p.
      */
     public final void mapProUsernameToUserId(
             final String username,
@@ -76,7 +92,8 @@ public class Mapper {
 
     /**
      * Unohtaa, että jokin username oli varattu. Käyttäjän poiston yhteydessä.
-     * @param username username
+     *
+     * @param username <code>username</code>.
      */
     public final void removeMappingForUsername(
             final String username
@@ -85,24 +102,23 @@ public class Mapper {
     }
 
     /**
-     * Returns true if username is reserved.
-     * @param username username
-     * @return true if username is reserved
+     * Tarkistaa onko kayttajanimi varattu.
+     *
+     * @param username kayttajanimi.
+     * @return <code>true</code> jos kayttajanimi on varattu.
+     * <code>false</code> muulloin.
      */
     public final synchronized boolean isUsernameReserved(
-            final String username
-    ) {
+            final String username) {
         return mapRegisteredUsers.containsKey(username);
     }
 
-    /** Getteri salaiselle kayttajaID:lle,
-     * parametrina julkinen kayttajanimi.
-     * Huom: mielekasta kayttaa vain rekisteroityjen
-     * kayttajien tapauksessa. Jos kysytaan vaikka
-     * nimimerkin "Anon" ID:ta, on mielivaltaista,
-     * mika ID sielta sattuu tulemaan.
-     * @param username julkinen username
-     * @return id salainen id
+    /**
+     * Hakee salaisen kayttajaID:n. argumenttina julkinen kayttajanimi.
+     * Kaytetaan vain rekisteroityjen kayttajien tapauksessa.
+     *
+     * @param username Julkinen <code>username</code>.
+     * @return id Salainen id.
      */
     public final synchronized String getIdFromRegisteredName(
             final String username
@@ -117,8 +133,10 @@ public class Mapper {
         return this.mapRegisteredUsers.get(username);
     }
 
-    /** Tuottaa ja varaa uuden yksilollisen ID:n (userId/channelId).
-     * @return userId
+    /**
+     * Tuottaa ja varaa uuden yksilollisen ID:n (userId/channelId).
+     *
+     * @return userId.
      */
     public final synchronized String generateNewId() {
         String newId;
@@ -129,30 +147,33 @@ public class Mapper {
         return newId;
     }
 
-    /** Nopea satunnaismerkkijonotuottaja (kaytossa).
-     *  @return satunnaismerkkijono
+    /**
+     * Nopea satunnaismerkkijonotuottaja (kaytossa).
+     *
+     *  @return Satunnaismerkkijono.
      */
     public final String getFastRandomString() {
         return fastGen.nextString();
     }
 
-    /** Nopea pseudosatunnaismerkkijonotuottaja.
+    /**
+     * Nopea pseudosatunnaismerkkijonotuottaja.
      * Attribution: http://stackoverflow.com/questions/
-     * 41107/how-to-generate-a-random-alpha-numeric-string
+     * 41107/how-to-generate-a-random-alpha-numeric-string.
      */
     private class FastGeneratorForRandomStrings {
 
-        /** Kaytetaan nopeaa randomia. */
+        /* Kaytetaan nopeaa randomia. */
         private final Random random = new Random();
-        /** Haluttu pituus satunnaismerkkijonoille. */
+        /* Haluttu pituus satunnaismerkkijonoille. */
         private static final int LENGTH = 16;
 
-        /** Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa. */
+        /* Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa. */
         private final char[] symbols;
-        /** Tilapaistaulukko uuden merkkijonon muodostukseen. */
+        /* Tilapaistaulukko uuden merkkijonon muodostukseen. */
         private final char[] buf;
 
-        /** Konstruktori alustaa olion (yksi olio riittaa). */
+        /* Konstruktori alustaa olion (yksi olio riittaa). */
         FastGeneratorForRandomStrings() {
             if (LENGTH < 1) {
                 throw new IllegalArgumentException("length < 1: " + LENGTH);
@@ -168,8 +189,10 @@ public class Mapper {
             symbols = tmp.toString().toCharArray();
         }
 
-        /** Palauttaa satunnaismerkkijonon.
-         * @return satunnaismerkkijono
+        /**
+         * Palauttaa satunnaismerkkijonon.
+         *
+         * @return Satunnaismerkkijono.
          */
         public String nextString() {
             for (int idx = 0; idx < buf.length; ++idx) {
