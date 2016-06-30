@@ -10,38 +10,49 @@ import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.*;
 
 /**
- * Chattiin kirjoitettujen viestien kirjaaminen ja valittaminen.
+ * Muistaa Chattiin kirjoitetut viestit.
  */
 @Component
 public class ChatLogger {
 
-    /** Kuinka usein siivotaan vanhoja viesteja muistista. */
+    /**
+     * Kuinka usein siivotaan vanhoja viesteja muistista.
+     */
     private static final int CLEAN_FREQUENCY_IN_MS = 1000 * 60 * 60 * 24; // 1pv
 
-    /** Siivouksessa poistetaan keskustelut, joiden uusin viesti on
-     * vanhempi kuin tassa muuttujassa maaritelty. */
+    /**
+     * Siivouksessa poistetaan keskustelut, joiden uusin viesti on
+     * vanhempi kuin tassa muuttujassa maaritelty.
+     * */
     private static final int DAYS_OLD_TO_BE_DELETED = 3;
+
+    /**
+     * Viive, kun saman kanavan lokeihin pyydetaan useita tiedotuksia.
+     */
+    private static final int CLBC_DELAY_MS = 200;
+
+    /**
+     * Avaimena <code>channelId</code>, arvona <code>Long</code>
+     * milloin viimeisin tiedotus tietylle kanavalle oli.
+     */
+    private Map<String, Long> lastBroadcast;
 
     /**
      * Avain = kanavan id. Arvo = lista viesteja (kanavan lokit).
      */
-    private HashMap<String, List<MsgToClient>> logs;
+    private Map<String, List<MsgToClient>> logs;
 
     /**
-     * Session Repository.
+     * Sessioiden kasittely.
      */
     @Autowired
     private SessionRepo sessionRepo;
 
     /**
-     * Database Service.
+     * Tietokantapalvelut.
      */
     @Autowired
     private DatabaseService databaseService;
@@ -51,6 +62,7 @@ public class ChatLogger {
      */
     public ChatLogger() {
         this.logs = new HashMap<>();
+        this.lastBroadcast = new HashMap<>();
     }
 
     /**
@@ -63,9 +75,9 @@ public class ChatLogger {
             final SessionRepo pSessionRepo,
             final DatabaseService pDatabaseService
     ) {
+        super();
         this.sessionRepo = pSessionRepo;
         this.databaseService = pDatabaseService;
-        this.logs = new HashMap<>();
     }
 
     /**
@@ -99,9 +111,9 @@ public class ChatLogger {
     }
 
     /**
-     * Saves msg to memory.
+     * Tallentaa viestin muistiin.
      *
-     * @param msgToClient msg to be saved.
+     * @param msgToClient Tallennettava viesti.
      */
     private void saveToMemory(
             final MsgToClient msgToClient
@@ -116,9 +128,9 @@ public class ChatLogger {
     }
 
     /**
-     * Tries to save message to database.
+     * Tallentaa viestin tietokantaan.
      *
-     * @param msgToClient msgToClient.
+     * @param msgToClient Tallennettava viesti.
      */
     private void saveToDatabase(
             final MsgToClient msgToClient
@@ -131,13 +143,59 @@ public class ChatLogger {
     }
 
     /**
-     * Metodi lahettaa kanavan chat-logit kanavan subscribaajille.
-     * TODO Protection against flooding (max 1 broadcast/second/channel).
+     * Lahettaa pyydetyn kanavan lokit kaikille kanavan tilanneille.
+     * Tama metodi ohjaa tehtavan mahdollisen timerin
+     * kautta metodille actuallyBroadcast.
+     * <p>
+     * Operaatio on suhteellisen raskas ja palvelinta voisi kyykyttaa
+     * aiheuttamalla esim. tuhansia paivityksia sekunnissa.
+     * Suojakeinona palvelunestohyokkayksia vastaan tiedotusten
+     * valille on asetettu minimiviive.
+     *
+     * @param channelId p.
+     * @param broker p.
+     */
+    public synchronized void broadcast(
+            final String channelId,
+            final MessageBroker broker
+    ) {
+        long timeNow = new DateTime().getMillis();
+        Long lastBroadcastTime = lastBroadcast.get(channelId);
+        if (lastBroadcastTime == null) {
+            lastBroadcastTime = 0L;
+        }
+        if (lastBroadcastTime + CLBC_DELAY_MS < timeNow) {
+            /* Jos ei olla juuri asken tiedotettu, tehdaan se nyt. */
+            actuallyBroadcast(channelId, broker);
+            lastBroadcastTime = new DateTime().getMillis();
+        } else if (lastBroadcastTime < timeNow) {
+            /* Jos ollaan askettain lahetetty lokit, halutaan
+             * viivastyttaa seuraavaa lahetysta, mutta ei
+              * haluta kaynnistaa useita ajastimia yhdelle
+              * kanavalle. Sen vuoksi
+              * lastBroadcastTime asetetaan tulevaisuuteen ja
+              * else if -ehdossa tarkistetaan sen avulla, onko
+              * uusi lahetys jo ajastettu. */
+            lastBroadcastTime += CLBC_DELAY_MS;
+            long delayToNext = lastBroadcastTime - timeNow;
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    actuallyBroadcast(channelId, broker);
+                }
+            }, delayToNext);
+        }
+        lastBroadcast.put(channelId, lastBroadcastTime);
+    }
+
+    /**
+     * Lahettaa kanavan chat-logit kanavan subscribaajille.
      *
      * @param channelId channelId
      * @param broker    broker
      */
-    public synchronized void broadcast(
+    private synchronized void actuallyBroadcast(
             final String channelId,
             final MessageBroker broker
     ) {
@@ -149,7 +207,7 @@ public class ChatLogger {
 
     /**
      * Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
-     * joilla kayttaja on ollut.
+     * joilla kayttaja on koskaan ollut.
      *
      * @param userId userId
      * @return String muotoa ["kanava1", "kanava2"]
@@ -161,7 +219,7 @@ public class ChatLogger {
     }
 
     /**
-     * Getteri halutun kanavan logeille.
+     * Getteri halutun kanavan lokeille.
      * Yrittaa hakea ensin muistista, sitten tietokannasta.
      *
      * @param channelId kanavan id
@@ -172,7 +230,7 @@ public class ChatLogger {
     ) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
-            /** Jos ei loydy muistista, haetaan tietokannasta muistiin. */
+            /* Jos ei loydy muistista, haetaan tietokannasta muistiin. */
             list = databaseService.retrieveMessages(channelId);
             logs.put(channelId, list);
         }
@@ -193,8 +251,7 @@ public class ChatLogger {
         if (list == null) {
             return "1";
         }
-        /** Huom: ID ei saa alkaa nollasta, koska tietokantaimplementaatiossa
-         * ID:t alkavat myos ykkosesta. */
+        /** Huom: ID ei saa alkaa nollasta! */
         return (1 + list.size()) + "";
     }
 
@@ -204,7 +261,6 @@ public class ChatLogger {
      * kerran paivassa (jattaen ne kuitenkin tietokantaan).
      * TODO Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
      */
-
     @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
     public synchronized void work() {
         removeOldMessagesFromMemory(DAYS_OLD_TO_BE_DELETED);
@@ -225,7 +281,6 @@ public class ChatLogger {
                 logs.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, List<MsgToClient>> entry = iterator.next();
-            String channelId = entry.getKey();
             List<MsgToClient> listOfMsgs = entry.getValue();
             if (listOfMsgs == null || listOfMsgs.isEmpty()) {
                 iterator.remove();
@@ -238,7 +293,7 @@ public class ChatLogger {
                 }
             }
         }
-}
+    }
 
 
 }

@@ -71,12 +71,12 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
             actuallyBroadcast();
             lastBroadcastTime = new DateTime().getMillis();
         } else if (lastBroadcastTime < timeNow) {
-            /* Jos ollaan askettain broadcastattu, halutaan
-             * viivastyttaa seuraavaa broadcastia, mutta ei
-              * haluta kaynnistaa useita timereita. Sen vuoksi
+            /* Jos ollaan askettain tiedotettu, halutaan
+             * viivastyttaa seuraavaa tiedotusta, mutta ei
+              * haluta kaynnistaa useita ajastimia. Sen vuoksi
               * lastBroadcastTime asetetaan tulevaisuuteen ja
               * else if -ehdossa tarkistetaan sen avulla, onko
-              * uusi broadcast jo skeduloitu. */ //TODO:fix
+              * uusi tiedotus jo ajastettu. */
             lastBroadcastTime += QBC_DELAY_MS;
             long delayToNext = lastBroadcastTime - timeNow;
             Timer timer = new Timer();
