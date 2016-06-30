@@ -12,8 +12,10 @@ Project members: [Atte Juvonen](https://github.com/baobabKoodaa), [Leo Kallonen]
 
 # Testaa sovellusta Herokussa
 
+Jos sovellusta ei ole hetkeen käytetty, sivun avautumisessa voi mennä hetki (dyno käynnistyy).
+
 [Hammashoidon asiakkaan linkki](http://sotechat.herokuapp.com/from/?source=hammashoito)
 
 [Terveydenhuollon asiakkaan linkki](http://sotechat.herokuapp.com/from/?source=terveyshuolto)
 
-[Ammattilaisen linkki](http://sotechat.herokuapp.com/pro) (vaatii kirjautumista *hoitaja/salasana*)
+[Ammattilaisen linkki](http://sotechat.herokuapp.com/pro) (vaatii kirjautumista hoitajan tai adminin tunnuksilla)
