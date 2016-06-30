@@ -75,7 +75,7 @@ public class ChatLogger {
             final SessionRepo pSessionRepo,
             final DatabaseService pDatabaseService
     ) {
-        super();
+        this();
         this.sessionRepo = pSessionRepo;
         this.databaseService = pDatabaseService;
     }

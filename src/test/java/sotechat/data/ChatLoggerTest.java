@@ -29,9 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
@@ -94,17 +92,17 @@ public class ChatLoggerTest {
     }
 
     @Test
-    public void broadcastTest(){
+    public void broadcastTest() {
         MessageBroker mockBroker = Mockito.mock(MessageBroker.class);
         MsgToClient m1 = chatlogger.logNewMessage(message);
         MsgToClient m2 = chatlogger.logNewMessage(MsgToServer.create(userId, "xxx", "haloo"));
         chatlogger.broadcast("xxx", mockBroker);
-        verify(mockBroker, times(1)).convertAndSend("/toClient/chat/xxx", m1);
-        verify(mockBroker, times(1)).convertAndSend("/toClient/chat/xxx", m2);
+        verify(mockBroker, timeout(20L).times(1)).convertAndSend("/toClient/chat/xxx", m1);
+        verify(mockBroker, timeout(20L).times(1)).convertAndSend("/toClient/chat/xxx", m2);
     }
 
     @Test
-    public void getChannelsByUserIdTest(){
+    public void getChannelsByUserIdTest() {
         dbservice.addPersonToConversation("666", "xxx");
         dbservice.saveMsg("Salla", "Haloo", "20.10.", "xxx");
         List<ConvInfo> channelinfo = chatlogger.getChannelsByUserId("666");
