@@ -48,8 +48,10 @@ public class AdminService {
      *
      * @param encodedPersonJson merkkijono muotoa eyJ1c2Vybm...
      *        decoded personJson: {"username": mikko ... }
-     *        TODO: JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla
-     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     *        TODO:
+     *             JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla.
+     *             Nahtavasti toimii siita huolimatta.
+     * @return Virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
      */
     @Transactional
     public String addUser(final String encodedPersonJson) {

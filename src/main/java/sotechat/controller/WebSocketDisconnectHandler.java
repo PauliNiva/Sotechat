@@ -49,8 +49,13 @@ public class WebSocketDisconnectHandler<S>
     }
 
     /**
-     * Kaynnistaa <code>WebSocket</code>-yhteyden katketessa odotuksen.
-     * Odotuksen jalkeen inaktiiviset sessiot poistetaan jonosta.
+     * Toiminnot <code>WebSocket</code>-yhteyden katketessa.
+     *
+     * Asiakaskayttaja: kaynnistaa odotuksen, jonka jalkeen
+     * kayttaja poistetaan jonosta, mikali kayttaja ei tule takaisin ennen sita.
+     *
+     * Ammattilaiskayttaja: merkitsee ammattilaiskayttajan "poissa" tilaan.
+     *
      *
      * @param event Yhteydenkatkeamistapahtuma.
      */
@@ -59,11 +64,18 @@ public class WebSocketDisconnectHandler<S>
        String sessionId = SimpMessageHeaderAccessor
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
-       Principal user = SimpMessageHeaderAccessor.getUser(headers);
-       if (user == null) {
+       Principal professional = SimpMessageHeaderAccessor.getUser(headers);
+       if (professional == null) {
+           /* Asiakaskayttaja */
            this.queueTimeoutService
                    .initiateWaitBeforeScanningForInactiveUsers(
                            sessionId);
+       } else {
+           /* Ammattilaiskayttaja */
+           String onlineStatus = "false";
+           sessionRepo.setOnlineStatus(sessionId, onlineStatus);
+           broker.sendJoinLeaveNotices(professional, onlineStatus);
+           Session session = sessionRepo.getSessionFromSessionId(sessionId);
        }
         Session userSession = this.sessionRepo
                 .getSessionFromSessionId(sessionId);

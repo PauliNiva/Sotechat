@@ -254,6 +254,13 @@ public class SessionRepo extends MapSessionRepository {
             final String onlineStatus
     ) {
         String sessionId = req.getSession().getId();
+        setOnlineStatus(sessionId, onlineStatus);
+    }
+
+    public synchronized void setOnlineStatus(
+            final String sessionId,
+            final String onlineStatus
+    ) {
         Session session = sessionsBySessionId.get(sessionId);
         session.set("online", onlineStatus);
         updateCountOfProsAcceptingNewCustomers();
@@ -314,33 +321,6 @@ public class SessionRepo extends MapSessionRepository {
      */
     public void forgetAllSessions() {
         initialize();
-    }
-    
-    /**
-     * Palauttaa sessionsByUserId Hashmapin testausta varten.
-     *
-     * @return HashMap<String, Session> sessionsByUserId.
-     */
-    public HashMap<String, Session> getSessionsByUserId(){
-        return this.sessionsByUserId;
-    }
-
-    /**
-     * Palauttaa sessionsBySessionId testausta varten.
-     *
-     * @return HashMap<String, Session> sessionsBySessionId
-     */
-    public HashMap<String, Session> getSessionsBySessionId(){
-        return this.sessionsBySessionId;
-    }
-
-    /**
-     * Palauttaa proUserSessions testausta varten.
-     *
-     * @return HashMap<String, Session> proUserSessions
-     */
-    public HashMap<String, Session> getProUserSessions(){
-        return this.proUserSessions;
     }
 
 }
