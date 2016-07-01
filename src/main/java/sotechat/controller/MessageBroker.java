@@ -20,22 +20,22 @@ public class MessageBroker {
     /**
      * Sessioiden kasittely.
      */
-    //@Autowired
+    @Autowired
     private SessionRepo sessionRepo;
 
     /**
      * Muistaa asioita kayttajiin liittyen.
      */
-    //@Autowired
+    @Autowired
     private Mapper mapper;
 
     /**
      * Spring:in viestienvalittajaolio.
      */
-    //@Autowired
+    @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @Autowired
+    /*@Autowired
     public MessageBroker(
             Mapper pMapper,
             SessionRepo pSessionRepo,
@@ -44,7 +44,7 @@ public class MessageBroker {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
         this.simpMessagingTemplate = pSimpMessagingTemplate;
-    }
+    }/*
 
     /**
      * Lahettaa kanavalle tiedotuksen kanavan sulkemisesta.
