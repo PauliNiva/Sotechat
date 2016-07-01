@@ -1,5 +1,8 @@
 package sotechat.data;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import sotechat.controller.MessageBroker;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,7 +56,9 @@ public class Channel {
      *
      * @param pChannelId Kanavatunnus.
      */
-    public Channel(final String pChannelId) {
+    public Channel(
+            final String pChannelId
+    ) {
         this.channelId = pChannelId;
         currentSubscribers = new HashSet<>();
         activeUserIds = new HashSet<>();
@@ -218,7 +223,7 @@ public class Channel {
     }
 
     /**
-     * Sulkee kanavan.
+     * Sulkee kanavan ja tiedottaa osallisille.
      */
     public synchronized void setInactive() {
         this.active = false;

@@ -97,6 +97,7 @@ public class ChatLogger {
             return;
         }
         mapper.setDatabaseService(databaseService);
+
         List<Person> persons = databaseService.getAllPersons();
         for (Person person : persons) {
             String username = person.getUserName();

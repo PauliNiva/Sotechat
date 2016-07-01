@@ -7,12 +7,9 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
-import sotechat.service.QueueTimeoutService;
-
-import java.security.Principal;
+import sotechat.service.TimeoutService;
 
 /**
  * Maarittelee mitä tapahtuu, kun <code>WebSocket</code>-yhteys katkeaa.
@@ -34,7 +31,7 @@ public class WebSocketDisconnectHandler<S>
      * Olio, jonka vastuuseen kuuluu poistaa inaktiiviset kayttajat jonosta.
      */
     @Autowired
-    private QueueTimeoutService queueTimeoutService;
+    private TimeoutService timeoutService;
 
     /**
      * Sanomien valittaja.
@@ -60,23 +57,12 @@ public class WebSocketDisconnectHandler<S>
      * @param event Yhteydenkatkeamistapahtuma.
      */
     public final void onApplicationEvent(final SessionDisconnectEvent event) {
-       MessageHeaders headers = event.getMessage().getHeaders();
-       String sessionId = SimpMessageHeaderAccessor
+        MessageHeaders headers = event.getMessage().getHeaders();
+        String sessionId = SimpMessageHeaderAccessor
                .getSessionAttributes(headers)
                .get("SPRING.SESSION.ID").toString();
-       Principal professional = SimpMessageHeaderAccessor.getUser(headers);
-       if (professional == null) {
-           /* Asiakaskayttaja */
-           this.queueTimeoutService
-                   .initiateWaitBeforeScanningForInactiveUsers(
-                           sessionId);
-       } else {
-           /* Ammattilaiskayttaja */
-           String onlineStatus = "false";
-           sessionRepo.setOnlineStatus(sessionId, onlineStatus);
-           broker.sendJoinLeaveNotices(professional, onlineStatus);
-           Session session = sessionRepo.getSessionFromSessionId(sessionId);
-       }
+        this.timeoutService
+               .waitThenProcessDisconnect(sessionId);
         Session userSession = this.sessionRepo
                 .getSessionFromSessionId(sessionId);
         if (userSession != null) {

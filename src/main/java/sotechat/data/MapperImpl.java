@@ -1,5 +1,6 @@
 package sotechat.data;
 import org.springframework.stereotype.Component;
+import sotechat.controller.MessageBroker;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.MsgToClient;
 

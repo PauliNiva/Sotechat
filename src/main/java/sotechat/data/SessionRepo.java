@@ -3,6 +3,7 @@ package sotechat.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
+import sotechat.controller.MessageBroker;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -41,7 +42,7 @@ public class SessionRepo extends MapSessionRepository {
     /**
      * Mapper.
      */
-    private final Mapper mapper;
+    private Mapper mapper;
 
     /**
      * Konstruktori.
@@ -292,22 +293,24 @@ public class SessionRepo extends MapSessionRepository {
     }
 
     /**
-     * Unohtaa kaiken, mikä liittyy kayttajaan annetulla userId:llä.
-     * Tarkoitettu kaytettavaksi kayttajan poiston yhteydessa.
+     * Unohtaa kaiken, mika liittyy kayttajaan annetulla userId:lla.
+     * Tarkoitettu kaytettavaksi timeoutissa seka ammattilaiskayttajan
+     * tilin poistamisen yhteydessa.
      *
      * @param userId userId
      */
     public void forgetSession(final String userId) {
         Session session = getSessionFromUserId(userId);
         if (session == null) {
-            /* Käyttäjään ei liity sessiota. */
+            /* Kayttajaan ei liity sessiota. */
             return;
         }
         for (String channelId : session.getChannels()) {
             Channel channel = mapper.getChannel(channelId);
             disableChannel(channel);
-            /* Note: ei haittaa että WS yhteys kanavalle jää auki, sillä
-             * kukaan ei pysty enää lähettämään viestejä kanavalle. */
+            /* Note: ei haittaa että WS yhteys kanavalle jaa auki, silla
+             * kukaan ei pysty enaa lahettamaan viesteja kanavalle.
+             * TODO: Ilmoitus kanaville sulkemisesta. */
         }
         sessionsByUserId.remove(userId);
         String sessionId = session.get("sessionId");

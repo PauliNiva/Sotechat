@@ -28,14 +28,14 @@ public class QueueTimeOutServiceTest {
     QueueBroadcaster queueBroadcaster;
 
     @InjectMocks
-    QueueTimeoutService queueTimeoutService = new QueueTimeoutService();
+    TimeoutService timeoutService = new TimeoutService();
 
     @Test
     public void testCantRemoveNonExistentSessionFromQueue() {
         Mockito.when(this.sessionRepo.getSessionFromSessionId(Mockito.anyString()))
                 .thenReturn(null);
 
-        this.queueTimeoutService.removeInactiveUsersFromQueue(Mockito.anyString());
+        this.timeoutService.processDisconnect(Mockito.anyString());
         Mockito.verify(this.sessionRepo, times(0)).leaveChannel(Mockito.anyString(), Mockito.anyString());
         Mockito.verify(this.queueService, times(0)).removeFromQueue(Mockito.anyString());
         Mockito.verify(this.queueBroadcaster, times(0)).broadcastQueue();
@@ -50,7 +50,7 @@ public class QueueTimeOutServiceTest {
                 .when(this.sessionRepo.getSessionFromSessionId(Mockito.anyString()))
                 .thenReturn(session);
 
-        this.queueTimeoutService.removeInactiveUsersFromQueue(Mockito.anyString());
+        this.timeoutService.processDisconnect(Mockito.anyString());
         Mockito.verify(this.sessionRepo, times(1)).leaveChannel(Mockito.anyString(), Mockito.anyString());
         Mockito.verify(this.queueService, times(1)).removeFromQueue(Mockito.anyString());
         Mockito.verify(this.queueBroadcaster, times(1)).broadcastQueue();
@@ -65,7 +65,7 @@ public class QueueTimeOutServiceTest {
                 .when(this.sessionRepo.getSessionFromSessionId(Mockito.anyString()))
                 .thenReturn(session);
 
-        this.queueTimeoutService.removeInactiveUsersFromQueue(Mockito.anyString());
+        this.timeoutService.processDisconnect(Mockito.anyString());
         Mockito.verify(this.sessionRepo, times(0)).leaveChannel(Mockito.anyString(), Mockito.anyString());
         Mockito.verify(this.queueService, times(0)).removeFromQueue(Mockito.anyString());
         Mockito.verify(this.queueBroadcaster, times(0)).broadcastQueue();
@@ -75,9 +75,9 @@ public class QueueTimeOutServiceTest {
     public void testQueueRemovalIsInitiatedAfterWait() {
         Timer timer = Mockito.mock(Timer.class);
 
-        this.queueTimeoutService.setTimer(timer);
+        this.timeoutService.setTimer(timer);
 
-        this.queueTimeoutService.initiateWaitBeforeScanningForInactiveUsers("1");
+        this.timeoutService.waitThenProcessDisconnect("1");
 
         Mockito.verify(timer, times(1)).schedule(Mockito.anyObject(), Mockito.anyLong());
     }

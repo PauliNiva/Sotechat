@@ -8,8 +8,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import sotechat.controller.MessageBroker;
-import sotechat.controller.WebSocketDisconnectHandler;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
@@ -19,13 +17,14 @@ import static org.junit.Assert.assertEquals;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import sotechat.service.QueueTimeoutService;
+import sotechat.service.TimeoutService;
 import sotechat.util.MockPrincipal;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 
 /**
  * Testit chattiin kirjoitettujen viestien kasittelyyn ja kuljetukseen.
@@ -38,7 +37,7 @@ public class WebSocketDisconnectHandlerTest {
     private SessionRepo sessionRepo;
 
     @Mock
-    private QueueTimeoutService queueTimeoutService;
+    private TimeoutService queueTimeoutService;
 
     @Spy
     private MessageBroker broker;
@@ -61,7 +60,8 @@ public class WebSocketDisconnectHandlerTest {
         Mockito.when(accessor.getSessionAttributes(headers))
                 .thenReturn(sessionAttributes);
         Mockito.when(accessor.getUser(headers)).thenReturn(new MockPrincipal("hoitaja"));
-        Mockito.doNothing().when(this.queueTimeoutService).initiateWaitBeforeScanningForInactiveUsers("123");
+        Mockito.doNothing().when(this.queueTimeoutService).waitThenProcessDisconnect("123");
+        Mockito.doNothing().when(this.broker).sendJoinLeaveNotices(any(), any());
 
         Session session = new Session();
 
@@ -88,7 +88,7 @@ public class WebSocketDisconnectHandlerTest {
         Mockito.when(accessor.getSessionAttributes(headers))
                 .thenReturn(sessionAttributes);
         Mockito.when(accessor.getUser(headers)).thenReturn(null);
-        Mockito.doNothing().when(this.queueTimeoutService).initiateWaitBeforeScanningForInactiveUsers("123");
+        Mockito.doNothing().when(this.queueTimeoutService).waitThenProcessDisconnect("123");
 
         Session session = new Session();
 
@@ -98,7 +98,7 @@ public class WebSocketDisconnectHandlerTest {
         this.webSocketDisconnectHandler.onApplicationEvent(event);
 
         Mockito.verify(this.queueTimeoutService, Mockito.times(1))
-                .initiateWaitBeforeScanningForInactiveUsers(Mockito.anyString());
+                .waitThenProcessDisconnect(Mockito.anyString());
         assertEquals("disconnected", session.get("connectionStatus"));
     }
 }

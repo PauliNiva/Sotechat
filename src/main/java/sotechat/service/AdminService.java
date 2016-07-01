@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.util.Base64Utils;
 
+import sotechat.controller.MessageBroker;
 import sotechat.data.ChatLogger;
 import sotechat.data.Mapper;
+import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
@@ -42,6 +44,9 @@ public class AdminService {
 
     @Autowired
     private ValidatorService validatorService;
+
+    @Autowired
+    private MessageBroker broker;
 
     /**
      * Lisaa uuden ammattilaisen.
@@ -122,6 +127,12 @@ public class AdminService {
             personRepo.delete(userId);
         } catch (Exception databaseException) {
             return "Tietokantavirhe yrittäessä poistaa käyttäjää!";
+        }
+        Session session = sessionRepo.getSessionFromUserId(userId);
+        for (String channelId : session.getChannels()) {
+            /* Tiedotetaan poistettavan kayttajan kanaville
+             * kanavien sulkemisesta. */
+            broker.sendClosedChannelNotice(channelId);
         }
         sessionRepo.forgetSession(userId);
 
