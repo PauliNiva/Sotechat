@@ -56,9 +56,4 @@ public class JpaAuthenticationProviderTest {
         Authentication mockAuthentication = new MockAuthentication("hoitaja", "salasana");
         Assert.assertNotNull(jpaAuthProv.authenticate(mockAuthentication));
     }
-
-    @Test
-    public void supportsReturnTrue() {
-        Assert.assertTrue(jpaAuthProv.supports(MockAuthentication.class));
-    }
 }

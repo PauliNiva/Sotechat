@@ -96,7 +96,6 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     /**
      * Palauttaa <code>true</code>, jos <code>AuthenticationProvider</code>
      * tukee viitattua <code>Authentication</code>-oliota.
-     * TODO: Selvennys, tuetaanko muitakin kuin Principal-tyyppisiä olioita?
      * <p>
      * <code>true</code>:n palautus ei takaa, etta
      * <code>AuthenticationProvider</code> pystyy valtuuttamaan sille esitetyn
@@ -110,7 +109,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
      */
     @Override
     public final boolean supports(final Class<?> type) {
-        return true;
+        return type.equals(UsernamePasswordAuthenticationToken.class);
     }
 
 }
