@@ -18,7 +18,7 @@ import java.util.List;
 public class PersonService {
 
     /**
-     * Person-olioita kasitteleava JPA-repositorio.
+     * Person-olioita kasitteleva JPA-repositorio.
      */
     @Autowired
     private PersonRepo personRepo;
