@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import sotechat.controller.MessageBroker;
 import sotechat.controller.QueueBroadcaster;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
@@ -13,6 +14,7 @@ import sotechat.data.SessionRepo;
 import java.util.Timer;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -23,6 +25,9 @@ public class QueueTimeOutServiceTest {
 
     @Mock
     SessionRepo sessionRepo;
+
+    @Mock
+    MessageBroker broker;
 
     @Mock
     QueueBroadcaster queueBroadcaster;
@@ -44,16 +49,18 @@ public class QueueTimeOutServiceTest {
     @Test
     public void testDisconnectedSessionIsRemovedSuccessfully() {
         Session session = new Session();
+        session.addChannel("testikanava");
         session.set("connectionStatus", "disconnected");
 
         Mockito
                 .when(this.sessionRepo.getSessionFromSessionId(Mockito.anyString()))
                 .thenReturn(session);
+        Mockito.doNothing().when(this.broker).sendClosedChannelNotice(any());
 
         this.timeoutService.processDisconnect(Mockito.anyString());
         Mockito.verify(this.sessionRepo, times(1)).leaveChannel(Mockito.anyString(), Mockito.anyString());
         Mockito.verify(this.queueService, times(1)).removeFromQueue(Mockito.anyString());
-        Mockito.verify(this.queueBroadcaster, times(1)).broadcastQueue();
+        Mockito.verify(this.queueBroadcaster, times(0)).broadcastQueue();
     }
 
     @Test

@@ -129,10 +129,12 @@ public class AdminService {
             return "Tietokantavirhe yrittäessä poistaa käyttäjää!";
         }
         Session session = sessionRepo.getSessionFromUserId(userId);
-        for (String channelId : session.getChannels()) {
+        if (session != null) {
+            for (String channelId : session.getChannels()) {
             /* Tiedotetaan poistettavan kayttajan kanaville
              * kanavien sulkemisesta. */
-            broker.sendClosedChannelNotice(channelId);
+                broker.sendClosedChannelNotice(channelId);
+            }
         }
         sessionRepo.forgetSession(userId);
 
