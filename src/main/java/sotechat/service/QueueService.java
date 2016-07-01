@@ -61,7 +61,7 @@ public class QueueService {
     }
 
     /**
-     * Pyynto liittya jonoon, validoitava ennen taman metodin kutsua.
+     * Lisaa jonoon uuden asiakaskayttajan.
      *
      * @param request req
      * @param payload payload
@@ -81,7 +81,7 @@ public class QueueService {
     }
 
     /**
-     * Metodi joinQueue testauksen helpottamiseksi.
+     * Lisaa jonoon uuden asiakaskayttajan.
      *
      * @param session palvelimelta loytyva sessio-olio
      * @param username kayttajan antama
@@ -123,7 +123,7 @@ public class QueueService {
     }
 
     /**
-     * Suoritetaan jonosta nostaminen (oletettavasti validoitu jo).
+     * Yrittaa nostaa halutun kanavan jonosta.
      *
      * @param channelId KanavaId.
      * @param accessor  Autentikaatiotiedot.

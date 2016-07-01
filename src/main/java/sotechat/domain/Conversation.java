@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Luokka keskustelun tietojen tallentamiseen. Tästä luokasta luodaan
- * tietokantaan <code>Conversation</code>-taulu, jonka riveinä ovat luokan
- * ilmentymamuuttujat.
+ * Luokka keskustelun metatietojen tallentamiseen tietokantaan.
+ * Tasta luokasta luodaan tietokantaan <code>Conversation</code>-taulu,
+ * jonka riveina ovat luokan ilmentymamuuttujat.
  */
 @Entity
 public class Conversation {
 
     /**
-     * Keskustelun kanavatunnus. Toimii tietokantataulun <code>id</code>:nä.
+     * Keskustelun kanavatunnus. Toimii tietokantataulun <code>id</code>:na.
      */
     @Id
     private String channelId;

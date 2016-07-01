@@ -35,23 +35,10 @@ public class ValidatorService {
     private SessionRepo sessionRepo;
 
     /**
-     * <code>WebSocket</code>-osoitteessa olevien kauttaviivalla eroteltujen
-     * osioden lukumaara.
-     */
-    private static final int CHANNEL_PATH_LENGTH = 4;
-
-    /**
-     * Kuinka mones alkio channelId on taulukossa, joka on muodostettu
-     * <code>WebSocket</code>-osoitteesta
-     * kauttaviivan perusteella erottelemalla.
-     */
-    private static final int POSITION_OF_CHANNEL_ID_IN_CHANNEL_PATH = 3;
-
-    /**
      * Konstruktori.
      *
-     * @param pMapper mapper
-     * @param pSessionRepo ses
+     * @param pMapper p
+     * @param pSessionRepo p
      */
     @Autowired
     public ValidatorService(
@@ -119,7 +106,7 @@ public class ValidatorService {
         /* Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
         Channel channel = mapper.getChannel(channelId);
-        if (!channel.hasActiveUser(userId)) { //TODO NULL.
+        if (!channel.hasActiveUser(userId)) {
             return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
@@ -160,7 +147,7 @@ public class ValidatorService {
 
 
     /**
-     * Sallitaanko kanavan kuuntelu?.
+     * Sallitaanko polun kuuntelu?
      * Jos sallitaan, palauttaa tyhjan Stringin.
      * Jos ei sallita, palauttaa virheilmoituksen.
      *
@@ -173,7 +160,7 @@ public class ValidatorService {
         Principal principal = acc.getUser();
         String sessionId = getSessionIdFrom(acc);
         String channelIdWithPath = acc.getDestination();
-        String prefix = "Validate subscription for channel " + channelIdWithPath
+        String prefix = "Validate subscription for " + channelIdWithPath
                 + " by session id " + sessionId + " ### ";
 
         /* Kelvollinen sessio? */
@@ -189,8 +176,8 @@ public class ValidatorService {
                 return prefix + "Session belongs to pro but user not auth'd";
             }
             if (channelIdWithPath.equals("/toClient/QBCC")) {
-                /* Sallitaan jonon tilannepaivityskanavan kuuntelu
-                 * ammattilaiskayttajalle. */
+                /* Sallitaan ammattilaiskayttajalle
+                 * jonon tilannepaivityksien kuuntelu. */
                 return "";
             }
             if (channelIdWithPath.startsWith("/toClient/queue/")) {
@@ -200,13 +187,12 @@ public class ValidatorService {
         }
 
         /**
-         * Kielletaan kanavan tilaus kaikkialle poislukien:
+         * Kielletaan kaikkien muiden polkujen tilaus, paitsi:
          * /toClient/queue/channelId
          * /toClient/chat/channelId
-         * Tarkistetaan, onko kayttajalla/pro:lla oikeutta kanavalle.
          */
         String[] splitted = channelIdWithPath.split("/");
-        if (splitted.length != CHANNEL_PATH_LENGTH) {
+        if (splitted.length != 4) {
             return prefix + "Invalid channel path (1): " + channelIdWithPath;
         }
         if (!"toClient".equals(splitted[1])) {
@@ -216,7 +202,7 @@ public class ValidatorService {
                 && !"chat".equals(splitted[2])) {
             return prefix + "Invalid channel path (3): " + channelIdWithPath;
         }
-        String channelId = splitted[POSITION_OF_CHANNEL_ID_IN_CHANNEL_PATH];
+        String channelId = splitted[3];
 
         if (!session.hasAccessToChannel(channelId)) {
             return prefix
@@ -246,7 +232,7 @@ public class ValidatorService {
             return "Denied join, no professionals available.";
         }
         if (professional != null) {
-            /* Hoitaja yrittaa liittya queueiin asiakkaana. */
+            /* Hoitaja yrittaa liittya queueen asiakkaana. */
             return "Denied join queue request for professional";
         }
 

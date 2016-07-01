@@ -11,27 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Luokka henkilon tietojen tallentamiseen.
+ * Luokka ammattikayttajan tallentamiseen tietokantaan.
  */
 @Entity
 public class Person {
 
     /**
-     * Henkilon Id.
+     * userId, tietokantataulun primary key.
      */
     @Id
     private String userId;
 
     /**
-     * Henkilon nimimerkki joka nakyy asiakkaille. Tietokannassa rivin on oltava
-     * yksilollinen.
+     * Ammattikayttajan yksilollinen, julkinen nimimerkki,
+     * joka voi olla eri kuin loginName.
      */
     @Column(unique = true)
     private String username;
 
     /**
-     * Nimimerkki jolla henkilo kirjautuu sisaan jarjestelmaan.
-     * Tietokannassa rivin on oltava yksilollinen.
+     * Kirjautumisnimi, jolla henkilo kirjautuu sisaan jarjestelmaan.
      */
     @Column(unique = true)
     private String loginName;
@@ -53,7 +52,9 @@ public class Person {
     private List<Conversation> conversationsOfPerson;
 
     /**
-     * Henkilon rooli.
+     * Joko ROLE_ADMIN tai ROLE_USER.
+     * Role_USER viittaa ammattikayttajaan (ei asiakaskayttajaan).
+     * Role_ADMIN viittaa yllapitajaan, joka voi hallinnoida ammattilaisia.
      */
     private String role;
 
@@ -112,7 +113,7 @@ public class Person {
     }
 
     /**
-     * Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmästä.
+     * Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmasta.
      *
      * @return Hajautusarvo merkkijonona.
      */
@@ -121,13 +122,14 @@ public class Person {
     }
 
     /**
-     * Luo argumenttina annetusta selkokielisestä salasanasta
+     * Luo argumenttina annetusta selkokielisesta salasanasta
      * hajautusarvon kirjautumisten tunnistautumiseen.
      * <p>
      * Aluksi selkokieliseen salasanaan lisataan suola, joka on satunnainen
-     * merkkijono. Suola tallennetaan selkokielisenä tietokantaan
-     * <code>Person</code>-olion mukana. Salasanan ja suolan yhdistelmästä
-     * luodaan hajautusarvo, joka myös tallennetaan <code>Person-olioon</code>.
+     * merkkijono. Suola tallennetaan selkokielisena tietokantaan
+     * <code>Person</code>-olion attribuuttina. Salasanan ja suolan
+     * yhdistelmasta luodaan hajautusarvo, joka myos tallennetaan
+     * <code>Person-olioon</code>.
      *
      * @param plainTextPassword Selkokielinen salasana.
      */

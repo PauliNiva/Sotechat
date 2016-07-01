@@ -101,7 +101,7 @@ public class AdminService {
     }
 
     /**
-     * Poistaa ammattilaiskäyttäjän annetulla userId:lla.
+     * Poistaa ammattilaiskayttajan annetulla userId:lla.
      *
      * @param userId userId
      * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
@@ -137,12 +137,6 @@ public class AdminService {
             }
         }
         sessionRepo.forgetSession(userId);
-
-        /* TODO:
-         * broker.sendClosedChannelNoticeToallChannelsOfDeletedUser
-         * Merkitysta harvinaisessa tilanteessa, jossa halutaan
-         * potkia ulos pro-kayttaja, jolla on aktiivisia kanavia.
-         * Silloin haluttaisiin lahettaa kanaville ilmoitus. */
 
         return "";
     }

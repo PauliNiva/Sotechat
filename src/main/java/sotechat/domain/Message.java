@@ -7,7 +7,7 @@ import javax.persistence.ManyToOne;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
- * Luokka viestien tallentamiseen.
+ * Luokka viestien tallentamiseen tietokantaan.
  */
 @Entity
 public class Message extends AbstractPersistable<Long> {
