@@ -246,8 +246,8 @@ public class ValidatorService {
             return "Denied join, no professionals available.";
         }
         if (professional != null) {
-            /* Hoitaja yrittaa liittya pooliin asiakkaana. */
-            return "Denied join pool request for professional";
+            /* Hoitaja yrittaa liittya queueiin asiakkaana. */
+            return "Denied join queue request for professional";
         }
 
         /* Clientin session tarkistus. */
@@ -263,12 +263,12 @@ public class ValidatorService {
 
         /* Tarkistetaan etta aiempi tila on "start". */
         if (!session.get("state").equals("start")) {
-            return "Denied join pool request due to bad state.";
+            return "Denied join queue request due to bad state.";
         }
 
         /* Tarkistetaan, ettei nimimerkki ole rekisteroity ammattilaiselle. */
         if (mapper.isUsernameReserved(username)) {
-            return "Denied join pool request due to reserved username.";
+            return "Denied join queue request due to reserved username.";
         }
 
         /* Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
@@ -276,7 +276,7 @@ public class ValidatorService {
         Channel channel = mapper.getChannel(channelId);
         for (Session other : channel.getCurrentSubscribers()) {
             if (other.get("username").equals(username)) {
-                return "Denied join pool request. Username already on channel.";
+                return "Denied join queue request. Username already on channel.";
             }
         }
 

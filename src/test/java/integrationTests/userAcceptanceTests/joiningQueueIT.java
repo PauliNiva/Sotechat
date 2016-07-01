@@ -56,7 +56,7 @@ public class joiningQueueIT {
         // A queueing view is showed to the user
         assertTrue(waitForTextToAppear(userWait, "sinua palvellaan mahdollisimman pian"));
 
-        // User is added to the pool of customers professionals side
+        // User is added to the queue of customers professionals side
 
         assertTrue(waitElementPresent(proWait,By.id("queuerBlock")).isDisplayed());
         waitAndPickFromQueue(proWait);

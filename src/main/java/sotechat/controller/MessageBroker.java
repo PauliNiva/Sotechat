@@ -11,7 +11,8 @@ import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 
 /**
- * Kanavalle lahetettavien viestien ja tilatietojen valittaminen.
+ * Erilaisiin polkuihin lahetettavien sanomien valittaminen.
+ * Esimerkiksi chattiin kirjoitettu viesti tai paivitys jonon sisallosta.
  */
 @Component
 public class MessageBroker {
@@ -62,8 +63,8 @@ public class MessageBroker {
      * @param online String true tai false.
      */
     public void sendJoinLeaveNotices(
-            Principal pro,
-            String online
+            final Principal pro,
+            final String online
     ) {
         String username = pro.getName();
         String userId = mapper.getIdFromRegisteredName(username);
@@ -81,7 +82,7 @@ public class MessageBroker {
      * @param session Liittyja.
      */
     public void sendJoinNotices(
-            Session session
+            final Session session
     ) {
         String username = session.get("username");
         for (String channelId : session.getChannels()) {
@@ -96,7 +97,7 @@ public class MessageBroker {
      * @param session Poistuja.
      */
     public void sendLeaveNotices(
-            Session session
+            final Session session
     ) {
         String username = session.get("username");
         for (String channelId : session.getChannels()) {
@@ -112,8 +113,8 @@ public class MessageBroker {
      * @param username Liittyja.
      */
     public void sendJoinNotice(
-            String path,
-            String username
+            final String path,
+            final String username
     ) {
         String joinInfo = "{\"join\":\"" + username + "\"}";
         simpMessagingTemplate.convertAndSend(path, joinInfo);
@@ -126,8 +127,8 @@ public class MessageBroker {
      * @param username Poistuja.
      */
     public void sendLeaveNotice(
-            String path,
-            String username
+            final String path,
+            final String username
     ) {
         String leaveInfo = "{\"leave\":\"" + username + "\"}";
         simpMessagingTemplate.convertAndSend(path, leaveInfo);

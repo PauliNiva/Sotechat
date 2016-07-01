@@ -59,7 +59,7 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             }
         }
 
-        /* Sallitaan subscriptionin normaali kasittely. */
+        /* Sallitaan sanoman normaali kasittely. */
         return message;
     }
 

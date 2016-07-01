@@ -9,7 +9,7 @@ import sotechat.data.Session;
 public class UserStateResponse {
 
     /**
-     * Tila ("start", "inpool" tai "chat").
+     * Tila ("start", "inqueue" tai "chat").
      */
     private String state;
 

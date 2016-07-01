@@ -51,7 +51,7 @@ public class StateController {
     private final QueueBroadcaster queueBroadcaster;
 
     /**
-     * Viestien lahetys.
+     * Sanomien lahettaminen.
      */
     private final MessageBroker broker;
 
@@ -81,14 +81,13 @@ public class StateController {
     }
 
     /**
-     * Kun asiakaskayttaja haluaa pyytaa tilan (mm. sivun latauksen yhteydessa).
+     * Kun asiakaskayttaja haluaa pyytaa omat tilatietonsa
+     * (muun muassa sivun latauksen yhteydessa).
      *
-     * @param req taalta paastaan session-olioon kasiksi.
-     * @param professional autentikointitiedot
-     * @return JSON-muotoon paketoitu UserStateResponse.
-     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
-     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
-     *          kayttajalle.
+     * @param req Pyynnon tiedot.
+     * @param professional Kirjautumistiedot.
+     * @return JSON-muotoon paketoitu UserStateResponse
+     * lahetetaan pyynnon tehneelle kayttajalle.
      */
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
@@ -100,14 +99,13 @@ public class StateController {
     }
 
     /**
-     * Kun proClient haluaa pyytaa tilan (mm. sivun lataus).
+     * Kun ammattilaiskayttaja haluaa pyytaa omat tilatietonsa
+     * (muun muassa sivun latauksen yhteydessa).
      *
-     * @param req taalta paastaan session-olioon kasiksi.
-     * @param professional kirjautumistiedot
-     * @return JSON-muotoon paketoitu ProStateResponse (tai null).
-     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
-     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
-     *          kayttajalle.
+     * @param req Pyynnon tiedot.
+     * @param professional Kirjautumistiedot.
+     * @return JSON-muotoon paketoitu ProStateResponse (tai tyhja vastaus)
+     * lahetetaan pyynnon tehneelle kayttajalle.
      */
     @RequestMapping(value = "/proState", method = RequestMethod.GET)
     public final ProStateResponse returnProStateResponse(
@@ -123,32 +121,30 @@ public class StateController {
     }
 
     /**
-     * Kun client lahettaa avausviestin ja haluaa liittya pooliin.
+     * Kun client lahettaa avausviestin ja haluaa liittya jonoon.
      *
-     * @param request pyynnon tiedot
-     * @param professional autentikaatiotiedot
+     * @param request Pyynto.
+     * @param professional Kirjautumistiedot.
      * @return JSON {"content":"Denied..."} tai {"content":"OK..."}
-     *          Palautusarvoa ei kayteta kuten yleensa metodin palautusarvoa,
-     *          vaan se lahetetaan HTTP-vastauksena pyynnon tehneelle
-     *          kayttajalle.
+     * lahetetaan pyynnon tehneelle kayttajalle.
      */
-    @RequestMapping(value = "/joinPool", method = RequestMethod.POST)
-    public final String respondToJoinPoolRequest(
+    @RequestMapping(value = "/joinQueue", method = RequestMethod.POST)
+    public final String respondToJoinQueueRequest(
             final HttpServletRequest request,
             final Principal professional
     ) {
-        String response = processJoinPoolReq(request, professional);
+        String response = processJoinQueueReq(request, professional);
         return "{\"content\":\"" + response + "\"}";
     }
 
     /**
      * Validoi pyynto liittya jonoon ja suorita se.
-     * 
-     * @param req pyynnon tiedot
-     * @param auth autentikaatiotiedot
-     * @return String "OK..." tai "Denied..."
+     *
+     * @param req Pyynto.
+     * @param auth Kirjautumistiedot.
+     * @return String "OK..." tai "Denied...".
      */
-    private String processJoinPoolReq(
+    private String processJoinQueueReq(
             final HttpServletRequest req,
             final Principal auth
     ) {

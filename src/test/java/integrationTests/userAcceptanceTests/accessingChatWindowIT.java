@@ -40,7 +40,7 @@ public class accessingChatWindowIT {
 
     /**
      * User sees the queuing view
-     * User can see a chat window when she/he is picked from a pool of customers by a healthcare professiona
+     * User can see a chat window when she/he is picked from a queue of customers by a healthcare professiona
      */
     @Test
     public void UserCanSeeAChatWindow() {
@@ -53,7 +53,7 @@ public class accessingChatWindowIT {
         assertTrue(waitQueueWindowsAppear(userWait).isDisplayed());
 
 
-        // A professional chooses the started conversation from a pool
+        // A professional chooses the started conversation from a queue
         waitAndPickFromQueue(proWait);
 
         // A chat window is opened for the user

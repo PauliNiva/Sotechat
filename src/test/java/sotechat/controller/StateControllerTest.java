@@ -124,7 +124,7 @@ public class StateControllerTest {
                 .get("/proState")
                 .accept(MediaType.APPLICATION_JSON)
                 .principal(new MockPrincipal("Hoitaja")));
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
         )
                 .andExpect(status().isOk())
@@ -154,7 +154,7 @@ public class StateControllerTest {
 
         /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .session(mockSession)
                     )
@@ -179,7 +179,7 @@ public class StateControllerTest {
 
         /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila != "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
                         .session(mockSession)
                         )
@@ -203,7 +203,7 @@ public class StateControllerTest {
         /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))
                 .andExpect(status().isOk())
@@ -223,7 +223,7 @@ public class StateControllerTest {
 
         String json = "väärä json";
 
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))
                 .andExpect(status().isOk())

@@ -5,7 +5,7 @@
 angular.module('chatApp')
     .controller('userToQueueCtrl', ['$http', '$scope', 'userStateService',
         function ($http, $scope, userStateService) {
-        var JOINPOOLURL = '/joinPool';
+        var JOINPOOLURL = '/joinQueue';
 
         /** 
          * Kun kayttaja painaa jonoon liittymispainiketta 
@@ -34,13 +34,13 @@ angular.module('chatApp')
                  */
             var errorJoinQueue = function (response) {
                     var err = "Tuntematon virhe";
-                    if (response.data.content === "Denied join pool request for professional.") {
+                    if (response.data.content === "Denied join queue request for professional.") {
                         // Tässä casessa userState vaihtuu "pro":ksi ja kayttajan nakyma
                         // heitetaan staattiselle virhesivulle. Siksi tyhja blokki.
                     } else {
-                        if (response.data.content === "Denied join pool request due to reserved username.") {
+                        if (response.data.content === "Denied join queue request due to reserved username.") {
                             err = "Kayttajanimi on varattu. Kokeile toista nimea.";
-                        } else if (response.data.content === "Denied join pool request. Username already on channel.") {
+                        } else if (response.data.content === "Denied join queue request. Username already on channel.") {
                             err = "Kanavalla on jo kayttaja samalla kayttajanimella. Kokeile toista nimea.";
                         } else if (response.data.content === "Denied join, no professionals available.") {
                             err = "Ammattilaisia ei ole juuri nyt paikalla.";

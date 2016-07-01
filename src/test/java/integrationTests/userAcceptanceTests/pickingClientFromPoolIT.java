@@ -20,7 +20,7 @@ import static integrationTests.util.sotechatITCommands.*;
  */
 @RunWith(WebDriverRunner.class)
 @Chrome
-public class pickingClientFromPoolIT {
+public class pickingClientFromQueueIT {
 
     private DriverHandler handler;
     private WebDriverWait userWait;
@@ -42,7 +42,7 @@ public class pickingClientFromPoolIT {
     }
 
     /**
-     * Professional can pick the first client from a pool of chats to start a conversation
+     * Professional can pick the first client from a queue of chats to start a conversation
      */
     @Test
     public void ProPickFirstFromQueue() {
@@ -67,7 +67,7 @@ public class pickingClientFromPoolIT {
 
     /**
      * TODO: Professional can pick a customer of her or his choosing
-     *  from the chat pool to start a conversation
+     *  from the chat queue to start a conversation
      * WHEN its implemented
      */
 

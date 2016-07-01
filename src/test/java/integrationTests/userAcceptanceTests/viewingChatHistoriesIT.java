@@ -51,7 +51,7 @@ public class viewingChatHistoriesIT {
         // Username and a starting message is submitted
         waitAndFillInformation(userWait);
         // A queueing view is showed to the user
-        // User is added to the pool of customers professionals side
+        // User is added to the queue of customers professionals side
 
         waitAndPickFromQueue(proWait);
         waitChatWindowsAppear(userWait);

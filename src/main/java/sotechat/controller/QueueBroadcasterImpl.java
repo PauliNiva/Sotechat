@@ -12,7 +12,7 @@ import sotechat.service.QueueService;
 
 /**
  * Tiedottaa jonon tilanteesta kaikille ammattilaisille
- * (QBCC kanavan tilanneille).
+ * (QBCC -polun tilanneille).
  */
 @Component
 public class QueueBroadcasterImpl implements QueueBroadcaster {
@@ -23,7 +23,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     private final QueueService queueService;
 
     /**
-     * Viestien lahettamiseen.
+     * Sanomien lahettamiseen.
      */
     private MessageBroker broker;
 
@@ -35,7 +35,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     /**
      * Millisekunneissa minimiviive tiedotusten valilla.
      */
-    public static final long QBC_DELAY_MS = 100L;
+    private static final long QBC_DELAY_MS = 100L;
 
     /**
      * Konstruktori.
@@ -90,7 +90,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
 
     /**
      * Tiedottaa valittomasti jonon tilanteen kaikille
-     * QBCC-kanavan tilaajille (hoitajille).
+     * QBCC-polun tilaajille (hoitajille).
      */
     private synchronized void actuallyBroadcast() {
         String qAsJson = queueService.toString();
