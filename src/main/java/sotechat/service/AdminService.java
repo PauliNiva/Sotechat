@@ -43,9 +43,6 @@ public class AdminService {
     @Autowired
     private ValidatorService validatorService;
 
-    //TODO: Selvitä miksi viimeisimmäksi käsitelty person halutaan jättää tähän?
-    private Person person;
-
     /**
      * Lisaa uuden ammattilaisen.
      *
@@ -65,10 +62,10 @@ public class AdminService {
         }
 
         /* Pyynto validoitu, tallennetaan tiedot uudesta personista. */
-        person = makePersonFrom(encodedPersonJson);
+        Person person = makePersonFrom(encodedPersonJson);
         person.setUserId(mapper.generateNewId());
         try {
-            personRepo.save(this.person);
+            personRepo.save(person);
         } catch (Exception databaseException) {
             return "Tietokantavirhe henkilön tallennusta yrittäessä!";
         }
@@ -149,7 +146,7 @@ public class AdminService {
     ) {
         try {
             String decodedPassword = decode(encodedPassword);
-            person = personRepo.findOne(userId);
+            Person person = personRepo.findOne(userId);
             if (person == null) {
                 return "Käyttäjää ei löydy.";
             }
