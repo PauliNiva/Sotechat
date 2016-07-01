@@ -12,7 +12,7 @@ import sotechat.util.MockPrincipal;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
-/*
+
 public class MessageBrokerTest {
 
     SessionRepo sessionRepo;
@@ -43,4 +43,3 @@ public class MessageBrokerTest {
         Mockito.verify(template, times(2)).convertAndSend(anyString(), anyString());
     }
 }
-*/

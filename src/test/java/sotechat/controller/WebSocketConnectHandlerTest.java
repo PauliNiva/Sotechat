@@ -30,6 +30,7 @@ public class WebSocketConnectHandlerTest {
     private SessionRepo sessionRepo;
 
     @Mock
+    //@Spy
     private MessageBroker broker;
 
     @InjectMocks
