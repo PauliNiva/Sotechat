@@ -19,26 +19,13 @@ import java.util.TimerTask;
 
 /**
  * Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
- *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
- *  - kun joku subscribaa QBCC kanavalle, pyytaa QueueBroadcasteria castaamaan.
+ *  - pitaa kirjaa, ketka kuuntelevat mitakin polkua.
+ *  - kun joku subscribaa QBCC polkuun, pyytaa QueueBroadcasteria tiedottamaan.
  *  HUOM: Spring hajoaa, jos kaytetaan Autowired konstruktoria tassa luokassa!
  */
 @Component
 public class SubscribeEventListener
         implements ApplicationListener<ApplicationEvent> {
-
-    /**
-     * Aika millisekunteina, joka odotetaan, ennen kuin suoritetaan Timer-
-     * ajastimen määrittämän TimerTask-olion run-metodi.
-     */
-    private static final int TIMER_DELAY_MS = 10;
-
-    /**
-     * Kun jäsennetään Http-osoite String-taulukoksi handleSubscribe-metodissa,
-     * tulee taulukosta ottaa alkio, joka on tämän muuttujan arvon mukaisessa
-     * kohdassa taulukkoa.
-     */
-    private static final int POSITION_OF_ELEMENT_IN_HTTP_ADDRESS_ARRAY = 3;
 
     /**
      * Session Repository.
@@ -106,27 +93,28 @@ public class SubscribeEventListener
          * Testattu: 1ms timer toimi lahes aina.
          * 10ms timerilla ei toistaiseksi havaittu samanaikaisuusvirheita.
          */
+        int timerDelayMS = 10;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 handleSubscribe((SessionSubscribeEvent) event);
             }
-        }, TIMER_DELAY_MS);
+        }, timerDelayMS);
     }
 
     /**
      * Kasittelee tilaus-tapahtumat
      * (sen jalkeen, kun Interceptor on validoinut ne).
      *
-     * @param event event
+     * @param event Event.
      */
     private synchronized void handleSubscribe(
             final SessionSubscribeEvent event
     ) {
         MessageHeaders headers = event.getMessage().getHeaders();
 
-        /* Interceptor estaa subscribet, joista puuttuu sessionId.
+        /* Interceptor estaa tilaukset, joista puuttuu sessionId.
          * Siksi allaoleva ei voi heittaa nullpointteria. */
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
@@ -135,21 +123,24 @@ public class SubscribeEventListener
         String channelIdWithPath = SimpMessageHeaderAccessor
                 .getDestination(headers);
 
-        /* Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
+        /* Jos tilattu QBCC-polku, tiedotetaan jonon tilanne. */
         if (channelIdWithPath.equals("/toClient/QBCC")) {
             queueBroadcaster.broadcastQueue();
             return;
         }
 
-        /* Add session to list of subscribers to channel.
-         * HUOM: Aktivoituu seka /queue/ etta /chat/ subscribesta. */
+        /* Lisataan Sessio kanavan aktiivisten WebSocket-yhteyksien settiin.
+         * HUOM: Aktivoituu seka /queue/ etta /chat/ tilauksista! */
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
-        String channelId = channelIdWithPath.split("/")
-                [POSITION_OF_ELEMENT_IN_HTTP_ADDRESS_ARRAY];
+
+        /* Polku on muotoa /toClient/chat/id. Kaivetaan sielta pelkka id. */
+        String channelId = channelIdWithPath.split("/")[3];
+
+        /* Haetaan Channel-olio channelId:n avulla. */
         Channel channel = mapper.getChannel(channelId);
         channel.addSubscriber(session);
 
-        /* Jos subscribattu /chat/kanavalle */
+        /* Jos tilattu /toClient/chat/{kanavaId} */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
             /* Lahetetaan kanavan chat-historia kaikille subscribaajille. */
@@ -157,6 +148,9 @@ public class SubscribeEventListener
             /* Ei laheteta tassa tietoa "uusi keskustelija liittynyt kanavalle"
              * vaan lahetetaan se WebSocketConnectHandlerissa. */
             if (!channel.isActive()) {
+                /* Suljetun kanavan tilaus voi tapahtua esimerkiksi, kun
+                 * ammattilaiskayttaja paivittaa sivun ja jotkin valilehdet
+                  * sisaltavat suljettuja kanavia. */
                 broker.sendClosedChannelNotice(channelId);
             }
         }
