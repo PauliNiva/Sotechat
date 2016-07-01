@@ -39,7 +39,7 @@ public class WebSocketDisconnectHandlerTest {
     @Mock
     private TimeoutService queueTimeoutService;
 
-    @Spy
+    @Mock
     private MessageBroker broker;
 
     @InjectMocks

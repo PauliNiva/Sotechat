@@ -86,7 +86,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param userId Kayttajan userId
      * @return SessionReposta userId:lla haettu session.
      */
-    public final synchronized Session getSessionFromUserId(
+    public synchronized Session getSessionFromUserId(
             final String userId
     ) {
         return sessionsByUserId.get(userId);
