@@ -47,7 +47,7 @@ public class TimeoutService {
      * se poistetaan jonosta.
      */
     private final static int WAIT_TIME_BEFORE_PROCESSING_DISCONNECT
-            = 1000; //1000 * 60 * 5; // 5 minuuttia
+            = 1000 * 60 * 5; // 5 minuuttia
 
     /**
      * Ajastin.
