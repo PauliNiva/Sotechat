@@ -8,6 +8,7 @@ import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class DatabaseService {
     /**
      * Konstruktori.
      *
-     * @param pPersonService PersonRepon CRUD-operaatioista vastaava palvelu-
-     *                       luokka.
+     * @param pPersonService       PersonRepon CRUD-operaatioista vastaava palvelu-
+     *                             luokka.
      * @param pConversationService ConversationRepon CRUD-operaatioista
      *                             vastaava palveluluokka
      */
@@ -48,9 +49,9 @@ public class DatabaseService {
      * Luodaan tietokantaan uusi keskustelu ja liitetaan siihen aloitusviesti
      * seka keskustelun kategoria.
      *
-     * @param sender Aloitusviestin lahettaja
+     * @param sender    Aloitusviestin lahettaja
      * @param channelId kanavan id
-     * @param category keskustelun kategoria
+     * @param category  keskustelun kategoria
      */
     public final void createConversation(
             final String sender,
@@ -72,7 +73,7 @@ public class DatabaseService {
      * Lisataan parametrina annetun kayttaja id:n omaava henkilo parametrina
      * annettua kanavaid:ta vastaavaan keskusteluun.
      *
-     * @param userId kayttajan id
+     * @param userId    kayttajan id
      * @param channelId kanavan id
      */
     public final void addPersonToConversation(
@@ -93,9 +94,9 @@ public class DatabaseService {
     /**
      * Tallennetaan viesti tietokantaan ja tietokannassa olevaan keskusteluun.
      *
-     * @param username viestin lahettajan kayttajanimi
-     * @param content viestin sisalto
-     * @param time viestin aikaleima
+     * @param username  viestin lahettajan kayttajanimi
+     * @param content   viestin sisalto
+     * @param time      viestin aikaleima
      * @param channelId viestin kanavan id
      */
     public final void saveMsg(
@@ -142,6 +143,15 @@ public class DatabaseService {
     }
 
     /**
+     * Palauttaa kaikki kayttajat.
+     *
+     * @return Lista kayttajista.
+     */
+    public List<Person> getAllPersons() {
+        return personService.findAll();
+    }
+
+    /**
      * Palauttaa listan ConvInfo-olioita.
      *
      * @param userId userId
@@ -174,15 +184,15 @@ public class DatabaseService {
     private ConvInfo wrapConversation(
             final Conversation conv
     ) {
-       String channelId = conv.getChannelId();
-       String date = conv.getDate();
+        String channelId = conv.getChannelId();
+        String date = conv.getDate();
        /* ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
         String person = "";
         if (conv.getMessagesOfConversation().size() > 0) {
             person = conv.getMessagesOfConversation().get(0).getSender();
         }
-       String category = conv.getCategory();
-       return new ConvInfo(channelId, date, person, category);
+        String category = conv.getCategory();
+        return new ConvInfo(channelId, date, person, category);
     }
 
     /**

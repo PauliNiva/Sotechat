@@ -57,7 +57,7 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        mapper = (Mapper)webApplicationContext.getBean("mapper");
+        mapper = (Mapper)webApplicationContext.getBean("mapperImpl");
         sessions = (SessionRepo)webApplicationContext
                 .getBean("sessionRepo");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();

@@ -10,7 +10,7 @@ public class MapperTest {
 
     @Before
     public void setUp() {
-        mapper = new Mapper();
+        mapper = new MapperImpl();
     }
 
     //@Test

@@ -224,4 +224,13 @@ public class Channel {
         this.active = false;
     }
 
+    /**
+     * Lisaa parametrina annetun userId:n historiallisen kayttajien listalle.
+     * Tarkoitettu kaytettavaksi, kun vanhoja kanavia ladataan muistiin
+     * ja halutaan tietaa, kenella on oikeus niiden lokeihin.
+     * @param userId userId
+     */
+    public void addHistoricUserId(final String userId) {
+        historicUserIds.add(userId);
+    }
 }

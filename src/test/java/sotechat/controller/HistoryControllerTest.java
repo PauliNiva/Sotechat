@@ -53,7 +53,7 @@ public class HistoryControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        this.mapper = (Mapper) webApplicationContext.getBean("mapper");
+        this.mapper = (Mapper) webApplicationContext.getBean("mapperImpl");
         this.mapper.mapProUsernameToUserId("Hoitaja", "666");
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();

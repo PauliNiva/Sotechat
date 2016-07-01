@@ -39,7 +39,7 @@ public class CategoryController {
     /**
      * Asiakkaan saapuessa paasivulle tulokategorian nayttavan linkin kautta
      * liitetaan sessioon tieto mihin kategoriaan asiakas kuuluu.
-     * Esimerkiksi www.sotechat.com/from/?source=mielenterveys osoitteeseen.
+     * Esimerkiksi www.sotechat.com/from/?source=mielenterveys linkki.
      *
      * @param source Polusta haettu kategoriamuuttuja.
      * @param req Pyynto.

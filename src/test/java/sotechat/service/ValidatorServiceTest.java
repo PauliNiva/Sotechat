@@ -11,6 +11,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.NativeMessageHeaderAccessor;
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
+import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
 import sotechat.util.MockHttpServletRequest;
 import sotechat.util.MockPrincipal;
@@ -43,7 +44,7 @@ public class ValidatorServiceTest {
     @Before
     public void setUp() {
         /* Testattavan luokan tarvitsemat riippuvuudet. */
-        mapper = new Mapper();
+        mapper = new MapperImpl();
         sessionRepo = new SessionRepo(mapper);
 
         /** Testattava luokka. */

@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tarjoaa palvelut jonoon lisaamiseen.
- *  Jonosta poistamiseen ja jonon tarkasteluun.
+ * Tarjoaa palvelut jonoon lisaamiseen,
+ * poistamiseen ja tarkasteluun.
  */
 @Service
 public class QueueService {
@@ -127,9 +127,6 @@ public class QueueService {
      *
      * @param channelId KanavaId.
      * @param accessor  Autentikaatiotiedot.
-     * @throws Exception Jos tiettyä kanavaa ei ole luotu, ei siihen löydy
-     * myöskään rekisteröitynyttä hoitajaa. Exceptionin voi siis aiheuttaa
-     * return channel.getAssignedPro();.
      * @return String pro username, kenelle popattu kanava kuuluu.
      */
     public final synchronized String popQueue(
