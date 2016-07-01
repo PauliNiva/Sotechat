@@ -35,7 +35,7 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
     /**
      * Millisekunneissa minimiviive tiedotusten valilla.
      */
-    private static final long QBC_DELAY_MS = 100L;
+    public static final long QBC_DELAY_MS = 100L;
 
     /**
      * Konstruktori.
