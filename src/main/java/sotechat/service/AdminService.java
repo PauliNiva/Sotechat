@@ -46,7 +46,9 @@ public class AdminService {
     //TODO: Selvitä miksi viimeisimmäksi käsitelty person halutaan jättää tähän?
     private Person person;
 
-    /** Lisaa uuden ammattilaisen.
+    /**
+     * Lisaa uuden ammattilaisen.
+     *
      * @param encodedPersonJson merkkijono muotoa eyJ1c2Vybm...
      *        decoded personJson: {"username": mikko ... }
      *        TODO: JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla
@@ -94,7 +96,9 @@ public class AdminService {
         return personWithDeprecatedAttributes;
     }
 
-    /** Poistaa ammattilaiskäyttäjän annetulla userId:lla.
+    /**
+     * Poistaa ammattilaiskäyttäjän annetulla userId:lla.
+     *
      * @param userId userId
      * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
      */
@@ -131,7 +135,9 @@ public class AdminService {
         return "";
     }
 
-    /** Vaihtaa salasanan.
+    /**
+     * Vaihtaa salasanan.
+     *
      * @param userId userId kenen salasana vaihdetaan
      * @param encodedPassword haluttu uusi salasana encodattuna
      * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
@@ -156,9 +162,11 @@ public class AdminService {
 
     }
 
-    /** Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
+    /**
+     * Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
      * Unohtaa aktiiviset sessiot, tyhjentaa asiakasjonon, unohtaa
      * keskustelut muistista, unohtaa keskustelut tietokannasta.
+     *
      * @return virheilmoitus Stringina tai tyhja jos ei virhetta
      */
     @Transactional
@@ -170,8 +178,10 @@ public class AdminService {
     }
 
 
-    /** Yrittaa luoda Person-olion encoodatusta JSON-stringista.
+    /**
+     * Yrittaa luoda Person-olion encoodatusta JSON-stringista.
      * HUOM: oliota ei tallenneta tietokantaan metodin sisalla.
+     *
      * @param encodedPersonJson encoodattu person Json Stringina
      * @return Person-olio tai null jos virheellinen syote.
      */
@@ -188,9 +198,11 @@ public class AdminService {
         }
     }
 
-    /** Annettuna encoodattu Stringi, palauttaa selkokielisen Stringin.
+    /**
+     * Annettuna encoodattu Stringi, palauttaa selkokielisen Stringin.
      * HUOM: Kyseessa ylimaarainen suojaus, kaikki liikenne tulisi
      * silti kuljettaa HTTPS yhteyden sisalla!
+     *
      * @param encodedData String encoodattua dataa
      * @return String decoodattua dataa
      * @throws UnsupportedEncodingException jos muotoilu on vaarin

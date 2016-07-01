@@ -1,5 +1,4 @@
 package sotechat.data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.MsgToClient;
@@ -67,6 +66,7 @@ public class MapperImpl implements Mapper {
             channel = new Channel(channelId);
             channels.put(channelId, channel);
             /* Haetaan kanavan lokit tietokannasta (tai tyhja lista). */
+
             List<MsgToClient> logs = databaseService.retrieveMessages(channelId);
             for (MsgToClient msg : logs) {
                 String username = msg.getUsername();

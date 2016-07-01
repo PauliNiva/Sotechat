@@ -36,6 +36,7 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.service.DatabaseService;
 import sotechat.service.QueueService;
 import sotechat.util.*;
 
@@ -88,6 +89,9 @@ public class StateControllerQueueTest {
     @Autowired
     private StateController stateController;
 
+    @Autowired
+    private DatabaseService databaseService;
+
     @Before
     public void setUp() throws Exception {
         Mockito.when(personRepo.findOne(any(String.class)))
@@ -97,6 +101,7 @@ public class StateControllerQueueTest {
         this.accessor = Mockito.mock(SimpMessageHeaderAccessor.class);
         this.stateController = (StateController) context.getBean("stateController");
         this.mapper = (Mapper) context.getBean("mapperImpl");
+        mapper.setDatabaseService(databaseService);
         this.queueService = (QueueService) context.getBean("queueService");
 
         this.mapper.mapProUsernameToUserId("hoitaja", "666");

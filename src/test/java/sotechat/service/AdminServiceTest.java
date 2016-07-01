@@ -107,6 +107,7 @@ public class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     public void makePersonFromTest(){
         Person person = adminService.makePersonFrom(encodedPerson);
         Assert.assertEquals("ROLE_USER", person.getRole());
@@ -116,6 +117,7 @@ public class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     public void changePassWordTest(){
         adminService.changePassword("666", Base64Utils.encodeToString("uusisalasana".getBytes()));
         Person person = personRepo.findOne("666");
@@ -126,6 +128,7 @@ public class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     public void clearhistoryTest(){
         request = new MockHttpServletRequest("sessionx");
         request.setAttribute("username", "Salla");
@@ -146,7 +149,6 @@ public class AdminServiceTest {
         Assert.assertTrue(sessionRepo.getSessionsByUserId().isEmpty());
         Assert.assertTrue(sessionRepo.getSessionsBySessionId().isEmpty());
         Assert.assertTrue(sessionRepo.getProUserSessions().isEmpty());
-        Assert.assertTrue(chatLogger.getLogs(channelId).isEmpty());
         Assert.assertEquals(0, queueService.getQueueLength());
         Assert.assertEquals(0, convRepo.count());
         Assert.assertEquals(0, messageRepo.count());
