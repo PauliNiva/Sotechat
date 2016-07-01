@@ -65,4 +65,10 @@ public class MsgToClientTest {
         Assert.assertEquals(-1, m2c.compareTo(m2c3));
         Assert.assertEquals(1, m2c.compareTo(m2c1));
     }
+
+    @Test
+    public void toStringTest() {
+        String expected = "MessageID 1, username pniva, 1, timeStamp 2, content cont";
+        Assert.assertEquals(expected, m2c.toString());
+    }
 }
