@@ -188,6 +188,7 @@ public class AdminService {
     public static Person makePersonFrom(final String encodedPersonJson) {
         try {
             String decodedPersonJson = decode(encodedPersonJson);
+            decodedPersonJson = decodedPersonJson.replaceFirst("password", "authenticationHash");
             Gson gson = new Gson();
             Person person = gson.fromJson(decodedPersonJson, Person.class);
             person.hashPasswordWithSalt(person.getHashOfPasswordAndSalt());
