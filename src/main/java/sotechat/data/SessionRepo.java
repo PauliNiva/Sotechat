@@ -309,8 +309,7 @@ public class SessionRepo extends MapSessionRepository {
             Channel channel = mapper.getChannel(channelId);
             disableChannel(channel);
             /* Note: ei haittaa että WS yhteys kanavalle jaa auki, silla
-             * kukaan ei pysty enaa lahettamaan viesteja kanavalle.
-             * TODO: Ilmoitus kanaville sulkemisesta. */
+             * kukaan ei pysty enaa lahettamaan viesteja kanavalle. */
         }
         sessionsByUserId.remove(userId);
         String sessionId = session.get("sessionId");

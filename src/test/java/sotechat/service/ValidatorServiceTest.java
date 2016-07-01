@@ -41,6 +41,9 @@ public class ValidatorServiceTest {
     User proA;
     User proB;
 
+    /**
+     * Ennen jokaista testia.
+     */
     @Before
     public void setUp() {
         /* Testattavan luokan tarvitsemat riippuvuudet. */
@@ -57,11 +60,11 @@ public class ValidatorServiceTest {
         chanD = mapper.createChannel();
 
         /* Alustetaan keskustelijoita. */
+        proA = createProUser("ProA");
+        proB = createProUser("ProB");
         clientA = createRegUser("Henri");
         clientB = createRegUser("Mikko");
         clientC = createRegUser("Pekka");
-        proA = createProUser("ProA");
-        proB = createProUser("ProB");
 
         /* Kanavalla A keskustelee ClientA ja ProA */
         chanA.allowParticipation(clientA.session);
@@ -81,9 +84,7 @@ public class ValidatorServiceTest {
     }
 
     /**
-     *  Testataan, etta kelvollinen pyynto aktiivisen
-     *  kanavan lokeihin validoituu. Validoitu pyynto
-     *  palauttaa tyhjan Stringin, virheellinen virheilmon.
+     *  Testataan kelvollinen pyynto aktiivisen kanavan lokeihin.
      */
     @Test
     public void logReqValidationActiveChatTest() {
@@ -92,8 +93,7 @@ public class ValidatorServiceTest {
     }
 
     /**
-     *  Testataan, etta lokienhakupyynto validoituu
-     *  myos kanaviin, joilta hoitaja on poistunut.
+     *  Testataan kelvollinen pyynto vanhan kanavan lokeihin.
      */
     @Test
     public void logReqValidationHistoricChatTest() {
@@ -320,7 +320,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void joinQueueValidationOkTest() {
-      //  assertSuccess(validateJoinQ(clientC)); //TODO:FIX JONO KIINNI
+        assertSuccess(validateJoinQ(clientC));
     }
 
     /**
