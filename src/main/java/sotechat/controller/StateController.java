@@ -172,7 +172,7 @@ public class StateController {
     }
 
     /** Kun hoitaja yrittaa ottaa jonosta uuden chatin, client lahettaa
-     * subscribe-pyynnon /queue/id/ ja tama metodi aktivoituu.
+     * tilauspyynnon polkuun /queue/{channelId}/ ja tama metodi aktivoituu.
      *
      *  Toimenpiteet mita tehdaan:
      *  - Poistetaan jonosta kyseinen chatti.
@@ -182,7 +182,7 @@ public class StateController {
      *
      * @param channelId channelId
      * @param accessor accessor
-     * @return Palautusarvo lahetetaan JSONina jonotuskanavalle.
+     * @return Palautusarvo lahetetaan JSONina polkuun /queue/{channelId}.
      *          esim. {"channel assigned to":"Hoitaja Anne"}
      *          Kayttotapauksia viestille:
      *          - Kerrotaan jonottajalle, etta chatti on auki
@@ -215,13 +215,13 @@ public class StateController {
     }
 
     /**
-     * Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
-     * (Jos normikayttaja on poistunut, halutaan jattaa kanavava suljettuna
-     * nakyviin hoitajan valilehtiin.)
+     * Pyynto poistua chat-kanavalta (asiakas- tai ammattilaiskayttaja).
+     * (Jos asiakaskayttaja on poistunut, halutaan jattaa kanavava suljettuna
+     * nakyviin ammattilaisen valilehtiin.)
      *
-     * @param req req
-     * @param pro pro
-     * @param channelId channelId
+     * @param req Pyynto.
+     * @param pro Kirjautumistiedot.
+     * @param channelId Kanavatunnus.
      */
     @RequestMapping(value = "/leave/{channelId}", method = RequestMethod.POST)
     public final void leaveChat(
@@ -241,10 +241,10 @@ public class StateController {
      * Pyynto asettaa ammattilaisen online-tilaksi true/false.
      * Esimerkiksi /setStatus/?online=true
      *
-     * @param online joko String "true" tai "false"
-     * @param req req
-     * @param professional autentikaatiotiedot
-     * @return vastaus pyyntoon
+     * @param online String "true" tai "false"
+     * @param req Pyynto.
+     * @param professional Kirjautumistiedot.
+     * @return Vastaus pyynnon tekijalle, tyypillisesti {"status":"OK"}.
      */
     @RequestMapping(value = "/setStatus/", method = RequestMethod.POST)
     public final String setStatusOfProUser(
