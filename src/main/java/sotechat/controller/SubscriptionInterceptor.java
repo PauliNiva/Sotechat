@@ -12,9 +12,9 @@ import sotechat.service.ValidatorService;
 
 
 /**
- * Sallii/kieltaa kanavan tilauksen kayttajaoikeuksista riippuen.
+ * Sallii/kieltaa polun tilauksen kayttajaoikeuksista riippuen.
  * Jos Interceptoria ei ole, kuka tahansa voi tilata esimerkiksi
- * kanavalle /toClient/* ja siten kuunnella salaa kaikkien viesteja.
+ * polun /toClient/* ja siten kuunnella salaa kaikkien viesteja.
  */
 @Component
 public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
@@ -37,7 +37,9 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
     }
 
     /**
-     * Toimii "portinvartijana" tilaus-tapahtumille.
+     * Metodin tehtava on toimia portinvartijana tilaus-tapahtumille,
+     * mutta muunkintyyppiset WebSocket-sanomat aktivoivat taman
+     * metodin ja heittamalla poikkeus voidaan estaa sanoman kasittely.
      *
      * @param message message
      * @param channel channel

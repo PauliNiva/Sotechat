@@ -28,7 +28,7 @@ public class WebSocketConnectHandler<S>
     private SessionRepo sessionRepo;
 
     /**
-     * Viestienvalittaja.
+     * Sanomien valittaja.
      */
     @Autowired
     private MessageBroker broker;

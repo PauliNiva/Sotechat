@@ -21,13 +21,13 @@ public class MessageBroker {
      * Sessioiden kasittely.
      */
     @Autowired
-    SessionRepo sessionRepo;
+    private SessionRepo sessionRepo;
 
     /**
      * Muistaa asioita kayttajiin liittyen.
      */
     @Autowired
-    Mapper mapper;
+    private Mapper mapper;
 
     /**
      * Spring:in viestienvalittajaolio.
@@ -47,16 +47,16 @@ public class MessageBroker {
     }
 
     /**
-     * Lahettaa annetun polun tilaajille sisallon.
-     * @param path Polku.
-     * @param content Sisalto.
+     * Lahettaa sanoman.
+     * @param path Polku, jonka tilaajille sanoma lahetetaan.
+     * @param content Sisalto lahetettavalle sanomalle.
      */
     public void convertAndSend(final String path, final Object content) {
         simpMessagingTemplate.convertAndSend(path, content);
     }
 
     /**
-     * Lahettaa kaikilla kanaville, joilla annettu ammattilaiskayttaja on,
+     * Lahettaa kaikille kanaville, joilla annettu ammattilaiskayttaja on,
      * tiedotteen, etta kayttaja on poistunut tai liittynyt.
      *
      * @param pro Authentikaatiotiedot.

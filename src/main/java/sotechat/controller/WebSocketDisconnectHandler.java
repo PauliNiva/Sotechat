@@ -37,7 +37,7 @@ public class WebSocketDisconnectHandler<S>
     private QueueTimeoutService queueTimeoutService;
 
     /**
-     * Viestienvalittaja.
+     * Sanomien valittaja.
      */
     @Autowired
     private MessageBroker broker;

@@ -81,7 +81,7 @@ public class SubscribeEventListener
          * Spring ei tarjoa meille nakyvyytta siihen, milloin 1) on suoritettu
          * loppun.
          *
-         * Jos kutsuisimme handleSubscribe -metodia suoraan tassa nyt,
+         * Jos kutsuisimme handleSubscribe -metodia suoraan nyt,
          * kavisi usein niin ettei uusi kuuntelija saa mahdollisia
          * broadcasteja lainkaan, silla broadcastit lahetetaan kanavalle
          * ennen kuin Spring on ehtinyt kirjata uuden kuuntelijan mukaan.
