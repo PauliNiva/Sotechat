@@ -153,7 +153,7 @@ public class StateController {
             final Principal auth
     ) {
 
-        /** Tehdaan JSON-objekti clientin lahettamasta JSONista. */
+        /* Tehdaan JSON-objekti clientin lahettamasta JSONista. */
         JsonObject payload;
         try {
             String jsonString = req.getReader().readLine();
@@ -163,13 +163,13 @@ public class StateController {
             return "Denied due to invalid JSON formatting.";
         }
 
-        /** Validointi. */
+        /* Validointi. */
         String error = validatorService.validateJoin(req, payload, auth);
         if (!error.isEmpty()) {
             return error;
         }
 
-        /** Suorittaminen. */
+        /* Suorittaminen. */
         queueService.joinQueue(req, payload);
         queueBroadcaster.broadcastQueue();
         return "OK, please request new state now.";
@@ -183,6 +183,7 @@ public class StateController {
      *  - Broadcastataan jonon uusi tila hoitajille
      *  - Kerrotaan kaikille asianomaisille (/queue/id/ subscribaajille),
      *    kenelle hoitajalle kanava kuuluu. Huomaa palautusarvon selitys!
+     *
      * @param channelId channelId
      * @param accessor accessor
      * @return Palautusarvo lahetetaan JSONina jonotuskanavalle.
@@ -200,26 +201,28 @@ public class StateController {
             final SimpMessageHeaderAccessor accessor
     ) {
 
-        /** Varmista, etta poppaaja on autentikoitunut. */
+        /* Varmista, etta poppaaja on autentikoitunut. */
         if (accessor.getUser() == null) {
             System.out.println("Hacking attempt?");
             return "";
         }
 
-        /** Yritetaan popata ja haetaan username kenelle kanava on popattu. */
+        /* Yritetaan popata ja haetaan username kenelle kanava on popattu. */
         String assignee = queueService.popQueue(channelId, accessor);
 
-        /** Broadcastataan jonon tila kaikille ammattilaisille.
+        /* Broadcastataan jonon tila kaikille ammattilaisille.
          * HUOM: Ei broadcastata viesteja viela. Vasta kun joku subscribaa. */
         queueBroadcaster.broadcastQueue();
 
-        /** Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
+        /* Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
         return "{\"channelAssignedTo\":\"" + assignee + "\"}";
     }
 
-    /** Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
+    /**
+     * Pyynto poistua chat-kanavalta (tavallinen tai ammattilaiskayttaja).
      * (Jos normikayttaja on poistunut, halutaan jattaa kanavava suljettuna
      * nakyviin hoitajan valilehtiin.)
+     *
      * @param req req
      * @param pro pro
      * @param channelId channelId
@@ -238,8 +241,10 @@ public class StateController {
         broker.sendClosedChannelNotice(channelId);
     }
 
-    /** Pyynto asettaa ammattilaisen online-tilaksi true/false.
+    /**
+     * Pyynto asettaa ammattilaisen online-tilaksi true/false.
      * Esimerkiksi /setStatus/?online=true
+     *
      * @param online joko String "true" tai "false"
      * @param req req
      * @param professional autentikaatiotiedot

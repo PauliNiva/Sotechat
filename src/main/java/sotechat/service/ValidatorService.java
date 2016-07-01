@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
 import sotechat.data.Session;
@@ -13,33 +17,39 @@ import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 import sotechat.wrappers.MsgToServer;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-
-
-/** Luokan tehtava on validoida netista tuleva data.
- *  (hyvaksya/siivota/kieltaytya vastaanottamasta). */
+/**
+ * Validoi palvelimelle tulevan datan
+ * (hyvaksya/siivota/kieltaytya vastaanottamasta).
+ */
 @Service
 public class ValidatorService {
 
-    /** Mapper. */
+    /**
+     * Mapper.
+     */
     private Mapper mapper;
 
-    /** Session Repo. */
+    /**
+     * Session Repo.
+     */
     private SessionRepo sessionRepo;
 
     /**
-     * WebSocket-osoitteessa olevien kauttaviivalla eroteltujen osien lukumaara.
+     * <code>WebSocket</code>-osoitteessa olevien kauttaviivalla eroteltujen
+     * osioden lukumaara.
      */
     private static final int CHANNEL_PATH_LENGTH = 4;
 
     /**
      * Kuinka mones alkio channelId on taulukossa, joka on muodostettu
-     * WebSocket-osoitteesta kauttaviivan perusteella erottelemalla.
+     * <code>WebSocket</code>-osoitteesta
+     * kauttaviivan perusteella erottelemalla.
      */
     private static final int POSITION_OF_CHANNEL_ID_IN_CHANNEL_PATH = 3;
+
     /**
      * Konstruktori.
+     *
      * @param pMapper mapper
      * @param pSessionRepo ses
      */
@@ -52,11 +62,13 @@ public class ValidatorService {
         this.sessionRepo = pSessionRepo;
     }
 
-    /** Onko chattiin tuleva viesti vaarennetty?
+    /**
+     * Validoi keskusteluun tulevan viestin.
+     *
      * @param msgToServer msgToServer
      * @param accessor accessor
-     * @return tyhja String jos viesti vaikuttaa aidolta,
-     *         muussa tapauksessa virheilmoitus-String.
+     * @return Tyhja <code>String</code> jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus.
      */
     public final String isMessageFraudulent(
             final MsgToServer msgToServer,
@@ -65,17 +77,17 @@ public class ValidatorService {
         String sessionId = getSessionIdFrom(accessor);
         Principal principal = accessor.getUser();
 
-        /* Overloadattu metodi testauksen helpottamiseksi. */
         return isMessageFraudulent(msgToServer, sessionId, principal);
     }
 
     /**
-     * Onko chattiin tuleva viesti vaarennetty?
+     * Validoi keskusteluun tulevan viestin.
+     *
      * @param msgToServer p
      * @param sessionId p
      * @param principal p
-     * @return tyhja String jos viesti vaikuttaa aidolta,
-     *         muussa tapauksessa virheilmoitus-String.
+     * @return Tyhja <code>String</code>  jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus.
      */
     public final String isMessageFraudulent(
             final MsgToServer msgToServer,
@@ -104,22 +116,24 @@ public class ValidatorService {
             }
         }
 
-        /** Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
+        /* Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
         String channelId = msgToServer.getChannelId();
         Channel channel = mapper.getChannel(channelId);
         if (!channel.hasActiveUser(userId)) { //TODO NULL.
             return "Lahettajalta puuttuu kuunteluoikeus kanavalle";
         }
 
-        /** Viesti vaikuttaa aidolta. */
+        /* Viesti vaikuttaa aidolta. */
         return "";
     }
 
-    /** Validoi pyynnon hakea lokeja.
+    /**
+     * Validoi pyynnon hakea lokeja.
+     *
      * @param principal autentikaatiotiedot
      * @param req pyynto
      * @param channelId channelId
-     * @return tyhja String, jos sallitaan pyynto. Muuten virheilmoitus.
+     * @return Tyhja String, jos sallitaan pyynto. Muuten virheilmoitus.
      */
     public final String validateLogRequest(
             final Principal principal,
@@ -140,17 +154,18 @@ public class ValidatorService {
             return "Can't access other peoples' logs!";
         }
 
-        /** Sallitaan pyynto. */
+        /* Sallitaan pyynto. */
         return "";
     }
 
 
-    /** Sallitaanko subscription eli kanavan kuuntelu?.
+    /**
+     * Sallitaanko kanavan kuuntelu?.
      * Jos sallitaan, palauttaa tyhjan Stringin.
      * Jos ei sallita, palauttaa virheilmoituksen.
-     * HUOM: Mockito vaatii, ettei metodi ole final!
-     * @param acc pyynnon tiedot
-     * @return virheilmoitus Stringina jos ei sallita pyyntoa.
+     *
+     * @param acc Pyynnon tiedot.
+     * @return Virheilmoitus Stringina jos ei sallita pyyntoa.
      */
     public String validateSubscription(
             final StompHeaderAccessor acc
@@ -161,35 +176,35 @@ public class ValidatorService {
         String prefix = "Validate subscription for channel " + channelIdWithPath
                 + " by session id " + sessionId + " ### ";
 
-        /** Kelvollinen sessio? */
+        /* Kelvollinen sessio? */
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return prefix + "Session is null";
         }
 
-        /** Ammattilaiskayttaja? */
+        /* Ammattilaiskayttaja? */
         if (session.isPro()) {
-            /** Loytyyko autentikaatio myos principal-oliosta? */
+            /* Loytyyko autentikaatio myos principal-oliosta? */
             if (principal == null) {
                 return prefix + "Session belongs to pro but user not auth'd";
             }
             if (channelIdWithPath.equals("/toClient/QBCC")) {
-                /** Sallitaan jonon tilannepaivityskanavan kuuntelu
+                /* Sallitaan jonon tilannepaivityskanavan kuuntelu
                  * ammattilaiskayttajalle. */
                 return "";
             }
             if (channelIdWithPath.startsWith("/toClient/queue/")) {
-                /** Sallitaan hoitajien kuunnella kaikkia jonokanavia. */
+                /* Sallitaan hoitajien kuunnella kaikkia jonokanavia. */
                 return "";
             }
         }
 
-        /** Kielletaan subscribaus kaikkialle poislukien:
+        /**
+         * Kielletaan kanavan tilaus kaikkialle poislukien:
          * /toClient/queue/channelId
          * /toClient/chat/channelId
          * Tarkistetaan, onko kayttajalla/pro:lla oikeutta kanavalle.
-         * TODO Refaktoroi regexilla.
-         * */
+         */
         String[] splitted = channelIdWithPath.split("/");
         if (splitted.length != CHANNEL_PATH_LENGTH) {
             return prefix + "Invalid channel path (1): " + channelIdWithPath;
@@ -209,11 +224,13 @@ public class ValidatorService {
                     + session.get("userId");
         }
 
-        /** Sessiolla on oikeus kuunnella kanavaa. */
+        /* Sessiolla on oikeus kuunnella kanavaa. */
         return "";
     }
 
-    /** Validointi pyynnolle liittya jonoon.
+    /**
+     * Validointi pyynnolle liittya jonoon.
+     *
      * @param request req
      * @param payload payload
      * @param professional pro
@@ -229,32 +246,32 @@ public class ValidatorService {
             return "Denied join, no professionals available.";
         }
         if (professional != null) {
-            /** Hoitaja yrittaa liittya pooliin asiakkaana. */
+            /* Hoitaja yrittaa liittya pooliin asiakkaana. */
             return "Denied join pool request for professional";
         }
 
-        /** Clientin session tarkistus. */
+        /* Clientin session tarkistus. */
         String sessionId = request.getSession().getId();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return "Denied due to missing or invalid session ID.";
         }
 
-        /** Kaivetaan JSON-objektista attribuutteja muuttujiin. */
+        /* Kaivetaan JSON-objektista attribuutteja muuttujiin. */
         String username = payload.get("username").getAsString();
         String channelId = session.get("channelId");
 
-        /** Tarkistetaan etta aiempi tila on "start". */
+        /* Tarkistetaan etta aiempi tila on "start". */
         if (!session.get("state").equals("start")) {
             return "Denied join pool request due to bad state.";
         }
 
-        /** Tarkistetaan, ettei nimimerkki ole rekisteroity ammattilaiselle. */
+        /* Tarkistetaan, ettei nimimerkki ole rekisteroity ammattilaiselle. */
         if (mapper.isUsernameReserved(username)) {
             return "Denied join pool request due to reserved username.";
         }
 
-        /** Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
+        /* Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
          * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
         Channel channel = mapper.getChannel(channelId);
         for (Session other : channel.getCurrentSubscribers()) {
@@ -263,42 +280,44 @@ public class ValidatorService {
             }
         }
 
-        /** Sallitaan pyynto. */
+        /* Sallitaan pyynto. */
         return "";
     }
 
-    /** Validoi pyynnon poistua chat-kanavalta.
+    /**
+     * Validoi pyynnon poistua chat-kanavalta.
+     *
      * @param sessionId sessionId
      * @param professional pro
      * @param channelId channelId
-     * @return true jos salltiaan pyynto
+     * @return <code>true</code> jos salltiaan pyynto.
      */
     public final boolean validateLeave(
             final String sessionId,
             final Principal professional,
             final String channelId
     ) {
-        /** Clientin session tarkistus. */
+        /* Clientin session tarkistus. */
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return false;
         }
 
-        /** Jos sessioId kuuluu kirjautuneelle kayttajalle,
+        /* Jos sessioId kuuluu kirjautuneelle kayttajalle,
          * varmistetaan viela autentikointi. */
         if (session.isPro()) {
             if (professional == null) {
-                /** Joku esittaa hoitajaa varastetulla sessio-cookiella. */
+                /* Joku esittaa hoitajaa varastetulla sessio-cookiella. */
                 return false;
             }
             if (!professional.getName().equals(session.get("username"))) {
-                /** Yksi hoitaja esittaa toista hoitajaa. */
+                /* Yksi hoitaja esittaa toista hoitajaa. */
                 return false;
             }
         }
 
         if (!session.hasAccessToChannel(channelId)) {
-            /** Ei voi poistua kanavalta, jolla ei ole. */
+            /* Ei voi poistua kanavalta, jolla ei ole. */
             return false;
         }
 
@@ -307,10 +326,11 @@ public class ValidatorService {
 
     /**
      * Validoi pyynnon muuttaa hoitajan online-tilaa.
-     * @param professional autentikaatiotiedot
-     * @param req pyynnon tiedot
-     * @param onlineStatus asetettava status "true" tai "false" Stringina
-     * @return virheilmoitus Stringina tai tyhja String jos pyynto ok.
+     *
+     * @param professional Autentikaatiotiedot.
+     * @param req Pyynnon tiedot.
+     * @param onlineStatus Asetettava status "true" tai "false" Stringina.
+     * @return Virheilmoitus Stringina tai tyhja String jos pyynto ok.
      */
     public String validateOnlineStatusChangeRequest(
             final Principal professional,
@@ -329,15 +349,16 @@ public class ValidatorService {
             return "You can only set online status to true or false!";
         }
 
-        /** Hyvaksytaan pyynto. */
+        /* Hyvaksytaan pyynto. */
         return "";
     }
 
-    /** Validoi admininin pyynnon lisata uusi ammattilaiskayttaja.
-     * @param encodedPersonJson lisattavan tiedot encoodattuna jsonina.
-     * @param personRepo spring hajoaa, jos tama on luokkainstanssin
-     *                   dependency eika parametri
-     * @return virheilmoitus String tai tyhja String jos pyynto hyvaksytaan.
+    /**
+     * Validoi yllapitajan pyynnon lisata uusi ammattilaiskayttaja.
+     *
+     * @param encodedPersonJson Lisattavan tiedot encoodattuna jsonina.
+     * @param personRepo PersonRepo.
+     * @return Virheilmoitus String tai tyhja String jos pyynto hyvaksytaan.
      */
     public String validateAddUserReq(
             final String encodedPersonJson,
@@ -366,9 +387,11 @@ public class ValidatorService {
         return "";
     }
 
-    /** Palauttaa sessionId:n Stringina tai tyhjan Stringin.
-     * @param headerAccessor mista id kaivetaan
-     * @return sessionId String
+    /**
+     * Palauttaa sessionId:n Stringina tai tyhjan Stringin.
+     *
+     * @param headerAccessor Id:n lahde.
+     * @return sessionId String.
      */
     private String getSessionIdFrom(
             final SimpMessageHeaderAccessor headerAccessor
@@ -382,6 +405,5 @@ public class ValidatorService {
             return "";
         }
     }
-
 
 }

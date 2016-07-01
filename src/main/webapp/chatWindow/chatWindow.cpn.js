@@ -1,6 +1,6 @@
 /**
- * Luodaan chatWindow templatea käyttäen erilliset komponentit clientille.
- * Kuten myös ammattilaiselle.
+ * Luodaan chatWindow templatea kayttaen erilliset komponentit clientille,
+ * kuten myos ammattilaiselle.
  */
 angular.module('chatApp').component('chatWindowComponent', {
     templateUrl: 'chatWindow/chatWindow.tpl.html',

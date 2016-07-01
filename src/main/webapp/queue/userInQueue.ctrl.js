@@ -1,12 +1,12 @@
-/** Controlleri hallitsee ja seuraa käyttäjän  
- *  tilaa, kun käyttäjä odottaa jonossa
- **/
+/** 
+ * Kontrolleri hallitsee ja seuraa kayttajan  
+ *  tilaa, kun kayttaja odottaa jonossa.
+ */
 angular.module('chatApp')
     .controller('userInQueueCtrl', ['$scope','$interval', 'userStateService', 'connectToServer',
         function ($scope, $interval, userStateService, connectToServer) {
-            /** Serverin mappaukset */
             var QUEUEADDRESS = '/toClient/queue/';
-            /** Muuttuja johon tallennetaan yhteys kanavaan */
+            /** Muuttuja johon tallennetaan yhteyskanavaan */
             var subscribeToQueue;
             $scope.color = 'blueBg';
             var iBackGround = $interval(function() {
@@ -17,9 +17,10 @@ angular.module('chatApp')
                 }
             }, 3000);
 
-            /** Viestin saapuessa jonotuskanavalle 
+            /** 
+             * Viestin saapuessa jonotuskanavalle 
              *  lopetetaan kanavan kuuntelu ja
-             *  pyydetään käyttäjän tila päivitystä
+             *  pyydetään kayttajan tila paivitysta.
              */
             var onMessage = function () {
                     subscribeToQueue.unsubscribe();
@@ -27,11 +28,15 @@ angular.module('chatApp')
                     $scope.updateState();
             };
 
-            /** Yhteyden muodostuttua serveriin yhdistetään jonon kanavaan */
+            /** 
+             * Yhteyden muodostuttua serveriin yhdistetaan jonon kanavaan.
+             */
             var onConnection = function () {
                 subscribeToQueue = connectToServer.subscribe(QUEUEADDRESS + userStateService.getChannelID(), onMessage);
             };
             
-            /** Yhdistetään serveriin*/
+            /** 
+             * Yhdistetaan serveriin.
+             */
             connectToServer.connect(onConnection);
         }]);

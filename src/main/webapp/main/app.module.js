@@ -1,12 +1,20 @@
-/** Alustataan angular moduulit ja liitetään siihen ulkopuoliset riippuvuus kirjastot */
+/** 
+ * Alustaa angular-moduulit ja liittaa siihen ulkopuoliset riippuvuuskirjastot 
+ */
 
-/** Moduuli yhteisille komponenteille */
+/** 
+ * Moduuli yhteisille komponenteille .
+ */
 angular.module('commonMod', ['luegg.directives', 'focus-if', 'ui.bootstrap', 'ngAnimate']);
 
-/** Moduuli käyttäjän komponenteille */
+/** 
+ * Moduuli kayttajan komponenteille.
+ */
 angular.module('chatApp', ['luegg.directives', 'focus-if', 'ui.bootstrap', 'ngAnimate', 'commonMod']);
 
-/** Moduuli ammattilaisen komponenteille */
+/** 
+ * Moduuli ammattilaisen komponenteille.
+ */
 angular.module('chatProApp', ['luegg.directives', 'focus-if', 'ui.bootstrap', 'ngAnimate', 'commonMod','uiSwitch', 'ab-base64']).config(function($httpProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 });

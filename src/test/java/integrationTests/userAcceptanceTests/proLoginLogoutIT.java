@@ -67,17 +67,5 @@ public class proLoginLogoutIT {
         assertTrue(waitForTextToAppear(proWait, "on virheellinen"));
     }
 
-    /**
-     * As a professional I want to logout
-     */
-    @Test
-    public void proLogoutTest() {
-        proLogin(proWait);
-        proLogout(proWait);
-        assertTrue(waitForTextToAppear(proWait, "Salasana:"));
-    }
-
-
-
 }
 

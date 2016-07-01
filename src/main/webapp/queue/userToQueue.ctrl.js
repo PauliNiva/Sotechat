@@ -1,19 +1,21 @@
-/** Controlleri hallitsee käyttäjän liittämistä jonoon, 
- *  kun käyttäjä on valinnut nimimerkin ja kirjoittanut aloitusviestin
+/**
+ * Kontrolleri hallitsee kayttajan liittamista jonoon,
+ * kun kayttaja on valinnut nimimerkin ja kirjoittanut aloitusviestin.
  */
 angular.module('chatApp')
     .controller('userToQueueCtrl', ['$http', '$scope', 'userStateService',
         function ($http, $scope, userStateService) {
-        /** Serverin mappaukset */
         var JOINPOOLURL = '/joinPool';
 
-        /** Kun käyttäjä painaa jonoon liittymispainiketta 
-         *  Suoritetaan post pyyntö serverille ja toimitaan
-         *  sen vastauksen mukaan.
+        /** 
+         * Kun kayttaja painaa jonoon liittymispainiketta 
+         * suoritetaan post pyynto serverille ja toimitaan
+         * sen vastauksen mukaan.
          */
         $scope.joinQueue = function () {
-            /** Onnistunut post pyyntö
-             *  Käyttäjä pyytää tilapäivitystä ja toimii sen mukaan
+            /** 
+             * Onnistunut post-pyynto.
+             * Kayttaja pyytaa tilapaivitysta ja toimii sen mukaan.
              */
             var handleResponse = function (response) {
                 if (response.data.content === "OK, please request new state now.") {
@@ -26,8 +28,9 @@ angular.module('chatApp')
                 }
 
             };
-                /** Epäonnistunut post pyyntö
-                 *  Alustetaan virheilmoitukset
+                /** 
+                 * Epaonnistunut post-pyynto.
+                 * Alustetaan virheilmoitukset.
                  */
             var errorJoinQueue = function (response) {
                     var err = "Tuntematon virhe";
@@ -46,9 +49,10 @@ angular.module('chatApp')
                     }
             };
 
-            /** Suoritetaan post pyyntö palvelimelle
-             *  Viesti sisältää halutun käyttäjänimen 
-             *  Sekä aloutusviestin
+            /** 
+             * Suoritetaan post pyynto palvelimelle.
+             * Viesti sisaltaa halutun kayttajanimen,
+             * sekä aloitusviestin.
              */
             $http.post(JOINPOOLURL, {'username': $scope.username, 'startMessage': $scope.startMessage})
                 .then(handleResponse, errorJoinQueue);

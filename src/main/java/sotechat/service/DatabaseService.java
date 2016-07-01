@@ -17,10 +17,14 @@ import java.util.List;
 @Service
 public class DatabaseService {
 
-    /** Henkiloihin liittyvat palvelut. */
+    /**
+     * Henkiloihin liittyvat palvelut.
+     */
     private PersonService personService;
 
-    /** Keskusteluihin liittyvat palvelut. */
+    /**
+     * Keskusteluihin liittyvat palvelut.
+     */
     private ConversationService conversationService;
 
     /**
@@ -41,8 +45,9 @@ public class DatabaseService {
     }
 
     /**
-     * Luodaan tietokantaan uusi keskustelu ja liitetään siihen aloitusviesti
-     * sekä keskustelun kategoria.
+     * Luodaan tietokantaan uusi keskustelu ja liitetaan siihen aloitusviesti
+     * seka keskustelun kategoria.
+     *
      * @param sender Aloitusviestin lahettaja
      * @param channelId kanavan id
      * @param category keskustelun kategoria
@@ -64,8 +69,9 @@ public class DatabaseService {
     }
 
     /**
-     * Lisätään parametrina annetun kayttaja id:n omaava henkilo parametrina
+     * Lisataan parametrina annetun kayttaja id:n omaava henkilo parametrina
      * annettua kanavaid:ta vastaavaan keskusteluun.
+     *
      * @param userId kayttajan id
      * @param channelId kanavan id
      */
@@ -86,8 +92,9 @@ public class DatabaseService {
 
     /**
      * Tallennetaan viesti tietokantaan ja tietokannassa olevaan keskusteluun.
-     * @param username viestin lähettäjän käyttäjänimi
-     * @param content viestin sisältö
+     *
+     * @param username viestin lahettajan kayttajanimi
+     * @param content viestin sisalto
      * @param time viestin aikaleima
      * @param channelId viestin kanavan id
      */
@@ -111,8 +118,9 @@ public class DatabaseService {
     /**
      * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
      * viestit aikaleiman mukaan jarjestettyna listana MsgToClient olioita.
-     * @param channelId keskustelun kanavan id
-     * @return List<MsgToClient> keskustelun viestit aikajarjestyksessa
+     *
+     * @param channelId Keskustelun kanavan id.
+     * @return List<MsgToClient> Keskustelun viestit aikajarjestyksessa.
      */
     public List<MsgToClient> retrieveMessages(
             final String channelId
@@ -133,7 +141,9 @@ public class DatabaseService {
 
     }
 
-    /** Palauttaa listan ConvInfo-olioita.
+    /**
+     * Palauttaa listan ConvInfo-olioita.
+     *
      * @param userId userId
      * @return lista convInfo-olioita
      */
@@ -155,7 +165,9 @@ public class DatabaseService {
 
     }
 
-    /** Wraps conversation into a ConvInfo object.
+    /**
+     * Muuttaa Conversation olion ConInfo-olioksi.
+     *
      * @param conv conv
      * @return ConvInfo wrapper
      */
@@ -164,7 +176,7 @@ public class DatabaseService {
     ) {
        String channelId = conv.getChannelId();
        String date = conv.getDate();
-       /** ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
+       /* ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
         String person = "";
         if (conv.getMessagesOfConversation().size() > 0) {
             person = conv.getMessagesOfConversation().get(0).getSender();
@@ -175,7 +187,8 @@ public class DatabaseService {
 
     /**
      * Luo uuden MsgToClient olion parametrina annetun Message olion tietojen
-     * pohjalta ts muuntaa Message olion MsgToClient olioksi.
+     * pohjalta.
+     *
      * @param message Message luokan ilmentyma
      * @return MsgToClient luokan ilmentyma
      */
@@ -189,7 +202,9 @@ public class DatabaseService {
         return msg;
     }
 
-    /** Tarkoitettu viestien poistamiseen tietokannasta demoamista varten.
+    /**
+     * Tarkoitettu viestien poistamiseen tietokannasta demoamista varten.
+     *
      * @return Virheilmoitus tai tyhja String jos onnistui.
      */
     public String removeAllConversationsFromDatabase() {

@@ -3,6 +3,7 @@ package sotechat.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
@@ -36,7 +37,8 @@ public class ConversationService {
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
      * keskusteluun parametrina annettu viesti.
-     * @param conv lisättävä keskustelu
+     *
+     * @param conv lisattava keskustelu
      * @throws Exception Poikkeus, joka heitetaan jos tietokantaan tallettaminen
      * epaonnistuu.
      */
@@ -47,9 +49,10 @@ public class ConversationService {
     }
 
     /**
-     * Lisää parametrina annettua kanavaid:tä vastaavaan keskusteluun
+     * Lisaa parametrina annettua kanavaid:ta vastaavaan keskusteluun
      * parametrina annetun Person luokan olion. Henkilo lisataan Keskustelun
      * henkiloihin.
+     * 
      * @param person Person luokan oli, joka halutaan lisata keskusteluun
      * @param channelId keskustelun kanavan id
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
@@ -66,6 +69,7 @@ public class ConversationService {
     /**
      * Liittaa parametrina annettulla kanavaid:lla tietokannasta loytyvan
      * keskustelun kategoriaksi parametrina annetun aihealueen.
+     *
      * @param category keskustelun aihealue
      * @param channelId keskustelun kanavan id
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
@@ -83,8 +87,9 @@ public class ConversationService {
      * Lisaa parametrina annetun Message-luokan olion parametrina annetun
      * Conversation-olion listaan, ts. liittaa viestin keskusteluun.
      * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
-     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
+     * ensin, ja kun viesti lisataan keskusteluun, viestia ei lisata kahteen
      * kertaan.
+     *
      * @param message Message-luokan olio, jossa on kayttajan viesti
      * @param conv Conversation-luokan oli, joka edustaa keskustelua, johon
      *             viesti liittyy
@@ -103,9 +108,8 @@ public class ConversationService {
     }
 
     /**
-     * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
-     * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
-     * muutoksen tietokantaan.
+     * Poistaa keskustelusta viestin.
+     *
      * @param message Viesti joka halutaan poistaa (taytyy etsia ensin
      *                messageServicesta)
      */
@@ -118,9 +122,8 @@ public class ConversationService {
     }
 
     /**
-     * Poistaa keskustelun tietokannasta ts. poistaa parametrina annettua
-     * kanavaid:ta vastaavaa keskustelua edustavan Conversation luokan olion
-     * tietokannasta.
+     * Poistaa keskustelun tietokannasta.
+     *
      * @param channelId keskustelun kanavan id
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
      * tallettaminen epaonnistuu.
@@ -131,7 +134,8 @@ public class ConversationService {
     }
 
     /**
-     * Palauttaa parametrina annettua channel id:tä vastaavan keskustelun.
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
+     *
      * @param channelId haetun keskustelun kanavaid
      * @return Conversation olio, jolla pyydetty kanavaid
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
@@ -145,6 +149,7 @@ public class ConversationService {
 
     /**
      * Palauttaa listan kaikista tietokannan keskusteluista.
+     *
      * @return lista Conversation-olioista
      */
     @Transactional

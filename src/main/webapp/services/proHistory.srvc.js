@@ -1,5 +1,5 @@
 /**
- * Hakee palvelimelta keskustelu historiat ja sen viestit.
+ * Hakee palvelimelta keskusteluhistoriat ja sen viestit.
  */
 angular.module('chatProApp')
     .factory('proHistoryService', ['$http', function ($http) {

@@ -1,5 +1,5 @@
 /**
- * Kontrolleri ylläpitäjän hallinttapaneelin toimintoja varten.
+ * Kontrolleri yllapitajan hallintapaneelin toimintoja varten.
  */
 angular.module('chatProApp')
     .controller('adminController',
@@ -13,8 +13,8 @@ angular.module('chatProApp')
                 $scope.newUser = {};
 
                 /**
-                 * Valitsee, parametrinaannetun vastauksen perusteella ilmoituksen.
-                 * @param response HTTP vastaus serveriltä
+                 * Valitsee, parametrina annetun vastauksen perusteella ilmoituksen.
+                 * @param response HTTP vastaus serverilta.
                  */
                 var success = function (response) {
                     if (response.data.status === 'OK') {
@@ -33,8 +33,8 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Shows AreUSure modal
-                 * @param sureFunction Function to run when sure
+                 * Shows AreUSure modal.
+                 * @param sureFunction Function to run when sure.
                  */
                 var makeSure = function(sureFunction) {
                     var modalInstance = $uibModal.open({
@@ -46,22 +46,22 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Vaihtaa näkymän asetuksiin.
+                 * Vaihtaa nakyman asetuksiin.
                  */
                 $scope.toSettings = function () {
                     $scope.adminView = 'admin/settings.tpl.html';
                 };
 
                 /**
-                 * Vaihtaa näkymän asetuksiin.
+                 * Vaihtaa nakyman asetusnakymaan.
                  */
                 $scope.toUsers = function () {
                     $scope.adminView = 'admin/userHandling.tpl.html';
                 };
 
                 /**
-                 * Välittää palvelulle uudenkäyttäjän lisäys pyynnön.
-                 * Sekä function, joka suoritetaan kun vastaus saapuu.
+                 * Valittaa palvelulle uudenkayttajan lisays pyynnon.
+                 * Seka function, joka suoritetaan kun vastaus saapuu.
                  */
                 $scope.createNewUser = function () {
                     adminService.createUser(base64.encode(JSON.stringify($scope.newUser)),
@@ -75,16 +75,16 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Kiinnittää käyttäjänID:n, jonka salasanaa muokataan.
-                 * @param userID ID jota muokataan.
+                 * Kiinnittaa kayttajanID:n, jonka salasanaa muokataan.
+                 * @param userID ID, jota muokataan.
                  */
                 $scope.rpsw = function (userID) {
                     $scope.resetPsw = userID;
                 };
 
                 /**
-                 * Välittää palvelulle salasanan vaihto pyynnön.
-                 * @param userID ID, jonka salasanaa muokataann
+                 * Valittaa palvelulle salasanan vaihto pyynnon.
+                 * @param userID ID, jonka salasanaa muokataan.
                  * @param newPsw Salasana, joka laitetaan tilalle.
                  */
                 $scope.doResetPsw = function (userID, newPsw) {
@@ -94,8 +94,8 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Völittää käyttäjän poistamis pyynnön.
-                 * @param userID Käyttäjä jota ollaan poistamassa.
+                 * Valittaa kayttajanpoistamispyynnon.
+                 * @param userID Kayttaja, jota ollaan poistamassa.
                  */
                 $scope.removeUser = function (userID) {
                     makeSure(function() {
@@ -104,14 +104,14 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Aloittaa uuden käyttäjän luomisen.
+                 * Aloittaa uuden kayttajan luomisen.
                  */
                 $scope.newUserBoolTrue = function () {
                     $scope.newUserBoolean = true;
                 };
 
                 /**
-                 * Peruuttaa käyttäjän luomisen tai salasanan nollaamisen.
+                 * Peruuttaa kayttajan luomisen tai salasanan nollaamisen.
                  */
                 $scope.cancelNewOrReset = function () {
                     $scope.newUserBoolean = false;
@@ -119,7 +119,7 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Välittää palvelimen tilan resetointi pyynnön.
+                 * Valitta palvelimen tilan resetointi pyynnon.
                  */
                 $scope.resetServer = function () {
                     makeSure(function() {
@@ -136,7 +136,7 @@ angular.module('chatProApp')
                 };
 
                 /**
-                 * Pyytää käyttäjien hakua palvelulta ja lisää ne taulukkoon.
+                 * Pyytaa kayttajien hakua palvelulta ja lisää ne taulukkoon.
                  */
                 var getUsers = function () {
                     $scope.users = [];
@@ -147,6 +147,6 @@ angular.module('chatProApp')
                     });
                 };
                 
-                /** Haetaan käyttäjät kun kontrolleri ladataan. */
+                /** Hakee kayttajat kun kontrolleri ladataan. */
                 getUsers();
             }]);

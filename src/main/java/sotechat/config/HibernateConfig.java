@@ -106,6 +106,7 @@ public class HibernateConfig {
      */
     private static final int LENGTH_OF_PRODUCTION_DBURL = 128;
 
+
     /**
      * Ymparistoresurssi.
      */
@@ -124,9 +125,8 @@ public class HibernateConfig {
     @Bean(destroyMethod = "close")
     public HikariDataSource dataSourceForProduction()
             throws URISyntaxException {
-        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+        URI dbUri = new URI(env.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
 
-        System.out.println(dbUri.toString());
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
 

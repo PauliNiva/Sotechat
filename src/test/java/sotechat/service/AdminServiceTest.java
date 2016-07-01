@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 
-import static org.springframework.security.crypto.bcrypt.BCrypt.hashpw;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
 @Transactional

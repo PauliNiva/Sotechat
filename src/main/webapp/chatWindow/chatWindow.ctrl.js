@@ -1,6 +1,7 @@
-/** Kontrolleri paivittaa tietoja molempiin suuntiin:
+/** 
+ * Kontrolleri paivittaa tietoja molempiin suuntiin:
  * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
- *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
+ * - Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
 angular.module('chatApp')
     .controller('chatController', ['$scope', '$uibModal', 'stompSocket', 'connectToServer', 'userStateService',
@@ -16,8 +17,8 @@ angular.module('chatApp')
             $scope.chatText = 'Tervetuloa!';
 
             /**
-             * Käyttäjän sulkiessa keskustelun kysytään varmistus,
-             * jonka jälkeen kutsutaan chatin sulkemista.
+             * Kayttajan sulkiessa keskustelun kysytaan varmistus,
+             * jonka jalkeen kutsutaan chatin sulkemista.
              */
             $scope.userLeave = function() {
                 var modalInstance = $uibModal.open({
@@ -29,7 +30,7 @@ angular.module('chatApp')
             };
 
             /**
-             * Functio muokkaa käyttöliittymän suljetuksi, kun keskustelusuljetaan.
+             * Functio muokkaa kayttoliittyman suljetuksi, kun keskustelu suljetaan.
              */
             var closeChat = function() {
                 userStateService.leaveChat();
@@ -38,8 +39,10 @@ angular.module('chatApp')
                 $scope.chatClosed = true;
             };
 
-            /** Funktio lahettaa servicen avulla tekstikentan
-             *  sisallon ja lopuksi tyhjentaa tekstikentan. */
+            /** 
+			 * Funktio lahettaa servicen avulla tekstikentan
+             * sisallon ja lopuksi tyhjentaa tekstikentan. 
+			 */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
                     var destination = "/toServer/chat/" + userStateService.getChannelID();
@@ -54,8 +57,8 @@ angular.module('chatApp')
             };
 
             /** Funktio muuttaa viestin haluttuun muotoon.
-             *  Lisää sille tiedon, siitä onko viesti käyttäjän
-             *  itsensä lähettämä.
+             *  Lisaa sille tiedon, siitä onko viesti kayttajan
+             *  itsensa lahettama.
              *  Asettaa chatinNimeen vastapuolen nimimerkin
              */
             var getMessage = function (data) {
@@ -69,7 +72,7 @@ angular.module('chatApp')
                 return message;
             };
 
-            /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
+            /** Alustaa kanavan, jolta kuunnellaan tulevat viestit */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + userStateService.getChannelID(), function (response) {
                     // Lisataan viesti, jos sita ei ole jo entuudestaan.
@@ -86,10 +89,10 @@ angular.module('chatApp')
 
             };
 
-            /** Varmistetaan serveriltä että ollaan yhteydessä  */
+            /** Varmistaa serverilta että ollaan yhteydessa  */
             var init = function () {
                 connectToServer.connect(subscribe);
             };
-            /** Alustetaan yhteys kun controller ladataan */
+            /** Alustaa yhteys kun controller ladataan */
             init();
         }]);

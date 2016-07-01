@@ -1,5 +1,5 @@
 /**
- * Lähettää palvelimelle kirjautumisen ja tarkistaa sen tilan palvelimelta.
+ * Lahettaa palvelimelle kirjautumisen ja tarkistaa sen tilan palvelimelta.
  */
 angular.module('chatProApp')
     .factory('auth', function ($rootScope, $http) {

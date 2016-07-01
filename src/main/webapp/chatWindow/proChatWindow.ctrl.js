@@ -1,4 +1,5 @@
-/** Kontrolleri ammattilaisen versio paivittaa tietoja molempiin suuntiin:
+/** 
+ * Kontrolleri ammattilaisen versio paivittaa tietoja molempiin suuntiin:
  * - Kun Servicelta tulee viesti, kontrolleri paivittaa selaimessa olevan nakyman.
  *- Kun halutaan lahettaa viesti, valitetaan se Servicelle.
  */
@@ -14,14 +15,14 @@ angular.module('chatProApp')
             // viesteja, jotka meilla jo on.
             var messageIds = {};
             var sub;
-            // Maaritellaan chatin nimi templateen
+            // Maaritellaan chatin nimi nakymaan
             $scope.chatText = '';
 
             var channel = this.channel;
             var endChat = this.chatend;
 
             /**
-             * Kuuntelee ja odottaa unsubscribe pyyntöä.
+             * Kuuntelee ja odottaa unsubscribe pyyntoa.
              * Jos tapahtuma kuuluu tälle komponentille,
              * katkaisee kanavan tilauksen.
              */
@@ -32,7 +33,7 @@ angular.module('chatProApp')
             });
 
             /**
-             * Ammattilainen klikkaa poist keskustelusta nappia.
+             * Ammattilainen klikkaa poistukeskustelusta-nappia.
              */
             $scope.userLeave = function () {
                 var modalInstance = $uibModal.open({
@@ -49,15 +50,17 @@ angular.module('chatProApp')
             };
 
             /**
-             * Käyttäjä on lopettanut keskustelun.
-             * Pyydetään välilehteä sulkiessa.
+             * Kayttaja on lopettanut keskustelun.
+             * Pyydetaan valilehtea sulkiessa.
              */
             $scope.closeConversation = function () {
                 endChat();
             };
 
-            /** Funktio lahettaa servicen avulla tekstikentan
-             *  sisallon ja lopuksi tyhjentaa tekstikentan. */
+            /** 
+			 * Lahettaa servicen avulla tekstikentan
+             * sisallon ja lopuksi tyhjentaa tekstikentan. 
+			 */
             $scope.sendMessage = function () {
                 if ($scope.messageForm.$valid) {
                     var destination = "/toServer/chat/" + channel;
@@ -71,10 +74,11 @@ angular.module('chatProApp')
                 }
             };
 
-            /** Funktio muuttaa viestin haluttuun muotoon.
-             *  Lisää sille tiedon, siitä onko viesti käyttäjän
-             *  itsensä lähettämä.
-             *  Asettaa chatinNimeen vastapuolen nimimerkin
+            /** 
+			 * Funktio muuttaa viestin haluttuun muotoon.
+             * Lisaa sille tiedon, siitä onko viesti käyttajan
+             * itsensa lähettama.
+             * Asettaa chatinNimeen vastapuolen nimimerkin.
              */
             var getMessage = function (data) {
                 var message = JSON.parse(data);
@@ -87,7 +91,9 @@ angular.module('chatProApp')
                 return message;
             };
 
-            /** Alustetaan kanava, jolta kuunnellaan tulevat viestit */
+            /** 
+			 * Alustaa kanavan, jolta kuunnellaan tulevat viestit.
+			 */
             var subscribe = function () {
                 sub = connectToServer.subscribe('/toClient/chat/' + channel, function (response) {
                     var message = getMessage(response.body);
@@ -96,12 +102,14 @@ angular.module('chatProApp')
                         $scope.messages.push(getMessage(response.body));
                     } else if (message.notice == "chat closed") {
                         sub.unsubscribe();
-                        $scope.chatText = 'Vastapuoli on lopettanu keskustelun';
+                        $scope.chatText = 'Vastapuoli on lopettanut keskustelun';
                         $scope.chatClosed = true;
                     }
                 });
             };
 
-            /** Alustetaan kanava, kun controlleri ladataan */
+            /** 
+			 * Alustaa kanavan, kun controlleri ladataan .
+			 */
             subscribe();
         }]);

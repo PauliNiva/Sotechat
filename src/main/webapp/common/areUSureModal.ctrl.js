@@ -4,14 +4,14 @@
 angular.module('commonMod')
     .controller('AreUSureModalController', function ($scope, $uibModalInstance) {
         /**
-         * Käytäjä hyväksyy
+         * Kaytaja hyvaksyy.
          */
         $scope.ok = function () {
             $uibModalInstance.close(true);
         };
 
         /**
-         * Käyttäjä hylkää
+         * Kayttaja hylkaa.
          */
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');

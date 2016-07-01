@@ -17,7 +17,8 @@ import sotechat.data.Channel;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/** Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
+/**
+ * Kuuntelee WebSocket subscribe/unsubscribe -tapahtumia
  *  - pitaa kirjaa, ketka kuuntelevat mitakin kanavaa.
  *  - kun joku subscribaa QBCC kanavalle, pyytaa QueueBroadcasteria castaamaan.
  *  HUOM: Spring hajoaa, jos kaytetaan Autowired konstruktoria tassa luokassa!
@@ -39,39 +40,51 @@ public class SubscribeEventListener
      */
     private static final int POSITION_OF_ELEMENT_IN_HTTP_ADDRESS_ARRAY = 3;
 
-    /** Session Repository. */
+    /**
+     * Session Repository.
+     */
     @Autowired
     private SessionRepo sessionRepo;
 
-    /** Queue Broadcaster. */
+    /**
+     * Queue Broadcaster.
+     */
     @Autowired
     private QueueBroadcaster queueBroadcaster;
 
-    /** Viestien lahetys. */
+    /**
+     * Viestien lahetys.
+     */
     @Autowired
     private MessageBroker broker;
 
-    /** Chat Logger (broadcastaa). */
+    /**
+     * Viestien muistaminen.
+     */
     @Autowired
     private ChatLogger chatLogger;
 
-    /** Mapper. */
+    /**
+     * Mapper.
+     */
     @Autowired
     private Mapper mapper;
 
-    /** Kaynnistaa SessionSubscribeEventeista timerin handleSubscribe-metodiin.
+    /**
+     * Kaynnistaa SessionSubscribeEventeista timerin handleSubscribe-metodiin.
+     *
      * @param event Kaikki applikaatioeventit aktivoivat taman metodin.
      */
     @Override
     public final void onApplicationEvent(
             final ApplicationEvent event
     ) {
-        /** Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
+        /* Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
         if (event.getClass() != SessionSubscribeEvent.class) {
             return;
         }
 
-        /** Eventin kasittelyn voi ajatella tapahtuvan kahdessa osassa:
+        /* Eventin kasittelyn voi ajatella tapahtuvan kahdessa osassa:
          * 1. Spring kirjaa kanavan subscribaajiin uuden kuuntelijan ylos
          * 2. Logiikka handleSubscribe -metodissa
          *
@@ -91,7 +104,8 @@ public class SubscribeEventListener
          * subscriben kirjaamisen loppuun.
          *
          * Testattu: 1ms timer toimi lahes aina.
-         * 10ms timerilla ei toistaiseksi havaittu samanaikaisuusvirheita. */
+         * 10ms timerilla ei toistaiseksi havaittu samanaikaisuusvirheita.
+         */
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -101,8 +115,10 @@ public class SubscribeEventListener
         }, TIMER_DELAY_MS);
     }
 
-    /** Kasittelee subscribe -tapahtumat
-     *      (sen jalkeen, kun Interceptor on validoinut ne).
+    /**
+     * Kasittelee tilaus-tapahtumat
+     * (sen jalkeen, kun Interceptor on validoinut ne).
+     *
      * @param event event
      */
     private synchronized void handleSubscribe(
@@ -110,7 +126,7 @@ public class SubscribeEventListener
     ) {
         MessageHeaders headers = event.getMessage().getHeaders();
 
-        /** Interceptor estaa subscribet, joista puuttuu sessionId.
+        /* Interceptor estaa subscribet, joista puuttuu sessionId.
          * Siksi allaoleva ei voi heittaa nullpointteria. */
         String sessionId = SimpMessageHeaderAccessor
                 .getSessionAttributes(headers)
@@ -122,13 +138,13 @@ public class SubscribeEventListener
             return;
         }
 
-        /** Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
+        /* Jos subscribattu QBCC (jonotiedotuskanava), broadcastataan jono. */
         if (channelIdWithPath.equals("/toClient/QBCC")) {
             queueBroadcaster.broadcastQueue();
             return;
         }
 
-        /** Add session to list of subscribers to channel.
+        /* Add session to list of subscribers to channel.
          * HUOM: Aktivoituu seka /queue/ etta /chat/ subscribesta. */
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         String channelId = channelIdWithPath.split("/")
@@ -136,12 +152,12 @@ public class SubscribeEventListener
         Channel channel = mapper.getChannel(channelId);
         channel.addSubscriber(session);
 
-        /** Jos subscribattu /chat/kanavalle */
+        /* Jos subscribattu /chat/kanavalle */
         String chatPrefix = "/toClient/chat/";
         if (channelIdWithPath.startsWith(chatPrefix)) {
-            /** Lahetetaan kanavan chat-historia kaikille subscribaajille. */
+            /* Lahetetaan kanavan chat-historia kaikille subscribaajille. */
             chatLogger.broadcast(channelId, broker);
-            /** Ei laheteta tassa tietoa "uusi keskustelija liittynyt kanavalle"
+            /* Ei laheteta tassa tietoa "uusi keskustelija liittynyt kanavalle"
              * vaan lahetetaan se WebSocketConnectHandlerissa. */
             if (!channel.isActive()) {
                 broker.sendClosedChannelNotice(channelId);
@@ -149,14 +165,17 @@ public class SubscribeEventListener
         }
     }
 
-    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
+    /**
+     * Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
      * @param repo repo
      */
     public synchronized void setSessionRepo(final SessionRepo repo) {
         this.sessionRepo = repo;
     }
 
-    /** Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
+    /**
+     * Vaaditaan dependency injektion toimimiseen tassa tapauksessa.
+     *
      *  @return SessionRepo sessionRepo
      * */
     public synchronized SessionRepo getSessionRepo() {
@@ -165,6 +184,7 @@ public class SubscribeEventListener
 
     /**
      * Testausta helpottamaan.
+     *
      * @param qbc qbc
      */
     public synchronized void setQueueBroadcaster(
@@ -175,6 +195,7 @@ public class SubscribeEventListener
 
     /**
      * Testausta helpottamaan.
+     *
      * @param pBroker p
      */
     public synchronized void setBroker(
@@ -185,6 +206,7 @@ public class SubscribeEventListener
 
     /**
      * Testausta helpottamaan.
+     *
      * @param pChatLogger p
      */
     public synchronized void setChatLogger(
@@ -195,6 +217,7 @@ public class SubscribeEventListener
 
     /**
      * Testausta helpottamaan.
+     *
      * @param pMapper p
      */
     public synchronized void setMapper(

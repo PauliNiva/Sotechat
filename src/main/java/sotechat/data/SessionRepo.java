@@ -3,36 +3,50 @@ package sotechat.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 
-/** Hoitaa Session-olioihin liittyvan kasittelyn.
+/**
+ * Hoitaa Session-olioihin liittyvan kasittelyn.
  * esim. paivittaa session-attribuutteihin nimimerkin.
  */
 @Component
 public class SessionRepo extends MapSessionRepository {
 
-    /** Avain sessio-ID, arvo Sessio-olio.
-     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon! */
+    /**
+     * Avain sessio-ID, arvo Sessio-olio.
+     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon!
+     */
     private HashMap<String, Session> sessionsBySessionId;
 
-    /** Avain userId, arvo Sessio-olio. */
+    /**
+     * Avain userId, arvo Sessio-olio.
+     */
     private HashMap<String, Session> sessionsByUserId;
 
-    /** Avain proUsername, arvo Sessio-olio.
-     * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
+    /**
+     * Avain proUsername, arvo Sessio-olio.
+     * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja
+     */
     private HashMap<String, Session> proUserSessions;
 
-    /** Lukumaara kirjautuneita ammattilaisia, jotka ovat valmiita
-     * vastaanottamaan uusia asiakkaita. Liittyy chatin sulkemiseen. */
+    /**
+     * Lukumaara kirjautuneita ammattilaisia, jotka ovat valmiita
+     * vastaanottamaan uusia asiakkaita. Liittyy chatin sulkemiseen.
+     */
     private int countOfProsAcceptingNewCustomers;
 
-    /** Mapper. */
+    /**
+     * Mapper.
+     */
     private final Mapper mapper;
 
-    /** Konstruktori.
-     * @param pMapper mapperi.
+    /**
+     * Konstruktori.
+     *
+     * @param pMapper p.
      */
     @Autowired
     public SessionRepo(
@@ -42,8 +56,10 @@ public class SessionRepo extends MapSessionRepository {
         initialize();
     }
 
-    /** Alustaminen, jota kutsutaan seka olion
-     * luonnissa etta sessioiden unohtamisessa. */
+    /**
+     * Alustaminen, jota kutsutaan seka olion
+     * luonnissa etta sessioiden unohtamisessa.
+     * */
     private void initialize() {
         this.sessionsBySessionId = new HashMap<>();
         this.sessionsByUserId = new HashMap<>();
@@ -51,9 +67,11 @@ public class SessionRepo extends MapSessionRepository {
         this.countOfProsAcceptingNewCustomers = 0;
     }
 
-    /** Kaivaa sessionId:lla session-olion.
-     * @param sessionId sessionId
-     * @return session-olio
+    /**
+     * Kaivaa sessionId:lla session-olion.
+     *
+     * @param sessionId SessionId.
+     * @return Session-olio.
      */
     public synchronized Session getSessionFromSessionId(
             final String sessionId
@@ -73,12 +91,13 @@ public class SessionRepo extends MapSessionRepository {
         return sessionsByUserId.get(userId);
     }
 
-    /** Kanavalta poistuminen. Kutsutaan tapauksissa:
+    /**
+     * Kanavalta poistuminen. Kutsutaan tapauksissa:
      * - Kun keskustelija painaa nappia "Poistu"
      * - Kun keskustelija on kadonnut eika tule takaisin pian (timeout)
      * - Kun admin poistaa ammattilaiskayttajan, jolla on aktiivisia kanavia.
-     * @param channelId p
-     * @param sessionId p
+     * @param channelId p.
+     * @param sessionId p.
      */
     public synchronized void leaveChannel(
             final String channelId,
@@ -93,6 +112,11 @@ public class SessionRepo extends MapSessionRepository {
         channel.removeActiveUserId(session.get("userId"));
     }
 
+    /**
+     * Asettaa kanavan epaaktiiviseksi.
+     *
+     * @param channel Kanava, joka asetaetaan.
+     */
     public void disableChannel(
             final Channel channel
     ) {
@@ -101,7 +125,7 @@ public class SessionRepo extends MapSessionRepository {
             Session someSession = getSessionFromUserId(someUserId);
             String someSessionId = someSession.get("sessionId");
             if (!someSession.isPro()) {
-                /** Jos kukaan lahtee kanavalta, jolla on normikayttajia,
+                /* Jos kukaan lahtee kanavalta, jolla on normikayttajia,
                  * unohdetaan normikayttajien sessiot. */
                 sessionsByUserId.remove(someUserId);
                 sessionsBySessionId.remove(someSessionId);
@@ -110,12 +134,14 @@ public class SessionRepo extends MapSessionRepository {
     }
 
 
-    /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
+    /**
+     * Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
      *      - Paivittaa mappayksia "sessioId liittyy tahan sessio-olioon" yms.
      *      - Paivittaa sessio-olion attribuutteja
-     * @param req taalta saadaan Http Session Id
-     * @param professional taalta saadaan kirjautumistiedot, voi olla null
-     * @return Session-olio
+     *
+     * @param req taalta saadaan Http Session Id.
+     * @param professional taalta saadaan kirjautumistiedot, voi olla null.
+     * @return Session-olio.
      */
     public synchronized Session updateSession(
             final HttpServletRequest req,
@@ -131,7 +157,9 @@ public class SessionRepo extends MapSessionRepository {
         return session;
     }
 
-    /** Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+    /**
+     * Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+     *
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
@@ -139,8 +167,7 @@ public class SessionRepo extends MapSessionRepository {
             final Session session,
             final Principal professional
     ) {
-
-        /** Kaivetaan username ja id sessio-attribuuteista. */
+        /* Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.get("username");
         String userId = session.get("userId");
 
@@ -165,18 +192,20 @@ public class SessionRepo extends MapSessionRepository {
         }
 
         if (chatClosed() && session.get("state").equals("start")) {
-            /** Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
+            /* Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
             session.set("state", "closed");
         } else if (!chatClosed() && session.get("state").equals("closed")) {
-            /** Chat oli joskus suljettu, mutta nyt se on avattu. */
+            /* Chat oli joskus suljettu, mutta nyt se on avattu. */
             session.set("state", "start");
         }
 
-        /** Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
+        /* Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
         sessionsByUserId.put(userId, session);
     }
 
-    /** Paivittaa mappayksia kuten "sessioId liittyy tahan sessio-olioon".
+    /**
+     * Paivittaa mappayksia kuten "sessioId liittyy tahan sessio-olioon".
+     *
      * @param sessionId sessioId
      * @param professional autentikaatiotiedot, voi olla null
      * @return sessio-olio
@@ -187,25 +216,25 @@ public class SessionRepo extends MapSessionRepository {
     ) {
         Session session = sessionsBySessionId.get(sessionId);
         if (session != null) {
-            /** Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
+            /* Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
             return session;
         }
 
         if (professional != null) {
-            /** Onko hoitajalla olemassaoleva vanha sessio? */
+            /* Onko hoitajalla olemassaoleva vanha sessio? */
             String proUsername = professional.getName();
             session = proUserSessions.get(proUsername);
         }
         if (session == null) {
-            /** Sessio edelleen tuntematon, luodaan uusi sessio. */
+            /* Sessio edelleen tuntematon, luodaan uusi sessio. */
             session = new Session();
             session.set("online", "true");
         }
 
-        /** Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
+        /* Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
         sessionsBySessionId.put(sessionId, session);
 
-        /** Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
+        /* Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
         if (professional != null) {
             proUserSessions.put(professional.getName(), session);
         }
@@ -213,8 +242,10 @@ public class SessionRepo extends MapSessionRepository {
         return session;
     }
 
-    /** Asettaa ammattilaisen online-statukseksi "true" tai "false".
+    /**
+     * Asettaa ammattilaisen online-statukseksi "true" tai "false".
      * Oletettavasti pyynto on validoitu ennen taman metodin kutsua.
+     *
      * @param req sessioId taalta
      * @param onlineStatus asettava onlineStatus
      */
@@ -228,9 +259,11 @@ public class SessionRepo extends MapSessionRepository {
         updateCountOfProsAcceptingNewCustomers();
     }
 
-    /** Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
+    /**
+     * Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
      * jotka hyvaksyvat uusia asiakkaita. Jos kirjautuneita ammattilaisia
-     * voi olla yli 1000, metodi olisi hyva kirjoittaa tehokkaammin. */
+     * voi olla yli 1000, metodi olisi hyva kirjoittaa tehokkaammin.
+     */
     private synchronized void updateCountOfProsAcceptingNewCustomers() {
         countOfProsAcceptingNewCustomers = 0;
         for (Session session : proUserSessions.values()) {
@@ -240,17 +273,21 @@ public class SessionRepo extends MapSessionRepository {
         }
     }
 
-    /** Onko chat suljettu? Tarkoitettu kaytettavaksi siihen liittyen,
+    /**
+     * Onko chat suljettu?. Tarkoitettu kaytettavaksi siihen liittyen,
      * hyvaksytaanko uusia asiakkaita enaa jonoon (tai edes aloitussivulle).
      * Vanhat asiakkaat on tarkoitus kasitella, vaikka chat olisikin "suljettu".
+     *
      * @return true jos uusia asiakkaita ei hyvaksyta.
      */
     public synchronized boolean chatClosed() {
         return countOfProsAcceptingNewCustomers == 0;
     }
 
-    /** Unohtaa kaiken, mikä liittyy käyttäjään annetulla userId:llä.
-     * Tarkoitettu käytettäväksi käyttäjän poiston yhteydessä.
+    /**
+     * Unohtaa kaiken, mikä liittyy kayttajaan annetulla userId:llä.
+     * Tarkoitettu kaytettavaksi kayttajan poiston yhteydessa.
+     *
      * @param userId userId
      */
     public void forgetSession(final String userId) {
@@ -272,21 +309,25 @@ public class SessionRepo extends MapSessionRepository {
         updateCountOfProsAcceptingNewCustomers();
     }
 
-    /** Testausta helpottamaan metodi sessioiden unohtamiseen. */
+    /**
+     * Testausta helpottamaan metodi sessioiden unohtamiseen.
+     */
     public void forgetAllSessions() {
         initialize();
     }
     
     /**
-     * Palauttaa sessionsByUserId Hashmapin testausta varten
-     * @return HashMap<String, Session> sessionsByUserId
+     * Palauttaa sessionsByUserId Hashmapin testausta varten.
+     *
+     * @return HashMap<String, Session> sessionsByUserId.
      */
     public HashMap<String, Session> getSessionsByUserId(){
         return this.sessionsByUserId;
     }
 
     /**
-     * Palauttaa sessionsBySessionId testausta varten
+     * Palauttaa sessionsBySessionId testausta varten.
+     *
      * @return HashMap<String, Session> sessionsBySessionId
      */
     public HashMap<String, Session> getSessionsBySessionId(){
@@ -294,10 +335,12 @@ public class SessionRepo extends MapSessionRepository {
     }
 
     /**
-     * Palauttaa proUserSessions testausta varten
+     * Palauttaa proUserSessions testausta varten.
+     *
      * @return HashMap<String, Session> proUserSessions
      */
     public HashMap<String, Session> getProUserSessions(){
         return this.proUserSessions;
     }
+
 }

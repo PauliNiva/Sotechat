@@ -1,5 +1,6 @@
-/** Controlelri huolehtii ammattilaisen näkymän välilehtien hallinnasta
- * Seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin
+/** 
+ * Kontrolleri huolehtii ammattilaisen nakyman valilehtien hallinnasta,
+ * seka ilmoittaa "lapsilleen" yhteyden muodostumisesta serveriin.
  */
 angular.module('chatProApp')
     .controller('proCPController', ['$scope', '$timeout', '$http', '$uibModal', 'connectToServer', 'proStateService', 'heartBeatService',
@@ -30,7 +31,7 @@ angular.module('chatProApp')
             };
 
             /**
-             * Poistaa annetun ID:n omaavan välilehden näkyvistä.
+             * Poistaa annetun ID:n omaavan valilehden nakyvista.
              * @param channelID
              */
             var removeTab = function (channelID) {
@@ -44,7 +45,7 @@ angular.module('chatProApp')
             };
 
             /**
-             * Vaihtaa historian näkymään.
+             * Vaihtaa historian nakymaan.
              */
             $scope.showHistory = function () {
                 $scope.proView = 'proHistories/chatHistory.html';
@@ -54,24 +55,30 @@ angular.module('chatProApp')
             };
 
             /**
-             * Vaihtaa jononäkymän näkymään
+             * Vaihtaa jononakyman nakymaan.
              */
             $scope.backToPanel = function () {
                 $scope.proView = 'proControlPanel/userHandlingArea.tpl.html';
             };
 
-            /** Ilmoitetaan jono controllerille että yhteys serveriin on muodostetu */
+            /** 
+			 * Ilmoitetaan jono kontrollerille että yhteys serveriin on muodostettu. 
+			 */
             var initQueue = function () {
                 $scope.$broadcast('connectedToQueue');
             };
 
-            /** Lopettaa annetun ID:n omaavan keskustelun ja poistaa välilehden. */
+            /** 
+			 * Lopettaa annetun ID:n omaavan keskustelun ja poistaa valilehden. 
+			 */
             $scope.endChat = function (channelID) {
                 proStateService.leaveChannel(channelID);
                 removeTab(channelID);
             };
 
-            /** Lisää uuden chat välilehdin annetulla kanavaID:nä */
+            /** 
+			 * Lisaa uuden chat-valilehdin annetulla kanavaID:na.
+			 */
             $scope.addChatTab = function (channelID) {
                 proStateService.addChannel(channelID);
                 $scope.chats.push({
@@ -84,12 +91,16 @@ angular.module('chatProApp')
                 tabCount++;
             };
 
-            /** Päivittää tiedon avonaisesta välilehdestä */
+            /** 
+			 * Paivittaa tiedon avonaisesta valilehdesta.
+			 */
             $scope.changeTab = function (index) {
                 $scope.activeChatTab = index;
             };
 
-            /** Palauttaa tiedon avonaisesta välilehdestä */
+            /** 
+			 * Palauttaa tiedon avonaisesta valilehdesta. 
+			 */
             $scope.tabIsSelected = function (index) {
                 return index === $scope.activeChatTab;
             };
@@ -118,8 +129,9 @@ angular.module('chatProApp')
                 updateChannels();
             };
 
-            /** Päivittää ammattilaisen tiedot serveriltä
-             *  Ja aloittaa alustuksen haun valmistuttua
+            /** 
+			 * Paivittaa ammattilaisentiedot serverilta
+             * ja aloittaa alustuksen haun valmistuttua.
              */
             $scope.updateProStatus = function () {
                 proStateService.getVariablesFormServer().then(function (response) {
@@ -129,7 +141,7 @@ angular.module('chatProApp')
             };
 
             /**
-             * Päivittää tiedon siitä onko ammattilainen paikalal vai poissa.
+             * Paivittaa tiedon siitä onko ammattilainen paikalla vai poissa.
              */
             $scope.changeStatus = function () {
                 if ($scope.present.yesNo) {
@@ -139,6 +151,6 @@ angular.module('chatProApp')
                 }
             };
 
-            /** Pyytää alustusta kun kontrolleri ladataan */
+            /** Pyytaa alustusta kun kontrolleri ladataan */
             $scope.updateProStatus();
         }]);

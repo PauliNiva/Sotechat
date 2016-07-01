@@ -359,7 +359,7 @@
                     <drivers>
                         <driver>
                             <name>chromedriver</name>
-                            <version>2.21</version>
+                            <version>2.22</version>
                         </driver>
                     </drivers>
                 </configuration>
@@ -384,8 +384,7 @@
                         </context>
                     </additionalContexts>
                     <preloadSources>
-                        <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
-                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.min.js</source>
                         <source>${project.basedir}/src/main/webapp/assets/lib/angular-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${project.basedir}</jsSrcDir>

@@ -1,5 +1,5 @@
 /**
- * Palvelu hoitaa yllapitajan toimiin liittyvat pyynnot palvelimelle
+ * Palvelu hoitaa yllapitajan toimiin liittyvat pyynnot palvelimelle.
  */
 angular.module('chatProApp')
     .factory('adminService', ['$http', function ($http) {

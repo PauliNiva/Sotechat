@@ -3,6 +3,7 @@ package sotechat.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
@@ -16,15 +17,18 @@ import java.util.List;
 @Service
 public class PersonService {
 
-    /** Person-olioita kasitteleava JPA-repositorio. */
+    /**
+     * Person-olioita kasitteleava JPA-repositorio.
+     */
     @Autowired
     private PersonRepo personRepo;
 
     /**
      * Lisaa tietokantaan uuden Person -olion ja asettaa talle parametrina
      * annetun salasanan.
-     * @param person Tietokantaan lisattava Person -olio
-     * @param password Henkilon salasana
+     *
+     * @param person Tietokantaan lisattava Person -olio.
+     * @param password Henkilon salasana.
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
      * epaonnistuu.
      */
@@ -39,6 +43,7 @@ public class PersonService {
 
     /**
      * Palauttaa listan kaikista tietokannan henkiloista.
+     *
      * @return lista Person olioista, jotka on tallennettu tietokantaan
      */
     @Transactional
@@ -48,6 +53,7 @@ public class PersonService {
 
     /**
      * Poistaa tietokannasta parametrina annettua id:ta vastaavan henkilon.
+     *
      * @param personId henkilon tunnus
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
      * epaonnistuu.
@@ -58,13 +64,13 @@ public class PersonService {
     }
 
     /**
-     * Palauttaa parametrina annettua tunnusta vastaavan Person -olion.
+     * Palauttaa parametrina annettua tunnusta vastaavan Person-olion.
+     *
      * @param personId Henkilon kayttajaId.
-     * @return Tunnusta vastaava henkilo (Person olio)
+     * @return Tunnusta vastaava henkilo (Person olio).
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
      * epaonnistuu.
      */
-
     @Transactional
     public Person getPerson(final String personId) throws Exception {
         return personRepo.findOne(personId);
@@ -74,9 +80,10 @@ public class PersonService {
      * Vaihtaa parametrina annettua tunnusta vastaavan henkilon salasanan
      * parametrina annettuun uuteen salasanaan ja tallentaa muutoksen
      * tietokantaan.
-     * @param personId Henkilon id
-     * @param password Uusi salasana
-     * @return true, jos salasanan vaihtaminen onnistui, false jos ei
+     *
+     * @param personId Henkilon id.
+     * @param password Uusi salasana.
+     * @return true, jos salasanan vaihtaminen onnistui, false jos ei.
      */
     @Transactional
     public boolean changePassword(final String personId,
@@ -94,6 +101,7 @@ public class PersonService {
     /**
      * Vaihtaa parametrina annettua tunnusta vastaavan henkilon nimimerkin
      * parametrina annettuun nimeen ja tallentaa muutoksen tietokantaan.
+     *
      * @param personId Henkilon id
      * @param newName Uusi nimi
      * @return true, jos nimen vaihtaminen onnnistui, false, jos ei
@@ -112,10 +120,11 @@ public class PersonService {
 
     /**
      * Palauttaa listan kaikista henkilon keskusteluista, eli listan
-     * Conversation oliota, jotka on liitetty parametrina annettua henkilon
-     * id:ta vastaavaan Person olioon.
-     * @param personId Henkilon id
-     * @return Lista henkilon keskusteluista Conversation olioina
+     * Conversation-oliota, jotka on liitetty parametrina annettua henkilon
+     * id:ta vastaavaan Person-olioon.
+     *
+     * @param personId Henkilon id.
+     * @return Lista henkilon keskusteluista Conversation-olioina.
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
      * epaonnistuu.
      */
@@ -129,6 +138,7 @@ public class PersonService {
      * Lisaa keskustelun henkilon keskusteluihin ts. Tallentaa parametrina
      * annetun Conversation -olion parametrina annettua tunnusta vastaavan
      * Person olion listaan.
+     *
      * @param personId Henkilon id
      * @param conv Lisattavaa keskustelua vastaava Conversation olio
      */
@@ -143,6 +153,7 @@ public class PersonService {
 
     /**
      * Poistaa keskustelun henkilon keskusteluista.
+     *
      * @param person Person olio
      * @param conv conv
      */
@@ -152,6 +163,5 @@ public class PersonService {
         person.removeConversation(conv);
         personRepo.save(person);
     }
-
 
 }

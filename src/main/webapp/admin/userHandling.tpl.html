@@ -20,7 +20,7 @@
                    class="form-control" name="password" ng-model="newUser.password" required/>
         </td>
         <td>
-            <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()">Luo uusi käyttäjä</button>
+            <button type="submit" ng-disabled="newUserForm.$invalid"class="btn btn-sm btn-success" ng-click="createNewUser()" name="createNewUserBtn">Luo uusi käyttäjä</button>
             <button class="btn btn-sm btn-danger" ng-click="cancelNewOrReset()">Peruuta</button>
         </td>
     </tr>
@@ -33,7 +33,7 @@
         <td>
             <div ng-hide="'' !== resetPsw || newUserBoolean" class="btn-group">
                 <button class="btn btn-sm btn-primary" ng-click="rpsw(user.userId)">Vaihda salasana</button>
-                <button class="btn btn-sm btn-danger" ng-click="removeUser(user.userId)">Poista</button>
+                <button class="btn btn-sm btn-danger" ng-click="removeUser(user.userId)" name="deleteUserBtn{{user.username}}">Poista</button>
             </div>
             <button ng-show="user.userId === resetPsw" class="btn btn-sm btn-success" ng-disabled="resetPswForm.editPassword.$invalid" ng-click="doResetPsw(user.userId, editPassword)">Lähetä uusi salasana</button>
             <button ng-show="user.userId === resetPsw" class="btn btn-sm btn-danger" ng-click="cancelNewOrReset()">Peruuta</button>

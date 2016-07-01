@@ -1,5 +1,5 @@
 /**
- * Kontrolleri kirjautumisnäkymälle.
+ * Kontrolleri kirjautumisnakymalle.
  */
 angular.module('chatProApp')
     .controller('loginController', ['$scope', 'auth',
@@ -8,7 +8,7 @@ angular.module('chatProApp')
             self.credentials = {};
 
             /**
-             * Pyytää kirjautumista auth palvelulta annetuilla syötteillä.
+             * Pyytaa kirjautumista auth-palvelulta annetuilla syotteilla.
              */
             self.login = function() {
                 auth.authenticate(self.credentials, $scope.$parent.login)

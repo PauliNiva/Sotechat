@@ -1,4 +1,5 @@
-/** Tama paketti sisaltaa CRUD-operaatioihin(Create, Read, Update, Delete)
+/**
+ * Tama paketti sisaltaa CRUD-operaatioihin(Create, Read, Update, Delete)
  *  liittyvat luokat. Eli esim kayttajatiedot talletetaan Mapper-olioon, josta
  *  ne voidaan myohemmin hakea.
  **/

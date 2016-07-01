@@ -1,7 +1,7 @@
 /**
- * Direktiivi havaitsee "ENTER"-painikkeen painallukset kentässä estää normaalintoiminnan
- * Jos painetaan SHIFT+ENTER tehdään normaali ENTER Toiminto
- * Käytetään estämään textarea kentän normaali rivin vaihto.
+ * Direktiivi havaitsee "ENTER"-painikkeen painallukset kentassa ja estaa normaalintoiminnan.
+ * Jos painetaan SHIFT+ENTER tehdaan normaali ENTER Toiminto.
+ * Kaytetaan estamaan textarea kentan normaali rivin vaihto.
  */
 angular.module('commonMod')
     .directive('ngEnter', function () {

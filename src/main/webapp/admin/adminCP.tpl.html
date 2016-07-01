@@ -17,10 +17,10 @@
                  uib-collapse="!isCollapsed">
                 <ul class="nav navbar-nav">
                     <li ng-class="{active : adminView == 'admin/userHandling.tpl.html'}">
-                        <a href ng-click="toUsers()">Käyttäjien hallinta</a>
+                        <a href ng-click="toUsers()" name="userHandlingTab">Käyttäjien hallinta</a>
                     </li>
                     <li ng-class="{active : adminView == 'admin/settings.tpl.html'}">
-                        <a href ng-click="toSettings()">Tietokannan hallinta</a>
+                        <a href ng-click="toSettings()" name="settingsTab">Tietokannan hallinta</a>
                     </li>
                 </ul>
 
@@ -34,7 +34,7 @@
                         </div>
                         <button class="btn btn-success"
                                 ng-click="newUserBoolTrue()"
-                                ng-hide="adminView != 'admin/userHandling.tpl.html'">
+                                ng-hide="adminView != 'admin/userHandling.tpl.html'" name="newUserButton">
                             Uusi käyttäjä
                         </button>
                         <button class="btn btn-default logoutAdmin"

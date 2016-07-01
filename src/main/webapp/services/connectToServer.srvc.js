@@ -1,6 +1,7 @@
-/** Palvelu huolehtii websocket yhteyden muodostus pyynnöstä
- *  palvelimeen ja pitää yhteyden elossa 
- *  kontrollerien välillä liikkuessa
+/** 
+ * Palvelu huolehtii websocket-yhteyden muodostuspyynnosta
+ * palvelimeen ja pitaa yhteyden elossa 
+ * kontrollerien valilla liikuessa.
  */
 angular.module('commonMod')
     .service('connectToServer', ['stompSocket', '$timeout', '$window',
@@ -34,9 +35,10 @@ angular.module('commonMod')
             }
         }
 
-        /** Funtio jolta voidaan pyytää kanavan tilaamista
-         *  Parametrina kavan osoite sekä functio jota kutsutaan
-         *  kun viestejä saapuu kanavalta
+        /** 
+         * Funtio jolta voidaan pyytaa kanavan tilaamista.
+         * Parametrina kavanosoite seka functio jota kutsutaan
+         * kun viesteja saapuu kanavalta.
          */
         function subscribe(destination, answerFunction) {
             return stompSocket.subscribe(destination, function (response) {
