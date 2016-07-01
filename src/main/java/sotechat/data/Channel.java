@@ -69,7 +69,7 @@ public class Channel {
      *
      * @param session <code>Session</code>-olio.
      */
-    public final synchronized void allowParticipation(final Session session) {
+    public synchronized void allowParticipation(final Session session) {
         session.addChannel(channelId);
         String userId = session.get("userId");
         activeUserIds.add(userId);
@@ -79,7 +79,7 @@ public class Channel {
     /**
      * Asettaa kanavan asiakaskayttajien tilaksi "chat".
      */
-    public void setRegUserSessionStatesToChat() {
+    public synchronized void setRegUserSessionStatesToChat() {
         for (Session member : getCurrentSubscribers()) {
             /* Hoitajan tilan kuuluu aina olla "pro". */
             if (!member.get("state").equals("pro")) {
@@ -110,7 +110,7 @@ public class Channel {
      *
      * @param session p.
      */
-    public final synchronized void removeSubscriber(final Session session) {
+    public synchronized void removeSubscriber(final Session session) {
         currentSubscribers.remove(session);
     }
 
@@ -121,7 +121,7 @@ public class Channel {
      *
      * @param userId p.
      */
-    public final synchronized void removeActiveUserId(final String userId) {
+    public synchronized void removeActiveUserId(final String userId) {
         activeUserIds.remove(userId);
     }
 
@@ -132,7 +132,7 @@ public class Channel {
      * @param userId userId
      * @return <code>true</code> jos oikeus osallistua kanavalle.
      */
-    public final synchronized boolean hasActiveUser(final String userId) {
+    public synchronized boolean hasActiveUser(final String userId) {
         return activeUserIds.contains(userId);
     }
 
@@ -142,7 +142,7 @@ public class Channel {
      * @param userId kayttajaId.
      * @return <code>true</code> jos on kayttajaId on joskus ollut kanavalla.
      */
-    public final synchronized boolean hasHistoricUser(final String userId) {
+    public synchronized boolean hasHistoricUser(final String userId) {
         return historicUserIds.contains(userId);
     }
 
@@ -151,7 +151,7 @@ public class Channel {
      *
      * @return Kanavatunnus.
      */
-    public final synchronized String getId() {
+    public synchronized String getId() {
         return this.channelId;
     }
 
@@ -161,7 +161,7 @@ public class Channel {
      *
      * @return Setti <code>Session</code>-olioita.
      */
-    public final synchronized Set<Session> getCurrentSubscribers() {
+    public synchronized Set<Session> getCurrentSubscribers() {
         return currentSubscribers;
     }
 
@@ -173,7 +173,7 @@ public class Channel {
      *
      * @return Setti <code>userId</code>:ta.
      */
-    public final synchronized Set<String> getActiveUserIds() {
+    public synchronized Set<String> getActiveUserIds() {
         return activeUserIds;
     }
 
@@ -183,7 +183,7 @@ public class Channel {
      *
      * @return Setti <code>Session</code>-olioita.
      */
-    public final synchronized Set<String> getHistoricUserIds() {
+    public synchronized Set<String> getHistoricUserIds() {
         return historicUserIds;
     }
 
@@ -193,7 +193,7 @@ public class Channel {
      *
      * @return username
      */
-    public final String getAssignedPro() {
+    public synchronized String getAssignedPro() {
         return assignedPro;
     }
 
@@ -203,7 +203,7 @@ public class Channel {
      *
      * @param username Ammattilaisen kayttajanimi.
      */
-    public final void setAssignedPro(final String username) {
+    public synchronized void setAssignedPro(final String username) {
         assignedPro = username;
     }
 
@@ -213,14 +213,14 @@ public class Channel {
      * @return <code>true</code>, jos kanava on aktiivien, <code>false</code>
      * jos kanava on suljettu.
      */
-    public boolean isActive() {
+    public synchronized boolean isActive() {
         return this.active;
     }
 
     /**
      * Sulkee kanavan.
      */
-    public void setInactive() {
+    public synchronized void setInactive() {
         this.active = false;
     }
 
@@ -230,7 +230,7 @@ public class Channel {
      * ja halutaan tietaa, kenella on oikeus niiden lokeihin.
      * @param userId userId
      */
-    public void addHistoricUserId(final String userId) {
+    public synchronized void addHistoricUserId(final String userId) {
         historicUserIds.add(userId);
     }
 }
