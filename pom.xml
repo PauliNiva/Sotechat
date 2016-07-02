@@ -5,7 +5,7 @@
 
     <groupId>Sotechat</groupId>
     <artifactId>Sotechat</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <packaging>war</packaging>
 
     <name>Sotechat</name>
@@ -227,6 +227,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.4.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -300,9 +306,8 @@
                 <version>0.7.6.201602180812</version>
                 <configuration>
                     <excludes>
-                        <exclude>sotechat/profiles/*.class</exclude>
-                        <exclude>sotechat/auth/*.class</exclude>
-                        <exclude>sotechat/config/*.class</exclude>
+                        <exclude>sotechat/profiles/ProProfile.class</exclude>
+                        <exclude>sotechat/config/HibernateConfig.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -343,6 +348,7 @@
                         <param>sotechat.LauncherTest</param>
                         <param>sotechat.auth*</param>
                         <param>sotechat.domain*</param>
+                        <param>sotechat.data*</param>
                         <param>sotechat.service*</param>
                         <param>sotechat.wrappers*</param>
                         <param>sotechat.websocketService*</param>

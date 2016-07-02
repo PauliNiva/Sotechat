@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Person.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.domain</a> &gt; <span class="el_source">Person.java</span></div><h1>Person.java</h1><pre class="source lang-java linenums">package sotechat.domain;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Luokka ammattikayttajan tallentamiseen tietokantaan.
+ */
+@Entity
+public class Person {
+
+    /**
+     * userId, tietokantataulun primary key.
+     */
+    @Id
+    private String userId;
+
+    /**
+     * Ammattikayttajan yksilollinen, julkinen nimimerkki,
+     * joka voi olla eri kuin loginName.
+     */
+    @Column(unique = true)
+    private String username;
+
+    /**
+     * Kirjautumisnimi, jolla henkilo kirjautuu sisaan jarjestelmaan.
+     */
+    @Column(unique = true)
+    private String loginName;
+
+    /**
+     * Hajautusarvo salasanan ja suolan yhdistelmasta.
+     */
+    private String authenticationHash;
+
+    /**
+     * Salasanan suola.
+     */
+    private String salt;
+
+    /**
+     * Henkilon keskustelut listana. Tietokannassa monesta moneen suhde.
+     */
+    @ManyToMany
+    private List&lt;Conversation&gt; conversationsOfPerson;
+
+    /**
+     * Joko ROLE_ADMIN tai ROLE_USER.
+     * Role_USER viittaa ammattikayttajaan (ei asiakaskayttajaan).
+     * Role_ADMIN viittaa yllapitajaan, joka voi hallinnoida ammattilaisia.
+     */
+    private String role;
+
+    /**
+     * Konstruktori alustaa listan henkilon keskusteluille.
+     */
+<span class="fc" id="L64">    public Person() {</span>
+<span class="fc" id="L65">        this.conversationsOfPerson = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * Konstruktori asettaa kayttajan id:ksi argumenttina annetun id:n
+     * ja alustaa listan henkilon keskusteluille.
+     *
+     * @param pUserId Kayttajan id.
+     */
+<span class="fc" id="L74">    public Person(final String pUserId) {</span>
+<span class="fc" id="L75">        this.userId = pUserId;</span>
+<span class="fc" id="L76">        this.conversationsOfPerson = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L77">    }</span>
+
+    /**
+     * Palauttaa henkilon nimimerkin, joka nakyy asiakkaille.
+     *
+     * @return Nimimerkki, joka nakyy asiakkaille.
+     */
+    public final String getUserName() {
+<span class="fc" id="L85">        return username;</span>
+    }
+
+    /**
+     * Asettaa argumenttina annetun nimimerkin kayttajan nimimerkiksi.
+     *
+     * @param pName Nimimerkki, joka nakyy asiakkaille.
+     */
+    public final void setUserName(final String pName) {
+<span class="fc" id="L94">        this.username = pName;</span>
+<span class="fc" id="L95">    }</span>
+
+    /**
+     * Palauttaa kirjautumisnimen, jolla henkilo kirjautuu jarjestelmaan sisaan.
+     *
+     * @return Kirjautumisnimi.
+     */
+    public final String getLoginName() {
+<span class="fc" id="L103">        return loginName;</span>
+    }
+
+    /**
+     * Asettaa kayttajan kirjautumisnimeksi parametrina annetun nimen.
+     *
+     * @param pLoginName Kirjautumisnimi.
+     */
+    public final void setLoginName(final String pLoginName) {
+<span class="fc" id="L112">        this.loginName = pLoginName;</span>
+<span class="fc" id="L113">    }</span>
+
+    /**
+     * Palauttaa hajautusarvon selkokielisen salasanan ja suolan yhdistelmasta.
+     *
+     * @return Hajautusarvo merkkijonona.
+     */
+    public final String getHashOfPasswordAndSalt() {
+<span class="fc" id="L121">        return authenticationHash;</span>
+    }
+
+    /**
+     * Luo argumenttina annetusta selkokielisesta salasanasta
+     * hajautusarvon kirjautumisten tunnistautumiseen.
+     * &lt;p&gt;
+     * Aluksi selkokieliseen salasanaan lisataan suola, joka on satunnainen
+     * merkkijono. Suola tallennetaan selkokielisena tietokantaan
+     * &lt;code&gt;Person&lt;/code&gt;-olion attribuuttina. Salasanan ja suolan
+     * yhdistelmasta luodaan hajautusarvo, joka myos tallennetaan
+     * &lt;code&gt;Person-olioon&lt;/code&gt;.
+     *
+     * @param plainTextPassword Selkokielinen salasana.
+     */
+    public final void hashPasswordWithSalt(final String plainTextPassword) {
+<span class="fc" id="L137">        this.salt = BCrypt.gensalt();</span>
+<span class="fc" id="L138">        this.authenticationHash = BCrypt.hashpw(plainTextPassword, this.salt);</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * Palauttaa salasanan suolan.
+     *
+     * @return Salasanan suola merkkijonona.
+     */
+    public final String getSalt() {
+<span class="fc" id="L147">        return salt;</span>
+    }
+
+    /**
+     * Palauttaa listan henkilon keskusteluista.
+     *
+     * @return Henkilon keskustelut listana.
+     */
+    public final List&lt;Conversation&gt; getConversationsOfPerson() {
+<span class="fc" id="L156">        return this.conversationsOfPerson;</span>
+    }
+
+    /**
+     * Liittaa argumenttina annetun &lt;code&gt;Conversation&lt;/code&gt;-olion
+     * henkilon keskusteluihin.
+     *
+     * @param conversation Conversation lisattava keskustelu
+     */
+    public final void addConversationToPerson(
+            final Conversation conversation) {
+<span class="fc" id="L167">        this.conversationsOfPerson.add(conversation);</span>
+<span class="fc" id="L168">    }</span>
+
+    /**
+     * Poistaa henkiloon liittyvan argumenttina annettavan keskustelun.
+     *
+     * @param conversation Poistettava keskustelu.
+     */
+    public final void removeConversation(
+            final Conversation conversation) {
+<span class="fc" id="L177">        this.conversationsOfPerson.remove(conversation);</span>
+<span class="fc" id="L178">    }</span>
+
+    /**
+     * Palauttaa kayttajan id:n.
+     *
+     * @return Henkilon id.
+     */
+    public String getUserId() {
+<span class="fc" id="L186">        return userId;</span>
+    }
+
+    /**
+     * Asettaa henkilon id:ksi argumenttina annetun id:n.
+     *
+     * @param pUserId Kayttajan id.
+     */
+    public void setUserId(final String pUserId) {
+<span class="fc" id="L195">        this.userId = pUserId;</span>
+<span class="fc" id="L196">    }</span>
+
+    /**
+     * Palauttaa henkilon roolin.
+     *
+     * @return Henkilon rooli merkkijonona.
+     */
+    public final String getRole() {
+<span class="fc" id="L204">        return this.role;</span>
+    }
+
+    /**
+     * Asettaa henkilon roolin.
+     *
+     * @param pRole Henkilon rooli.
+     */
+    public final void setRole(final String pRole) {
+<span class="fc" id="L213">        this.role = pRole;</span>
+<span class="fc" id="L214">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

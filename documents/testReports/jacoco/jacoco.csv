@@ -1,0 +1,53 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Sotechat,sotechat.auth,JpaAuthenticationProvider.new AuthenticationException() {...},0,7,0,0,0,1,0,1,0,1
+Sotechat,sotechat.auth,JpaAuthenticationProvider.new AuthenticationException() {...},0,7,0,0,0,1,0,1,0,1
+Sotechat,sotechat.auth,JpaAuthenticationProvider,4,97,0,6,1,17,1,6,1,3
+Sotechat,sotechat.controller,CategoryController,0,18,0,0,0,6,0,2,0,2
+Sotechat,sotechat.controller,SubscribeEventListener,0,107,1,7,0,37,1,12,0,9
+Sotechat,sotechat.controller,SubscriptionInterceptor,0,38,0,4,0,10,0,4,0,2
+Sotechat,sotechat.controller,MessageBroker,0,154,0,6,0,36,0,11,0,8
+Sotechat,sotechat.controller,WebSocketConnectHandler,0,29,1,1,0,12,1,2,0,2
+Sotechat,sotechat.controller,HistoryController,0,61,0,4,0,16,0,5,0,3
+Sotechat,sotechat.controller,WebSocketDisconnectHandler,0,33,1,1,0,14,1,2,0,2
+Sotechat,sotechat.controller,QueueBroadcasterImpl,0,78,0,4,0,18,0,5,0,3
+Sotechat,sotechat.controller,SubscribeEventListener.new TimerTask() {...},0,16,0,0,0,3,0,2,0,2
+Sotechat,sotechat.controller,ProUrlController,0,7,0,0,0,3,0,3,0,3
+Sotechat,sotechat.controller,StateController,54,139,5,7,12,36,5,10,2,7
+Sotechat,sotechat.controller,ChatController,0,37,0,2,0,10,0,3,0,2
+Sotechat,sotechat.controller,AdminController,0,51,0,2,0,9,0,8,0,7
+Sotechat,sotechat.controller,QueueBroadcasterImpl.new TimerTask() {...},0,10,0,0,0,3,0,2,0,2
+Sotechat,sotechat.controller,HeartBeatController,0,5,0,0,0,2,0,2,0,2
+Sotechat,sotechat.controller,LoginController,0,5,0,0,0,2,0,2,0,2
+Sotechat,sotechat.data,SessionRepo,70,311,5,29,18,82,6,26,2,13
+Sotechat,sotechat.data,Channel,9,134,0,4,3,38,2,17,2,15
+Sotechat,sotechat.data,MapperImpl.FastGeneratorForRandomStrings,0,82,0,6,0,13,0,5,0,2
+Sotechat,sotechat.data,ChatLogger.new TimerTask() {...},20,0,0,0,3,0,2,0,2,0
+Sotechat,sotechat.data,ChatLogger.new TimerTask() {...},0,10,0,0,0,3,0,2,0,2
+Sotechat,sotechat.data,ChatLogger,32,385,7,23,7,97,6,24,0,15
+Sotechat,sotechat.data,Session,0,128,0,10,0,31,0,14,0,9
+Sotechat,sotechat.data,MapperImpl,31,139,7,7,6,37,6,13,0,12
+Sotechat,sotechat.profiles,DevProfile,0,68,0,0,0,18,0,2,0,2
+Sotechat,sotechat.domain,Conversation,0,71,0,0,0,25,0,12,0,12
+Sotechat,sotechat.domain,Person,0,78,0,0,0,29,0,16,0,16
+Sotechat,sotechat.domain,Message,0,43,0,0,0,19,0,10,0,10
+Sotechat,sotechat.service,ConversationService,0,94,0,0,0,25,0,9,0,9
+Sotechat,sotechat.service,DatabaseService,11,317,0,10,3,74,0,15,0,10
+Sotechat,sotechat.service,TimeoutService,3,77,1,7,1,22,1,8,0,5
+Sotechat,sotechat.service,ValidatorService,34,416,18,70,12,111,15,39,1,9
+Sotechat,sotechat.service,PersonService,0,96,0,0,0,28,0,10,0,10
+Sotechat,sotechat.service,QueueService,44,202,3,13,10,50,3,14,1,8
+Sotechat,sotechat.service,TimeoutService.new TimerTask() {...},6,9,0,0,2,1,1,1,1,1
+Sotechat,sotechat.service,AdminService,39,185,7,5,17,50,6,10,0,10
+Sotechat,sotechat.wrappers,QueueItem,0,67,0,0,0,13,0,5,0,5
+Sotechat,sotechat.wrappers,MsgToClient,0,83,0,4,0,20,0,10,0,8
+Sotechat,sotechat.wrappers,ConvInfo,0,27,0,0,0,10,0,5,0,5
+Sotechat,sotechat.wrappers,UserStateResponse,0,43,0,0,0,12,0,6,0,6
+Sotechat,sotechat.wrappers,ProStateResponse,0,47,0,0,0,14,0,7,0,7
+Sotechat,sotechat.wrappers,MsgToServer,0,39,0,0,0,15,0,8,0,8
+Sotechat,sotechat.config,WebSecurityConfig.AuthenticationConfiguration,0,9,0,0,0,3,0,2,0,2
+Sotechat,sotechat.config,WebConfig,0,20,0,0,0,4,0,2,0,2
+Sotechat,sotechat.config,WebSecurityConfig.new OncePerRequestFilter() {...},7,40,6,2,1,12,4,2,0,2
+Sotechat,sotechat.config,WebSocketConfig,0,38,0,0,0,7,0,4,0,4
+Sotechat,sotechat.config,WebSecurityConfig,0,63,0,0,0,15,0,4,0,4
+Sotechat,sotechat,Application,0,16,0,0,0,6,0,4,0,4
+Sotechat,sotechat,Launcher,0,7,0,0,0,2,0,2,0,2

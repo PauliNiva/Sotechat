@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>PersonService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.service</a> &gt; <span class="el_source">PersonService.java</span></div><h1>PersonService.java</h1><pre class="source lang-java linenums">package sotechat.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import sotechat.domain.Conversation;
+import sotechat.domain.Person;
+import sotechat.repo.PersonRepo;
+
+import java.util.List;
+
+/**
+ * Luokka Person-olioiden kasittelyyn (CRUD-operaatiot)
+ * ja sailyttamiseen tietokannassa.
+ */
+@Service
+<span class="fc" id="L18">public class PersonService {</span>
+
+    /**
+     * Person-olioita kasitteleva JPA-repositorio.
+     */
+    @Autowired
+    private PersonRepo personRepo;
+
+    /**
+     * Lisaa tietokantaan uuden Person -olion ja asettaa talle parametrina
+     * annetun salasanan.
+     *
+     * @param person Tietokantaan lisattava Person -olio.
+     * @param password Henkilon salasana.
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
+     */
+    @Transactional
+    public void addPerson(
+            final Person person,
+            final String password
+    ) throws Exception {
+<span class="fc" id="L40">        person.hashPasswordWithSalt(password);</span>
+<span class="fc" id="L41">        personRepo.save(person);</span>
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Palauttaa listan kaikista tietokannan henkiloista.
+     *
+     * @return lista Person olioista, jotka on tallennettu tietokantaan
+     */
+    @Transactional
+    public List&lt;Person&gt; findAll() {
+<span class="fc" id="L51">        return personRepo.findAll();</span>
+    }
+
+    /**
+     * Poistaa tietokannasta parametrina annettua id:ta vastaavan henkilon.
+     *
+     * @param personId henkilon tunnus
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
+     */
+    @Transactional
+    public void delete(final String personId) throws Exception {
+<span class="fc" id="L63">        personRepo.delete(personId);</span>
+<span class="fc" id="L64">    }</span>
+
+    /**
+     * Palauttaa parametrina annettua tunnusta vastaavan Person-olion.
+     *
+     * @param personId Henkilon kayttajaId.
+     * @return Tunnusta vastaava henkilo (Person olio).
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
+     */
+    @Transactional
+    public Person getPerson(final String personId) throws Exception {
+<span class="fc" id="L76">        return personRepo.findOne(personId);</span>
+    }
+
+    /**
+     * Vaihtaa parametrina annettua tunnusta vastaavan henkilon salasanan
+     * parametrina annettuun uuteen salasanaan ja tallentaa muutoksen
+     * tietokantaan.
+     *
+     * @param personId Henkilon id.
+     * @param password Uusi salasana.
+     * @return true, jos salasanan vaihtaminen onnistui, false jos ei.
+     */
+    @Transactional
+    public boolean changePassword(final String personId,
+                                  final String password) {
+        try {
+<span class="fc" id="L92">            Person person = personRepo.findOne(personId);</span>
+<span class="fc" id="L93">            person.hashPasswordWithSalt(password);</span>
+<span class="fc" id="L94">            personRepo.save(person);</span>
+<span class="fc" id="L95">            return true;</span>
+<span class="fc" id="L96">        } catch (Exception e) {</span>
+<span class="fc" id="L97">            return false;</span>
+        }
+    }
+
+    /**
+     * Vaihtaa parametrina annettua tunnusta vastaavan henkilon nimimerkin
+     * parametrina annettuun nimeen ja tallentaa muutoksen tietokantaan.
+     *
+     * @param personId Henkilon id
+     * @param newName Uusi nimi
+     * @return true, jos nimen vaihtaminen onnnistui, false, jos ei
+     */
+    @Transactional
+    public boolean changeUserName(final String personId, final String newName) {
+        try {
+<span class="fc" id="L112">            Person person = personRepo.findOne(personId);</span>
+<span class="fc" id="L113">            person.setUserName(newName);</span>
+<span class="fc" id="L114">            personRepo.save(person);</span>
+<span class="fc" id="L115">            return true;</span>
+<span class="fc" id="L116">        } catch (Exception e) {</span>
+<span class="fc" id="L117">            return false;</span>
+        }
+    }
+
+    /**
+     * Palauttaa listan kaikista henkilon keskusteluista, eli listan
+     * Conversation-oliota, jotka on liitetty parametrina annettua henkilon
+     * id:ta vastaavaan Person-olioon.
+     *
+     * @param personId Henkilon id.
+     * @return Lista henkilon keskusteluista Conversation-olioina.
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan tallennus
+     * epaonnistuu.
+     */
+    @Transactional
+    public List&lt;Conversation&gt; personsConversations(final String personId)
+            throws Exception {
+<span class="fc" id="L134">        return personRepo.findOne(personId).getConversationsOfPerson();</span>
+    }
+
+    /**
+     * Lisaa keskustelun henkilon keskusteluihin ts. Tallentaa parametrina
+     * annetun Conversation -olion parametrina annettua tunnusta vastaavan
+     * Person olion listaan.
+     *
+     * @param personId Henkilon id
+     * @param conv Lisattavaa keskustelua vastaava Conversation olio
+     */
+    @Transactional
+    public void addConversation(final String personId,
+                                final Conversation conv) {
+<span class="fc" id="L148">        Person person = personRepo.findOne(personId);</span>
+<span class="fc" id="L149">        person.addConversationToPerson(conv);</span>
+<span class="fc" id="L150">        personRepo.save(person);</span>
+<span class="fc" id="L151">    }</span>
+
+
+    /**
+     * Poistaa keskustelun henkilon keskusteluista.
+     *
+     * @param person Person olio
+     * @param conv conv
+     */
+    @Transactional
+    public void removeConversation(final Person person,
+                                   final Conversation conv) {
+<span class="fc" id="L163">        person.removeConversation(conv);</span>
+<span class="fc" id="L164">        personRepo.save(person);</span>
+<span class="fc" id="L165">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MessageBroker.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.controller</a> &gt; <span class="el_source">MessageBroker.java</span></div><h1>MessageBroker.java</h1><pre class="source lang-java linenums">package sotechat.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+
+import java.security.Principal;
+
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+
+/**
+ * Erilaisiin polkuihin lahetettavien sanomien valittaminen.
+ * Esimerkiksi chattiin kirjoitettu viesti tai paivitys jonon sisallosta.
+ */
+@Component
+public class MessageBroker {
+
+    /**
+     * Sessioiden kasittely.
+     */
+   // @Autowired
+    private SessionRepo sessionRepo;
+
+    /**
+     * Muistaa asioita kayttajiin liittyen.
+     */
+    //@Autowired
+    private Mapper mapper;
+
+    /**
+     * Spring:in viestienvalittajaolio.
+     */
+    //@Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    public MessageBroker(
+            Mapper pMapper,
+            SessionRepo pSessionRepo,
+            SimpMessagingTemplate pSimpMessagingTemplate
+<span class="fc" id="L43">    ) {</span>
+<span class="fc" id="L44">        this.mapper = pMapper;</span>
+<span class="fc" id="L45">        this.sessionRepo = pSessionRepo;</span>
+<span class="fc" id="L46">        this.simpMessagingTemplate = pSimpMessagingTemplate;</span>
+<span class="fc" id="L47">    }</span>
+
+    /**
+     * Lahettaa kanavalle tiedotuksen kanavan sulkemisesta.
+     * @param channelId Kanavantunnus.
+     */
+    public void sendClosedChannelNotice(final String channelId) {
+<span class="fc" id="L54">        String channelIdWithPath = &quot;/toClient/chat/&quot; + channelId;</span>
+<span class="fc" id="L55">        String closedChannelNotice = &quot;{\&quot;notice\&quot;:\&quot;chat closed\&quot;}&quot;;</span>
+<span class="fc" id="L56">        simpMessagingTemplate.convertAndSend(</span>
+                channelIdWithPath, closedChannelNotice);
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * Lahettaa sanoman.
+     * @param path Polku, jonka tilaajille sanoma lahetetaan.
+     * @param content Sisalto lahetettavalle sanomalle.
+     */
+    public void convertAndSend(final String path, final Object content) {
+<span class="fc" id="L66">        simpMessagingTemplate.convertAndSend(path, content);</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Lahettaa kaikille kanaville, joilla annettu ammattilaiskayttaja on,
+     * tiedotteen, etta kayttaja on poistunut tai liittynyt.
+     *
+     * @param pro Authentikaatiotiedot.
+     * @param online String true tai false.
+     */
+    public void sendJoinLeaveNotices(
+            final Principal pro,
+            final String online
+    ) {
+<span class="fc" id="L80">        String username = pro.getName();</span>
+<span class="fc" id="L81">        String userId = mapper.getIdFromRegisteredName(username);</span>
+<span class="fc" id="L82">        Session session = sessionRepo.getSessionFromUserId(userId);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (online.equals(&quot;true&quot;)) {</span>
+<span class="fc" id="L84">            sendJoinNotices(session);</span>
+        } else {
+<span class="fc" id="L86">            sendLeaveNotices(session);</span>
+        }
+<span class="fc" id="L88">    }</span>
+
+    /**
+     * Lahettaa annetun session kanaville tieto liittymisesta.
+     *
+     * @param session Liittyja.
+     */
+    public void sendJoinNotices(
+            final Session session
+    ) {
+<span class="fc" id="L98">        String username = session.get(&quot;username&quot;);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        for (String channelId : session.getChannels()) {</span>
+<span class="fc" id="L100">            String channelIdWithPath = &quot;/toClient/chat/&quot; + channelId;</span>
+<span class="fc" id="L101">            sendJoinNotice(channelIdWithPath, username);</span>
+<span class="fc" id="L102">        }</span>
+<span class="fc" id="L103">    }</span>
+
+    /**
+     * Lahettaa annetun session kanaville tieto poistuisesta.
+     *
+     * @param session Poistuja.
+     */
+    public void sendLeaveNotices(
+            final Session session
+    ) {
+<span class="fc" id="L113">        String username = session.get(&quot;username&quot;);</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        for (String channelId : session.getChannels()) {</span>
+<span class="fc" id="L115">            String channelIdWithPath = &quot;/toClient/chat/&quot; + channelId;</span>
+<span class="fc" id="L116">            sendLeaveNotice(channelIdWithPath, username);</span>
+<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">    }</span>
+
+    /**
+     * Lahettaa annetulle kanavalle tiedon kayttajan liittymisesta.
+     *
+     * @param path Polku.
+     * @param username Liittyja.
+     */
+    public void sendJoinNotice(
+            final String path,
+            final String username
+    ) {
+<span class="fc" id="L130">        String joinInfo = &quot;{\&quot;join\&quot;:\&quot;&quot; + username + &quot;\&quot;}&quot;;</span>
+<span class="fc" id="L131">        simpMessagingTemplate.convertAndSend(path, joinInfo);</span>
+<span class="fc" id="L132">    }</span>
+
+    /**
+     * Lahettaa annetulle kanavalle tiedon kayttajan poistumisesta.
+     *
+     * @param path Polku.
+     * @param username Poistuja.
+     */
+    public void sendLeaveNotice(
+            final String path,
+            final String username
+    ) {
+<span class="fc" id="L144">        String leaveInfo = &quot;{\&quot;leave\&quot;:\&quot;&quot; + username + &quot;\&quot;}&quot;;</span>
+<span class="fc" id="L145">        simpMessagingTemplate.convertAndSend(path, leaveInfo);</span>
+<span class="fc" id="L146">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Conversation.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.domain</a> &gt; <span class="el_source">Conversation.java</span></div><h1>Conversation.java</h1><pre class="source lang-java linenums">package sotechat.domain;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotNull;
+import javax.persistence.OneToMany;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Luokka keskustelun metatietojen tallentamiseen tietokantaan.
+ * Tasta luokasta luodaan tietokantaan &lt;code&gt;Conversation&lt;/code&gt;-taulu,
+ * jonka riveina ovat luokan ilmentymamuuttujat.
+ */
+@Entity
+public class Conversation {
+
+    /**
+     * Keskustelun kanavatunnus. Toimii tietokantataulun &lt;code&gt;id&lt;/code&gt;:na.
+     */
+    @Id
+    private String channelId;
+
+    /**
+     * Keskustelun aikaleima. Ei voi olla arvoltaan &lt;code&gt;null&lt;/code&gt;.
+     */
+    @NotNull
+    private String date;
+
+    /**
+     * Keskustelun aihealue.
+     */
+    private String category;
+
+    /**
+     * Keskusteluun liittyvat &lt;code&gt;Person&lt;/code&gt;-oliot listana. Tietokannassa
+     * monesta moneen suhde, jonka avain loytyy &lt;code&gt;Person&lt;/code&gt;-taulun
+     * &lt;code&gt;conversationsOfPerson&lt;/code&gt; rivilta.
+     */
+    @ManyToMany(mappedBy = &quot;conversationsOfPerson&quot;)
+    private List&lt;Person&gt; participantsOfConversation;
+
+    /**
+     * Keskusteluun liittyvien &lt;code&gt;Message&lt;/code&gt;-oliot listana. Tietokannassa
+     * yhdesta moneen suhde, jonka avain loytyy &lt;code&gt;Message&lt;/code&gt;-taulun
+     * &lt;code&gt;conversation&lt;/code&gt; rivilta. Hakutapa on &lt;code&gt;EAGER&lt;/code&gt;, eli
+     * kaikki listalla olevat &lt;code&gt;Message&lt;/code&gt;-oliot haetaan heti, kun
+     * kyseisen listan omaava &lt;code&gt;Conversation&lt;/code&gt;-olio haetaan.
+     */
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+            mappedBy = &quot;conversation&quot;)
+    private List&lt;Message&gt; messagesOfConversation;
+
+    /**
+     * Konstruktori. Alustaa listat keskusteluun liittyville viesteille ja
+     * henkiloille.
+     */
+<span class="fc" id="L62">    public Conversation() {</span>
+<span class="fc" id="L63">        this.messagesOfConversation = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L64">        this.participantsOfConversation = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L65">    }</span>
+
+    /**
+     * Konstruktori. Asettaa aikaleimaksi argumenttina annetun
+     * &lt;code&gt;pDate&lt;/code&gt; nimisen muuttujan ja kanavatunnukseksi
+     * &lt;code&gt;pChannelId&lt;/code&gt; nimisen muuttujan sekä alustaa listat
+     * keskusteluun liittyville viesteille ja henkiloille.
+     *
+     * @param pDate Aikaleima.
+     * @param pChannelId Kanavan tunnus.
+     */
+<span class="fc" id="L76">    public Conversation(final String pChannelId, final String pDate) {</span>
+<span class="fc" id="L77">        this.date = pDate;</span>
+<span class="fc" id="L78">        this.channelId = pChannelId;</span>
+<span class="fc" id="L79">        this.messagesOfConversation = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L80">        this.participantsOfConversation = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * Palauttaa viestin aikaleiman.
+     *
+     * @return Aikaleima.
+     */
+    public final String getDate() {
+<span class="fc" id="L89">        return this.date;</span>
+    }
+
+    /**
+     * Asettaa viestin aikaleiman argumenttina annetuksi aikaleimaksi.
+     *
+     * @param pDate Viestin aikaleima.
+     */
+    public final void setDate(final String pDate) {
+<span class="fc" id="L98">        this.date = pDate;</span>
+<span class="fc" id="L99">    }</span>
+
+    /**
+     * Palauttaa listan keskusteluun liittyvista &lt;code&gt;Person&lt;/code&gt;-olioista.
+     *
+     * @return Lista &lt;code&gt;Person&lt;/code&gt;-olioista, jotka on liitetty
+     * keskusteluun.
+     */
+    public final List&lt;Person&gt; getParticipantsOfConversation() {
+<span class="fc" id="L108">        return this.participantsOfConversation;</span>
+    }
+
+    /**
+     * Palauttaa listan keskustelun &lt;code&gt;Message&lt;/code&gt;-olioista.
+     *
+     * @return Lista &lt;code&gt;Message&lt;/code&gt;-olioista, jotka on liitetty
+     * keskusteluun.
+     */
+    public final List&lt;Message&gt; getMessagesOfConversation() {
+<span class="fc" id="L118">        return this.messagesOfConversation;</span>
+    }
+
+    /**
+     * Lisaa argumenttina annetun &lt;code&gt;Person&lt;/code&gt;-olion keskusteluun
+     * liittyvien henkiloiden listaan.
+     *
+     * @param pPerson &lt;code&gt;Person&lt;/code&gt;-olio, joka liitetaam keskusteluun.
+     */
+    public final void addPersonToConversation(final Person pPerson) {
+<span class="fc" id="L128">        participantsOfConversation.add(pPerson);</span>
+<span class="fc" id="L129">    }</span>
+
+    /**
+     * Lisaa argumenttina annetun &lt;code&gt;Message&lt;/code&gt;-olion keskusteluun
+     * liittyvien viestien listaan.
+     *
+     * @param pMessage &lt;code&gt;Message&lt;/code&gt;-olio, joka liitetaan keskusteluun.
+     */
+    public final void addMessageToConversation(final Message pMessage) {
+<span class="fc" id="L138">        messagesOfConversation.add(pMessage);</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * Palauttaa keskustelun aihealueen.
+     *
+     * @return Keskustelun aihealue.
+     */
+    public final String getCategory() {
+<span class="fc" id="L147">        return category;</span>
+    }
+
+    /**
+     * Asettaa keskustelun aihealueeksi argumenttina annetun aihealueen.
+     *
+     * @param pCategory Keskustelulle annettava kategoria
+     *                  &lt;code&gt;String&lt;/code&gt;-oliona.
+     */
+    public final void setCategory(final String pCategory) {
+<span class="fc" id="L157">        this.category = pCategory;</span>
+<span class="fc" id="L158">    }</span>
+
+    /**
+     * Palauttaa keskustelun kanavatunnuksen.
+     *
+     * @return Palauttaa keskustelun kanavatunnuksen
+     * &lt;code&gt;String&lt;/code&gt;-oliona.
+     */
+    public String getChannelId() {
+<span class="fc" id="L167">        return channelId;</span>
+    }
+
+    /**
+     * Asettaa keskustelun kanavatunnukseksi argumenttina annetun
+     * kanavatunnuksen.
+     *
+     * @param pChannelId Kanavatunnus.
+     */
+    public void setChannelId(final String pChannelId) {
+<span class="fc" id="L177">        this.channelId = pChannelId;</span>
+<span class="fc" id="L178">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

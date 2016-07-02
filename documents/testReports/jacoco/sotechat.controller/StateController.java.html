@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StateController.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.controller</a> &gt; <span class="el_source">StateController.java</span></div><h1>StateController.java</h1><pre class="source lang-java linenums">package sotechat.controller;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.service.QueueService;
+import sotechat.service.ValidatorService;
+import sotechat.wrappers.ProStateResponse;
+import sotechat.wrappers.UserStateResponse;
+
+/**
+ * Reititys tilaan liittyville pyynnoille (GET, POST, WS).
+ */
+@RestController
+public class StateController {
+
+    /**
+     * Pyyntojen validointi.
+     */
+    private final ValidatorService validatorService;
+
+    /**
+     * Sessioiden kasittely.
+     */
+    private final SessionRepo sessionRepo;
+
+    /**
+     * Jonon kasittely.
+     */
+    private final QueueService queueService;
+
+    /**
+     * Jonon tiedottaminen.
+     */
+    private final QueueBroadcaster queueBroadcaster;
+
+    /**
+     * Sanomien lahettaminen.
+     */
+    private final MessageBroker broker;
+
+
+    /**
+     * Konstruktori.
+     *
+     * @param pValidatorService validatorService
+     * @param pSessionRepo sessionRepo
+     * @param pQueueService queueService
+     * @param pQueueBroadcaster queueBroadCaster
+     * @param pBroker broker
+     */
+    @Autowired
+    public StateController(
+            final ValidatorService pValidatorService,
+            final SessionRepo pSessionRepo,
+            final QueueService pQueueService,
+            final QueueBroadcaster pQueueBroadcaster,
+            final MessageBroker pBroker
+<span class="fc" id="L75">    ) {</span>
+<span class="fc" id="L76">        this.validatorService = pValidatorService;</span>
+<span class="fc" id="L77">        this.sessionRepo = pSessionRepo;</span>
+<span class="fc" id="L78">        this.queueService = pQueueService;</span>
+<span class="fc" id="L79">        this.queueBroadcaster = pQueueBroadcaster;</span>
+<span class="fc" id="L80">        this.broker = pBroker;</span>
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * Kun asiakaskayttaja haluaa pyytaa omat tilatietonsa
+     * (muun muassa sivun latauksen yhteydessa).
+     *
+     * @param req Pyynnon tiedot.
+     * @param professional Kirjautumistiedot.
+     * @return JSON-muotoon paketoitu UserStateResponse
+     * lahetetaan pyynnon tehneelle kayttajalle.
+     */
+    @RequestMapping(value = &quot;/userState&quot;, method = RequestMethod.GET)
+    public final UserStateResponse returnUserStateResponse(
+            final HttpServletRequest req,
+            final Principal professional
+    ) {
+<span class="fc" id="L97">        Session session = sessionRepo.updateSession(req, professional);</span>
+<span class="fc" id="L98">        return new UserStateResponse(session);</span>
+    }
+
+    /**
+     * Kun ammattilaiskayttaja haluaa pyytaa omat tilatietonsa
+     * (muun muassa sivun latauksen yhteydessa).
+     *
+     * @param req Pyynnon tiedot.
+     * @param professional Kirjautumistiedot.
+     * @return JSON-muotoon paketoitu ProStateResponse (tai tyhja vastaus)
+     * lahetetaan pyynnon tehneelle kayttajalle.
+     */
+    @RequestMapping(value = &quot;/proState&quot;, method = RequestMethod.GET)
+    public final ProStateResponse returnProStateResponse(
+            final HttpServletRequest req,
+            final Principal professional
+    ) {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (professional == null) {</span>
+            /** Hacking attempt? */
+<span class="fc" id="L117">            return null;</span>
+        }
+<span class="fc" id="L119">        Session session = sessionRepo.updateSession(req, professional);</span>
+<span class="fc" id="L120">        return new ProStateResponse(session);</span>
+    }
+
+    /**
+     * Kun client lahettaa avausviestin ja haluaa liittya jonoon.
+     *
+     * @param request Pyynto.
+     * @param professional Kirjautumistiedot.
+     * @return JSON {&quot;content&quot;:&quot;Denied...&quot;} tai {&quot;content&quot;:&quot;OK...&quot;}
+     * lahetetaan pyynnon tehneelle kayttajalle.
+     */
+    @RequestMapping(value = &quot;/joinQueue&quot;, method = RequestMethod.POST)
+    public final String respondToJoinQueueRequest(
+            final HttpServletRequest request,
+            final Principal professional
+    ) {
+<span class="fc" id="L136">        String response = processJoinQueueReq(request, professional);</span>
+<span class="fc" id="L137">        return &quot;{\&quot;content\&quot;:\&quot;&quot; + response + &quot;\&quot;}&quot;;</span>
+    }
+
+    /**
+     * Validoi pyynto liittya jonoon ja suorita se.
+     *
+     * @param req Pyynto.
+     * @param auth Kirjautumistiedot.
+     * @return String &quot;OK...&quot; tai &quot;Denied...&quot;.
+     */
+    private String processJoinQueueReq(
+            final HttpServletRequest req,
+            final Principal auth
+    ) {
+
+        /* Tehdaan JSON-objekti clientin lahettamasta JSONista. */
+        JsonObject payload;
+        try {
+<span class="fc" id="L155">            String jsonString = req.getReader().readLine();</span>
+<span class="fc" id="L156">            JsonParser parser = new JsonParser();</span>
+<span class="fc" id="L157">            payload = parser.parse(jsonString).getAsJsonObject();</span>
+<span class="fc" id="L158">        } catch (Exception e) {</span>
+<span class="fc" id="L159">            return &quot;Denied due to invalid JSON formatting.&quot;;</span>
+<span class="fc" id="L160">        }</span>
+
+        /* Validointi. */
+<span class="fc" id="L163">        String error = validatorService.validateJoin(req, payload, auth);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (!error.isEmpty()) {</span>
+<span class="fc" id="L165">            return error;</span>
+        }
+
+        /* Suorittaminen. */
+<span class="nc" id="L169">        queueService.joinQueue(req, payload);</span>
+<span class="nc" id="L170">        queueBroadcaster.broadcastQueue();</span>
+<span class="nc" id="L171">        return &quot;OK, please request new state now.&quot;;</span>
+    }
+
+    /** Kun hoitaja yrittaa ottaa jonosta uuden chatin, client lahettaa
+     * tilauspyynnon polkuun /queue/{channelId}/ ja tama metodi aktivoituu.
+     *
+     *  Toimenpiteet mita tehdaan:
+     *  - Poistetaan jonosta kyseinen chatti.
+     *  - Broadcastataan jonon uusi tila hoitajille
+     *  - Kerrotaan kaikille asianomaisille (/queue/id/ subscribaajille),
+     *    kenelle hoitajalle kanava kuuluu. Huomaa palautusarvon selitys!
+     *
+     * @param channelId channelId
+     * @param accessor accessor
+     * @return Palautusarvo lahetetaan JSONina polkuun /queue/{channelId}.
+     *          esim. {&quot;channel assigned to&quot;:&quot;Hoitaja Anne&quot;}
+     *          Kayttotapauksia viestille:
+     *          - Kerrotaan jonottajalle, etta chatti on auki
+     *          - Poppausta yrittanyt client saa kuulla, etta poppaus onnistui
+     *          - Poppausta yrittanyt client saa kuulla, etta joku toinen ehti
+     *              juuri popata ennen meita.
+     */
+    @MessageMapping(&quot;/toServer/queue/{channelId}&quot;)
+    @SendTo(&quot;/toClient/queue/{channelId}&quot;)
+    public final String popClientFromQueue(
+            final @DestinationVariable String channelId,
+            final SimpMessageHeaderAccessor accessor
+    ) {
+
+        /* Varmista, etta poppaaja on autentikoitunut. */
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (accessor.getUser() == null) {</span>
+<span class="fc" id="L202">            System.out.println(&quot;Hacking attempt?&quot;);</span>
+<span class="fc" id="L203">            return &quot;&quot;;</span>
+        }
+
+        /* Yritetaan popata ja haetaan username kenelle kanava on popattu. */
+<span class="fc" id="L207">        String assignee = queueService.popQueue(channelId, accessor);</span>
+
+        /* Broadcastataan jonon tila kaikille ammattilaisille.
+         * HUOM: Ei broadcastata viesteja viela. Vasta kun joku subscribaa. */
+<span class="fc" id="L211">        queueBroadcaster.broadcastQueue();</span>
+
+        /* Palautetaan asianomaisille tieto, kenelle kanava on popattu. */
+<span class="fc" id="L214">        return &quot;{\&quot;channelAssignedTo\&quot;:\&quot;&quot; + assignee + &quot;\&quot;}&quot;;</span>
+    }
+
+    /**
+     * Pyynto poistua chat-kanavalta (asiakas- tai ammattilaiskayttaja).
+     * (Jos asiakaskayttaja on poistunut, halutaan jattaa kanavava suljettuna
+     * nakyviin ammattilaisen valilehtiin.)
+     *
+     * @param req Pyynto.
+     * @param pro Kirjautumistiedot.
+     * @param channelId Kanavatunnus.
+     */
+    @RequestMapping(value = &quot;/leave/{channelId}&quot;, method = RequestMethod.POST)
+    public final void leaveChat(
+            final @PathVariable String channelId,
+            final HttpServletRequest req,
+            final Principal pro
+    ) {
+<span class="fc" id="L232">        String sessionId = req.getSession().getId();</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">        if (!validatorService.validateLeave(sessionId, pro, channelId)) {</span>
+<span class="fc" id="L234">            return;</span>
+        }
+<span class="fc" id="L236">        sessionRepo.leaveChannel(channelId, sessionId);</span>
+<span class="fc" id="L237">        broker.sendClosedChannelNotice(channelId);</span>
+<span class="fc" id="L238">    }</span>
+
+    /**
+     * Pyynto asettaa ammattilaisen online-tilaksi true/false.
+     * Esimerkiksi /setStatus/?online=true
+     *
+     * @param online String &quot;true&quot; tai &quot;false&quot;
+     * @param req Pyynto.
+     * @param professional Kirjautumistiedot.
+     * @return Vastaus pyynnon tekijalle, tyypillisesti {&quot;status&quot;:&quot;OK&quot;}.
+     */
+    @RequestMapping(value = &quot;/setStatus/&quot;, method = RequestMethod.POST)
+    public final String setStatusOfProUser(
+            final @RequestParam String online,
+            final HttpServletRequest req,
+            final Principal professional
+    ) {
+<span class="nc" id="L255">        String error = validatorService.validateOnlineStatusChangeRequest(</span>
+                professional, req, online
+        );
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (!error.isEmpty()) {</span>
+<span class="nc" id="L259">            return jsonifiedResponse(error);</span>
+        }
+<span class="nc" id="L261">        sessionRepo.setOnlineStatus(req, online);</span>
+<span class="nc" id="L262">        broker.sendJoinLeaveNotices(professional, online);</span>
+<span class="nc" id="L263">        return jsonifiedResponse(&quot;&quot;);</span>
+    }
+
+    /**
+     * Metodi, joka muuntaa ValidatorServicen palauttaman String-muotoisen
+     * virheilmoituksen JSON-muotoon, jotta se voidaan lahettaa Clientille
+     * ja Clientin on helppo kasitella sita.
+     *
+     * @param error ValidatorServicen palauttama String-muotoinen virheviesti.
+     * @return Palauttaa JSON-muotoisen virheen.
+     */
+    private String jsonifiedResponse(final String error) {
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        if (error.isEmpty()) {</span>
+<span class="nc" id="L276">            return &quot;{\&quot;status\&quot;:\&quot;OK\&quot;}&quot;;</span>
+        }
+<span class="nc" id="L278">        return &quot;{\&quot;error\&quot;: \&quot;&quot; + error + &quot;\&quot;}&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>WebSocketConnectHandler.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.controller</a> &gt; <span class="el_source">WebSocketConnectHandler.java</span></div><h1>WebSocketConnectHandler.java</h1><pre class="source lang-java linenums">package sotechat.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+
+import sotechat.controller.MessageBroker;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+
+/**
+ * Maarittelee mitä tapahtuu, kun WebSocket-yhteys muodostuu.
+ *
+ * @param &lt;S&gt; Abstrakti olio.
+ */
+@Component
+public class WebSocketConnectHandler&lt;S&gt;
+        implements ApplicationListener&lt;SessionConnectEvent&gt; {
+
+    /**
+     * &lt;code&gt;SessionRepo&lt;/code&gt;-olio, jonka perusteella voidaan selvittaa, onko
+     * tietty sessio aktiivinen vai inaktiivinen.
+     */
+    @Autowired
+    private SessionRepo sessionRepo;
+
+    /**
+     * Sanomien valittaja.
+     */
+    @Autowired
+    private MessageBroker broker;
+
+    /**
+     * Konstruktori.
+     */
+<span class="fc" id="L39">    public WebSocketConnectHandler() {</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Maarittelee ylimaaraisen toiminnallisuuden
+     * &lt;code&gt;WebSocket&lt;/code&gt;-yhteyden muodostuessa.
+     *
+     * @param event &lt;code&gt;SessionConnectEvent&lt;/code&gt;-olio.
+     */
+   public final void onApplicationEvent(final SessionConnectEvent event) {
+<span class="fc" id="L49">       MessageHeaders headers = event.getMessage().getHeaders();</span>
+<span class="fc" id="L50">       String sessionId = SimpMessageHeaderAccessor</span>
+<span class="fc" id="L51">               .getSessionAttributes(headers)</span>
+<span class="fc" id="L52">               .get(&quot;SPRING.SESSION.ID&quot;).toString();</span>
+<span class="fc" id="L53">       Session userSession = this.sessionRepo</span>
+<span class="fc" id="L54">               .getSessionFromSessionId(sessionId);</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">       if (userSession != null) {</span>
+<span class="fc" id="L56">           userSession.set(&quot;connectionStatus&quot;, &quot;connected&quot;);</span>
+<span class="fc" id="L57">           broker.sendJoinNotices(userSession);</span>
+       }
+<span class="fc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

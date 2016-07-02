@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DatabaseService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.service</a> &gt; <span class="el_source">DatabaseService.java</span></div><h1>DatabaseService.java</h1><pre class="source lang-java linenums">package sotechat.service;
+
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import sotechat.domain.Conversation;
+import sotechat.domain.Message;
+import sotechat.domain.Person;
+import sotechat.wrappers.ConvInfo;
+import sotechat.wrappers.MsgToClient;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Luokka tietokantaoperaatioiden toteuttamiseen.
+ */
+@Service
+public class DatabaseService {
+
+    /**
+     * Henkiloihin liittyvat palvelut.
+     */
+    private PersonService personService;
+
+    /**
+     * Keskusteluihin liittyvat palvelut.
+     */
+    private ConversationService conversationService;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pPersonService       PersonRepon CRUD-operaatioista vastaava palvelu-
+     *                             luokka.
+     * @param pConversationService ConversationRepon CRUD-operaatioista
+     *                             vastaava palveluluokka
+     */
+    @Autowired
+    public DatabaseService(
+            final PersonService pPersonService,
+            final ConversationService pConversationService
+<span class="fc" id="L43">    ) {</span>
+<span class="fc" id="L44">        this.personService = pPersonService;</span>
+<span class="fc" id="L45">        this.conversationService = pConversationService;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Luodaan tietokantaan uusi keskustelu ja liitetaan siihen aloitusviesti
+     * seka keskustelun kategoria.
+     *
+     * @param sender    Aloitusviestin lahettaja
+     * @param channelId kanavan id
+     * @param category  keskustelun kategoria
+     */
+    public final void createConversation(
+            final String sender,
+            final String channelId,
+            final String category
+    ) {
+        try {
+<span class="fc" id="L62">            String timeStamp = new DateTime().toString();</span>
+<span class="fc" id="L63">            Conversation conversation = new Conversation(channelId, timeStamp);</span>
+<span class="fc" id="L64">            conversationService.addConversation(conversation);</span>
+<span class="fc" id="L65">            conversationService.setCategory(category, channelId);</span>
+<span class="fc" id="L66">        } catch (Exception e) {</span>
+<span class="fc" id="L67">            System.out.println(&quot;DBE on createConversation! &quot; + e.toString());</span>
+<span class="fc" id="L68">        }</span>
+
+<span class="fc" id="L70">    }</span>
+
+    /**
+     * Lisataan parametrina annetun kayttaja id:n omaava henkilo parametrina
+     * annettua kanavaid:ta vastaavaan keskusteluun.
+     *
+     * @param userId    kayttajan id
+     * @param channelId kanavan id
+     */
+    public final void addPersonToConversation(
+            final String userId,
+            final String channelId
+    ) {
+        try {
+<span class="fc" id="L84">            Person person = personService.getPerson(userId);</span>
+<span class="fc" id="L85">            conversationService.addPerson(person, channelId);</span>
+<span class="fc" id="L86">            Conversation conv = conversationService.getConversation(channelId);</span>
+<span class="fc" id="L87">            personService.addConversation(userId, conv);</span>
+<span class="fc" id="L88">        } catch (Exception e) {</span>
+<span class="fc" id="L89">            System.out.println(&quot;DBE on addPersonToConversati! &quot; + e.toString());</span>
+<span class="fc" id="L90">        }</span>
+
+<span class="fc" id="L92">    }</span>
+
+    /**
+     * Tallennetaan viesti tietokantaan ja tietokannassa olevaan keskusteluun.
+     *
+     * @param username  viestin lahettajan kayttajanimi
+     * @param content   viestin sisalto
+     * @param time      viestin aikaleima
+     * @param channelId viestin kanavan id
+     */
+    public final void saveMsg(
+            final String username,
+            final String content,
+            final String time,
+            final String channelId
+    ) {
+        try {
+<span class="fc" id="L109">            Message message = new Message(username, content, time);</span>
+<span class="fc" id="L110">            Conversation conv = conversationService.getConversation(channelId);</span>
+<span class="fc" id="L111">            message.setConversation(conv);</span>
+<span class="fc" id="L112">            conversationService.addMessage(message, conv);</span>
+<span class="fc" id="L113">        } catch (Exception e) {</span>
+<span class="fc" id="L114">            System.out.println(&quot;DBE on saveMsg! &quot; + e.toString());</span>
+<span class="fc" id="L115">        }</span>
+
+<span class="fc" id="L117">    }</span>
+
+    /**
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
+     * viestit aikaleiman mukaan jarjestettyna listana MsgToClient olioita.
+     *
+     * @param channelId Keskustelun kanavan id.
+     * @return List&lt;MsgToClient&gt; Keskustelun viestit aikajarjestyksessa.
+     */
+    public List&lt;MsgToClient&gt; retrieveMessages(
+            final String channelId
+    ) {
+        try {
+<span class="fc" id="L130">            Conversation conv = conversationService.getConversation(channelId);</span>
+<span class="fc" id="L131">            List&lt;Message&gt; messages = conv.getMessagesOfConversation();</span>
+<span class="fc" id="L132">            List&lt;MsgToClient&gt; messageList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            for (Message message : messages) {</span>
+<span class="fc" id="L134">                MsgToClient newMsg = wrapMessage(message);</span>
+<span class="fc" id="L135">                messageList.add(newMsg);</span>
+<span class="fc" id="L136">            }</span>
+<span class="fc" id="L137">            return messageList;</span>
+<span class="fc" id="L138">        } catch (Exception e) {</span>
+<span class="fc" id="L139">            System.out.println(&quot;DBE on retrieveMessages! &quot; + e.toString());</span>
+<span class="fc" id="L140">            return new ArrayList&lt;&gt;();</span>
+        }
+
+    }
+
+    /**
+     * Palauttaa kaikki kayttajat.
+     *
+     * @return Lista kayttajista.
+     */
+    public List&lt;Person&gt; getAllPersons() {
+<span class="fc" id="L151">        return personService.findAll();</span>
+    }
+
+    /**
+     * Palauttaa listan ConvInfo-olioita.
+     *
+     * @param userId userId
+     * @return lista convInfo-olioita
+     */
+    public final List&lt;ConvInfo&gt; getConvInfoListOfUserId(
+            final String userId
+    ) {
+        try {
+<span class="fc" id="L164">            Person person = personService.getPerson(userId);</span>
+<span class="fc" id="L165">            List&lt;Conversation&gt; convs = person.getConversationsOfPerson();</span>
+<span class="fc" id="L166">            List&lt;ConvInfo&gt; info = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            for (Conversation conversation : convs) {</span>
+<span class="fc" id="L168">                info.add(wrapConversation(conversation));</span>
+<span class="fc" id="L169">            }</span>
+<span class="fc" id="L170">            return info;</span>
+<span class="fc" id="L171">        } catch (Exception e) {</span>
+<span class="fc" id="L172">            System.out.println(&quot;DBE on getConvInfoListOfUser! &quot; + e.toString());</span>
+<span class="fc" id="L173">            return new ArrayList&lt;&gt;();</span>
+        }
+
+    }
+
+    /**
+     * Muuttaa Conversation olion ConInfo-olioksi.
+     *
+     * @param conv conv
+     * @return ConvInfo wrapper
+     */
+    private ConvInfo wrapConversation(
+            final Conversation conv
+    ) {
+<span class="fc" id="L187">        String channelId = conv.getChannelId();</span>
+<span class="fc" id="L188">        String date = conv.getDate();</span>
+       /* ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */
+<span class="fc" id="L190">        String person = &quot;&quot;;</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        if (conv.getMessagesOfConversation().size() &gt; 0) {</span>
+<span class="fc" id="L192">            person = conv.getMessagesOfConversation().get(0).getSender();</span>
+        }
+<span class="fc" id="L194">        String category = conv.getCategory();</span>
+<span class="fc" id="L195">        return new ConvInfo(channelId, date, person, category);</span>
+    }
+
+    /**
+     * Luo uuden MsgToClient olion parametrina annetun Message olion tietojen
+     * pohjalta.
+     *
+     * @param message Message luokan ilmentyma
+     * @return MsgToClient luokan ilmentyma
+     */
+    private MsgToClient wrapMessage(final Message message) {
+<span class="fc" id="L206">        String id = &quot;&quot; + message.getId();</span>
+<span class="fc" id="L207">        String name = message.getSender();</span>
+<span class="fc" id="L208">        String channelId = message.getConversation().getChannelId();</span>
+<span class="fc" id="L209">        String time = message.getDate();</span>
+<span class="fc" id="L210">        String content = message.getContent();</span>
+<span class="fc" id="L211">        MsgToClient msg = new MsgToClient(id, name, channelId, time, content);</span>
+<span class="fc" id="L212">        return msg;</span>
+    }
+
+    /**
+     * Tarkoitettu viestien poistamiseen tietokannasta demoamista varten.
+     *
+     * @return Virheilmoitus tai tyhja String jos onnistui.
+     */
+    public String removeAllConversationsFromDatabase() {
+        try {
+<span class="fc" id="L222">            List&lt;Conversation&gt; conversations = conversationService.findAll();</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">            for (Conversation conversation : conversations) {</span>
+                /* Poistaa myos keskusteluun liitetyt viestit. */
+<span class="fc bfc" id="L225" title="All 2 branches covered.">                for (Person person : conversation</span>
+<span class="fc" id="L226">                        .getParticipantsOfConversation()) {</span>
+<span class="fc" id="L227">                    personService.removeConversation(person, conversation);</span>
+<span class="fc" id="L228">                }</span>
+<span class="fc" id="L229">                String id = conversation.getChannelId();</span>
+<span class="fc" id="L230">                conversationService.removeConversation(id);</span>
+<span class="fc" id="L231">            }</span>
+<span class="fc" id="L232">            return &quot;&quot;;</span>
+<span class="nc" id="L233">        } catch (Exception e) {</span>
+<span class="nc" id="L234">            return &quot;Virhe tietokannan tyhjennyksessa, muutoksia tietokantaan &quot;</span>
+<span class="nc" id="L235">                    + &quot;ei tehty. &quot; + e.toString();</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

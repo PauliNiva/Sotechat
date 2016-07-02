@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Session.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.data</a> &gt; <span class="el_source">Session.java</span></div><h1>Session.java</h1><pre class="source lang-java linenums">package sotechat.data;
+
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+
+/**
+ * Session-oliot kuvaamaan aktiivisia sessioita.
+ * HUOM: Usea sessioId voidaan liittaa samaan Sessioon.
+ */
+public class Session {
+
+    /**
+     * Attribuutit, kuten &quot;username&quot;, &quot;userId&quot;, &quot;sessionId&quot;.
+     * Huom: asiakaskayttajalla on &quot;channelId&quot;, pro:lla &quot;channelIds&quot;.
+     */
+    private HashMap&lt;String, String&gt; attributes;
+
+    /**
+     * Kanavat, joille sessiolla on oikeus osallistua. Myos Channel-oliossa.
+     * */
+    private LinkedHashSet&lt;String&gt; channels;
+
+    /**
+     * Konstruktori.
+     */
+<span class="fc" id="L27">    public Session() {</span>
+<span class="fc" id="L28">        attributes = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L29">        channels = new LinkedHashSet&lt;&gt;();</span>
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * Setteri attribuuteille. Useimpia attribuutteja voi muokata suoraan
+     * taalta, mutta kanavia on tarkoitus kasitella metodien addChannel/
+     * removeChannel kautta. sessionId ja userId saattaa olla myos kirjattuna
+     * muualle, esim. mapperiin - eli jos niita muokkaa taalta, voi olla
+     * etta vanha arvo jaa viela jonnekin muualle. (Todellista kayttotapausta
+     * muokkaamiseen ei ole, tama tieto oli relevantti lahinna
+     * testien kirjoittamiseen).
+     * @param key Attribuutin nimi. Esimerkiksi &quot;username&quot;.
+     * @param value Attribuutin arvo. Esimerkiksi &quot;Mikko&quot;.
+     */
+    public final void set(
+            final String key,
+            final String value
+    ) {
+<span class="fc" id="L47">        attributes.put(key, value);</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Palauttoo haetun attribuutin arvon, tai tyhjan Stringin jos ei loydy.
+     * @param key Haettavan attribuutin nimi.
+     * @return Haettavan attribuutin arvo, tai tyhja String jos ei loydy.
+     */
+    public final String get(final String key) {
+<span class="fc" id="L56">        String value = attributes.get(key);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L58">            return &quot;&quot;;</span>
+        }
+<span class="fc" id="L60">        return value;</span>
+    }
+
+    /**
+     * Lisaa kanavan ja paivittaa attribuutin channelId/channelIds.
+     * @param channelId Lisattavan kanavan channelId.
+     */
+    public final void addChannel(final String channelId) {
+<span class="fc" id="L68">        channels.add(channelId);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (get(&quot;channelIds&quot;).isEmpty()) {</span>
+            /* Case: tavallinen kayttaja, jolla vain 1 kanava. */
+<span class="fc" id="L71">            set(&quot;channelId&quot;, channelId);</span>
+        } else {
+            /* Case: pro-kayttaja, jolla useita kanavia. */
+<span class="fc" id="L74">            updateChannelsAttribute();</span>
+        }
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Poistaa kanavan Session-olion kanavasetista.
+     * Pro-kayttajan tapauksessa myos paivittaa &quot;channels&quot; -attribuutin.
+     * @param channelId Poistettavan kanavan channelId.
+     */
+    public void removeChannel(final String channelId) {
+<span class="fc" id="L84">        channels.remove(channelId);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (isPro()) {</span>
+<span class="fc" id="L86">            updateChannelsAttribute();</span>
+        }
+<span class="fc" id="L88">    }</span>
+
+    /**
+     * Asettaa ammattilaiskayttajan &quot;channels&quot; attribuutin
+     * JSON-ystavallisessa muotoilussa.
+     * Esimerkiksi set(&quot;channelIds&quot;, &quot;[&quot;kanava85&quot;, &quot;kanava33&quot;, &quot;kanava89&quot;]&quot;.
+     */
+    public final void updateChannelsAttribute() {
+<span class="fc" id="L96">        String output = &quot;[&quot;;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        for (String channel : channels) {</span>
+            /* Lisataan kanavat lainausmerkeilla, peraan pilkku ja vali. */
+<span class="fc" id="L99">            output += &quot;\&quot;&quot; + channel + &quot;\&quot;, &quot;;</span>
+<span class="fc" id="L100">        }</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (!channels.isEmpty()) {</span>
+            /* Jos kanavia oli yli 0, poistetaan viimeinen pilkku ja vali. */
+<span class="fc" id="L103">            output = output.substring(0, output.length() - 2);</span>
+        }
+<span class="fc" id="L105">        output += &quot;]&quot;;</span>
+<span class="fc" id="L106">        set(&quot;channelIds&quot;, output);</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * Palauttaa true jos henkilo on kanavalla.
+     * @param channelId channelId
+     * @return true jos on kanavalla
+     */
+    public final boolean hasAccessToChannel(final String channelId) {
+<span class="fc" id="L115">        return channels.contains(channelId);</span>
+    }
+
+    /**
+     * Palauttaa setin kanavia.
+     * @return LinkedHashSet kanavia.
+     */
+    public LinkedHashSet&lt;String&gt; getChannels() {
+<span class="fc" id="L123">        return channels;</span>
+    }
+
+    /**
+     * Liittyyko sessio ammattilaiskayttajaan?
+     * @return true jos liittyy
+     */
+    public final boolean isPro() {
+<span class="fc" id="L131">        return this.get(&quot;state&quot;).equals(&quot;pro&quot;);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

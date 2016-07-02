@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ValidatorService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.service</a> &gt; <span class="el_source">ValidatorService.java</span></div><h1>ValidatorService.java</h1><pre class="source lang-java linenums">package sotechat.service;
+
+import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+
+import sotechat.data.Channel;
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.domain.Person;
+import sotechat.repo.PersonRepo;
+import sotechat.wrappers.MsgToServer;
+
+/**
+ * Validoi palvelimelle tulevan datan
+ * (hyvaksya/siivota/kieltaytya vastaanottamasta).
+ */
+@Service
+public class ValidatorService {
+
+    /**
+     * Mapper.
+     */
+    private Mapper mapper;
+
+    /**
+     * Session Repo.
+     */
+    private SessionRepo sessionRepo;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pMapper p
+     * @param pSessionRepo p
+     */
+    @Autowired
+    public ValidatorService(
+            final Mapper pMapper,
+            final SessionRepo pSessionRepo
+<span class="fc" id="L47">    ) {</span>
+<span class="fc" id="L48">        this.mapper = pMapper;</span>
+<span class="fc" id="L49">        this.sessionRepo = pSessionRepo;</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * Validoi keskusteluun tulevan viestin.
+     *
+     * @param msgToServer msgToServer
+     * @param accessor accessor
+     * @return Tyhja &lt;code&gt;String&lt;/code&gt; jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus.
+     */
+    public final String isMessageFraudulent(
+            final MsgToServer msgToServer,
+            final SimpMessageHeaderAccessor accessor
+    ) {
+<span class="fc" id="L64">        String sessionId = getSessionIdFrom(accessor);</span>
+<span class="fc" id="L65">        Principal principal = accessor.getUser();</span>
+
+<span class="fc" id="L67">        return isMessageFraudulent(msgToServer, sessionId, principal);</span>
+    }
+
+    /**
+     * Validoi keskusteluun tulevan viestin.
+     *
+     * @param msgToServer p
+     * @param sessionId p
+     * @param principal p
+     * @return Tyhja &lt;code&gt;String&lt;/code&gt;  jos viesti vaikuttaa aidolta,
+     *         muussa tapauksessa virheilmoitus.
+     */
+    public final String isMessageFraudulent(
+            final MsgToServer msgToServer,
+            final String sessionId,
+            final Principal principal
+    ) {
+<span class="fc" id="L84">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (session == null) {</span>
+<span class="fc" id="L87">            return &quot;Kelvoton sessioId, hylataan viesti&quot;;</span>
+        }
+<span class="fc" id="L89">        String userId = msgToServer.getUserId();</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (sessionRepo.getSessionFromUserId(userId) != session) {</span>
+<span class="fc" id="L91">            return &quot;Kelvoton userId, hylataan viesti&quot;;</span>
+        }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if (session.isPro()) {</span>
+            /** ID kuuluu ammattilaiselle, varmistetaan etta on kirjautunut. */
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">            if (principal == null) {</span>
+<span class="fc" id="L97">                return &quot;ID kuuluu pro:lle, lahettaja ei kirjautunut, hylataan&quot;;</span>
+            }
+<span class="fc" id="L99">            String username = principal.getName();</span>
+<span class="fc" id="L100">            String authId = mapper.getIdFromRegisteredName(username);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">            if (!userId.equals(authId)) {</span>
+<span class="fc" id="L102">                return &quot;Lahettajaksi merkitty ID eri kuin autentikaation ID&quot;;</span>
+            }
+        }
+
+        /* Puuttuuko viestin lahettajalta kuunteluoikeus kanavalle? */
+<span class="fc" id="L107">        String channelId = msgToServer.getChannelId();</span>
+<span class="fc" id="L108">        Channel channel = mapper.getChannel(channelId);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (!channel.hasActiveUser(userId)) {</span>
+<span class="fc" id="L110">            return &quot;Lahettajalta puuttuu kuunteluoikeus kanavalle&quot;;</span>
+        }
+
+        /* Viesti vaikuttaa aidolta. */
+<span class="fc" id="L114">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Validoi pyynnon hakea lokeja.
+     *
+     * @param principal autentikaatiotiedot
+     * @param req pyynto
+     * @param channelId channelId
+     * @return Tyhja String, jos sallitaan pyynto. Muuten virheilmoitus.
+     */
+    public final String validateLogRequest(
+            final Principal principal,
+            final HttpServletRequest req,
+            final String channelId
+    ) {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (principal == null) {</span>
+<span class="fc" id="L131">            return &quot;Unauthenticated user can't request logs!&quot;;</span>
+        }
+<span class="fc" id="L133">        String sessionId = req.getSession().getId();</span>
+<span class="fc" id="L134">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (session == null) {</span>
+<span class="fc" id="L136">            return &quot;Invalid session!&quot;;</span>
+        }
+<span class="fc" id="L138">        Channel channel = mapper.getChannel(channelId);</span>
+<span class="fc" id="L139">        String userId = session.get(&quot;userId&quot;);</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        if (!channel.hasHistoricUser(userId)) {</span>
+<span class="fc" id="L141">            return &quot;Can't access other peoples' logs!&quot;;</span>
+        }
+
+        /* Sallitaan pyynto. */
+<span class="fc" id="L145">        return &quot;&quot;;</span>
+    }
+
+
+    /**
+     * Sallitaanko polun kuuntelu?
+     * Jos sallitaan, palauttaa tyhjan Stringin.
+     * Jos ei sallita, palauttaa virheilmoituksen.
+     *
+     * @param acc Pyynnon tiedot.
+     * @return Virheilmoitus Stringina jos ei sallita pyyntoa.
+     */
+    public String validateSubscription(
+            final StompHeaderAccessor acc
+    ) {
+<span class="fc" id="L160">        Principal principal = acc.getUser();</span>
+<span class="fc" id="L161">        String sessionId = getSessionIdFrom(acc);</span>
+<span class="fc" id="L162">        String channelIdWithPath = acc.getDestination();</span>
+<span class="fc" id="L163">        String prefix = &quot;Validate subscription for &quot; + channelIdWithPath</span>
+                + &quot; by session id &quot; + sessionId + &quot; ### &quot;;
+
+        /* Kelvollinen sessio? */
+<span class="fc" id="L167">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (session == null) {</span>
+<span class="fc" id="L169">            return prefix + &quot;Session is null&quot;;</span>
+        }
+
+        /* Ammattilaiskayttaja? */
+<span class="fc bfc" id="L173" title="All 2 branches covered.">        if (session.isPro()) {</span>
+            /* Loytyyko autentikaatio myos principal-oliosta? */
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            if (principal == null) {</span>
+<span class="fc" id="L176">                return prefix + &quot;Session belongs to pro but user not auth'd&quot;;</span>
+            }
+<span class="fc bfc" id="L178" title="All 2 branches covered.">            if (channelIdWithPath.equals(&quot;/toClient/QBCC&quot;)) {</span>
+                /* Sallitaan ammattilaiskayttajalle
+                 * jonon tilannepaivityksien kuuntelu. */
+<span class="fc" id="L181">                return &quot;&quot;;</span>
+            }
+<span class="fc bfc" id="L183" title="All 2 branches covered.">            if (channelIdWithPath.startsWith(&quot;/toClient/queue/&quot;)) {</span>
+                /* Sallitaan hoitajien kuunnella kaikkia jonokanavia. */
+<span class="fc" id="L185">                return &quot;&quot;;</span>
+            }
+        }
+
+        /**
+         * Kielletaan kaikkien muiden polkujen tilaus, paitsi:
+         * /toClient/queue/channelId
+         * /toClient/chat/channelId
+         */
+<span class="fc" id="L194">        String[] splitted = channelIdWithPath.split(&quot;/&quot;);</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (splitted.length != 4) {</span>
+<span class="fc" id="L196">            return prefix + &quot;Invalid channel path (1): &quot; + channelIdWithPath;</span>
+        }
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (!&quot;toClient&quot;.equals(splitted[1])) {</span>
+<span class="fc" id="L199">            return prefix + &quot;Invalid channel path (2): &quot; + channelIdWithPath;</span>
+        }
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (!&quot;queue&quot;.equals(splitted[2])</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">                &amp;&amp; !&quot;chat&quot;.equals(splitted[2])) {</span>
+<span class="fc" id="L203">            return prefix + &quot;Invalid channel path (3): &quot; + channelIdWithPath;</span>
+        }
+<span class="fc" id="L205">        String channelId = splitted[3];</span>
+
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (!session.hasAccessToChannel(channelId)) {</span>
+<span class="fc" id="L208">            return prefix</span>
+                    + &quot;Ei oikeutta kuunnella kanavaa! userId &quot;
+<span class="fc" id="L210">                    + session.get(&quot;userId&quot;);</span>
+        }
+
+        /* Sessiolla on oikeus kuunnella kanavaa. */
+<span class="fc" id="L214">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Validointi pyynnolle liittya jonoon.
+     *
+     * @param request req
+     * @param payload payload
+     * @param professional pro
+     * @return Jos pyynto hylataan, palautetaan virheilmoitus Stringina.
+     *         Jos pyynto hyvaksytaan, palautetaan payload JSON-objektina.
+     */
+    public final String validateJoin(
+            final HttpServletRequest request,
+            final JsonObject payload,
+            final Principal professional
+    ) {
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        if (sessionRepo.chatClosed()) {</span>
+<span class="fc" id="L232">            return &quot;Denied join, no professionals available.&quot;;</span>
+        }
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        if (professional != null) {</span>
+            /* Hoitaja yrittaa liittya queueen asiakkaana. */
+<span class="fc" id="L236">            return &quot;Denied join queue request for professional&quot;;</span>
+        }
+
+        /* Clientin session tarkistus. */
+<span class="fc" id="L240">        String sessionId = request.getSession().getId();</span>
+<span class="fc" id="L241">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        if (session == null) {</span>
+<span class="fc" id="L243">            return &quot;Denied due to missing or invalid session ID.&quot;;</span>
+        }
+
+        /* Kaivetaan JSON-objektista attribuutteja muuttujiin. */
+<span class="fc" id="L247">        String username = payload.get(&quot;username&quot;).getAsString();</span>
+<span class="fc" id="L248">        String channelId = session.get(&quot;channelId&quot;);</span>
+
+        /* Tarkistetaan etta aiempi tila on &quot;start&quot;. */
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (!session.get(&quot;state&quot;).equals(&quot;start&quot;)) {</span>
+<span class="fc" id="L252">            return &quot;Denied join queue request due to bad state.&quot;;</span>
+        }
+
+        /* Tarkistetaan, ettei nimimerkki ole rekisteroity ammattilaiselle. */
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        if (mapper.isUsernameReserved(username)) {</span>
+<span class="fc" id="L257">            return &quot;Denied join queue request due to reserved username.&quot;;</span>
+        }
+
+        /* Tarkistetaan, ettei kanavalla ole toista kayttajaa samalla
+         * nimimerkilla (olennainen vasta 3+ henkilon chatissa). */
+<span class="fc" id="L262">        Channel channel = mapper.getChannel(channelId);</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">        for (Session other : channel.getCurrentSubscribers()) {</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">            if (other.get(&quot;username&quot;).equals(username)) {</span>
+<span class="fc" id="L265">                return &quot;Denied join queue request. Username already on channel.&quot;;</span>
+            }
+<span class="nc" id="L267">        }</span>
+
+        /* Sallitaan pyynto. */
+<span class="fc" id="L270">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Validoi pyynnon poistua chat-kanavalta.
+     *
+     * @param sessionId sessionId
+     * @param professional pro
+     * @param channelId channelId
+     * @return &lt;code&gt;true&lt;/code&gt; jos salltiaan pyynto.
+     */
+    public final boolean validateLeave(
+            final String sessionId,
+            final Principal professional,
+            final String channelId
+    ) {
+        /* Clientin session tarkistus. */
+<span class="fc" id="L287">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">        if (session == null) {</span>
+<span class="fc" id="L289">            return false;</span>
+        }
+
+        /* Jos sessioId kuuluu kirjautuneelle kayttajalle,
+         * varmistetaan viela autentikointi. */
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (session.isPro()) {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            if (professional == null) {</span>
+                /* Joku esittaa hoitajaa varastetulla sessio-cookiella. */
+<span class="fc" id="L297">                return false;</span>
+            }
+<span class="fc bfc" id="L299" title="All 2 branches covered.">            if (!professional.getName().equals(session.get(&quot;username&quot;))) {</span>
+                /* Yksi hoitaja esittaa toista hoitajaa. */
+<span class="fc" id="L301">                return false;</span>
+            }
+        }
+
+<span class="fc bfc" id="L305" title="All 2 branches covered.">        if (!session.hasAccessToChannel(channelId)) {</span>
+            /* Ei voi poistua kanavalta, jolla ei ole. */
+<span class="fc" id="L307">            return false;</span>
+        }
+
+<span class="fc" id="L310">        return true;</span>
+    }
+
+    /**
+     * Validoi pyynnon muuttaa hoitajan online-tilaa.
+     *
+     * @param professional Autentikaatiotiedot.
+     * @param req Pyynnon tiedot.
+     * @param onlineStatus Asetettava status &quot;true&quot; tai &quot;false&quot; Stringina.
+     * @return Virheilmoitus Stringina tai tyhja String jos pyynto ok.
+     */
+    public String validateOnlineStatusChangeRequest(
+            final Principal professional,
+            final HttpServletRequest req,
+            final String onlineStatus
+    ) {
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        if (professional == null) {</span>
+<span class="nc" id="L327">            return &quot;Unauthenticated user.&quot;;</span>
+        }
+<span class="nc" id="L329">        String sessionId = req.getSession().getId();</span>
+<span class="nc" id="L330">        Session session = sessionRepo.getSessionFromSessionId(sessionId);</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">        if (session == null) {</span>
+<span class="nc" id="L332">            return &quot;No session associated.&quot;;</span>
+        }
+<span class="nc bnc" id="L334" title="All 4 branches missed.">        if (!onlineStatus.equals(&quot;true&quot;) &amp;&amp; !onlineStatus.equals(&quot;false&quot;)) {</span>
+<span class="nc" id="L335">            return &quot;You can only set online status to true or false!&quot;;</span>
+        }
+
+        /* Hyvaksytaan pyynto. */
+<span class="nc" id="L339">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Validoi yllapitajan pyynnon lisata uusi ammattilaiskayttaja.
+     *
+     * @param encodedPersonJson Lisattavan tiedot encoodattuna jsonina.
+     * @param personRepo PersonRepo.
+     * @return Virheilmoitus String tai tyhja String jos pyynto hyvaksytaan.
+     */
+    public String validateAddUserReq(
+            final String encodedPersonJson,
+            final PersonRepo personRepo
+    ) {
+<span class="fc" id="L353">        Person person = AdminService.makePersonFrom(encodedPersonJson);</span>
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">        if (person == null) {</span>
+<span class="nc" id="L355">            return &quot;Virheellinen muotoilu (joko encoodaus tai itse JSON)&quot;;</span>
+        }
+<span class="fc" id="L357">        String loginName = person.getLoginName();</span>
+<span class="fc" id="L358">        String userName = person.getUserName();</span>
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">        if (loginName == null</span>
+<span class="pc bpc" id="L360" title="1 of 2 branches missed.">                || loginName.isEmpty()</span>
+<span class="pc bpc" id="L361" title="1 of 2 branches missed.">                || person.getHashOfPasswordAndSalt() == null</span>
+<span class="pc bpc" id="L362" title="2 of 4 branches missed.">                || person.getHashOfPasswordAndSalt().isEmpty()</span>
+                || userName == null
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">                || userName.isEmpty()</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">                || mapper.isUsernameReserved(userName)</span>
+<span class="pc bpc" id="L366" title="1 of 2 branches missed.">                || personRepo.findByLoginName(loginName) != null) {</span>
+<span class="nc" id="L367">            return &quot;Käyttäjää ei voitu lisätä. &quot;</span>
+                    + &quot;Tarkista, että kirjautumisnimi tai&quot;
+                    + &quot;palvelunimi eivät ole jo varattuja.&quot;;
+        }
+
+        /* Hyvaksytaan pyynto. */
+<span class="fc" id="L373">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Palauttaa sessionId:n Stringina tai tyhjan Stringin.
+     *
+     * @param headerAccessor Id:n lahde.
+     * @return sessionId String.
+     */
+    private String getSessionIdFrom(
+            final SimpMessageHeaderAccessor headerAccessor
+    ) {
+        try {
+<span class="fc" id="L386">            return headerAccessor</span>
+<span class="fc" id="L387">                    .getSessionAttributes()</span>
+<span class="fc" id="L388">                    .get(&quot;SPRING.SESSION.ID&quot;)</span>
+<span class="fc" id="L389">                    .toString();</span>
+<span class="fc" id="L390">        } catch (Exception e) {</span>
+<span class="fc" id="L391">            return &quot;&quot;;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

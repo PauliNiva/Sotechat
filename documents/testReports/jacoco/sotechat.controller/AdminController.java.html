@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AdminController.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.controller</a> &gt; <span class="el_source">AdminController.java</span></div><h1>AdminController.java</h1><pre class="source lang-java linenums">package sotechat.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import sotechat.service.AdminService;
+
+
+/**
+ * Reitittaa adminin tekemat pyynnot.
+ */
+@RestController
+<span class="fc" id="L19">public class AdminController {</span>
+
+    /**
+     * Palvelu pyyntojen kasittelyyn.
+     */
+    @Autowired
+    private AdminService adminService;
+
+    /**
+     * Pyynto ammattilaiskayttajien listaamiseen.
+     * Esimerkki vastaus: [{&quot;userId&quot;:&quot;admin&quot;,&quot;username&quot;:&quot;pauli&quot;,
+     * &quot;loginName&quot;:&quot;admin&quot;,&quot;conversationsOfPerson&quot;:[]},
+     * {&quot;userId&quot;:&quot;666&quot;,&quot;username&quot;:&quot;Hoitaja&quot;,
+     * &quot;loginName&quot;:&quot;hoitaja&quot;,&quot;conversationsOfPerson&quot;:[]}]
+     *
+     * @return Listaus JSON-taulukkona.
+     */
+    @Secured(&quot;ROLE_ADMIN&quot;)
+    @RequestMapping(value = &quot;/getusers&quot;, method = RequestMethod.GET)
+    public String getAllUsers() {
+<span class="fc" id="L39">        return adminService.listAllPersonsAsJsonList();</span>
+    }
+
+    /**
+     * Pyynto uuden ammattilaiskayttajan luomiseksi.
+     *
+     * @param encodedJsonPerson &lt;code&gt;Base64&lt;/code&gt;-koodattuna JSON
+     *                          luotavan kayttajan tiedoista.
+     * @return JSON {&quot;status&quot;:&quot;OK&quot;} tai {&quot;error&quot;:&quot;reason&quot;}.
+     */
+    @Secured(&quot;ROLE_ADMIN&quot;)
+    @RequestMapping(value = &quot;/newuser&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public String addNewUser(@RequestBody final String encodedJsonPerson) {
+<span class="fc" id="L53">        return jsonifiedResponse(adminService.addUser(encodedJsonPerson));</span>
+    }
+
+    /**
+     * Pyynto ammattilaiskayttajan tilin poistamiseksi.
+     *
+     * @param id Poistettavan kayttajan &lt;code&gt;userId&lt;/code&gt;.
+     * @return JSON {&quot;status&quot;:&quot;OK&quot;} tai {&quot;error&quot;:&quot;reason&quot;}.
+     */
+    @Secured(&quot;ROLE_ADMIN&quot;)
+    @RequestMapping(value = &quot;/delete/{id}&quot;, method = RequestMethod.DELETE)
+    public String deleteUser(@PathVariable final String id) {
+<span class="fc" id="L65">        return jsonifiedResponse(adminService.deleteUser(id));</span>
+    }
+
+    /**
+     * Adminin tekema pyynto ammattilaiskayttajan salasanan vaihtamiseksi.
+     *
+     * @param id &lt;code&gt;userId&lt;/code&gt; vaihdon kohteelle (voi olla eri kuin pyynnon tekija)
+     * @param encodedPass Uusi salasana &lt;code&gt;Base64&lt;/code&gt;-koodattuna.
+     * @return JSON {&quot;status&quot;:&quot;OK&quot;} tai {&quot;error&quot;:&quot;reason&quot;}.
+     */
+    @Secured(&quot;ROLE_ADMIN&quot;)
+    @RequestMapping(value = &quot;/resetpassword/{id}&quot;, method = RequestMethod.POST)
+    public String resetPassword(
+            @PathVariable final String id,
+            @RequestBody final String encodedPass
+    ) {
+<span class="fc" id="L81">        return jsonifiedResponse(adminService.changePassword(id, encodedPass));</span>
+    }
+
+    /**
+     * Tarkoitettu tehtavaksi vain ennen ohjelmiston demoamista.
+     *
+     * @return JSON {&quot;status&quot;:&quot;OK&quot;} tai {&quot;error&quot;:&quot;reason&quot;}.
+     */
+    @Secured(&quot;ROLE_ADMIN&quot;)
+    @RequestMapping(value = &quot;/tuhoaHistoria&quot;, method = RequestMethod.DELETE)
+    public String resetDatabase() {
+<span class="fc" id="L92">        return jsonifiedResponse(adminService.clearHistory());</span>
+    }
+
+    /**
+     * Muotoilee lahetettavan vastauksen.
+     *
+     * @param error Virheilmoitus Stringina tai tyhja String jos kaikki ok.
+     * @return JSON {&quot;status&quot;:&quot;OK&quot;} tai {&quot;error&quot;:&quot;bla&quot;}.
+     */
+    private String jsonifiedResponse(final String error) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (error.isEmpty()) {</span>
+<span class="fc" id="L103">            return &quot;{\&quot;status\&quot;:\&quot;OK\&quot;}&quot;;</span>
+        }
+<span class="fc" id="L105">        return &quot;{\&quot;error\&quot;: \&quot;&quot; + error + &quot;\&quot;}&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
