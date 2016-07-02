@@ -37,10 +37,8 @@ public class DatabaseService {
      *                             vastaava palveluluokka
      */
     @Autowired
-    public DatabaseService(
-            final PersonService pPersonService,
-            final ConversationService pConversationService
-    ) {
+    public DatabaseService(final PersonService pPersonService,
+                           final ConversationService pConversationService) {
         this.personService = pPersonService;
         this.conversationService = pConversationService;
     }
@@ -53,11 +51,9 @@ public class DatabaseService {
      * @param channelId kanavan id
      * @param category  keskustelun kategoria
      */
-    public final void createConversation(
-            final String sender,
-            final String channelId,
-            final String category
-    ) {
+    public final void createConversation(final String sender,
+                                         final String channelId,
+                                         final String category) {
         try {
             String timeStamp = new DateTime().toString();
             Conversation conversation = new Conversation(channelId, timeStamp);
@@ -76,10 +72,8 @@ public class DatabaseService {
      * @param userId    kayttajan id
      * @param channelId kanavan id
      */
-    public final void addPersonToConversation(
-            final String userId,
-            final String channelId
-    ) {
+    public final void addPersonToConversation(final String userId,
+                                              final String channelId) {
         try {
             Person person = personService.getPerson(userId);
             conversationService.addPerson(person, channelId);
@@ -99,12 +93,8 @@ public class DatabaseService {
      * @param time      viestin aikaleima
      * @param channelId viestin kanavan id
      */
-    public final void saveMsg(
-            final String username,
-            final String content,
-            final String time,
-            final String channelId
-    ) {
+    public final void saveMsg(final String username, final String content,
+                              final String time, final String channelId) {
         try {
             Message message = new Message(username, content, time);
             Conversation conv = conversationService.getConversation(channelId);
@@ -123,9 +113,7 @@ public class DatabaseService {
      * @param channelId Keskustelun kanavan id.
      * @return List<MsgToClient> Keskustelun viestit aikajarjestyksessa.
      */
-    public List<MsgToClient> retrieveMessages(
-            final String channelId
-    ) {
+    public List<MsgToClient> retrieveMessages(final String channelId) {
         try {
             Conversation conv = conversationService.getConversation(channelId);
             List<Message> messages = conv.getMessagesOfConversation();
@@ -157,9 +145,7 @@ public class DatabaseService {
      * @param userId userId
      * @return lista convInfo-olioita
      */
-    public final List<ConvInfo> getConvInfoListOfUserId(
-            final String userId
-    ) {
+    public final List<ConvInfo> getConvInfoListOfUserId(final String userId) {
         try {
             Person person = personService.getPerson(userId);
             List<Conversation> convs = person.getConversationsOfPerson();
@@ -181,9 +167,7 @@ public class DatabaseService {
      * @param conv conv
      * @return ConvInfo wrapper
      */
-    private ConvInfo wrapConversation(
-            final Conversation conv
-    ) {
+    private ConvInfo wrapConversation(final Conversation conv) {
         String channelId = conv.getChannelId();
         String date = conv.getDate();
        /* ensimmainen viesti on asiakkaalta, joten tahan asiakkaan nimi */

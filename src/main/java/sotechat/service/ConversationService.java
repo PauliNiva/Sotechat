@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
-
-import java.util.List;
 
 /**
  * Luokka tietokannassa olevien keskustelujen hallinnoimiseen.
@@ -45,7 +45,7 @@ public class ConversationService {
     @Transactional
     public void addConversation(final Conversation conv)
             throws Exception {
-            conversationRepo.save(conv);
+        conversationRepo.save(conv);
     }
 
     /**
@@ -61,9 +61,9 @@ public class ConversationService {
     @Transactional
     public void addPerson(final Person person, final String channelId)
             throws Exception {
-                Conversation conv = conversationRepo.findOne(channelId);
-                conv.addPersonToConversation(person);
-                conversationRepo.save(conv);
+        Conversation conv = conversationRepo.findOne(channelId);
+        conv.addPersonToConversation(person);
+        conversationRepo.save(conv);
     }
 
     /**
@@ -78,9 +78,9 @@ public class ConversationService {
     @Transactional
     public void setCategory(final String category, final String channelId)
             throws Exception {
-            Conversation conv = conversationRepo.findOne(channelId);
-            conv.setCategory(category);
-            conversationRepo.save(conv);
+        Conversation conv = conversationRepo.findOne(channelId);
+        conv.setCategory(category);
+        conversationRepo.save(conv);
     }
 
     /**
@@ -100,11 +100,11 @@ public class ConversationService {
     @Transactional
     public Message addMessage(final Message message, final Conversation conv)
             throws Exception {
-            message.setConversation(conv);
-            Message messageToBeAddedToConversation = messageRepo.save(message);
-            conv.addMessageToConversation(messageToBeAddedToConversation);
-            conversationRepo.save(conv);
-            return messageToBeAddedToConversation;
+        message.setConversation(conv);
+        Message messageToBeAddedToConversation = messageRepo.save(message);
+        conv.addMessageToConversation(messageToBeAddedToConversation);
+        conversationRepo.save(conv);
+        return messageToBeAddedToConversation;
     }
 
     /**

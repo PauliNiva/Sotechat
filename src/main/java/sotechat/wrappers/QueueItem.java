@@ -28,7 +28,7 @@ public class QueueItem {
      * @param pUsername Jonottavan kayttajan kayttajanimi.
      */
     public QueueItem(final String pChannelId, final String pCategory,
-            final String pUsername) {
+                     final String pUsername) {
         this.channelId = pChannelId;
         this.category = pCategory;
         this.username = pUsername;

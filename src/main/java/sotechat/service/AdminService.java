@@ -185,10 +185,8 @@ public class AdminService {
      * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
      */
     @Transactional
-    public String changePassword(
-            final String userId,
-            final String encodedPassword
-    ) {
+    public String changePassword(final String userId,
+                                 final String encodedPassword) {
         try {
             String decodedPassword = decode(encodedPassword);
             Person person = personRepo.findOne(userId);
@@ -251,8 +249,8 @@ public class AdminService {
      * @return String decoodattua dataa
      * @throws UnsupportedEncodingException jos muotoilu on vaarin
      */
-    private static String decode(
-            final String encodedData) throws UnsupportedEncodingException {
+    private static String decode(final String encodedData)
+            throws UnsupportedEncodingException {
         return new String(Base64Utils.decodeFromString(encodedData), "UTF-8");
     }
 

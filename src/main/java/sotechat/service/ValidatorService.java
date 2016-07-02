@@ -41,10 +41,8 @@ public class ValidatorService {
      * @param pSessionRepo p
      */
     @Autowired
-    public ValidatorService(
-            final Mapper pMapper,
-            final SessionRepo pSessionRepo
-    ) {
+    public ValidatorService(final Mapper pMapper,
+                            final SessionRepo pSessionRepo) {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
     }
@@ -59,8 +57,7 @@ public class ValidatorService {
      */
     public final String isMessageFraudulent(
             final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor accessor
-    ) {
+            final SimpMessageHeaderAccessor accessor) {
         String sessionId = getSessionIdFrom(accessor);
         Principal principal = accessor.getUser();
 
@@ -76,11 +73,9 @@ public class ValidatorService {
      * @return Tyhja <code>String</code>  jos viesti vaikuttaa aidolta,
      *         muussa tapauksessa virheilmoitus.
      */
-    public final String isMessageFraudulent(
-            final MsgToServer msgToServer,
-            final String sessionId,
-            final Principal principal
-    ) {
+    public final String isMessageFraudulent(final MsgToServer msgToServer,
+                                            final String sessionId,
+                                            final Principal principal) {
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
 
         if (session == null) {
@@ -122,11 +117,9 @@ public class ValidatorService {
      * @param channelId channelId
      * @return Tyhja String, jos sallitaan pyynto. Muuten virheilmoitus.
      */
-    public final String validateLogRequest(
-            final Principal principal,
-            final HttpServletRequest req,
-            final String channelId
-    ) {
+    public final String validateLogRequest(final Principal principal,
+                                           final HttpServletRequest req,
+                                           final String channelId) {
         if (principal == null) {
             return "Unauthenticated user can't request logs!";
         }
@@ -154,9 +147,7 @@ public class ValidatorService {
      * @param acc Pyynnon tiedot.
      * @return Virheilmoitus Stringina jos ei sallita pyyntoa.
      */
-    public String validateSubscription(
-            final StompHeaderAccessor acc
-    ) {
+    public String validateSubscription(final StompHeaderAccessor acc) {
         Principal principal = acc.getUser();
         String sessionId = getSessionIdFrom(acc);
         String channelIdWithPath = acc.getDestination();
@@ -223,8 +214,7 @@ public class ValidatorService {
      * @return Jos pyynto hylataan, palautetaan virheilmoitus Stringina.
      *         Jos pyynto hyvaksytaan, palautetaan payload JSON-objektina.
      */
-    public final String validateJoin(
-            final HttpServletRequest request,
+    public final String validateJoin(final HttpServletRequest request,
             final JsonObject payload,
             final Principal professional
     ) {

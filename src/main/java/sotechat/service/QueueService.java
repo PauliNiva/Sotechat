@@ -66,10 +66,8 @@ public class QueueService {
      * @param request req
      * @param payload payload
      */
-    public final synchronized void joinQueue(
-            final HttpServletRequest request,
-            final JsonObject payload
-    ) {
+    public final synchronized void joinQueue(final HttpServletRequest request,
+                                             final JsonObject payload) {
         /* Kaivetaan requestista ja payloadista tietoja.*/
         String sessionId = request.getSession().getId();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
@@ -87,11 +85,9 @@ public class QueueService {
      * @param username kayttajan antama
      * @param startMsg kayttajan antama
      */
-    public final synchronized void joinQueue(
-            final Session session,
-            final String username,
-            final String startMsg
-    ) {
+    public final synchronized void joinQueue(final Session session,
+                                             final String username,
+                                             final String startMsg) {
         String userId = session.get("userId");
         String channelId = session.get("channelId");
         String category = session.get("category");
@@ -131,8 +127,7 @@ public class QueueService {
      */
     public final synchronized String popQueue(
             final String channelId,
-            final SimpMessageHeaderAccessor accessor
-    ) {
+            final SimpMessageHeaderAccessor accessor) {
         Channel channel = mapper.getChannel(channelId);
         if (!removeFromQueue(channelId)) {
             /* Poppaus epaonnistui. Ehtiko joku muu popata samaan aikaan? */
@@ -166,9 +161,7 @@ public class QueueService {
      * @return <code>true</code> jos poisto onnistui,
      * <code>fail</code> jos alkiota ei loytynyt.
      */
-    public boolean removeFromQueue(
-            final String channelId
-    ) {
+    public boolean removeFromQueue(final String channelId) {
         /* Etsitaan jonosta oikea alkio. */
         for (int i = 0; i < queue.size(); i++) {
             QueueItem item = queue.get(i);
@@ -199,10 +192,8 @@ public class QueueService {
      * @return Sijainti jonossa, kyseisen kategorian alla, alkaen ykkosesta.
      * jos haettua alkiota ei loydy, palauttaa -1.
      */
-    public final int getPositionInQueue(
-            final String channelId,
-            final String category
-    ) {
+    public final int getPositionInQueue(final String channelId,
+                                        final String category) {
         int countItemsOfSameCategory = 1;
         for (int i = 0; i < queue.size(); i++) {
             QueueItem item = queue.get(i);

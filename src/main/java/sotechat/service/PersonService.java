@@ -33,10 +33,8 @@ public class PersonService {
      * epaonnistuu.
      */
     @Transactional
-    public void addPerson(
-            final Person person,
-            final String password
-    ) throws Exception {
+    public void addPerson(final Person person, final String password)
+            throws Exception {
         person.hashPasswordWithSalt(password);
         personRepo.save(person);
     }

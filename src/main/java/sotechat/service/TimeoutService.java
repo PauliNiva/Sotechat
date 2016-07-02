@@ -69,9 +69,7 @@ public class TimeoutService {
      *                  voidaan tarkistaa, onko sessio viela aktiivinen,
      *                  vai pitaako se poistaa jonosta.
      */
-    public void waitThenProcessDisconnect(
-            final String sessionId
-    ) {
+    public void waitThenProcessDisconnect(final String sessionId) {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -84,9 +82,7 @@ public class TimeoutService {
      * Tarkistetaan, onko kayttaja yha poissa, ja poistetaan kayttaja jos on.
      * @param sessionId Poistettavan kayttajan sessionId.
      */
-    public void processDisconnect(
-            final String sessionId
-    ) {
+    public void processDisconnect(final String sessionId) {
         Session session = this.sessionRepo.getSessionFromSessionId(sessionId);
         if (session == null) {
             return;
@@ -108,10 +104,8 @@ public class TimeoutService {
      * @param sessionId Session-tunnus.
      * @param channelId Kanavatunnus.
      */
-    private void disconnectSessionFromChannel(
-            final String sessionId,
-            final String channelId
-    ) {
+    private void disconnectSessionFromChannel(final String sessionId,
+                                              final String channelId) {
         /* Poistetaan sessio kanavalta. */
         sessionRepo.leaveChannel(channelId, sessionId);
 
