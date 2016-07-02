@@ -52,7 +52,7 @@ public class ConversationService {
      * Lisaa parametrina annettua kanavaid:ta vastaavaan keskusteluun
      * parametrina annetun Person luokan olion. Henkilo lisataan Keskustelun
      * henkiloihin.
-     * 
+     *
      * @param person Person luokan oli, joka halutaan lisata keskusteluun
      * @param channelId keskustelun kanavan id
      * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan

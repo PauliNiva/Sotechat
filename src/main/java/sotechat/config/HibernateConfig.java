@@ -96,7 +96,7 @@ public class HibernateConfig {
             "hibernate.show_sql";
 
     /**
-     * Muoto, jossa tietokantaoperaatiot naytetaan. //TODO:plz
+     * Muoto, jossa tietokantaoperaatiot naytetaan.
      */
     private static final String PROPERTY_NAME_HIBERNATE_FORMAT_SQL =
             "hibernate.format_sql";
@@ -119,13 +119,15 @@ public class HibernateConfig {
      * @return Palauttaa tietokantayhteyksista vastaavan
      * <code>HikariDataSource</code>:n.
      * @throws URISyntaxException Jos
-     * haettua <code>String</code>:ia ei tunnisteta <code>URI</code>-osoitteeksi.
+     * haettua <code>String</code>:ia ei tunnisteta
+     * <code>URI</code>-osoitteeksi.
      */
     @Profile("production")
     @Bean(destroyMethod = "close")
     public HikariDataSource dataSourceForProduction()
             throws URISyntaxException {
-        URI dbUri = new URI(env.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
+        URI dbUri = new URI(
+                env.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
 
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
@@ -158,7 +160,8 @@ public class HibernateConfig {
 
     /**
      * Kehitysprofiili. Luodaan yhteys testitietokantaan.
-     * <code>HikariDataSource</code> vastaa tietokantayhteyksien yllapitamisesta.
+     * <code>HikariDataSource</code> vastaa tietokantayhteyksien
+     * yllapitamisesta.
      * @return Palauttaa <code>HikariDataSource</code>-olion.
      */
     @Profile("development")
@@ -228,7 +231,7 @@ public class HibernateConfig {
     /**
      * Luo <code>Bean</code>:in, joka huolehtii transaktioista.
      *
-     * @param entityManagerFactory Olio, joka sisältää kaikki JPA Entity-oliot. //TODO:fix
+     * @param entityManagerFactory Olio, joka sisältää kaikki JPA Entity-oliot.
      * @return Palautetaan JpaTransactionManager-olio, joka vastaa siitä,
      * että JPA-olioihin tehdyt tietokantaoperaatiot toteutetaan myös
      * tietokantaan.

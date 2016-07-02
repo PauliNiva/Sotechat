@@ -3,7 +3,6 @@ package sotechat.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
-import sotechat.controller.MessageBroker;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -258,6 +257,12 @@ public class SessionRepo extends MapSessionRepository {
         setOnlineStatus(sessionId, onlineStatus);
     }
 
+    /**
+     * Asettaa onlie-statuksen sessionId:n avulla.
+     *
+     * @param sessionId p.
+     * @param onlineStatus p.
+     */
     public synchronized void setOnlineStatus(
             final String sessionId,
             final String onlineStatus

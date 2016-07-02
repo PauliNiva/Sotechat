@@ -192,7 +192,9 @@ public class ValidatorService {
          * /toClient/chat/channelId
          */
         String[] splitted = channelIdWithPath.split("/");
-        if (splitted.length != 4) {
+        int n = 4;
+        int m = 3;
+        if (splitted.length != n) {
             return prefix + "Invalid channel path (1): " + channelIdWithPath;
         }
         if (!"toClient".equals(splitted[1])) {
@@ -202,7 +204,7 @@ public class ValidatorService {
                 && !"chat".equals(splitted[2])) {
             return prefix + "Invalid channel path (3): " + channelIdWithPath;
         }
-        String channelId = splitted[3];
+        String channelId = splitted[m];
 
         if (!session.hasAccessToChannel(channelId)) {
             return prefix
@@ -262,7 +264,8 @@ public class ValidatorService {
         Channel channel = mapper.getChannel(channelId);
         for (Session other : channel.getCurrentSubscribers()) {
             if (other.get("username").equals(username)) {
-                return "Denied join queue request. Username already on channel.";
+                return "Denied join queue request. " +
+                        "Username already on channel.";
             }
         }
 

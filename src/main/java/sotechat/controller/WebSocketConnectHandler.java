@@ -7,7 +7,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 
-import sotechat.controller.MessageBroker;
 import sotechat.data.Session;
 import sotechat.data.SessionRepo;
 

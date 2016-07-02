@@ -53,9 +53,6 @@ public class AdminService {
      *
      * @param encodedPersonJson merkkijono muotoa eyJ1c2Vybm...
      *        decoded personJson: {"username": mikko ... }
-     *        TODO:
-     *             JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla.
-     *             Nahtavasti toimii siita huolimatta.
      * @return Virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
      */
     @Transactional
@@ -194,7 +191,8 @@ public class AdminService {
     public static Person makePersonFrom(final String encodedPersonJson) {
         try {
             String decodedPersonJson = decode(encodedPersonJson);
-            decodedPersonJson = decodedPersonJson.replaceFirst("password", "authenticationHash");
+            decodedPersonJson = decodedPersonJson.replaceFirst("password",
+                    "authenticationHash");
             Gson gson = new Gson();
             Person person = gson.fromJson(decodedPersonJson, Person.class);
             person.hashPasswordWithSalt(person.getHashOfPasswordAndSalt());

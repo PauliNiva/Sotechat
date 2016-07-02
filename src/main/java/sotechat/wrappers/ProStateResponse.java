@@ -26,7 +26,7 @@ public class ProStateResponse {
     /**
      * <code>WebSocket</code>-osoite, jonka tilaamalla saa jonon paivitykset.
      */
-    private String QBCC;
+    final private String QBCC;
 
     /**
      * Onko kayttaja merkinnyt itsensa paikallaolevaksi. Arvona on joko

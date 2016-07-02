@@ -33,6 +33,9 @@ public class ProProfile {
     @Autowired
     private Mapper mapper;
 
+    /**
+     * Ymparisto.
+     */
     @Autowired
     private Environment env;
 
@@ -54,7 +57,8 @@ public class ProProfile {
             admin.setUserId(mapper.generateNewId());
             admin.setRole("ROLE_ADMIN");
             personRepo.save(admin);
-            mapper.mapProUsernameToUserId(admin.getUserName(), admin.getUserId());
+            mapper.mapProUsernameToUserId(admin.getUserName(),
+                    admin.getUserId());
         }
     }
 

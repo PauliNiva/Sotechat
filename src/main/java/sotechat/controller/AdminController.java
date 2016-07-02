@@ -68,7 +68,8 @@ public class AdminController {
     /**
      * Adminin tekema pyynto ammattilaiskayttajan salasanan vaihtamiseksi.
      *
-     * @param id <code>userId</code> vaihdon kohteelle (voi olla eri kuin pyynnon tekija)
+     * @param id <code>userId</code> vaihdon kohteelle (voi olla eri kuin
+     *           pyynnon tekija).
      * @param encodedPass Uusi salasana <code>Base64</code>-koodattuna.
      * @return JSON {"status":"OK"} tai {"error":"reason"}.
      */

@@ -1,7 +1,5 @@
 package sotechat.data;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import sotechat.controller.MessageBroker;
 
 import java.util.HashSet;
 import java.util.Set;

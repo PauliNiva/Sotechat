@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-
 import org.joda.time.DateTime;
 
 import sotechat.controller.MessageBroker;
@@ -14,6 +12,9 @@ import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
+
+import java.util.*;
+
 
 /**
  * Muistaa Chattiin kirjoitetut viestit.

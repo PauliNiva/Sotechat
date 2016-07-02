@@ -1,11 +1,11 @@
 package sotechat.data;
+
 import org.springframework.stereotype.Component;
-import sotechat.controller.MessageBroker;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.MsgToClient;
 
-
 import java.util.*;
+
 
 /**
  * Mapper muistaa asioita kanaviin ja ID:hen liittyen. Esimerkiksi:

@@ -31,8 +31,8 @@ public class DatabaseService {
     /**
      * Konstruktori.
      *
-     * @param pPersonService       PersonRepon CRUD-operaatioista vastaava palvelu-
-     *                             luokka.
+     * @param pPersonService       PersonRepon CRUD-operaatioista vastaava
+     *                             palveluluokka.
      * @param pConversationService ConversationRepon CRUD-operaatioista
      *                             vastaava palveluluokka
      */
