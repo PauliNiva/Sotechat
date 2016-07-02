@@ -21,30 +21,57 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Palvelu admin-toiminnoille.
+ */
 @Service
 public class AdminService {
 
+    /**
+     * Sailo <code>Person</code>-olioille.
+     */
     @Autowired
     private PersonRepo personRepo;
 
+    /**
+     * Palvelu tietokantatoiminnoille.
+     */
     @Autowired
     private DatabaseService databaseService;
 
+    /**
+     * Sessioille repo.
+     */
     @Autowired
     private SessionRepo sessionRepo;
 
+    /**
+     * Mapperi.
+     */
     @Autowired
     private Mapper mapper;
 
+    /**
+     * Keskustelujen lokitietojen keraaja.
+     */
     @Autowired
     private ChatLogger chatLogger;
 
+    /**
+     * Jonotuspalvelu.
+     */
     @Autowired
     private QueueService queueService;
 
+    /**
+     * Palvelu validointitoiminnoille.
+     */
     @Autowired
     private ValidatorService validatorService;
 
+    /**
+     * Viestinvalittaja.
+     */
     @Autowired
     private MessageBroker broker;
 
@@ -79,6 +106,11 @@ public class AdminService {
         return "";
     }
 
+    /**
+     * Listaa kaikki <code>Person</code>-oliot JSON-listana.
+     *
+     * @return Lista henkiloita JSON:ina.
+     */
     @Transactional
     public String listAllPersonsAsJsonList() {
         List<Person> personList = personRepo.findAll();
@@ -89,6 +121,13 @@ public class AdminService {
         return gson.toJson(deprecatedPersonList);
     }
 
+    /**
+     * Hakee argumenttina annettavasta <code>Person</code>-oliosta
+     * kirjautumisnimen, kayttajanimen ja kayttajatunnuksen.
+     *
+     * @param pPerson <code>Person</code>-olio, josta halutaan tietoja.
+     * @return Kirjautumisnimi, kayttajanimi ja kayttajatunnus listana.
+     */
     private Person extractInfo(final Person pPerson) {
         Person personWithDeprecatedAttributes = new Person();
         personWithDeprecatedAttributes.setLoginName(pPerson.getLoginName());

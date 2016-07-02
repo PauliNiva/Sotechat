@@ -262,8 +262,8 @@ public class ValidatorService {
         Channel channel = mapper.getChannel(channelId);
         for (Session other : channel.getCurrentSubscribers()) {
             if (other.get("username").equals(username)) {
-                return "Denied join queue request. " +
-                        "Username already on channel.";
+                return "Denied join queue request."
+                        + " Username already on channel.";
             }
         }
 

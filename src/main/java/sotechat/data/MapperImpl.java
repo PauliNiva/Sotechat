@@ -68,7 +68,8 @@ public class MapperImpl implements Mapper {
             channels.put(channelId, channel);
             /* Haetaan kanavan lokit tietokannasta (tai tyhja lista). */
 
-            List<MsgToClient> logs = databaseService.retrieveMessages(channelId);
+            List<MsgToClient> logs = databaseService
+                    .retrieveMessages(channelId);
             for (MsgToClient msg : logs) {
                 String username = msg.getUsername();
                 if (isUsernameReserved(username)) {
@@ -99,6 +100,7 @@ public class MapperImpl implements Mapper {
      * Poistaa kanavan, joka vastaa parametrina annettua channelId:ta.
      * Jos palvelin on pitkaan paalla, halutaan vapauttaa vanhojen
      * kanavien tietoja muistista.
+     *
      * @param channelId channelId
      */
     @Override
@@ -113,17 +115,18 @@ public class MapperImpl implements Mapper {
      * @param userId p.
      */
     @Override
-    public synchronized void mapProUsernameToUserId(
-            final String username,
-            final String userId
-    ) {
+    public synchronized void mapProUsernameToUserId(final String username,
+            final String userId) {
         this.mapRegisteredUsers.put(username, userId);
     }
 
+    /**
+     * Varaa Id:n.
+     *
+     * @param someId Varattava Id.
+     */
     @Override
-    public synchronized void reserveId(
-            final String someId
-    ) {
+    public synchronized void reserveId(final String someId) {
         this.reservedIds.add(someId);
     }
 
@@ -199,9 +202,14 @@ public class MapperImpl implements Mapper {
         return fastGen.nextString();
     }
 
+    /**
+     * Asettaa tietokantapalvelun.
+     *
+     * @param pDatabaseService Asetettava tietokantapalvelu.
+     */
     @Override
-    public void setDatabaseService(DatabaseService databaseService) {
-        this.databaseService = databaseService;
+    public void setDatabaseService(final DatabaseService pDatabaseService) {
+        this.databaseService = pDatabaseService;
     }
 
     /**
@@ -211,17 +219,29 @@ public class MapperImpl implements Mapper {
      */
     private class FastGeneratorForRandomStrings {
 
-        /* Kaytetaan nopeaa randomia. */
+        /**
+         * Nopea satunnaislukugeneraattori.
+         */
         private final Random random = new Random();
-        /* Haluttu pituus satunnaismerkkijonoille. */
+
+        /**
+         * Haluttu pituus satunnaismerkkijonoille.
+         */
         private static final int LENGTH = 16;
 
-        /* Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa. */
+        /**
+         *  Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa.
+         */
         private final char[] symbols;
-        /* Tilapaistaulukko uuden merkkijonon muodostukseen. */
+
+        /**
+         * Tilapaistaulukko uuden merkkijonon muodostukseen.
+         */
         private final char[] buf;
 
-        /* Konstruktori alustaa olion (yksi olio riittaa). */
+        /**
+         * Konstruktori alustaa olion (yksi olio riittaa).
+         */
         FastGeneratorForRandomStrings() {
             if (LENGTH < 1) {
                 throw new IllegalArgumentException("length < 1: " + LENGTH);

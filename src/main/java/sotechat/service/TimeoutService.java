@@ -102,6 +102,12 @@ public class TimeoutService {
         sessionRepo.forgetSession(userId);
     }
 
+    /**
+     * Katkaisee session kanavalta.
+     *
+     * @param sessionId Session-tunnus.
+     * @param channelId Kanavatunnus.
+     */
     private void disconnectSessionFromChannel(
             final String sessionId,
             final String channelId

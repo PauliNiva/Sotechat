@@ -63,7 +63,9 @@ coverage:
       default:
         branches: null
 
-  ignore: null
+  ignore:
+  - "sotechat/profiles/ProProfile.java"
+  - "sotechat/config/HibernateConfig.java"
 
 comment:
   layout: "header, diff, changes, sunburst, uncovered"

@@ -90,27 +90,9 @@ public class ChatLogger {
     }
 
     /**
-     * TODO: Refactoroi.
-     * Kaytannossa allaoleva metodi suoritetaan kerran,
-     * palvelimen kaynnistyessa. Kyseessa on viime
-     * hetken korjaus, jolla saatiin purkattua kasaan
-     * tarvittavat riippuvuudet, jotta asiakaskayttajien ja
-     * ammattilaiskayttajien timeout disconnect toimii
-     * jarkevalla ja intuitiivisella tavalla. Metodi
-     * odottelee, kunnes Mapper ja DatabaseService ovat
-     * alustettu, ja sen jalkeen antaa Mapperille
-     * riippuvuuden DatabaseServiceen. Miksi riippuvuuksia
-     * ei olla asetettu normaalilla tavalla? Jostain syysta
-     * joillain tietokoneilla Spring kuvittelee loytaneensa
-     * kehariippuvuuden ja kieltaytyy kaynnistymasta.
-     * Talla purkalla saadaan Spring kaynnistymaan.
-     * Spring siis luulee, etta DatabaseServicesta on
-     * riippuvuus takaisin Mapperiin, vaikka nain ei ole.
-     *
-     * Lisaksi tama metodi kirjaa palvelimen kaynnistymisen
+     * Kirjaa palvelimen kaynnistymisen
      * yhteydessa Mapperiin tietokannasta varatut ID:t ja
      * usernamet.
-     *
      */
     public void tryToInitializeDependencies() {
         if (mapper == null || databaseService == null) {
@@ -125,7 +107,8 @@ public class ChatLogger {
             String userId = person.getUserId();
             mapper.mapProUsernameToUserId(username, userId);
             mapper.reserveId(userId);
-            List<ConvInfo> list = databaseService.getConvInfoListOfUserId(userId);
+            List<ConvInfo> list = databaseService
+                    .getConvInfoListOfUserId(userId);
             for (ConvInfo conv : list) {
                 String channelId = conv.getChannelId();
                 mapper.reserveId(channelId);
@@ -133,6 +116,11 @@ public class ChatLogger {
         }
     }
 
+    /**
+     * Asettaa <code>Mapper</code>-olion.
+     *
+     * @param pMapper Asetettava <code>Mapper</code>-olio.
+     */
     public void setMapper(final Mapper pMapper) {
         this.mapper = pMapper;
     }
@@ -329,7 +317,6 @@ public class ChatLogger {
      * Poistaa vanhan viestit muistista. Palvelimen ollessa paalla pitkaan
      * muisti voi loppua. Taman vuoksi vanhat viestit on hyva siivota pois
      * muistista esim. kerran paivassa (jattaen ne kuitenkin tietokantaan).
-     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
      */
     @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
     public synchronized void work() {

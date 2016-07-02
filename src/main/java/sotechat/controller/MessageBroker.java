@@ -20,7 +20,7 @@ public class MessageBroker {
     /**
      * Sessioiden kasittely.
      */
-   // @Autowired
+    // @Autowired
     private SessionRepo sessionRepo;
 
     /**
@@ -35,12 +35,16 @@ public class MessageBroker {
     //@Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
+    /**
+     * Konstruktori.
+     *
+     * @param pMapper p.
+     * @param pSessionRepo p.
+     * @param pSimpMessagingTemplate p.
+     */
     @Autowired
-    public MessageBroker(
-            Mapper pMapper,
-            SessionRepo pSessionRepo,
-            SimpMessagingTemplate pSimpMessagingTemplate
-    ) {
+    public MessageBroker(final Mapper pMapper, final SessionRepo pSessionRepo,
+            final SimpMessagingTemplate pSimpMessagingTemplate) {
         this.mapper = pMapper;
         this.sessionRepo = pSessionRepo;
         this.simpMessagingTemplate = pSimpMessagingTemplate;
