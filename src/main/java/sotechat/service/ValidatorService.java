@@ -192,9 +192,7 @@ public class ValidatorService {
          * /toClient/chat/channelId
          */
         String[] splitted = channelIdWithPath.split("/");
-        int n = 4;
-        int m = 3;
-        if (splitted.length != n) {
+        if (splitted.length != 4) {
             return prefix + "Invalid channel path (1): " + channelIdWithPath;
         }
         if (!"toClient".equals(splitted[1])) {
@@ -204,7 +202,7 @@ public class ValidatorService {
                 && !"chat".equals(splitted[2])) {
             return prefix + "Invalid channel path (3): " + channelIdWithPath;
         }
-        String channelId = splitted[m];
+        String channelId = splitted[3];
 
         if (!session.hasAccessToChannel(channelId)) {
             return prefix
