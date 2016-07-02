@@ -49,9 +49,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param pMapper p.
      */
     @Autowired
-    public SessionRepo(
-            final Mapper pMapper
-    ) {
+    public SessionRepo(final Mapper pMapper) {
         this.mapper = pMapper;
         initialize();
     }
@@ -74,8 +72,7 @@ public class SessionRepo extends MapSessionRepository {
      * @return Session-olio.
      */
     public synchronized Session getSessionFromSessionId(
-            final String sessionId
-    ) {
+            final String sessionId) {
         return sessionsBySessionId.get(sessionId);
     }
 
@@ -85,9 +82,7 @@ public class SessionRepo extends MapSessionRepository {
      * @param userId Kayttajan userId
      * @return SessionReposta userId:lla haettu session.
      */
-    public synchronized Session getSessionFromUserId(
-            final String userId
-    ) {
+    public synchronized Session getSessionFromUserId(final String userId) {
         return sessionsByUserId.get(userId);
     }
 
@@ -99,10 +94,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param channelId p.
      * @param sessionId p.
      */
-    public synchronized void leaveChannel(
-            final String channelId,
-            final String sessionId
-    ) {
+    public synchronized void leaveChannel(final String channelId,
+                                          final String sessionId) {
         Session session = getSessionFromSessionId(sessionId);
         session.removeChannel(channelId);
         updateCountOfProsAcceptingNewCustomers();
@@ -117,9 +110,7 @@ public class SessionRepo extends MapSessionRepository {
      *
      * @param channel Kanava, joka asetaetaan.
      */
-    public void disableChannel(
-            final Channel channel
-    ) {
+    public void disableChannel(final Channel channel) {
         channel.setInactive();
         for (String someUserId : channel.getActiveUserIds()) {
             Session someSession = getSessionFromUserId(someUserId);
@@ -143,10 +134,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param professional taalta saadaan kirjautumistiedot, voi olla null.
      * @return Session-olio.
      */
-    public synchronized Session updateSession(
-            final HttpServletRequest req,
-            final Principal professional
-    ) {
+    public synchronized Session updateSession(final HttpServletRequest req,
+                                              final Principal professional) {
         String sessionId = req.getSession().getId();
 
         Session session = updateSessionObjectMapping(sessionId, professional);
@@ -163,10 +152,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
-    public void updateSessionAttributes(
-            final Session session,
-            final Principal professional
-    ) {
+    public void updateSessionAttributes(final Session session,
+                                        final Principal professional) {
         /* Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.get("username");
         String userId = session.get("userId");
@@ -210,10 +197,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param professional autentikaatiotiedot, voi olla null
      * @return sessio-olio
      */
-    private Session updateSessionObjectMapping(
-            final String sessionId,
-            final Principal professional
-    ) {
+    private Session updateSessionObjectMapping(final String sessionId,
+                                               final Principal professional) {
         Session session = sessionsBySessionId.get(sessionId);
         if (session != null) {
             /* Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
@@ -249,10 +234,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param req sessioId taalta
      * @param onlineStatus asettava onlineStatus
      */
-    public synchronized void setOnlineStatus(
-            final HttpServletRequest req,
-            final String onlineStatus
-    ) {
+    public synchronized void setOnlineStatus(final HttpServletRequest req,
+                                             final String onlineStatus) {
         String sessionId = req.getSession().getId();
         setOnlineStatus(sessionId, onlineStatus);
     }
@@ -263,10 +246,8 @@ public class SessionRepo extends MapSessionRepository {
      * @param sessionId p.
      * @param onlineStatus p.
      */
-    public synchronized void setOnlineStatus(
-            final String sessionId,
-            final String onlineStatus
-    ) {
+    public synchronized void setOnlineStatus(final String sessionId,
+                                             final String onlineStatus) {
         Session session = sessionsBySessionId.get(sessionId);
         session.set("online", onlineStatus);
         updateCountOfProsAcceptingNewCustomers();

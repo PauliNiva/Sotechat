@@ -75,10 +75,8 @@ public class AdminController {
      */
     @Secured("ROLE_ADMIN")
     @RequestMapping(value = "/resetpassword/{id}", method = RequestMethod.POST)
-    public String resetPassword(
-            @PathVariable final String id,
-            @RequestBody final String encodedPass
-    ) {
+    public String resetPassword(@PathVariable final String id,
+                                @RequestBody final String encodedPass) {
         return jsonifiedResponse(adminService.changePassword(id, encodedPass));
     }
 

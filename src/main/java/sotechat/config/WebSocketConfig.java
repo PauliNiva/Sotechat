@@ -59,8 +59,7 @@ public class WebSocketConfig extends
      */
     @Override
     public final void configureMessageBroker(
-            final MessageBrokerRegistry conf
-    ) {
+            final MessageBrokerRegistry conf) {
         conf.enableSimpleBroker("/toClient");
     }
 
@@ -70,9 +69,7 @@ public class WebSocketConfig extends
      * @param reg <code>StompEndpointRegistry</code>-olio.
      */
     @Override
-    public final void configureStompEndpoints(
-            final StompEndpointRegistry reg
-    ) {
+    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 
@@ -83,8 +80,7 @@ public class WebSocketConfig extends
      */
     @Override
     public void configureClientInboundChannel(
-            final ChannelRegistration registration
-    ) {
+            final ChannelRegistration registration) {
         registration.setInterceptors(new SubscriptionInterceptor(validatorSer));
     }
 }

@@ -34,10 +34,8 @@ public class ChatController {
      * @param pValidatorService p
      */
     @Autowired
-    public ChatController(
-            final ChatLogger pChatLogger,
-            final ValidatorService pValidatorService
-    ) {
+    public ChatController(final ChatLogger pChatLogger,
+                          final ValidatorService pValidatorService) {
         this.chatLogger = pChatLogger;
         this.validatorService = pValidatorService;
     }
@@ -56,10 +54,8 @@ public class ChatController {
      */
     @MessageMapping("/toServer/chat/{channelId}")
     @SendTo("/toClient/chat/{channelId}")
-    public final MsgToClient routeMessage(
-            final MsgToServer msgToServer,
-            final SimpMessageHeaderAccessor acc
-    ) {
+    public final MsgToClient routeMessage(final MsgToServer msgToServer,
+                                          final SimpMessageHeaderAccessor acc) {
 
         String error = validatorService.isMessageFraudulent(msgToServer, acc);
         if (!error.isEmpty()) {

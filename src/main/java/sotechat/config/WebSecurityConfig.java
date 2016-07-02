@@ -66,10 +66,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private Filter csrfHeaderFilter() {
         return new OncePerRequestFilter() {
             @Override
-            protected void doFilterInternal(
-                    final HttpServletRequest request,
-                    final HttpServletResponse response,
-                    final FilterChain filterChain)
+            protected void doFilterInternal(final HttpServletRequest request,
+                                            final HttpServletResponse response,
+                                            final FilterChain filterChain)
                     throws ServletException, IOException {
 
                 CsrfToken csrf = (CsrfToken) request

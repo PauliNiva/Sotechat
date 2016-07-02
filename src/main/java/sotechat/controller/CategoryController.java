@@ -29,9 +29,7 @@ public class CategoryController {
      * @param pSessionRepo Alustettava sailo.
      */
     @Autowired
-    public CategoryController(
-            final SessionRepo pSessionRepo
-    ) {
+    public CategoryController(final SessionRepo pSessionRepo) {
         this.sessionRepo = pSessionRepo;
     }
 

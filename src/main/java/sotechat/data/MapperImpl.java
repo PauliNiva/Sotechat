@@ -58,9 +58,7 @@ public class MapperImpl implements Mapper {
      * @return <code>Channel</code>-olio tai <code>null</code> jos ei loydy.
      */
     @Override
-    public synchronized Channel getChannel(
-            final String channelId
-    ) {
+    public synchronized Channel getChannel(final String channelId) {
         Channel channel = channels.get(channelId);
         if (channel == null) {
             /* Kanavaa ei loydy muistista, luodaan se. */
@@ -116,7 +114,7 @@ public class MapperImpl implements Mapper {
      */
     @Override
     public synchronized void mapProUsernameToUserId(final String username,
-            final String userId) {
+                                                    final String userId) {
         this.mapRegisteredUsers.put(username, userId);
     }
 
@@ -136,9 +134,7 @@ public class MapperImpl implements Mapper {
      * @param username <code>username</code>.
      */
     @Override
-    public synchronized void removeMappingForUsername(
-            final String username
-    ) {
+    public synchronized void removeMappingForUsername(final String username) {
         this.mapRegisteredUsers.remove(username);
     }
 
@@ -150,9 +146,7 @@ public class MapperImpl implements Mapper {
      * <code>false</code> muulloin.
      */
     @Override
-    public synchronized boolean isUsernameReserved(
-            final String username
-    ) {
+    public synchronized boolean isUsernameReserved(final String username) {
         return mapRegisteredUsers.containsKey(username);
     }
 
@@ -164,9 +158,7 @@ public class MapperImpl implements Mapper {
      * @return id Salainen id.
      */
     @Override
-    public synchronized String getIdFromRegisteredName(
-            final String username
-    ) {
+    public synchronized String getIdFromRegisteredName(final String username) {
         /* Varmistetaan ensin, etta username tunnetaan. */
         if (username == null
                 || username.isEmpty()

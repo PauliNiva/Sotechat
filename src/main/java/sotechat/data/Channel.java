@@ -54,9 +54,7 @@ public class Channel {
      *
      * @param pChannelId Kanavatunnus.
      */
-    public Channel(
-            final String pChannelId
-    ) {
+    public Channel(final String pChannelId) {
         this.channelId = pChannelId;
         currentSubscribers = new HashSet<>();
         activeUserIds = new HashSet<>();

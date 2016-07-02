@@ -77,10 +77,7 @@ public class MessageBroker {
      * @param pro Authentikaatiotiedot.
      * @param online String true tai false.
      */
-    public void sendJoinLeaveNotices(
-            final Principal pro,
-            final String online
-    ) {
+    public void sendJoinLeaveNotices(final Principal pro, final String online) {
         String username = pro.getName();
         String userId = mapper.getIdFromRegisteredName(username);
         Session session = sessionRepo.getSessionFromUserId(userId);
@@ -96,9 +93,7 @@ public class MessageBroker {
      *
      * @param session Liittyja.
      */
-    public void sendJoinNotices(
-            final Session session
-    ) {
+    public void sendJoinNotices(final Session session) {
         String username = session.get("username");
         for (String channelId : session.getChannels()) {
             String channelIdWithPath = "/toClient/chat/" + channelId;
@@ -111,9 +106,7 @@ public class MessageBroker {
      *
      * @param session Poistuja.
      */
-    public void sendLeaveNotices(
-            final Session session
-    ) {
+    public void sendLeaveNotices(final Session session) {
         String username = session.get("username");
         for (String channelId : session.getChannels()) {
             String channelIdWithPath = "/toClient/chat/" + channelId;
@@ -127,10 +120,7 @@ public class MessageBroker {
      * @param path Polku.
      * @param username Liittyja.
      */
-    public void sendJoinNotice(
-            final String path,
-            final String username
-    ) {
+    public void sendJoinNotice(final String path, final String username) {
         String joinInfo = "{\"join\":\"" + username + "\"}";
         simpMessagingTemplate.convertAndSend(path, joinInfo);
     }
@@ -141,10 +131,7 @@ public class MessageBroker {
      * @param path Polku.
      * @param username Poistuja.
      */
-    public void sendLeaveNotice(
-            final String path,
-            final String username
-    ) {
+    public void sendLeaveNotice(final String path, final String username) {
         String leaveInfo = "{\"leave\":\"" + username + "\"}";
         simpMessagingTemplate.convertAndSend(path, leaveInfo);
     }

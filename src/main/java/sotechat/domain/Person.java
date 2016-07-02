@@ -162,8 +162,7 @@ public class Person {
      *
      * @param conversation Conversation lisattava keskustelu
      */
-    public final void addConversationToPerson(
-            final Conversation conversation) {
+    public final void addConversationToPerson(final Conversation conversation) {
         this.conversationsOfPerson.add(conversation);
     }
 
@@ -172,8 +171,7 @@ public class Person {
      *
      * @param conversation Poistettava keskustelu.
      */
-    public final void removeConversation(
-            final Conversation conversation) {
+    public final void removeConversation(final Conversation conversation) {
         this.conversationsOfPerson.remove(conversation);
     }
 

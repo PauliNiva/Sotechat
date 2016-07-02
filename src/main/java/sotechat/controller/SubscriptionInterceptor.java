@@ -30,9 +30,7 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
      * @param pValidatorService validatorService
      */
     @Autowired
-    public SubscriptionInterceptor(
-            final ValidatorService pValidatorService
-    ) {
+    public SubscriptionInterceptor(final ValidatorService pValidatorService) {
         validatorService = pValidatorService;
     }
 
@@ -48,10 +46,8 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
      * metodeille sallitaan. Jos ei sallita, heitetaan poikkeus.
      */
     @Override
-    public final Message<?> preSend(
-            final Message<?> message,
-            final MessageChannel channel
-    ) {
+    public final Message<?> preSend(final Message<?> message,
+                                    final MessageChannel channel) {
         StompHeaderAccessor acc = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(acc.getCommand())) {
             String error = validatorService.validateSubscription(acc);

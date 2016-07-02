@@ -66,13 +66,11 @@ public class StateController {
      * @param pBroker broker
      */
     @Autowired
-    public StateController(
-            final ValidatorService pValidatorService,
-            final SessionRepo pSessionRepo,
-            final QueueService pQueueService,
-            final QueueBroadcaster pQueueBroadcaster,
-            final MessageBroker pBroker
-    ) {
+    public StateController(final ValidatorService pValidatorService,
+                           final SessionRepo pSessionRepo,
+                           final QueueService pQueueService,
+                           final QueueBroadcaster pQueueBroadcaster,
+                           final MessageBroker pBroker) {
         this.validatorService = pValidatorService;
         this.sessionRepo = pSessionRepo;
         this.queueService = pQueueService;
@@ -92,8 +90,7 @@ public class StateController {
     @RequestMapping(value = "/userState", method = RequestMethod.GET)
     public final UserStateResponse returnUserStateResponse(
             final HttpServletRequest req,
-            final Principal professional
-    ) {
+            final Principal professional) {
         Session session = sessionRepo.updateSession(req, professional);
         return new UserStateResponse(session);
     }
@@ -110,8 +107,7 @@ public class StateController {
     @RequestMapping(value = "/proState", method = RequestMethod.GET)
     public final ProStateResponse returnProStateResponse(
             final HttpServletRequest req,
-            final Principal professional
-    ) {
+            final Principal professional) {
         if (professional == null) {
             /** Hacking attempt? */
             return null;
@@ -144,10 +140,8 @@ public class StateController {
      * @param auth Kirjautumistiedot.
      * @return String "OK..." tai "Denied...".
      */
-    private String processJoinQueueReq(
-            final HttpServletRequest req,
-            final Principal auth
-    ) {
+    private String processJoinQueueReq(final HttpServletRequest req,
+                                       final Principal auth) {
 
         /* Tehdaan JSON-objekti clientin lahettamasta JSONista. */
         JsonObject payload;
@@ -194,8 +188,7 @@ public class StateController {
     @SendTo("/toClient/queue/{channelId}")
     public final String popClientFromQueue(
             final @DestinationVariable String channelId,
-            final SimpMessageHeaderAccessor accessor
-    ) {
+            final SimpMessageHeaderAccessor accessor) {
 
         /* Varmista, etta poppaaja on autentikoitunut. */
         if (accessor.getUser() == null) {
@@ -224,11 +217,9 @@ public class StateController {
      * @param channelId Kanavatunnus.
      */
     @RequestMapping(value = "/leave/{channelId}", method = RequestMethod.POST)
-    public final void leaveChat(
-            final @PathVariable String channelId,
-            final HttpServletRequest req,
-            final Principal pro
-    ) {
+    public final void leaveChat(final @PathVariable String channelId,
+                                final HttpServletRequest req,
+                                final Principal pro) {
         String sessionId = req.getSession().getId();
         if (!validatorService.validateLeave(sessionId, pro, channelId)) {
             return;
@@ -247,14 +238,11 @@ public class StateController {
      * @return Vastaus pyynnon tekijalle, tyypillisesti {"status":"OK"}.
      */
     @RequestMapping(value = "/setStatus/", method = RequestMethod.POST)
-    public final String setStatusOfProUser(
-            final @RequestParam String online,
-            final HttpServletRequest req,
-            final Principal professional
-    ) {
-        String error = validatorService.validateOnlineStatusChangeRequest(
-                professional, req, online
-        );
+    public final String setStatusOfProUser(final @RequestParam String online,
+                                           final HttpServletRequest req,
+                                           final Principal professional) {
+        String error = validatorService
+                .validateOnlineStatusChangeRequest(professional, req, online);
         if (!error.isEmpty()) {
             return jsonifiedResponse(error);
         }

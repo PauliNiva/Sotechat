@@ -44,10 +44,8 @@ public class QueueBroadcasterImpl implements QueueBroadcaster {
      * @param pMessageBroker p
      */
     @Autowired
-    public QueueBroadcasterImpl(
-            final QueueService pQueueService,
-            final MessageBroker pMessageBroker
-    ) {
+    public QueueBroadcasterImpl(final QueueService pQueueService,
+                                final MessageBroker pMessageBroker) {
         this.queueService = pQueueService;
         this.broker = pMessageBroker;
         this.lastBroadcastTime = 0L;

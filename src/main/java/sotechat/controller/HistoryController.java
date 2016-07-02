@@ -47,11 +47,9 @@ public class HistoryController {
      * @param pSessionRepo p
      */
     @Autowired
-    public HistoryController(
-            final ValidatorService pValidatorService,
-            final ChatLogger pChatLogger,
-            final SessionRepo pSessionRepo
-    ) {
+    public HistoryController(final ValidatorService pValidatorService,
+                             final ChatLogger pChatLogger,
+                             final SessionRepo pSessionRepo) {
         this.validatorService = pValidatorService;
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
@@ -71,8 +69,7 @@ public class HistoryController {
     public final List<MsgToClient> getMessages(
             final @PathVariable("channelId") String channelId,
             final HttpServletRequest req,
-            final Principal pro
-    ) {
+            final Principal pro) {
         String error = validatorService.validateLogRequest(pro, req, channelId);
         if (!error.isEmpty()) {
             System.out.println("Hacking attempt with getLogs? " + error);
@@ -90,10 +87,8 @@ public class HistoryController {
      */
     @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
     @ResponseBody
-    public final List<ConvInfo> getConversations(
-            final Principal professional,
-            final HttpServletRequest req
-    ) {
+    public final List<ConvInfo> getConversations(final Principal professional,
+                                                 final HttpServletRequest req) {
         if (professional == null) {
             /* Listaus on kaytossa vain autentikoituneille kayttajille. */
             return null;

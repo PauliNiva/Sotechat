@@ -6,15 +6,14 @@ import org.springframework.stereotype.Component;
 
 import org.joda.time.DateTime;
 
+import java.util.*;
+
 import sotechat.controller.MessageBroker;
 import sotechat.domain.Person;
 import sotechat.service.DatabaseService;
 import sotechat.wrappers.ConvInfo;
 import sotechat.wrappers.MsgToClient;
 import sotechat.wrappers.MsgToServer;
-
-import java.util.*;
-
 
 /**
  * Muistaa Chattiin kirjoitetut viestit.
@@ -148,8 +147,7 @@ public class ChatLogger {
      * @return msgToClient Viesti clientille.
      */
     public final synchronized MsgToClient logNewMessage(
-            final MsgToServer msgToServer
-    ) {
+            final MsgToServer msgToServer) {
         /* Esikasitellaan tietoja muuttujiin. */
         String channelId = msgToServer.getChannelId();
         String messageId = pollNextFreeMessageIdFor(channelId);
@@ -211,10 +209,8 @@ public class ChatLogger {
      * @param channelId p.
      * @param broker p.
      */
-    public synchronized void broadcast(
-            final String channelId,
-            final MessageBroker broker
-    ) {
+    public synchronized void broadcast(final String channelId,
+                                       final MessageBroker broker) {
         long timeNow = new DateTime().getMillis();
         Long lastBroadcastTime = lastBroadcast.get(channelId);
         if (lastBroadcastTime == null) {
@@ -251,10 +247,8 @@ public class ChatLogger {
      * @param channelId Kanavatunnus.
      * @param broker    Viestin valittaja.
      */
-    private synchronized void actuallyBroadcast(
-            final String channelId,
-            final MessageBroker broker
-    ) {
+    private synchronized void actuallyBroadcast(final String channelId,
+                                                final MessageBroker broker) {
         String channelIdWithPath = "/toClient/chat/" + channelId;
         for (MsgToClient msg : getLogs(channelId)) {
             broker.convertAndSend(channelIdWithPath, msg);
@@ -284,8 +278,7 @@ public class ChatLogger {
      * @return Lista <code>msgToClient</code>-olioita.
      */
     public final synchronized List<MsgToClient> getLogs(
-            final String channelId
-        ) {
+            final String channelId) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             /* Jos ei loydy muistista, haetaan tietokannasta muistiin. */
@@ -303,8 +296,7 @@ public class ChatLogger {
      * @return <code>MessageId</code>.
      */
     private synchronized String pollNextFreeMessageIdFor(
-            final String channelId
-    ) {
+            final String channelId) {
         List<MsgToClient> list = logs.get(channelId);
         if (list == null) {
             return "1";

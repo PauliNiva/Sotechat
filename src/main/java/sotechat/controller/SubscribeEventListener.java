@@ -63,9 +63,7 @@ public class SubscribeEventListener
      * @param event Kaikki applikaatioeventit aktivoivat taman metodin.
      */
     @Override
-    public final void onApplicationEvent(
-            final ApplicationEvent event
-    ) {
+    public final void onApplicationEvent(final ApplicationEvent event) {
         /* Ei kaynnisteta turhia timereita muista applikaatioeventeista. */
         if (event.getClass() != SessionSubscribeEvent.class) {
             return;
@@ -178,9 +176,7 @@ public class SubscribeEventListener
      *
      * @param qbc qbc
      */
-    public synchronized void setQueueBroadcaster(
-            final QueueBroadcaster qbc
-    ) {
+    public synchronized void setQueueBroadcaster(final QueueBroadcaster qbc) {
         this.queueBroadcaster = qbc;
     }
 
@@ -189,9 +185,7 @@ public class SubscribeEventListener
      *
      * @param pBroker p
      */
-    public synchronized void setBroker(
-            final MessageBroker pBroker
-    ) {
+    public synchronized void setBroker(final MessageBroker pBroker) {
         this.broker = pBroker;
     }
 
@@ -200,9 +194,7 @@ public class SubscribeEventListener
      *
      * @param pChatLogger p
      */
-    public synchronized void setChatLogger(
-            final ChatLogger pChatLogger
-    ) {
+    public synchronized void setChatLogger(final ChatLogger pChatLogger) {
         this.chatLogger = pChatLogger;
     }
 
@@ -211,9 +203,7 @@ public class SubscribeEventListener
      *
      * @param pMapper p
      */
-    public synchronized void setMapper(
-            final Mapper pMapper
-    ) {
+    public synchronized void setMapper(final Mapper pMapper) {
         this.mapper = pMapper;
     }
 }
