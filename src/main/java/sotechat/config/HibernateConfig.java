@@ -2,6 +2,7 @@ package sotechat.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,17 +15,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManagerFactory;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
- * Luokassa konfiguroidaan JPA-rajapinnan toteuttava Hibernate. Hibernaten
- * tehtävänä on luoda SQL-tietokantaan @Entity-annotaatiolla merkittyjä
- * Java-luokkia vastaavat tietokantataulut. Lisäksi Hibernaten tehtäviin
- * kuuluu huolehtia tietokantatransaktioista, eli, että @Entity-luokkia
- * koskevat tietokantaoperaatiot toteutetaan myös varsinaiseen SQL-
- * tietokantaan.
+ * Luokassa konfiguroidaan <code>JPA</code>-rajapinnan toteuttava Hibernate.
+ * Hibernaten tehtavana on luoda SQL-tietokantaan
+ * <code>@Entity</code>-annotaatiolla
+ * merkittyja Java-luokkia vastaavat tietokantataulut. Hibernaten tehtaviin
+ * kuuluu huolehtia tietokantatransaktioista, siis
+ * <code>@Entity</code>-luokkia koskevat tietokantaoperaatiot
+ * toteutetaan myos varsinaiseen SQL-tietokantaan. Luokkamuuttujat eivat ole
+ * kovakoodattuja arvoja, vaan nimia joiden perusteella arvo haetaan
+ * <code>application.properties</code>-tiedostoista.
  */
 @Configuration
 @EnableJpaRepositories(basePackages = {"sotechat.repo"})
@@ -32,95 +37,102 @@ import java.util.Properties;
 public class HibernateConfig {
 
     /**
-     * Ajuri, jolla saadaan Javasta muodostettua yhteys tietokantaan.
+     * Ajurin nimi.
      */
     private static final String PROPERTY_NAME_DATABASE_DRIVER = "db.driver";
 
     /**
-     * Salasana tietokantayhteyden muodostamiseksi.
+     * Nimi attribuutille, josta salasana loytyy.
      */
     private static final String PROPERTY_NAME_DATABASE_PASSWORD = "db.password";
 
     /**
-     * Osoite, josta SQL-tietokanta löytyy.
+     * Nimi attribuutille, josta SQL-tietokannan osoite loytyy.
      */
     private static final String PROPERTY_NAME_DATABASE_URL = "db.url";
 
     /**
-     * Käyttäjänimi tietokantayhteyden muodostamiseksi.
+     * Nimi attribuutille, josta kayttajanimi loytyy.
      */
     private static final String PROPERTY_NAME_DATABASE_USERNAME = "db.username";
 
     /**
-     *  Mitä "dialektia" hibernate käyttää, eli arvo riippuu siitä
-     *  käytetäänkö esim. H2-tietokantaa kehitysvaiheessa vai PostgreSql-
-     *  tietokantaa tuotannossa
+     *  Hibernate <code>Dialect</code>.
      */
     private static final String PROPERTY_NAME_HIBERNATE_DIALECT =
             "hibernate.dialect";
 
     /**
-     * Mistä EntityManager-bean etsii @Entity-annotaatiolla merkittyjä
-     * luokkia.
+     * Mista <code>EntityManager</code> etsii <code>@Entity</code>-annotaatiolla
+     * merkittyja luokkia.
      */
     private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN =
             "entitymanager.packages.to.scan";
 
     /**
-     * Miten toimitaan palvelimen käynnistys- ja sammutustilanteessa, voi olla
-     * esim. että käynnistystilanteessa tietokanta pystytetään ja sammutus-
-     * tilanteessa tietokanta tuhotaan.
+     * Miten toimitaan palvelimen kaynnistys- ja sammutustilanteessa,
+     * esimerkiksi kaynnistystilanteessa tietokanta pystytetaan tai
+     * sammutustilanteessa tietokanta tuhotaan.
      */
     private static final String PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO =
             "hibernate.hbm2ddl.auto";
 
     /**
-     * Mistä Hibernate löytää Entity-luokat.
+     * Paketti josta <code>@Entity</code>-luokat loytyvat.
      */
     private static final String PROPERTY_NAME_PACKAGES_TO_SCAN =
             "sotechat.domain";
 
     /**
-     * Miten SQL-tietokantataulut
-     * nimetään @Entity-luokkien nimien pohjalta.
+     * Tietokantataulujen nimeamistapa.
      */
     private static final String PROPERTY_NAME_HIBERNATE_NAMING_STRATEGY =
             "hibernate.ejb.naming_strategy";
 
     /**
-     * Näytetäänkö komentorivillä tietokantaoperaatiot.
+     * Naytetaanko komentorivilla tietokantaoperaatiot.
      */
     private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL =
             "hibernate.show_sql";
+
     /**
-     * Missä muodossa tietokantaoperaatiot näytetään.
+     * Muoto, jossa tietokantaoperaatiot naytetaan.
      */
     private static final String PROPERTY_NAME_HIBERNATE_FORMAT_SQL =
             "hibernate.format_sql";
+
     /**
-     * Määritellään ympäristömuuttuja, josta voidaan hakea esim. salaiset
-     * tietokanna kirjautumistiedot.
+     * Tietokantaosoitteen maksimipituus.
+     */
+    private static final int LENGTH_OF_PRODUCTION_DBURL = 128;
+
+
+    /**
+     * Ymparistoresurssi.
      */
     @Resource
     private Environment env;
 
     /**
-     * Luodaan yhteys tuotantotietokantaan.
+     * Tuotantoprofiili. Luodaan yhteys tuotantotietokantaan.
      *
-     * @return Palautaa tietokantayhteyksistä vastaavaa HikariDataSourceen.
-     * @throws URISyntaxException
+     * @return Palauttaa tietokantayhteyksista vastaavan
+     * <code>HikariDataSource</code>:n.
+     * @throws URISyntaxException Jos
+     * haettua <code>String</code>:ia ei tunnisteta
+     * <code>URI</code>-osoitteeksi.
      */
     @Profile("production")
     @Bean(destroyMethod = "close")
     public HikariDataSource dataSourceForProduction()
             throws URISyntaxException {
-        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+        URI dbUri = new URI(
+                env.getRequiredProperty(PROPERTY_NAME_DATABASE_URL));
 
-        System.out.println(dbUri.toString());
         String username = dbUri.getUserInfo().split(":")[0];
         String password = dbUri.getUserInfo().split(":")[1];
 
-        StringBuilder dbUrl = new StringBuilder(128);
+        StringBuilder dbUrl = new StringBuilder(LENGTH_OF_PRODUCTION_DBURL);
         dbUrl.append("jdbc:postgresql://")
                 .append(dbUri.getHost())
                 .append(":")
@@ -145,10 +157,12 @@ public class HibernateConfig {
 
         return new HikariDataSource(dataSourceConfig);
     }
+
     /**
-     * Luodaan yhteys testitietokantaan. HikariDataSource vastaa
-     * tietokantayhteyksien ylläpitämisestä
-     * @return Palauttaa tietokantayhteyksien ylläpitäjäolion HikariDataSourcen
+     * Kehitysprofiili. Luodaan yhteys testitietokantaan.
+     * <code>HikariDataSource</code> vastaa tietokantayhteyksien
+     * yllapitamisesta.
+     * @return Palauttaa <code>HikariDataSource</code>-olion.
      */
     @Profile("development")
     @Bean(destroyMethod = "close")
@@ -172,11 +186,11 @@ public class HibernateConfig {
     }
 
     /**
-     * Luodaan EntityManagerFactoryBean eli olio, joka alustaa @Entity-
-     * notaatiolla varustetut luokat Hibernaten käyttöön.
+     * Luo <code>EntityManagerFactory</code> olion, joka alustaa
+     * <code>@Entity</code> luokat Hibernaten kayttoon.
      *
-     * @param dataSource Tietokantayhteyksistä huolehtiva olio
-     * @return Palautetaan EntityManagerFactoryBean
+     * @param dataSource Tietokantayhteyksista huolehtiva olio.
+     * @return Palauttaa <code>EntityManagerFactory</code>:n.
      */
     @Bean
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
@@ -215,13 +229,12 @@ public class HibernateConfig {
     }
 
     /**
-     * Luodaan Bean, jonka tehtävänä on huolehtia transaktioista, eli domain-
-     * Service-paketista löytyvien service-luokkien avulla tehdyistä tieto-
-     * kantaoperaatioista, kuten tietokantaan talletuksista, ja tietokannasta
-     * hauista.
+     * Luo <code>Bean</code>:in, joka huolehtii transaktioista.
      *
-     * @param entityManagerFactory
-     * @return
+     * @param entityManagerFactory Olio, joka sisältää kaikki JPA Entity-oliot.
+     * @return Palautetaan JpaTransactionManager-olio, joka vastaa siitä,
+     * että JPA-olioihin tehdyt tietokantaoperaatiot toteutetaan myös
+     * tietokantaan.
      */
     @Bean
     JpaTransactionManager transactionManager(

@@ -1,29 +1,40 @@
 package sotechat.wrappers;
 
-/** Asiakasohjelman palvelimelle lahettama viesti paketoidaan MsgToServer-olion
- * sisalle, ennen kuin palvelimen ChatController-luokka voi kasitella sita.
+/**
+ * Asiakasohjelman palvelimelle lahettama viesti paketoidaan
+ * <code>MsgToServer</code>-olion sisalle, ennen kuin palvelimen
+ * <code>ChatController</code>-luokka kasittelee sen.
  */
 public class MsgToServer {
 
-    /** Kayttajan yksiloiva salainen ID. */
+    /**
+     * Kayttajan Id.
+     */
     private String userId;
-    /** Kanavan yksiloiva salainen ID. */
+
+    /**
+     * Kanavatunnus.
+     */
     private String channelId;
-    /** Viestin sisalto. */
+
+    /**
+     * Viestin sisalto.
+     */
     private String content;
 
-    /** Huom: konstruktorin lisaaminen rikkoo Springin (ChatControllerin).
-     * Siksi luotu epavirallinen konstruktori staattisena metodina.
+    /**
+     * Konstruktorin lisaaminen rikkoo <code>Spring</code>:in, tarkemmin
+     * <code>ChatController</code>:in.
+     * Siksi staattinen metodi toimittaa konstruktorin virkaa
+     * .
      * @param pUserId p
      * @param pChannelId p
      * @param pContent p
-     * @return uusi MsgToServer-olio annetuilla arvoilla.
+     * @return uusi <code>MsgToServer</code>-olio annetuilla arvoilla.
      */
-    public static MsgToServer create(
-            final String pUserId,
-            final String pChannelId,
-            final String pContent
-    ) {
+    public static MsgToServer create(final String pUserId,
+                                     final String pChannelId,
+                                     final String pContent) {
         MsgToServer instance = new MsgToServer();
         instance.setUserId(pUserId);
         instance.setChannelId(pChannelId);
@@ -32,47 +43,58 @@ public class MsgToServer {
     }
 
 
-    /** Palauttaa kayttajaID:n, jota ei saa vuotaa muille kayttajille.
-     * @return Palauttaa kayttajaID:n, jota ei saa vuotaa muille kayttajille.
+    /**
+     * Palauttaa kayttajan Id:n, jota ei saa vuotaa muille kayttajille.
+     *
+     * @return Kayttajan Id.
      */
     public final String getUserId() {
         return this.userId;
     }
 
-    /** Palauttaa salaisen kanavaID:n.
-     * @return Palauttaa salaisen kanavaID:n.
+    /**
+     * Palauttaa salaisen kanavatunnuksen.
+     *
+     * @return Salainen kanavatunnus.
      */
     public final String getChannelId() {
         return this.channelId;
     }
 
-    /** Palauttaa viestin sisallon.
-     * @return Palauttaa viestin sisallon.
+    /**
+     * Palauttaa viestin sisallon.
+     *
+     * @return Viestin sisalto.
      */
     public final String getContent() {
         return this.content;
     }
 
-    /** Setter.
-     * @param pUserId userId
+    /**
+     * Asettaa kayttajan Id:n.
+     *
+     * @param pUserId Kayttajan Id.
      */
     public final void setUserId(final String pUserId) {
         this.userId = pUserId;
     }
 
-    /** Setter.
-     * @param pChannelId channelId
+    /**
+     * Asettaa kanvatunnuksen.
+     *
+     * @param pChannelId Kanavatunnus.
      */
     public final void setChannelId(final String pChannelId) {
         this.channelId = pChannelId;
     }
 
-    /** Setter.
-     * @param pContent content
+    /**
+     * Asettaa viestin sisallon.
+     *
+     * @param pContent Viestin sisalto.
      */
     public final void setContent(final String pContent) {
         this.content = pContent;
     }
-
 
 }

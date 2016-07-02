@@ -25,12 +25,12 @@ import static org.mockito.Mockito.timeout;
 public class QueueBroadcasterTest {
 
     QueueBroadcaster qbc;
-    SimpMessagingTemplate broker;
+    MessageBroker broker;
 
     @Before
     public void setUp() {
         QueueService qService = Mockito.mock(QueueService.class);
-        broker = Mockito.mock(SimpMessagingTemplate.class);
+        broker = Mockito.mock(MessageBroker.class);
         Mockito.when(qService.toString()).thenReturn("jono");
         qbc = new QueueBroadcasterImpl(qService, broker);
     }

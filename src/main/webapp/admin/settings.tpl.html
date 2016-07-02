@@ -1,4 +1,9 @@
 <div class="alert alert-danger">
-    <strong>VARO!</strong> Painike poistaa kaiken talletetun historian tietokannasta. Vain testi käyttöön!
+    <strong>VARO!</strong> Vain testikäyttöön! Tarkoitettu viestihistorian
+    siivoamiseen ennen chatin esittelyä. Toiminto ei poista rekisteröityjä
+    käyttäjiä, mutta muutoin palauttaa palvelimen alkutilaan (unohtaa
+    kirjoitetut viestit, aktiiviset sessiot, yms.)
 </div>
-<button type="button" class="btn btn-danger btn-lg errorButton" ng-click="resetDatabase()">Tyhjennä tietokanta viesteistä</button>
+<button type="button" class="btn btn-danger btn-lg errorButton"
+        ng-click="resetServer()" name="resetDatabaseButton">Resetoi palvelimen tila
+</button>

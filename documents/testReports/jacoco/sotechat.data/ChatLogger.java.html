@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ChatLogger.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.data</a> &gt; <span class="el_source">ChatLogger.java</span></div><h1>ChatLogger.java</h1><pre class="source lang-java linenums">package sotechat.data;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+import org.joda.time.DateTime;
+
+import sotechat.controller.MessageBroker;
+import sotechat.domain.Person;
+import sotechat.service.DatabaseService;
+import sotechat.wrappers.ConvInfo;
+import sotechat.wrappers.MsgToClient;
+import sotechat.wrappers.MsgToServer;
+
+/**
+ * Muistaa Chattiin kirjoitetut viestit.
+ */
+@Component
+public class ChatLogger {
+
+    /**
+     * Kuinka usein siivotaan vanhoja viesteja muistista.
+     */
+    private static final int CLEAN_FREQUENCY_IN_MS = 1000 * 60 * 60 * 24; // 1pv
+
+    /**
+     * Siivouksessa poistetaan keskustelut, joiden uusin viesti on
+     * vanhempi kuin tassa muuttujassa maaritelty.
+     * */
+    private static final int DAYS_OLD_TO_BE_DELETED = 3;
+
+    /**
+     * Viive, kun saman kanavan lokeihin pyydetaan useita tiedotuksia.
+     */
+    private static final int CLBC_DELAY_MS = 200;
+
+    /**
+     * Avaimena &lt;code&gt;channelId&lt;/code&gt;, arvona &lt;code&gt;Long&lt;/code&gt;
+     * milloin viimeisin tiedotus tietylle kanavalle oli.
+     */
+    private Map&lt;String, Long&gt; lastBroadcast;
+
+    /**
+     * Avaimena kanavan id ja arvona lista viesteja (kanavan lokitiedot).
+     */
+    private Map&lt;String, List&lt;MsgToClient&gt;&gt; logs;
+
+    /**
+     * Kasittelee sessioita.
+     */
+    @Autowired
+    private SessionRepo sessionRepo;
+
+    /**
+     * Mapper.
+     */
+    @Autowired
+    private Mapper mapper;
+
+    /**
+     * Tietokantapalvelut.
+     */
+    @Autowired
+    private DatabaseService databaseService;
+
+    /**
+     * Konstruktori. Alustaa lokitiedoille uuden hajautustaulun.
+     */
+<span class="fc" id="L72">    public ChatLogger() {</span>
+<span class="fc" id="L73">        this.logs = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L74">        this.lastBroadcast = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">        waitAndTryToInitializeDependencies();</span>
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * TODO: Selita.
+     */
+    public void waitAndTryToInitializeDependencies() {
+<span class="fc" id="L82">        Timer timer = new Timer();</span>
+<span class="fc" id="L83">        timer.schedule(new TimerTask() {</span>
+            @Override
+            public void run() {
+<span class="fc" id="L86">                tryToInitializeDependencies();</span>
+<span class="fc" id="L87">            }</span>
+        }, 100);
+<span class="fc" id="L89">    }</span>
+
+    /**
+     * TODO: Selita.
+     */
+    public void tryToInitializeDependencies() {
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">        if (mapper == null || databaseService == null) {</span>
+<span class="nc" id="L96">            waitAndTryToInitializeDependencies();</span>
+<span class="nc" id="L97">            return;</span>
+        }
+<span class="fc" id="L99">        mapper.setDatabaseService(databaseService);</span>
+
+<span class="fc" id="L101">        List&lt;Person&gt; persons = databaseService.getAllPersons();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (Person person : persons) {</span>
+<span class="fc" id="L103">            String username = person.getUserName();</span>
+<span class="fc" id="L104">            String userId = person.getUserId();</span>
+<span class="fc" id="L105">            mapper.mapProUsernameToUserId(username, userId);</span>
+<span class="fc" id="L106">            mapper.reserveId(userId);</span>
+<span class="fc" id="L107">            List&lt;ConvInfo&gt; list = databaseService.getConvInfoListOfUserId(userId);</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            for (ConvInfo conv : list) {</span>
+<span class="fc" id="L109">                String channelId = conv.getChannelId();</span>
+<span class="fc" id="L110">                mapper.reserveId(channelId);</span>
+<span class="fc" id="L111">            }</span>
+<span class="fc" id="L112">        }</span>
+<span class="fc" id="L113">    }</span>
+
+    public void setMapper(final Mapper pMapper) {
+<span class="fc" id="L116">        this.mapper = pMapper;</span>
+<span class="fc" id="L117">    }</span>
+
+    /**
+     * Konstruktori testausta varten.
+     *
+     * @param pSessionRepo     SessionRepo.
+     * @param pDatabaseService DatabaseService.
+     */
+    public ChatLogger(
+            final SessionRepo pSessionRepo,
+            final DatabaseService pDatabaseService
+    ) {
+<span class="fc" id="L129">        this();</span>
+<span class="fc" id="L130">        this.sessionRepo = pSessionRepo;</span>
+<span class="fc" id="L131">        this.databaseService = pDatabaseService;</span>
+<span class="fc" id="L132">    }</span>
+
+    /**
+     * Kirjaa viestin lokitietoihin, muistiin ja tietokantaan.
+     * Palauttaa viestin clienteille lahetettavassa muodossa.
+     *
+     * @param msgToServer Viesti palvelimelle.
+     * @return msgToClient Viesti clientille.
+     */
+    public final synchronized MsgToClient logNewMessage(
+            final MsgToServer msgToServer
+    ) {
+        /* Esikasitellaan tietoja muuttujiin. */
+<span class="fc" id="L145">        String channelId = msgToServer.getChannelId();</span>
+<span class="fc" id="L146">        String messageId = pollNextFreeMessageIdFor(channelId);</span>
+<span class="fc" id="L147">        String userId = msgToServer.getUserId();</span>
+<span class="fc" id="L148">        Session session = sessionRepo.getSessionFromUserId(userId);</span>
+<span class="fc" id="L149">        String username = session.get(&quot;username&quot;);</span>
+<span class="fc" id="L150">        String timeStamp = new DateTime().toString();</span>
+<span class="fc" id="L151">        String content = msgToServer.getContent();</span>
+<span class="fc" id="L152">        MsgToClient msgToClient = new MsgToClient(</span>
+                messageId, username, channelId, timeStamp, content
+        );
+
+        /* Tallennetaan seka muistiin etta tietokantaan. */
+<span class="fc" id="L157">        saveToMemory(msgToClient);</span>
+<span class="fc" id="L158">        saveToDatabase(msgToClient);</span>
+
+        /* Palautetaan viesti MsgToClient -oliona lahetysta varten. */
+<span class="fc" id="L161">        return msgToClient;</span>
+    }
+
+    /**
+     * Tallentaa viestin muistiin.
+     *
+     * @param msgToClient Tallennettava viesti.
+     */
+    private void saveToMemory(final MsgToClient msgToClient) {
+<span class="fc" id="L170">        String channelId = msgToClient.getChannelId();</span>
+<span class="fc" id="L171">        List&lt;MsgToClient&gt; list = logs.get(channelId);</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="fc" id="L173">            list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L174">            logs.put(channelId, list);</span>
+        }
+<span class="fc" id="L176">        list.add(msgToClient);</span>
+<span class="fc" id="L177">    }</span>
+
+    /**
+     * Tallentaa viestin tietokantaan.
+     *
+     * @param msgToClient Tallennettava viesti.
+     */
+    private void saveToDatabase(final MsgToClient msgToClient) {
+<span class="fc" id="L185">        String username = msgToClient.getUsername();</span>
+<span class="fc" id="L186">        String content = msgToClient.getContent();</span>
+<span class="fc" id="L187">        String timeStamp = msgToClient.getTimeStamp();</span>
+<span class="fc" id="L188">        String channelId = msgToClient.getChannelId();</span>
+<span class="fc" id="L189">        databaseService.saveMsg(username, content, timeStamp, channelId);</span>
+<span class="fc" id="L190">    }</span>
+
+    /**
+     * Lahettaa pyydetyn kanavan lokit kaikille kanavan tilanneille.
+     * Tama metodi ohjaa tehtavan mahdollisen timerin
+     * kautta metodille actuallyBroadcast.
+     * &lt;p&gt;
+     * Operaatio on suhteellisen raskas ja palvelinta voisi kyykyttaa
+     * aiheuttamalla esim. tuhansia paivityksia sekunnissa.
+     * Suojakeinona palvelunestohyokkayksia vastaan tiedotusten
+     * valille on asetettu minimiviive.
+     *
+     * @param channelId p.
+     * @param broker p.
+     */
+    public synchronized void broadcast(
+            final String channelId,
+            final MessageBroker broker
+    ) {
+<span class="fc" id="L209">        long timeNow = new DateTime().getMillis();</span>
+<span class="fc" id="L210">        Long lastBroadcastTime = lastBroadcast.get(channelId);</span>
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">        if (lastBroadcastTime == null) {</span>
+<span class="fc" id="L212">            lastBroadcastTime = 0L;</span>
+        }
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">        if (lastBroadcastTime + CLBC_DELAY_MS &lt; timeNow) {</span>
+            /* Jos ei olla juuri asken tiedotettu, tehdaan se nyt. */
+<span class="fc" id="L216">            actuallyBroadcast(channelId, broker);</span>
+<span class="fc" id="L217">            lastBroadcastTime = new DateTime().getMillis();</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        } else if (lastBroadcastTime &lt; timeNow) {</span>
+            /* Jos ollaan askettain lahetetty lokit, halutaan
+             * viivastyttaa seuraavaa lahetysta, mutta ei
+              * haluta kaynnistaa useita ajastimia yhdelle
+              * kanavalle. Sen vuoksi
+              * lastBroadcastTime asetetaan tulevaisuuteen ja
+              * else if -ehdossa tarkistetaan sen avulla, onko
+              * uusi lahetys jo ajastettu. */
+<span class="nc" id="L226">            lastBroadcastTime += CLBC_DELAY_MS;</span>
+<span class="nc" id="L227">            long delayToNext = lastBroadcastTime - timeNow;</span>
+<span class="nc" id="L228">            Timer timer = new Timer();</span>
+<span class="nc" id="L229">            timer.schedule(new TimerTask() {</span>
+                @Override
+                public void run() {
+<span class="nc" id="L232">                    actuallyBroadcast(channelId, broker);</span>
+<span class="nc" id="L233">                }</span>
+            }, delayToNext);
+        }
+<span class="fc" id="L236">        lastBroadcast.put(channelId, lastBroadcastTime);</span>
+<span class="fc" id="L237">    }</span>
+
+    /**
+     * Lahettaa kanavan chat-lokitiedot kanavan kuuntelijoille.
+     *
+     * @param channelId Kanavatunnus.
+     * @param broker    Viestin valittaja.
+     */
+    private synchronized void actuallyBroadcast(
+            final String channelId,
+            final MessageBroker broker
+    ) {
+<span class="fc" id="L249">        String channelIdWithPath = &quot;/toClient/chat/&quot; + channelId;</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">        for (MsgToClient msg : getLogs(channelId)) {</span>
+<span class="fc" id="L251">            broker.convertAndSend(channelIdWithPath, msg);</span>
+<span class="fc" id="L252">        }</span>
+<span class="fc" id="L253">    }</span>
+
+    /**
+     * Palauttaa JSON-ystavallisen listauksen Stringina kaikista kanavista,
+     * joilla kayttaja on koskaan ollut.
+     *
+     * @param userId KayttajanId.
+     * @return merkkijono muotoa [&quot;kanava1&quot;, &quot;kanava2&quot;].
+     */
+    public final synchronized List&lt;ConvInfo&gt; getChannelsByUserId(
+            final String userId) {
+<span class="fc" id="L264">        return databaseService.getConvInfoListOfUserId(userId);</span>
+    }
+
+    /**
+     * Getteri halutun kanavan lokeille.
+     * Yrittaa hakea ensin muistista, sitten tietokannasta.
+     * Hakee kanavan lokitiedot.
+     * Yrittaa ensin hakea muistista ja jos ei loyda sieltä, sen jalkeen
+     * hakee tietokannasta.
+     *
+     * @param channelId Kanavan id.
+     * @return Lista &lt;code&gt;msgToClient&lt;/code&gt;-olioita.
+     */
+    public final synchronized List&lt;MsgToClient&gt; getLogs(
+            final String channelId
+        ) {
+<span class="fc" id="L280">        List&lt;MsgToClient&gt; list = logs.get(channelId);</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (list == null) {</span>
+            /* Jos ei loydy muistista, haetaan tietokannasta muistiin. */
+<span class="fc" id="L283">            list = databaseService.retrieveMessages(channelId);</span>
+<span class="fc" id="L284">            logs.put(channelId, list);</span>
+        }
+<span class="fc" id="L286">        return list;</span>
+    }
+
+    /**
+     * Antaa seuraavan vapaan ID:n viestille AngularJS:aa varten.
+     * Joka kanavan viestit saapumisjarjestyksessa: 1,2,3...
+     *
+     * @param channelId &lt;code&gt;channelId&lt;/code&gt;.
+     * @return &lt;code&gt;MessageId&lt;/code&gt;.
+     */
+    private synchronized String pollNextFreeMessageIdFor(
+            final String channelId
+    ) {
+<span class="fc" id="L299">        List&lt;MsgToClient&gt; list = logs.get(channelId);</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="fc" id="L301">            return &quot;1&quot;;</span>
+        }
+        /** Huom: ID ei saa alkaa nollasta! */
+<span class="fc" id="L304">        return (1 + list.size()) + &quot;&quot;;</span>
+    }
+
+    /**
+     * Poistaa vanhan viestit muistista. Palvelimen ollessa paalla pitkaan
+     * muisti voi loppua. Taman vuoksi vanhat viestit on hyva siivota pois
+     * muistista esim. kerran paivassa (jattaen ne kuitenkin tietokantaan).
+     * TODO: Taskin suorittaminen hyydyttamatta palvelinta siivouksen ajaksi.
+     */
+    @Scheduled(fixedRate = CLEAN_FREQUENCY_IN_MS)
+    public synchronized void work() {
+<span class="fc" id="L315">        removeOldMessagesFromMemory(DAYS_OLD_TO_BE_DELETED);</span>
+<span class="fc" id="L316">    }</span>
+
+
+    /**
+     * Siivoaa &lt;code&gt;ChatLogger&lt;/code&gt;:in muistista vanhat viestit, jattaen ne
+     * tietokantaan. Keskustelun vanhuus maaraytyy sen uusimman viestin mukaan.
+     *
+     * @param daysOld Kuinka monta paivaa vanhat keskustelut poistetaan.
+     */
+    public final synchronized void removeOldMessagesFromMemory(
+            final int daysOld
+    ) {
+<span class="fc" id="L328">        Long now = DateTime.now().getMillis();</span>
+<span class="fc" id="L329">        Long threshold = now - daysOld * CLEAN_FREQUENCY_IN_MS;</span>
+<span class="fc" id="L330">        DateTime trdate = new DateTime(threshold);</span>
+<span class="fc" id="L331">        Iterator&lt;Map.Entry&lt;String, List&lt;MsgToClient&gt;&gt;&gt; iterator =</span>
+<span class="fc" id="L332">                logs.entrySet().iterator();</span>
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        while (iterator.hasNext()) {</span>
+<span class="fc" id="L334">            Map.Entry&lt;String, List&lt;MsgToClient&gt;&gt; entry = iterator.next();</span>
+<span class="fc" id="L335">            String channelId = entry.getKey();</span>
+<span class="fc" id="L336">            List&lt;MsgToClient&gt; listOfMsgs = entry.getValue();</span>
+<span class="pc bpc" id="L337" title="1 of 4 branches missed.">            if (listOfMsgs == null || listOfMsgs.isEmpty()) {</span>
+<span class="fc" id="L338">                iterator.remove();</span>
+            } else {
+<span class="fc" id="L340">                MsgToClient last = listOfMsgs.get(listOfMsgs.size() - 1);</span>
+<span class="fc" id="L341">                DateTime lastdate = DateTime.parse(last.getTimeStamp());</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">                if (lastdate.isBefore(trdate)) {</span>
+                    /* Poistetaan ChatLoggerin logeista. */
+<span class="fc" id="L344">                    iterator.remove();</span>
+                    /* Poistetaan myos Mapperin kanavista. */
+<span class="fc" id="L346">                    mapper.forgetChannel(channelId);</span>
+                }
+            }
+<span class="fc" id="L349">        }</span>
+<span class="fc" id="L350">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -6,11 +6,12 @@
     <title>Sosiaali ja terveys chat</title>
     <script src="assets/lib/sockjs-0.3.4.js"></script>
     <script src="assets/lib/stomp.js"></script>
-    <script src="assets/lib/angular.js"></script>
-    <script src="assets/lib/angular-animate.js"></script>
+    <script src="assets/lib/angular.min.js"></script>
+    <script src="assets/lib/angular-animate.min.js"></script>
     <script src="assets/lib/scrollglue.js"></script>
     <script src="assets/lib/focusIf.min.js"></script>
-    <script src="assets/lib/ui-bootstrap.js"></script>
+    <script src="assets/lib/ui-bootstrap.min.js"></script>
+    <script src="assets/lib/angular-base64.js"></script>
 
     <script src="main/app.module.js"></script>
     <script src="main/pro.ctrl.js"></script>
@@ -41,10 +42,12 @@
 
     <script src="common/areUSureModal.ctrl.js"></script>
 
+    <script src="assets/lib/angular-ui-switch.min.js" ></script>
+
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/chat.css" rel="stylesheet">
     <link href="assets/css/pro.css" rel="stylesheet">
-    <link href="assets/css/bootstrap-switch.min.css" rel="stylesheet">
+    <link href="assets/css/angular-ui-switch.min.css" rel="stylesheet">
 </head>
 <body ng-app="chatProApp">
 <div class="ng-cloak container-fluid proContainer chat-animation" ng-controller="proCtrl" ng-include="authStatus"></div>

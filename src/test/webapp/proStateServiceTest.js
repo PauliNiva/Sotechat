@@ -28,7 +28,7 @@ describe('proStateService tests', function () {
             proStateService.setAllVariables(response);
         });
         $httpBackend.flush();
-        expect(proStateService.getOnline()).toEqual('online');
+        expect(proStateService.getOnline()).toEqual(false);
         expect(proStateService.getChannelIDs()).toEqual(["id", "id2"]);
         expect(proStateService.getUsername()).toEqual('uu');
         expect(proStateService.getUserID()).toEqual('uid');

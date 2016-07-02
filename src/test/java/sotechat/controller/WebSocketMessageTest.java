@@ -90,7 +90,7 @@ public class WebSocketMessageTest {
     public void setUp() throws Exception {
         Mockito.when(conversationRepo.findOne(anyString()))
                 .thenReturn(new Conversation());
-        this.mapper = (Mapper) context.getBean("mapper");
+        this.mapper = (Mapper) context.getBean("mapperImpl");
         this.sessionRepo = (SessionRepo) context.getBean("sessionRepo");
         this.mapper.mapProUsernameToUserId("666", "hoitaja");
         this.brokerChannelInterceptor = new MockChannelInterceptor();
@@ -99,7 +99,7 @@ public class WebSocketMessageTest {
 
     @After
     public void tearDown() {
-        this.sessionRepo.forgetSessions();
+        this.sessionRepo.forgetAllSessions();
     }
 
     @Test

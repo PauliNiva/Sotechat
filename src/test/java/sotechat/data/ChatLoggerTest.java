@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sotechat.Launcher;
+import sotechat.controller.MessageBroker;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.PersonRepo;
 import sotechat.service.DatabaseService;
@@ -28,9 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Launcher.class)
@@ -56,7 +55,7 @@ public class ChatLoggerTest {
 
     @Before
     public void setUp(){
-        mapper = new Mapper();
+        mapper = new MapperImpl();
         srepo = new SessionRepo(mapper);
         request = new MockHttpServletRequest("sessionx");
         session = srepo.updateSession(request, null);
@@ -66,6 +65,8 @@ public class ChatLoggerTest {
         dbservice.createConversation("Salla", "xxx", "hammashoito");
         dbservice.addPersonToConversation("666", "xxx");
         chatlogger = new ChatLogger(srepo, dbservice);
+        chatlogger.setMapper(mapper);
+        chatlogger.tryToInitializeDependencies();
     }
 
     private boolean equals(MsgToClient first, MsgToClient second){
@@ -93,17 +94,17 @@ public class ChatLoggerTest {
     }
 
     @Test
-    public void broadcastTest(){
-        SimpMessagingTemplate mockBroker = Mockito.mock(SimpMessagingTemplate.class);
+    public void broadcastTest() {
+        MessageBroker mockBroker = Mockito.mock(MessageBroker.class);
         MsgToClient m1 = chatlogger.logNewMessage(message);
         MsgToClient m2 = chatlogger.logNewMessage(MsgToServer.create(userId, "xxx", "haloo"));
         chatlogger.broadcast("xxx", mockBroker);
-        verify(mockBroker, times(1)).convertAndSend("/toClient/chat/xxx", m1);
-        verify(mockBroker, times(1)).convertAndSend("/toClient/chat/xxx", m2);
+        verify(mockBroker, timeout(20L).times(1)).convertAndSend("/toClient/chat/xxx", m1);
+        verify(mockBroker, timeout(20L).times(1)).convertAndSend("/toClient/chat/xxx", m2);
     }
 
     @Test
-    public void getChannelsByUserIdTest(){
+    public void getChannelsByUserIdTest() {
         dbservice.addPersonToConversation("666", "xxx");
         dbservice.saveMsg("Salla", "Haloo", "20.10.", "xxx");
         List<ConvInfo> channelinfo = chatlogger.getChannelsByUserId("666");
@@ -153,6 +154,8 @@ public class ChatLoggerTest {
     public void removeOldMessagesFromMemoryAndGetLogsTest() {
         DatabaseService mockdb = Mockito.mock(DatabaseService.class);
         chatlogger = new ChatLogger(srepo, mockdb);
+        chatlogger.setMapper(mapper);
+        chatlogger.tryToInitializeDependencies();
         Long tms = new DateTime().getMillis() - 5 * 1000 * 60 * 60 *24;
         DateTime time = new DateTime(tms);
         chatlogger.getLogs("xxx").add(new MsgToClient("123", "Salla", "xxx", time.toString(), "Haloo"));

@@ -1,9 +1,12 @@
 package sotechat.data;
 
+
 import java.util.HashSet;
 import java.util.Set;
 
-/** Kanavaan liittyvat tiedot keskitetty kanava-olioon. Kasitteiden selitykset:
+/**
+ * Kanava-oliot ovat olemassa kanaviin liittyvan tiedon keskittamiseksi.
+ * Miten keskeiset jasenyyskasitteet eroavat toisistaan:
  * - Current subscribers: juuri nyt aktiiviset WS yhteydet kanavalle.
  * - Active userIds: oikeus kuunnella ja lahettaa viesteja kanavalle.
  *      HUOM: Yllapidetaan tietoa myos Session-olioissa (jotta O(1) haut).
@@ -11,40 +14,63 @@ import java.util.Set;
  */
 public class Channel {
 
-    /** ChannelId. */
+    /**
+     * Kanavatunnus.
+     */
     private String channelId;
 
-    /** Current Subscribers. */
+    /**
+     * Sessiot, joilla on aukioleva <code>WebSocket</code>-yhteys kanavalle.
+     */
     private Set<Session> currentSubscribers;
 
-    /** Active User Ids (oikeus osallistua, myos Session-olioissa). */
+    /**
+     * Aktiiviset kayttajatunnukset tarkoittavat niita, joilla on oikeus avata
+     * <code>WebSocket</code>-yhteys kanavalle.
+     * Tietoa yllapidetaan myos
+     * <code>Session</code>-olioissa hakuoperaatioiden nopeuttamiseksi.
+     */
     private Set<String> activeUserIds;
 
-    /** Historic User Ids. */
+    /**
+     * Historialliset kayttajatunnukset tarkoittavat niita, jotka ovat joskus
+     * olleet kanavalla. Historiallisilla ammattilaiskayttajilla on oikeus
+     * hakea kanavan lokitietoja.
+     */
     private Set<String> historicUserIds;
 
-    /** String of pro username assigned to this Channel. */
+    /**
+     * Kanavaan mahdollisesti liittyvan ammattilaisen <code>username</code>.
+     */
     private String assignedPro;
 
-    /** Konstruktori.
-     * @param pChannelId channelId/
+    /**
+     * False, jos kanava on suljettu.
      */
-    public Channel(
-            final String pChannelId
-    ) {
+    private boolean active;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pChannelId Kanavatunnus.
+     */
+    public Channel(final String pChannelId) {
         this.channelId = pChannelId;
         currentSubscribers = new HashSet<>();
         activeUserIds = new HashSet<>();
         historicUserIds = new HashSet<>();
         this.assignedPro = "";
+        this.active = true;
     }
 
-    /** Kirjaa Channel-olioon ja Session-olioon oikeuden osallistua kanavalle.
-     * @param session session-olio
+    /**
+     * Sallii parametrina annetun Sessionin osallistua kanavalle.
+     * Tarkemmin ilmaistuna: kirjaa <code>Channel</code>-olioon ja
+     * <code>Session</code>-olioon oikeuden osallistua kanavalle.
+     *
+     * @param session <code>Session</code>-olio.
      */
-    public final synchronized void allowParticipation(
-            final Session session
-    ) {
+    public synchronized void allowParticipation(final Session session) {
         session.addChannel(channelId);
         String userId = session.get("userId");
         activeUserIds.add(userId);
@@ -52,11 +78,11 @@ public class Channel {
     }
 
     /**
-     * Asettaa kanavan normikayttajien tilaksi "chat".
+     * Asettaa kanavan asiakaskayttajien tilaksi "chat".
      */
-    public void setRegUserSessionStatesToChat() {
+    public synchronized void setRegUserSessionStatesToChat() {
         for (Session member : getCurrentSubscribers()) {
-            /** Hoitajan tilan kuuluu aina olla "pro". */
+            /* Hoitajan tilan kuuluu aina olla "pro". */
             if (!member.get("state").equals("pro")) {
                 member.set("state", "chat");
             }
@@ -64,101 +90,148 @@ public class Channel {
     }
 
 
-    /** Kirjataan subscribe ylos, seka /queue/ etta /chat/ tapauksissa.
-     * @param session sessio-olio
+    /**
+     * Kirjaa uuden tilaajan ylos kanavan tietoihin.
+     * Kutsuttava seka tapauksissa, joissa asiakaskayttaja liittyy jonoon
+     * eli tilaa polun /toClient/queue/{kanavaId}, etta tapauksessa,
+     * jossa jokin kayttaja tilaa varsinaisen kanavan /toClient/chat/{kanavaId}.
+     *
+     * @param session <code>Session</code>-olio.
      */
-    public synchronized void addSubscriber(
-            final Session session
-    ) {
+    public synchronized void addSubscriber(final Session session) {
         currentSubscribers.add(session);
         String userId = session.get("userId");
         activeUserIds.add(userId);
         historicUserIds.add(userId);
     }
 
-    /** Kutsutaan, kun WS yhteys disconnectaa, seka poistu-nappia painettaessa.
-     * @param session p
+    /**
+     * Kutsutaan <code>WebSocket</code>-yhteyden katketessa, seka poistu-nappia
+     * painettaessa.
+     *
+     * @param session p.
      */
-    public final synchronized void removeSubscriber(
-            final Session session
-    ) {
+    public synchronized void removeSubscriber(final Session session) {
         currentSubscribers.remove(session);
     }
 
-    /** Kutsutaan, kun WS yhteys on ollut pitkaan disconnectissa (timeout)
+    /**
+     * Poistaa parametrina annetun userId:n osallistumisoikeuden kanavalle.
+     * Kutsutaan <code>WebSocket</code>-yhteyden ollessa pitkaan katkenneena,
      * seka poistu-nappia painettaessa.
-     * @param userId p
+     *
+     * @param userId p.
      */
-    public final synchronized void removeActiveUserId(
-            final String userId
-    ) {
+    public synchronized void removeActiveUserId(final String userId) {
         activeUserIds.remove(userId);
     }
 
-    /** Palauttaa true jos annettu userId on lahiaikoina ollut kanavalla.
+    /**
+     * Palauttaa <code>true</code> jos annetulla userId:lla on oikeus
+     * osallistua kanavalle.
+     *
      * @param userId userId
-     * @return true jos on lahiaikoina ollut kanavalla
+     * @return <code>true</code> jos oikeus osallistua kanavalle.
      */
-    public final synchronized boolean hasActiveUser(
-            final String userId
-    ) {
+    public synchronized boolean hasActiveUser(final String userId) {
         return activeUserIds.contains(userId);
     }
 
-    /** Palauttaa true jos annettu userId on lahiaikoina ollut kanavalla.
-     * @param userId userId
-     * @return true jos on lahiaikoina ollut kanavalla
+    /**
+     * Palauttaa <code>true</code> jos kayttajaId on joskus ollut kanavalla.
+     *
+     * @param userId kayttajaId.
+     * @return <code>true</code> jos on kayttajaId on joskus ollut kanavalla.
      */
-    public final synchronized boolean hasHistoricUser(
-            final String userId
-    ) {
+    public synchronized boolean hasHistoricUser(final String userId) {
         return historicUserIds.contains(userId);
     }
 
     /**
-     * Getteri channelId:lle
-     * @return channelId
+     * Hakee kanavatunnuksen.
+     *
+     * @return Kanavatunnus.
      */
-    public final synchronized String getId() {
+    public synchronized String getId() {
         return this.channelId;
     }
 
-    /** Palauttaa listan sessioita, jotka ovat subscribanneet kanavaID:lle.
-     * @return lista sessioita
+    /**
+     * Palauttaa setin <code>Session</code>-olioista, joilla on
+     * aukioleva <code>WebSocket</code>-yhteys kanavalle.
+     *
+     * @return Setti <code>Session</code>-olioita.
      */
-    public final synchronized Set<Session> getCurrentSubscribers() {
+    public synchronized Set<Session> getCurrentSubscribers() {
         return currentSubscribers;
     }
 
-    /** Palauttaa listan userId:ta, jotka lasketaan aktiivisiksi kanavalle.
-     * Hetkeksi dropannut henkilo lasketaan aktiiviseksi timeouttiin saakka.
-     * @return lista sessioita
+    /**
+     * Palauttaa setin <code>userId</code>:ta, joilla on oikeus
+     * avata <code>WebSocket</code>-yhteys kanavalle.
+     * Hetkeksi yhteyden katkaissut tai menettänyt henkilo lasketaan
+     * aktiiviseksi aikakatkaisuun saakka.
+     *
+     * @return Setti <code>userId</code>:ta.
      */
-    public final synchronized Set<String> getActiveUserIds() {
+    public synchronized Set<String> getActiveUserIds() {
         return activeUserIds;
     }
 
-    /** Palauttaa listan userId:ta, jotka ovat joskus olleet kanavalla.
-     * Kaytetaan validoidessa lokienhakupyyntoa.
-     * @return lista sessioita
+    /**
+     * Palauttaa setin <code>userId</code>:ta, jotka ovat joskus olleet
+     * kanavalla. Kaytetaan validoitaessa lokitietojenhakupyyntoa.
+     *
+     * @return Setti <code>Session</code>-olioita.
      */
-    public final synchronized Set<String> getHistoricUserIds() {
+    public synchronized Set<String> getHistoricUserIds() {
         return historicUserIds;
     }
 
-    /** Palauttaa usernamen, kenelle pro:lle kanava on assignattu.
-     * @return String
+    /**
+     * Palauttaa <code>username</code>:n ammattilaiselle, jolle tama kanava
+     * kuuluu, tai tyhjan merkkijonon jos kanava ei viela kuulu kenellekaan.
+     *
+     * @return username
      */
-    public final String getAssignedPro() {
+    public synchronized String getAssignedPro() {
         return assignedPro;
     }
 
-    /** Asettaa parametrina annetun usernamen taman kavan pro:ksi.
-     * @param username pro
+    /**
+     * Asettaa argumenttina annetun <code>username</code>:n
+     * kanavan ammattilaiseksi.
+     *
+     * @param username Ammattilaisen kayttajanimi.
      */
-    public final void setAssignedPro(
-            final String username
-    ) {
+    public synchronized void setAssignedPro(final String username) {
         assignedPro = username;
+    }
+
+    /**
+     * Tarkistaa onko kanava aktiivinen vai suljettu.
+     *
+     * @return <code>true</code>, jos kanava on aktiivien, <code>false</code>
+     * jos kanava on suljettu.
+     */
+    public synchronized boolean isActive() {
+        return this.active;
+    }
+
+    /**
+     * Sulkee kanavan ja tiedottaa osallisille.
+     */
+    public synchronized void setInactive() {
+        this.active = false;
+    }
+
+    /**
+     * Lisaa parametrina annetun userId:n historiallisen kayttajien listalle.
+     * Tarkoitettu kaytettavaksi, kun vanhoja kanavia ladataan muistiin
+     * ja halutaan tietaa, kenella on oikeus niiden lokeihin.
+     * @param userId userId
+     */
+    public synchronized void addHistoricUserId(final String userId) {
+        historicUserIds.add(userId);
     }
 }

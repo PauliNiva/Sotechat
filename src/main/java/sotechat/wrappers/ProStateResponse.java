@@ -2,86 +2,111 @@ package sotechat.wrappers;
 
 import sotechat.data.Session;
 
-import static sotechat.config.StaticVariables.QUEUE_BROADCAST_CHANNEL;
-
-/** Luokan tarkoitus on auttaa JSONin paketoinnissa,
- * kun "ammattilaiskayttajalle" kerrotaan state.
+/**
+ * Luokka auttamaan <code>JSON</code>:in paketoinnissa,
+ * kun "ammattilaiskayttajalle" kerrotaan tila.
  */
 public class ProStateResponse {
 
-    /** Aina "pro". */
+    /**
+     * Ammattilaiskayttajan tila, joka on aina "pro".
+     */
     private String state;
 
-    /** Julkinen kayttajanimi. */
+    /**
+     * Julkinen kayttajanimi.
+     */
     private String username;
 
-    /** Salainen kayttajaID. */
+    /**
+     * Salainen kayttajatunnus.
+     */
     private String userId;
 
-    /** WebSocket-osoite, johon subscribaamalla saa jonon paivitykset. */
-    private String QBCC;
+    /**
+     * <code>WebSocket</code>-osoite, jonka tilaamalla saa jonon paivitykset.
+     */
+    final private String QBCC;
 
-    /** Onko kayttaja merkinnyt itsensa paikallaolevaksi.
-     * "true" tai "false" Stringina JSON paketointia varten. */
+    /**
+     * Onko kayttaja merkinnyt itsensa paikallaolevaksi. Arvona on joko
+     * <code>true</code> tai <code>false</code>.
+     */
     private String online;
 
-    /** Salainen kanavaID. */
+    /**
+     * Salainen kanavatunnus.
+     */
     private String channelIds;
 
-    /** Konstruktori asettaa arvoiksi staattisia arvoja
-     * seka session-oliosta kaivettuja arvoja.
-     * @param session oma session-olio
+    /**
+     * Konstruktori asettaa arvoiksi staattisia arvoja seka
+     * <code>Session</code>-oliosta saatuja arvoja.
+     *
+     * @param session Ammattilaisen <code>Session</code>-olio.
      */
-    public ProStateResponse(
-            final Session session
-    ) {
+    public ProStateResponse(final Session session) {
         this.state = "pro";
         this.username = session.get("username");
         this.userId = session.get("userId");
-        this.QBCC = QUEUE_BROADCAST_CHANNEL;
-        this.online = "true"; //TODO: session.get("online");
+        this.QBCC = "QBCC";
+        this.online = session.get("online");
         this.channelIds = session.get("channelIds");
     }
 
-    /** Antaa tilan.
-     * @return state.
+    /**
+     * Palauttaa ammattilaisen tilan.
+     *
+     * @return Ammattilainsen tila.
      */
     public final String getState() {
         return this.state;
     }
 
-    /** Palauttaa julkisen kayttajanimen.
-     * @return Palauttaa julkisen kayttajanimen.
+    /**
+     * Palauttaa julkisen kayttajanimen.
+     *
+     * @return Julkinen kayttajanimi.
      */
     public final String getUsername() {
         return this.username;
     }
 
-    /** Palauttaa salaisen kayttajaID:n.
-     * @return Palauttaa salaisen kayttajaID:n.
+    /**
+     * Palauttaa salaisen kayttajatunnuksen.
+     *
+     * @return Salainen kayttajatunnus.
      */
     public final String getUserId() {
         return this.userId;
     }
 
-    /** Palauttaa kategorian, esim "mielenterveys".
-     * @return Palauttaa kategorian.
+    /**
+     * Palauttaa aihealueen.
+     *
+     * @return Aihealue.
      */
     public final String getQBCC() {
         return this.QBCC;
     }
 
-    /** getteri online-statukselle.
-     * @return "true" tai "false".
+    /**
+     * Hakee tiedon siitä onko kayttaja merkinnyt itsensa paikalla olevaksi
+     * vai ei.
+     *
+     * @return <code>true</code> jos paikalla ja <code>false</code> jos taas ei.
      */
     public final String getOnline() {
         return this.online;
     }
 
-    /** Palauttaa salaisen kanavaID:n.
-     * @return Palauttaa salaisen kanavaID:n.
+    /**
+     * Palauttaa salaisen kanavatunnuksen.
+     *
+     * @return Salainen kanavatunnus.
      */
     public final String getChannelIds() {
         return this.channelIds;
     }
+
 }

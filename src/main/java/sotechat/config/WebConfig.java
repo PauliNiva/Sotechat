@@ -6,13 +6,15 @@ import org.springframework.web.servlet.config.annotation.
 import org.springframework.web.servlet.config.annotation.
         WebMvcConfigurerAdapter;
 
-/** Maarittelee Springille fronttipuolen tiedostopolun.
+/**
+ * Maarittelee kayttoliittyman tiedostopolun.
  */
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
 
-    /** Maarittelee, etta /resources/ pyyntoihin haetaan
-     *  tiedostot todellisesta polusta /webapp/. */
+    /**
+     * Staattisten resurssien polku /webapp/.
+     */
     @Override
     public final void addResourceHandlers(final ResourceHandlerRegistry reg) {
         reg.addResourceHandler("/resources/**")

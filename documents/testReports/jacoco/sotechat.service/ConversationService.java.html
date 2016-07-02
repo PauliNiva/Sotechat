@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ConversationService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.service</a> &gt; <span class="el_source">ConversationService.java</span></div><h1>ConversationService.java</h1><pre class="source lang-java linenums">package sotechat.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import sotechat.domain.Conversation;
+import sotechat.domain.Message;
+import sotechat.domain.Person;
+import sotechat.repo.ConversationRepo;
+import sotechat.repo.MessageRepo;
+
+import java.util.List;
+
+/**
+ * Luokka tietokannassa olevien keskustelujen hallinnoimiseen.
+ * (CRUD -operaatiot)
+ */
+@Service
+<span class="fc" id="L20">public class ConversationService {</span>
+
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Message-luokan olioita.
+     */
+    @Autowired
+    private MessageRepo messageRepo;
+
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Conversation-luokan olioita.
+     */
+    @Autowired
+    private ConversationRepo conversationRepo;
+
+    /**
+     * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
+     * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
+     * keskusteluun parametrina annettu viesti.
+     *
+     * @param conv lisattava keskustelu
+     * @throws Exception Poikkeus, joka heitetaan jos tietokantaan tallettaminen
+     * epaonnistuu.
+     */
+    @Transactional
+    public void addConversation(final Conversation conv)
+            throws Exception {
+<span class="fc" id="L48">            conversationRepo.save(conv);</span>
+<span class="fc" id="L49">    }</span>
+
+    /**
+     * Lisaa parametrina annettua kanavaid:ta vastaavaan keskusteluun
+     * parametrina annetun Person luokan olion. Henkilo lisataan Keskustelun
+     * henkiloihin.
+     * 
+     * @param person Person luokan oli, joka halutaan lisata keskusteluun
+     * @param channelId keskustelun kanavan id
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
+     */
+    @Transactional
+    public void addPerson(final Person person, final String channelId)
+            throws Exception {
+<span class="fc" id="L64">                Conversation conv = conversationRepo.findOne(channelId);</span>
+<span class="fc" id="L65">                conv.addPersonToConversation(person);</span>
+<span class="fc" id="L66">                conversationRepo.save(conv);</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Liittaa parametrina annettulla kanavaid:lla tietokannasta loytyvan
+     * keskustelun kategoriaksi parametrina annetun aihealueen.
+     *
+     * @param category keskustelun aihealue
+     * @param channelId keskustelun kanavan id
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
+     */
+    @Transactional
+    public void setCategory(final String category, final String channelId)
+            throws Exception {
+<span class="fc" id="L81">            Conversation conv = conversationRepo.findOne(channelId);</span>
+<span class="fc" id="L82">            conv.setCategory(category);</span>
+<span class="fc" id="L83">            conversationRepo.save(conv);</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * Lisaa parametrina annetun Message-luokan olion parametrina annetun
+     * Conversation-olion listaan, ts. liittaa viestin keskusteluun.
+     * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
+     * ensin, ja kun viesti lisataan keskusteluun, viestia ei lisata kahteen
+     * kertaan.
+     *
+     * @param message Message-luokan olio, jossa on kayttajan viesti
+     * @param conv Conversation-luokan oli, joka edustaa keskustelua, johon
+     *             viesti liittyy
+     * @return Palauttaa keskusteluun lisatyn viestin Message-oliona.
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
+     */
+    @Transactional
+    public Message addMessage(final Message message, final Conversation conv)
+            throws Exception {
+<span class="fc" id="L103">            message.setConversation(conv);</span>
+<span class="fc" id="L104">            Message messageToBeAddedToConversation = messageRepo.save(message);</span>
+<span class="fc" id="L105">            conv.addMessageToConversation(messageToBeAddedToConversation);</span>
+<span class="fc" id="L106">            conversationRepo.save(conv);</span>
+<span class="fc" id="L107">            return messageToBeAddedToConversation;</span>
+    }
+
+    /**
+     * Poistaa keskustelusta viestin.
+     *
+     * @param message Viesti joka halutaan poistaa (taytyy etsia ensin
+     *                messageServicesta)
+     */
+    @Transactional
+    public void removeMessage(final Message message) {
+<span class="fc" id="L118">        String channelId = message.getConversation().getChannelId();</span>
+<span class="fc" id="L119">        Conversation conv = conversationRepo.findOne(channelId);</span>
+<span class="fc" id="L120">        conv.getMessagesOfConversation().remove(message);</span>
+<span class="fc" id="L121">        conversationRepo.save(conv);</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * Poistaa keskustelun tietokannasta.
+     *
+     * @param channelId keskustelun kanavan id
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
+     */
+    @Transactional
+    public void removeConversation(final String channelId) throws Exception {
+<span class="fc" id="L133">        conversationRepo.delete(channelId);</span>
+<span class="fc" id="L134">    }</span>
+
+    /**
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
+     *
+     * @param channelId haetun keskustelun kanavaid
+     * @return Conversation olio, jolla pyydetty kanavaid
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
+     */
+    @Transactional
+    public Conversation getConversation(final String channelId)
+            throws Exception {
+<span class="fc" id="L147">        return conversationRepo.findOne(channelId);</span>
+    }
+
+    /**
+     * Palauttaa listan kaikista tietokannan keskusteluista.
+     *
+     * @return lista Conversation-olioista
+     */
+    @Transactional
+    public List&lt;Conversation&gt; findAll() {
+<span class="fc" id="L157">        return conversationRepo.findAll();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,3 +1,6 @@
+/**
+ * Lahettaa palvelimelle kirjautumisen ja tarkistaa sen tilan palvelimelta.
+ */
 angular.module('chatProApp')
     .factory('auth', function ($rootScope, $http) {
         var authenticated = false;

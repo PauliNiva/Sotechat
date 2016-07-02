@@ -1,6 +1,6 @@
 /**
- * Luodaan chatWindow templatea käyttäen erilliset komponentit clientille
- * Ja ammattilaiselle
+ * Luodaan chatWindow templatea kayttaen erilliset komponentit clientille,
+ * kuten myos ammattilaiselle.
  */
 angular.module('chatApp').component('chatWindowComponent', {
     templateUrl: 'chatWindow/chatWindow.tpl.html',
@@ -11,7 +11,7 @@ angular.module('chatProApp').component('proChatWindowComponent', {
     templateUrl: 'chatWindow/chatWindow.tpl.html',
     controller: 'proChatController',
     bindings: {
-        channel: '@', //Välitetään kanavan ID controllerille
-        chatend: '&'
+        channel: '@',
+        chatend: '&'  
     }
 });

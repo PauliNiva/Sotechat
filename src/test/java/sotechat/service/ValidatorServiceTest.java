@@ -11,6 +11,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.NativeMessageHeaderAccessor;
 import sotechat.data.Channel;
 import sotechat.data.Mapper;
+import sotechat.data.MapperImpl;
 import sotechat.data.SessionRepo;
 import sotechat.util.MockHttpServletRequest;
 import sotechat.util.MockPrincipal;
@@ -40,10 +41,13 @@ public class ValidatorServiceTest {
     User proA;
     User proB;
 
+    /**
+     * Ennen jokaista testia.
+     */
     @Before
     public void setUp() {
         /* Testattavan luokan tarvitsemat riippuvuudet. */
-        mapper = new Mapper();
+        mapper = new MapperImpl();
         sessionRepo = new SessionRepo(mapper);
 
         /** Testattava luokka. */
@@ -56,11 +60,11 @@ public class ValidatorServiceTest {
         chanD = mapper.createChannel();
 
         /* Alustetaan keskustelijoita. */
+        proA = createProUser("ProA");
+        proB = createProUser("ProB");
         clientA = createRegUser("Henri");
         clientB = createRegUser("Mikko");
         clientC = createRegUser("Pekka");
-        proA = createProUser("ProA");
-        proB = createProUser("ProB");
 
         /* Kanavalla A keskustelee ClientA ja ProA */
         chanA.allowParticipation(clientA.session);
@@ -80,9 +84,7 @@ public class ValidatorServiceTest {
     }
 
     /**
-     *  Testataan, etta kelvollinen pyynto aktiivisen
-     *  kanavan lokeihin validoituu. Validoitu pyynto
-     *  palauttaa tyhjan Stringin, virheellinen virheilmon.
+     *  Testataan kelvollinen pyynto aktiivisen kanavan lokeihin.
      */
     @Test
     public void logReqValidationActiveChatTest() {
@@ -91,8 +93,7 @@ public class ValidatorServiceTest {
     }
 
     /**
-     *  Testataan, etta lokienhakupyynto validoituu
-     *  myos kanaviin, joilta hoitaja on poistunut.
+     *  Testataan kelvollinen pyynto vanhan kanavan lokeihin.
      */
     @Test
     public void logReqValidationHistoricChatTest() {
@@ -141,7 +142,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void logReqValidationFailsInvalidSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateLogRequest(proA, chanA));
     }
 
@@ -186,7 +187,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void messageValidationFailsWithInvalidSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateMsg(clientA, chanA));
         assertFail(validateMsg(proA, chanA));
     }
@@ -272,7 +273,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void subscriptionValidationFailWithoutProperSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateSubscription(proB, "queue", chanB));
         assertFail(validateSubscription(proB, "chat", chanB));
         assertFail(validateSubscription(clientB, "queue", chanB));
@@ -381,7 +382,7 @@ public class ValidatorServiceTest {
      */
     @Test
     public void leaveValidationFailWithBadSessionTest() {
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         assertFail(validateLeave(proA, chanA));
     }
 

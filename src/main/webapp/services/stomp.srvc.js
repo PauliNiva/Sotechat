@@ -1,12 +1,14 @@
-/** Service hoitaa tietoliikenteen
- *  (over STOMP over Websockets over TCP/IP) */
+/** 
+ * Service hoitaa tietoliikenteen
+ * (over STOMP over Websockets over TCP/IP) .
+ */
 angular.module('commonMod')
     .factory('stompSocket', ['$rootScope', function ($rootScope) {
         var stompClient;
 
         function init(url) {
             stompClient = Stomp.over(new SockJS(url));
-        };
+        }
 
          function connect(successCallback, errorCallback) {
             stompClient.connect({}, function (frame) {
@@ -18,7 +20,7 @@ angular.module('commonMod')
                     errorCallback(error);
                 });
             });
-        };
+        }
 
         function subscribe(destination, callback) {
            return stompClient.subscribe(destination, function (message) {
@@ -26,12 +28,12 @@ angular.module('commonMod')
                     callback(message);
                 });
             });
-        };
+        }
         
 
         function send(destination, headers, object) {
             stompClient.send(destination, headers, object);
-        };
+        }
 
         var socket = {
             init: init,

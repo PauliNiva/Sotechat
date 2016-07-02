@@ -1,6 +1,7 @@
 package sotechat.wrappers;
 
-/** Palvelimen asiakasohjelmalle lahettama viesti on talletettu
+/**
+ * Palvelimen asiakasohjelmalle lahettama viesti on talletettu
  * MsgToClient-olioon. Olion sisalto muokataan JSON-muotoon
  * Jackson-kirjaston avulla ennen kuin asiakasohjelma saa viestin.
  *
@@ -10,32 +11,44 @@ package sotechat.wrappers;
  */
 public class  MsgToClient implements Comparable<MsgToClient> {
 
-    /** Viestin ID. */
+    /**
+     * Viestin Id.
+     */
     private String messageId;
-    /** Julkinen nimimerkki, kuten "Anon" tai "Hoitaja Anne". */
+
+    /**
+     * Julkinen kayttajanimi.
+     */
     private String username;
-    /** Salainen avain kanavan kuunteluun ja viestien lahettamiseen. */
+
+    /**
+     * Salainen kanavatunnus.
+     */
     private String channelId;
-    /** Serverin aika viestin saapumiselle
-     *  erityisessa muodossa AngularJS varten. */
+
+    /**
+     * Aikaleima. Arvoksi annetaan aika jolloin viesti saapuu palvelimelle.
+     * Leiman muotona on <code>String</code> Angularia varten.
+     */
     private String timeStamp;
-    /** Viestin sisalto. */
+
+    /**
+     * Viestin sisalto.
+     */
     private String content;
 
-    /** Konstruktori alustaa olion annetuilla parametreilla.
-     * @param pMessageId messageId
-     * @param pUsername username
-     * @param pChannelId channelId
-     * @param pTimeStamp timeStamp
-     * @param pContent content
+    /**
+     * Konstruktori alustaa olion annetuilla parametreilla.
+     *
+     * @param pMessageId Viestin Id.
+     * @param pUsername KayttajaNimi.
+     * @param pChannelId Kanavatunnus.
+     * @param pTimeStamp Aikaleima.
+     * @param pContent Viestin sisalto.
      */
-    public MsgToClient(
-            final String pMessageId,
-            final String pUsername,
-            final String pChannelId,
-            final String pTimeStamp,
-            final String pContent
-    ) {
+    public MsgToClient(final String pMessageId, final String pUsername,
+                       final String pChannelId, final String pTimeStamp,
+                       final String pContent) {
         this.messageId = pMessageId;
         this.username = pUsername;
         this.channelId = pChannelId;
@@ -43,53 +56,84 @@ public class  MsgToClient implements Comparable<MsgToClient> {
         this.content = pContent;
     }
 
-    /** Palauttaa viestin Id:n.
-     * @return Palauttaa viestin id:n.
+    /**
+     * Palauttaa viestin Id:n.
+     *
+     * @return Viestin Id.
      */
     public final String getMessageId() {
         return this.messageId;
     }
 
-    /** Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
-     * @return Palauttaa julkisen nimimerkin, kuten "Anon" tai "Hoitaja Anne".
+    /**
+     * Palauttaa kayttajanimen.
+     *
+     * @return Kayttajanimi.
      */
     public final String getUsername() {
         return this.username;
     }
 
-    /** Palauttaa salaisen avaimen, jolla kanavaa voi kuunnella + viestittaa.
-     * @return Palauttaa salaisen avaimen.
+    /**
+     * Palauttaa kanavatunnuksen, jolla kanavaa voi kuunnella ja sinne voi
+     * lahettaa viesteja.
+     *
+     * @return Kanavatunnus.
      */
     public final String getChannelId() {
         return this.channelId;
     }
 
-    /** Palauttaa ajan viestin saapumiselle (serverin ajassa).
-     * @return Palauttaa ajan viestin saapumiselle (serverin ajassa).
+    /**
+     * Palauttaa aikaleiman.
+     *
+     * @return Aikaleima.
      */
     public final String getTimeStamp() {
         return this.timeStamp;
     }
 
-    /** Palauttaa viestin sisallon.
-     * @return Palauttaa viestin sisallon.
+    /**
+     * Palauttaa viestin sisallon.
+     *
+     * @return Viestin sisalto.
      */
     public final String getContent() {
         return this.content;
     }
 
     /**
-     * Vertaa oliota parametrina annettuun toiseen MsgToClient olioon ja
-     * palauttaa -1 jos, parametrina annetun olion timeStamp on isompi kuin
-     * taman olion, 1 jos pienempi ja 0 jos ne ovat samaa suuruiset.
-     * @param other MsgToClient olio johon verrataan
-     * @return -1, 1 tai 0
+     * Vertaa oliota argumenttina annettuun toiseen
+     * <code>MsgToClient</code>-olioon.
+     *
+     * @param other <code>MsgToClient</code>-olio johon verrataan.
+     * @return palauttaa luvun -1 jos argumenttina
+     * annetun olion <code>timeStamp</code> on suurempi. Jos
+     * <code>timeStamp</code> on pienempi palauttaa luvun 1 ja jos ne ovat
+     * yhtäsuuret, niin palautetaan 0.
      */
-    public final int compareTo(MsgToClient other) {
+    public final int compareTo(final MsgToClient other) {
         int thistime = Integer.parseInt(this.timeStamp);
         int othertime = Integer.parseInt(other.getTimeStamp());
-        if(thistime<othertime) return -1;
-        else if(othertime<thistime) return 1;
-        else return 0;
+        if (thistime < othertime) {
+            return -1;
+        } else if (othertime < thistime) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
+
+    /**
+     * Muodostaa <code>MsgToClient</code>-oliosta <code>String</code> esityksen.
+     *
+     * @return <code>MsgToClient</code>-olio merkkijonona.
+     */
+    @Override
+    public String toString() {
+        return "MessageID " + messageId + ", username " + username + ", "
+                + channelId + ", timeStamp " + timeStamp + ", content "
+                + content;
+    }
+
 }

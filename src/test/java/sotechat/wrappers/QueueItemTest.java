@@ -31,4 +31,10 @@ public class QueueItemTest {
 
     }
 
+    @Test
+    public void toStringTest() {
+        String expected = "{\"channelId\": \"444\", \"category\": \"mielenterveys\", \"username\": \"Anon\"}";
+        Assert.assertEquals(expected, item.toString());
+    }
+
 }

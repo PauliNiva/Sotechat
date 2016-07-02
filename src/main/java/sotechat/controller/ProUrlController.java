@@ -3,12 +3,14 @@ package sotechat.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** Uudelleenohjaus polkuun /pro.
+/**
+ * Uudelleenohjaus polkuun "/pro".
  */
 @Controller
 public class ProUrlController {
 
-    /** Uudelleenohjaus /pro to /proCp.html .
+    /**
+     * Uudelleenohjaus polun "/pro" polkuun "/proCp.html".
      * @return proCP.html
      */
     @RequestMapping(value = "/pro")
@@ -17,7 +19,7 @@ public class ProUrlController {
     }
 
     /**
-     * Uudelleenohjaa /login to /pro
+     * Uudelleenohjaa polun "/login" polkuun "/pro".
      * @return /pro
      */
     @RequestMapping(value = "/login")

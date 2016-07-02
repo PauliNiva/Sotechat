@@ -44,12 +44,14 @@ public class refreshingSiteIT {
      */
     @Test
     public void UserSeesOtherPeopleMessages() {
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User has accessed queue
         waitAndFillInformation(userWait);
         waitQueueWindowsAppear(userWait);
 
         // Professional has logged in & next in line button
-        proLogin(proWait);
+
         waitAndPickFromQueue(proWait);
         // The other person sends a message
         sendMessageChatWindow(proWait,"Can you see this message?");

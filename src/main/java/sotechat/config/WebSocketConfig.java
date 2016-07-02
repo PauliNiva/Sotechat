@@ -13,71 +13,74 @@ import org.springframework.session.web.socket.config
 import org.springframework.web
         .socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+
 import sotechat.controller.SubscriptionInterceptor;
 import sotechat.data.SessionRepo;
 import sotechat.service.ValidatorService;
 
 
-/** Palvelin kasittelee kahta erityyppista liikennetta: HTML ja WebSockets.
- * Tama konfiguraatioluokka koskee WebSocket-liikenteen kasittelya.
- * Maaritellaan polut, joihin tulevat/menevat viestit
- * kasitellaan - ja muihin polkuihin menevat viestit unohdetaan.
- * Lisaksi ohjataan subscriptionien hyvaksyminen interceptorille. */
+/**
+ * <code>WebSocket</code>-liikenteen asetukset.
+ * Maarittelee sallitut polut liikenteelle ja
+ * ohjaa tilausten hyvaksymisen <code>Interceptor</code>-oliolle.
+ */
 @Configuration
 @EnableScheduling
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends
         AbstractSessionWebSocketMessageBrokerConfigurer<ExpiringSession> {
 
-    /** SessionRepoImpl taytyy autowireaa tassa, jotta WebSocket-sessiot
-     * onnistutaan sailomaan sinne. */
+    /**
+     * Sailo erilaisille <code>Session</code>-olioille.
+     * HUOMAUTUS <code>@Autowired</code>-notaatio ja luokkamuuttuja ovat
+     * pakollisia tassa.
+     */
     @Autowired
     private SessionRepo repository;
 
-    /** ValidatorService taytyy autowireaa tassa, jotta se voidaan antaa
-     * parametrina luotavalle Interceptorille, joka on pakko maaritella tassa.*/
+    /**
+     * <code>ValidatorService</code>-olio.
+     */
     @Autowired
     private ValidatorService validatorSer;
 
+    /**
+     * Olio, joka "kuuntelee" WebSocket-yhteyden kautta tapahtuvia kanaville
+     * tehtyja listautumispyyntoja. //TODO fix
+     */
     @Autowired
     private ApplicationListener<ApplicationEvent> subscribeEventListener;
 
 
-    /** Metodi kayttaa MessageBrokerRegistry-luokan metodia enableSimpleBroker
-     * valittaakseen WebSocketin kautta asiakasohjelmalle viestin palvelimelta.
+    /**
+     * Maarittelee sallitut polut <code>client</code>:in suuntaan.
      *
-     * @param conf Valittajaolio, joka valittaa viestit WebSocketin kautta
-     *               palvelimen ChatController-luokalta asiakasohjelmalle.
+     * @param conf <code>MessageBrokerRegistry</code>-olio.
      */
     @Override
     public final void configureMessageBroker(
-            final MessageBrokerRegistry conf
-    ) {
+            final MessageBrokerRegistry conf) {
         conf.enableSimpleBroker("/toClient");
     }
 
-    /** Metodi kayttaa StompEndpointRegistry-luokan metodia addEndpoint
-     * maarittaakseen asiakasohjelmalta WebSocketin kautta tulleille viesteille
-     * paateosoitteen.
+    /**
+     * Maarittelee sallitut polut <code>server</code>:in suuntaan.
      *
-     * @param reg Luokka, joka maarittaa WebSocketin kautta tulleille
-     *                 asiakasohjelmien viesteille paateosoitteen.
+     * @param reg <code>StompEndpointRegistry</code>-olio.
      */
     @Override
-    public final void configureStompEndpoints(
-            final StompEndpointRegistry reg
-    ) {
+    public final void configureStompEndpoints(final StompEndpointRegistry reg) {
         reg.addEndpoint("/toServer").withSockJS();
     }
 
-    /** Subscriptionien hyvaksyminen ohjataan Interceptor -instanssille.
-     * @param registration registration
+    /**
+     * Tilausten hyvaksyminen siirretaan <code>Interceptor</code>-oliolle.
+     *
+     * @param registration <code>ChannelRegistration</code>-olio.
      */
     @Override
     public void configureClientInboundChannel(
-            final ChannelRegistration registration
-    ) {
+            final ChannelRegistration registration) {
         registration.setInterceptors(new SubscriptionInterceptor(validatorSer));
     }
 }
-

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ProStateResponse.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.wrappers</a> &gt; <span class="el_source">ProStateResponse.java</span></div><h1>ProStateResponse.java</h1><pre class="source lang-java linenums">package sotechat.wrappers;
+
+import sotechat.data.Session;
+
+/**
+ * Luokka auttamaan &lt;code&gt;JSON&lt;/code&gt;:in paketoinnissa,
+ * kun &quot;ammattilaiskayttajalle&quot; kerrotaan tila.
+ */
+public class ProStateResponse {
+
+    /**
+     * Ammattilaiskayttajan tila, joka on aina &quot;pro&quot;.
+     */
+    private String state;
+
+    /**
+     * Julkinen kayttajanimi.
+     */
+    private String username;
+
+    /**
+     * Salainen kayttajatunnus.
+     */
+    private String userId;
+
+    /**
+     * &lt;code&gt;WebSocket&lt;/code&gt;-osoite, jonka tilaamalla saa jonon paivitykset.
+     */
+    private String QBCC;
+
+    /**
+     * Onko kayttaja merkinnyt itsensa paikallaolevaksi. Arvona on joko
+     * &lt;code&gt;true&lt;/code&gt; tai &lt;code&gt;false&lt;/code&gt;.
+     */
+    private String online;
+
+    /**
+     * Salainen kanavatunnus.
+     */
+    private String channelIds;
+
+    /**
+     * Konstruktori asettaa arvoiksi staattisia arvoja seka
+     * &lt;code&gt;Session&lt;/code&gt;-oliosta saatuja arvoja.
+     *
+     * @param session Ammattilaisen &lt;code&gt;Session&lt;/code&gt;-olio.
+     */
+<span class="fc" id="L48">    public ProStateResponse(final Session session) {</span>
+<span class="fc" id="L49">        this.state = &quot;pro&quot;;</span>
+<span class="fc" id="L50">        this.username = session.get(&quot;username&quot;);</span>
+<span class="fc" id="L51">        this.userId = session.get(&quot;userId&quot;);</span>
+<span class="fc" id="L52">        this.QBCC = &quot;QBCC&quot;;</span>
+<span class="fc" id="L53">        this.online = session.get(&quot;online&quot;);</span>
+<span class="fc" id="L54">        this.channelIds = session.get(&quot;channelIds&quot;);</span>
+<span class="fc" id="L55">    }</span>
+
+    /**
+     * Palauttaa ammattilaisen tilan.
+     *
+     * @return Ammattilainsen tila.
+     */
+    public final String getState() {
+<span class="fc" id="L63">        return this.state;</span>
+    }
+
+    /**
+     * Palauttaa julkisen kayttajanimen.
+     *
+     * @return Julkinen kayttajanimi.
+     */
+    public final String getUsername() {
+<span class="fc" id="L72">        return this.username;</span>
+    }
+
+    /**
+     * Palauttaa salaisen kayttajatunnuksen.
+     *
+     * @return Salainen kayttajatunnus.
+     */
+    public final String getUserId() {
+<span class="fc" id="L81">        return this.userId;</span>
+    }
+
+    /**
+     * Palauttaa aihealueen.
+     *
+     * @return Aihealue.
+     */
+    public final String getQBCC() {
+<span class="fc" id="L90">        return this.QBCC;</span>
+    }
+
+    /**
+     * Hakee tiedon siitä onko kayttaja merkinnyt itsensa paikalla olevaksi
+     * vai ei.
+     *
+     * @return &lt;code&gt;true&lt;/code&gt; jos paikalla ja &lt;code&gt;false&lt;/code&gt; jos taas ei.
+     */
+    public final String getOnline() {
+<span class="fc" id="L100">        return this.online;</span>
+    }
+
+    /**
+     * Palauttaa salaisen kanavatunnuksen.
+     *
+     * @return Salainen kanavatunnus.
+     */
+    public final String getChannelIds() {
+<span class="fc" id="L109">        return this.channelIds;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

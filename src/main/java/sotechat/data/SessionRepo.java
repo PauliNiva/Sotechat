@@ -3,117 +3,158 @@ package sotechat.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 
-/** Hoitaa Session-olioihin liittyvan kasittelyn.
+/**
+ * Hoitaa Session-olioihin liittyvan kasittelyn.
  * esim. paivittaa session-attribuutteihin nimimerkin.
  */
 @Component
 public class SessionRepo extends MapSessionRepository {
 
-    /** Avain sessio-ID, arvo Sessio-olio.
-     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon! */
+    /**
+     * Avain sessio-ID, arvo Sessio-olio.
+     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon!
+     */
     private HashMap<String, Session> sessionsBySessionId;
 
-    /** Avain userId, arvo Sessio-olio. */
+    /**
+     * Avain userId, arvo Sessio-olio.
+     */
     private HashMap<String, Session> sessionsByUserId;
 
-    /** Avain proUsername, arvo Sessio-olio.
-     * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja*/
+    /**
+     * Avain proUsername, arvo Sessio-olio.
+     * Tehty toteuttamaan hoitajan kayttotapaus: logout->login->jatka chatteja
+     */
     private HashMap<String, Session> proUserSessions;
 
-    /** Mapper. */
-    private final Mapper mapper;
+    /**
+     * Lukumaara kirjautuneita ammattilaisia, jotka ovat valmiita
+     * vastaanottamaan uusia asiakkaita. Liittyy chatin sulkemiseen.
+     */
+    private int countOfProsAcceptingNewCustomers;
 
-    /** Konstruktori.
-     * @param pMapper mapperi.
+    /**
+     * Mapper.
+     */
+    private Mapper mapper;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pMapper p.
      */
     @Autowired
-    public SessionRepo(
-            final Mapper pMapper
-    ) {
+    public SessionRepo(final Mapper pMapper) {
+        this.mapper = pMapper;
+        initialize();
+    }
+
+    /**
+     * Alustaminen, jota kutsutaan seka olion
+     * luonnissa etta sessioiden unohtamisessa.
+     * */
+    private void initialize() {
         this.sessionsBySessionId = new HashMap<>();
         this.sessionsByUserId = new HashMap<>();
         this.proUserSessions = new HashMap<>();
-        this.mapper = pMapper;
+        this.countOfProsAcceptingNewCustomers = 0;
     }
 
-    /** Kaivaa sessionId:lla session-olion.
-     * @param sessionId sessionId
-     * @return sesson-olio
+    /**
+     * Kaivaa sessionId:lla session-olion.
+     *
+     * @param sessionId SessionId.
+     * @return Session-olio.
      */
     public synchronized Session getSessionFromSessionId(
-            final String sessionId
-    ) {
+            final String sessionId) {
         return sessionsBySessionId.get(sessionId);
     }
 
-    public final synchronized Session getSessionFromUserId(
-            final String userId
-    ) {
+    /**
+     * Kaivaa session-olion userId:lla.
+     *
+     * @param userId Kayttajan userId
+     * @return SessionReposta userId:lla haettu session.
+     */
+    public synchronized Session getSessionFromUserId(final String userId) {
         return sessionsByUserId.get(userId);
     }
 
-    /** Kanavalta poistuminen. Kutsutaan tapauksissa:
+    /**
+     * Kanavalta poistuminen. Kutsutaan tapauksissa:
      * - Kun keskustelija painaa nappia "Poistu"
      * - Kun keskustelija on kadonnut eika tule takaisin pian (timeout)
-     * @param channelId p
-     * @param sessionId p
+     * - Kun admin poistaa ammattilaiskayttajan, jolla on aktiivisia kanavia.
+     * @param channelId p.
+     * @param sessionId p.
      */
-    public synchronized void leaveChannel(
-            final String channelId,
-            final String sessionId
-    ) {
+    public synchronized void leaveChannel(final String channelId,
+                                          final String sessionId) {
         Session session = getSessionFromSessionId(sessionId);
         session.removeChannel(channelId);
+        updateCountOfProsAcceptingNewCustomers();
         Channel channel = mapper.getChannel(channelId);
+        disableChannel(channel);
+        channel.removeSubscriber(session);
+        channel.removeActiveUserId(session.get("userId"));
+    }
+
+    /**
+     * Asettaa kanavan epaaktiiviseksi.
+     *
+     * @param channel Kanava, joka asetaetaan.
+     */
+    public void disableChannel(final Channel channel) {
+        channel.setInactive();
         for (String someUserId : channel.getActiveUserIds()) {
             Session someSession = getSessionFromUserId(someUserId);
             String someSessionId = someSession.get("sessionId");
             if (!someSession.isPro()) {
-                /** Jos kukaan lahtee kanavalta, jolla on normikayttajia,
+                /* Jos kukaan lahtee kanavalta, jolla on normikayttajia,
                  * unohdetaan normikayttajien sessiot. */
                 sessionsByUserId.remove(someUserId);
                 sessionsBySessionId.remove(someSessionId);
             }
         }
-        channel.removeSubscriber(session);
-        channel.removeActiveUserId(session.get("userId"));
     }
 
-    /** Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
+
+    /**
+     * Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
      *      - Paivittaa mappayksia "sessioId liittyy tahan sessio-olioon" yms.
      *      - Paivittaa sessio-olion attribuutteja
-     * @param req taalta saadaan Http Session Id
-     * @param professional taalta saadaan kirjautumistiedot, voi olla null
-     * @return Session-olio
+     *
+     * @param req taalta saadaan Http Session Id.
+     * @param professional taalta saadaan kirjautumistiedot, voi olla null.
+     * @return Session-olio.
      */
-    public synchronized Session updateSession(
-            final HttpServletRequest req,
-            final Principal professional
-    ) {
+    public synchronized Session updateSession(final HttpServletRequest req,
+                                              final Principal professional) {
         String sessionId = req.getSession().getId();
 
-        /** Paivityslogiikka jaettu kahteen metodiin, alla kutsut. */
         Session session = updateSessionObjectMapping(sessionId, professional);
         updateSessionAttributes(session, professional);
         session.set("sessionId", sessionId);
+        updateCountOfProsAcceptingNewCustomers();
 
         return session;
     }
 
-    /** Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+    /**
+     * Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+     *
      * @param session session-olio
      * @param professional kirjautumistiedot, saa olla null
      */
-    public final void updateSessionAttributes(
-            final Session session,
-            final Principal professional
-    ) {
-
-        /** Kaivetaan username ja id sessio-attribuuteista. */
+    public void updateSessionAttributes(final Session session,
+                                        final Principal professional) {
+        /* Kaivetaan username ja id sessio-attribuuteista. */
         String username = session.get("username");
         String userId = session.get("userId");
 
@@ -137,39 +178,48 @@ public class SessionRepo extends MapSessionRepository {
             channel.allowParticipation(session);
         }
 
-        /** Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
+        if (chatClosed() && session.get("state").equals("start")) {
+            /* Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
+            session.set("state", "closed");
+        } else if (!chatClosed() && session.get("state").equals("closed")) {
+            /* Chat oli joskus suljettu, mutta nyt se on avattu. */
+            session.set("state", "start");
+        }
+
+        /* Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
         sessionsByUserId.put(userId, session);
     }
 
-    /** Paivittaa mappayksia kuten "sessioId liittyy tahan sessio-olioon".
+    /**
+     * Paivittaa mappayksia kuten "sessioId liittyy tahan sessio-olioon".
+     *
      * @param sessionId sessioId
      * @param professional autentikaatiotiedot, voi olla null
      * @return sessio-olio
      */
-    private Session updateSessionObjectMapping(
-            final String sessionId,
-            final Principal professional
-    ) {
+    private Session updateSessionObjectMapping(final String sessionId,
+                                               final Principal professional) {
         Session session = sessionsBySessionId.get(sessionId);
         if (session != null) {
-            /** Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
+            /* Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
             return session;
         }
 
         if (professional != null) {
-            /** Onko hoitajalla olemassaoleva vanha sessio? */
+            /* Onko hoitajalla olemassaoleva vanha sessio? */
             String proUsername = professional.getName();
             session = proUserSessions.get(proUsername);
         }
         if (session == null) {
-            /** Sessio edelleen tuntematon, luodaan uusi sessio. */
+            /* Sessio edelleen tuntematon, luodaan uusi sessio. */
             session = new Session();
+            session.set("online", "true");
         }
 
-        /** Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
+        /* Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
         sessionsBySessionId.put(sessionId, session);
 
-        /** Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
+        /* Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
         if (professional != null) {
             proUserSessions.put(professional.getName(), session);
         }
@@ -177,13 +227,88 @@ public class SessionRepo extends MapSessionRepository {
         return session;
     }
 
-
-
-
-    /** Testausta helpottamaan metodi sessioiden unohtamiseen. */
-    public final void forgetSessions() {
-        this.sessionsBySessionId.clear();
-        this.sessionsByUserId.clear();
-        this.proUserSessions.clear();
+    /**
+     * Asettaa ammattilaisen online-statukseksi "true" tai "false".
+     * Oletettavasti pyynto on validoitu ennen taman metodin kutsua.
+     *
+     * @param req sessioId taalta
+     * @param onlineStatus asettava onlineStatus
+     */
+    public synchronized void setOnlineStatus(final HttpServletRequest req,
+                                             final String onlineStatus) {
+        String sessionId = req.getSession().getId();
+        setOnlineStatus(sessionId, onlineStatus);
     }
+
+    /**
+     * Asettaa onlie-statuksen sessionId:n avulla.
+     *
+     * @param sessionId p.
+     * @param onlineStatus p.
+     */
+    public synchronized void setOnlineStatus(final String sessionId,
+                                             final String onlineStatus) {
+        Session session = sessionsBySessionId.get(sessionId);
+        session.set("online", onlineStatus);
+        updateCountOfProsAcceptingNewCustomers();
+    }
+
+    /**
+     * Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
+     * jotka hyvaksyvat uusia asiakkaita. Jos kirjautuneita ammattilaisia
+     * voi olla yli 1000, paivitys olisi hyva hoitaa tehokkaammin.
+     */
+    private synchronized void updateCountOfProsAcceptingNewCustomers() {
+        countOfProsAcceptingNewCustomers = 0;
+        for (Session session : proUserSessions.values()) {
+            if (session.get("online").equals("true")) {
+                countOfProsAcceptingNewCustomers++;
+            }
+        }
+    }
+
+    /**
+     * Onko chat suljettu?. Tarkoitettu kaytettavaksi siihen liittyen,
+     * hyvaksytaanko uusia asiakkaita enaa jonoon (tai edes aloitussivulle).
+     * Vanhat asiakkaat on tarkoitus kasitella, vaikka chat olisikin "suljettu".
+     *
+     * @return true jos uusia asiakkaita ei hyvaksyta.
+     */
+    public synchronized boolean chatClosed() {
+        return countOfProsAcceptingNewCustomers == 0;
+    }
+
+    /**
+     * Unohtaa kaiken, mika liittyy kayttajaan annetulla userId:lla.
+     * Tarkoitettu kaytettavaksi timeoutissa seka ammattilaiskayttajan
+     * tilin poistamisen yhteydessa.
+     *
+     * @param userId userId
+     */
+    public void forgetSession(final String userId) {
+        Session session = getSessionFromUserId(userId);
+        if (session == null) {
+            /* Kayttajaan ei liity sessiota. */
+            return;
+        }
+        for (String channelId : session.getChannels()) {
+            Channel channel = mapper.getChannel(channelId);
+            disableChannel(channel);
+            /* Note: ei haittaa että WS yhteys kanavalle jaa auki, silla
+             * kukaan ei pysty enaa lahettamaan viesteja kanavalle. */
+        }
+        sessionsByUserId.remove(userId);
+        String sessionId = session.get("sessionId");
+        sessionsBySessionId.remove(sessionId);
+        proUserSessions.remove(session.get("username"));
+        updateCountOfProsAcceptingNewCustomers();
+    }
+
+    /**
+     * Testausta helpottamaan metodi sessioiden unohtamiseen.
+     */
+    public void forgetAllSessions() {
+        initialize();
+    }
+
 }

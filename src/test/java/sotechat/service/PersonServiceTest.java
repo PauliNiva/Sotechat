@@ -16,7 +16,6 @@ import sotechat.Launcher;
 import sotechat.domain.Conversation;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
-import sotechat.service.PersonService;
 
 
 import javax.transaction.Transactional;
@@ -66,10 +65,10 @@ public class PersonServiceTest {
     @Transactional
     public void personsPasswordIsChanged() throws Exception {
         personService.addPerson(this.person, "0000");
-        Assert.assertTrue(BCrypt.checkpw("0000", person.getPassword()));
+        Assert.assertTrue(BCrypt.checkpw("0000", person.getHashOfPasswordAndSalt()));
         personService.changePassword(this.person.getUserId(), "1111");
         Person person2 = personService.getPerson("jokustringivaansinne");
-        Assert.assertTrue(BCrypt.checkpw("1111", person2.getPassword()));
+        Assert.assertTrue(BCrypt.checkpw("1111", person2.getHashOfPasswordAndSalt()));
         Assert.assertFalse(personService.changePassword("Idjotaeiolemassakaan",
                 "1111"));
     }

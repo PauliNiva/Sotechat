@@ -1,92 +1,98 @@
 package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import sotechat.data.ChatLogger;
-import sotechat.data.Mapper;
-import sotechat.data.Session;
-import sotechat.data.SessionRepo;
-import sotechat.service.DatabaseService;
-import sotechat.service.ValidatorService;
-import sotechat.wrappers.ConvInfo;
-import sotechat.wrappers.MsgToClient;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
-/** Reititys ammattilaiskayttajan historian selaamiseen liittyville pyynnoille:
- *  - "luettele kanavat, joilla olen ollut."
- *  - "anna kanavan x lokit".
+import sotechat.data.ChatLogger;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.service.ValidatorService;
+import sotechat.wrappers.ConvInfo;
+import sotechat.wrappers.MsgToClient;
+
+/**
+ * Reititys ammattilaiskayttajan historian selaamiseen liittyville pyynnoille.
  */
 @RestController
 public class HistoryController {
 
-    /** Validator Service. */
+    /**
+     * Pyyntojen validointi.
+     */
     private ValidatorService validatorService;
 
-    /** Chat Logger. */
+    /**
+     * Viestien muistaminen.
+     */
     private ChatLogger chatLogger;
 
-    /** Session Repo. */
+    /**
+     * Sessioiden kasittely.
+     */
     private final SessionRepo sessionRepo;
 
     /**
      * Konstruktori.
+     *
      * @param pValidatorService p
      * @param pChatLogger p
      * @param pSessionRepo p
      */
     @Autowired
-    public HistoryController(
-            final ValidatorService pValidatorService,
-            final ChatLogger pChatLogger,
-            final SessionRepo pSessionRepo
-    ) {
+    public HistoryController(final ValidatorService pValidatorService,
+                             final ChatLogger pChatLogger,
+                             final SessionRepo pSessionRepo) {
         this.validatorService = pValidatorService;
         this.chatLogger = pChatLogger;
         this.sessionRepo = pSessionRepo;
     }
 
-    /** Client pyytaa meilta tietyn kanavan lokeja.
-     * @param pro autentikaatiotiedot
-     * @param req req
-     * @param channelId channelId
-     * @return lokit, jos clientilla oikeus niihin. Muuten null.
+    /**
+     * Client pyytaa tietyn kanavan vanhoja viesteja.
+     *
+     * @param pro Autentikaatiotiedot.
+     * @param req Pyynto.
+     * @param channelId Kanavatunnus.
+     * @return Vanhat viestit, jos clientilla oikeus niihin.
+     * Muuten <code>null</code>.
      */
     @RequestMapping(value = "/getLogs/{channelId}", method = RequestMethod.GET)
     @ResponseBody
     public final List<MsgToClient> getMessages(
             final @PathVariable("channelId") String channelId,
             final HttpServletRequest req,
-            final Principal pro
-    ) {
+            final Principal pro) {
         String error = validatorService.validateLogRequest(pro, req, channelId);
         if (!error.isEmpty()) {
             System.out.println("Hacking attempt with getLogs? " + error);
             return null;
         }
-        System.out.println("Retrieving channel " + channelId + " ##########");
         return chatLogger.getLogs(channelId);
     }
 
-    /** Client pyytaa listauksen vanhoista keskusteluistaan.
-     * @param professional autentikointitiedot
-     * @param req req
-     * @return listaus, jos client autentikoitinut. Muuten null.
+    /**
+     * Client pyytaa listauksen vanhoista keskusteluistaan.
+     * @param professional Autentikointitiedot.
+     * @param req Pyynto.
+     * @return Vanhat keskustelut, jos client autentikoitinut.
+     * Muuten <code>null</code>.
      */
     @RequestMapping(value = "/listMyConversations/", method = RequestMethod.GET)
     @ResponseBody
-    public final List<ConvInfo> getConversations(
-            final Principal professional,
-            final HttpServletRequest req
-    ) {
+    public final List<ConvInfo> getConversations(final Principal professional,
+                                                 final HttpServletRequest req) {
         if (professional == null) {
-            /** Listaus on kaytossa vain autentikoituneille kayttajille. */
+            /* Listaus on kaytossa vain autentikoituneille kayttajille. */
             return null;
         }
-        System.out.println("REQUESTING HISTORY ##########");
         String sessionId = req.getSession().getId();
         Session session = sessionRepo.getSessionFromSessionId(sessionId);
         String userId = session.get("userId");

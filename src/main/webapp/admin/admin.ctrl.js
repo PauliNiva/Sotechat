@@ -1,94 +1,152 @@
+/**
+ * Kontrolleri yllapitajan hallintapaneelin toimintoja varten.
+ */
 angular.module('chatProApp')
-    .controller('adminController', ['$scope', '$http', '$uibModal', 'adminService',
-        function ($scope, $http, $uibModal, adminService) {
-            $scope.users = [];
-            $scope.alerts = [];
-            $scope.resetPsw = '';
-            $scope.editPassword = '';
-            $scope.adminView = 'admin/userHandling.tpl.html';
-
-            var success = function(response) {
-                if (response.data.status == 'OK') {
-                    $scope.alerts.push({ type: 'success',dismiss: 4000,  msg: 'Toiminto onnistui!' })
-                    getUsers();
-                } else {
-                    $scope.alerts.push({ type: 'danger', msg: 'Toiminto ei onnistunut! ' + response.data.error })
-                }
-            };
-
-            $scope.toSettings = function() {
-                $scope.adminView = 'admin/settings.tpl.html';
-            };
-
-            $scope.toUsers = function() {
-                $scope.adminView = 'admin/userHandling.tpl.html';
-            };
-            
-            $scope.createNewUser = function () {
-                var user = '{"username": '+ $scope.newUserUsername + ', "loginName": '
-                    + $scope.newUserLoginName +', "password": '
-                    + $scope.newUserPassword+ '}';
-                adminService.createUser(btoa(user), function(response) {
-                    if (response.data.status == 'OK') {
-                        $scope.newUserBoolean = false;
-                        $scope.newUserUsername = '';
-                        $scope.newUserPassword = '';
-                        $scope.newUserLoginName = '';
-                    }
-                    success(response);
-                })
-            };
-
-            $scope.rpsw = function(userID) {
-                $scope.resetPsw = userID;
-            };
-
-            $scope.doResetPsw = function(userID, newPsw) {
-                adminService.resetPassword(userID, btoa(newPsw), success);
+    .controller('adminController',
+        ['$scope', '$http', '$uibModal', 'base64', 'adminService',
+            function ($scope, $http, $uibModal, base64, adminService) {
+                $scope.users = [];
+                $scope.alerts = [];
                 $scope.resetPsw = '';
                 $scope.editPassword = '';
-            };
+                $scope.adminView = 'admin/userHandling.tpl.html';
+                $scope.newUser = {};
 
-            $scope.removeUser = function(userID) {
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'common/areUSureModal.tpl.html',
-                    controller: 'AreUSureModalController'
-                });
+                /**
+                 * Valitsee, parametrina annetun vastauksen perusteella ilmoituksen.
+                 * @param response HTTP vastaus serverilta.
+                 */
+                var success = function (response) {
+                    if (response.data.status === 'OK') {
+                        $scope.alerts.push({
+                            type: 'success',
+                            dismiss: 4000,
+                            msg: 'Toiminto onnistui!'
+                        });
+                        getUsers();
+                    } else {
+                        $scope.alerts.push({
+                            type: 'danger',
+                            msg: 'Toiminto ei onnistunut! ' + response.data.error
+                        });
+                    }
+                };
 
-                modalInstance.result.then(function (result) {
-                    adminService.delUser(userID, success);
-                });
-            };
-
-            $scope.cancelEditOrReset = function() {
-                $scope.resetPsw = '';
-            };
-
-            $scope.resetDatabase = function () {
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'common/areUSureModal.tpl.html',
-                    controller: 'AreUSureModalController'
-                });
-
-                modalInstance.result.then(function (result) {
-                    adminService.resetDatabase(success);
-                });
-            };
-
-            $scope.closeAlert = function(index) {
-                $scope.alerts.splice(index, 1);
-            };
-            
-            var getUsers = function() {
-                $scope.users = [];
-                adminService.getUsers(function(response) {
-                    angular.forEach(response.data, function (key) {
-                        $scope.users.push(key);
+                /**
+                 * Shows AreUSure modal.
+                 * @param sureFunction Function to run when sure.
+                 */
+                var makeSure = function(sureFunction) {
+                    var modalInstance = $uibModal.open({
+                        animation: true,
+                        templateUrl: 'common/areUSureModal.tpl.html',
+                        controller: 'AreUSureModalController'
                     });
-                });
-            };
+                    modalInstance.result.then(sureFunction);
+                };
 
-            getUsers();
-        }]);
+                /**
+                 * Vaihtaa nakyman asetuksiin.
+                 */
+                $scope.toSettings = function () {
+                    $scope.adminView = 'admin/settings.tpl.html';
+                };
+
+                /**
+                 * Vaihtaa nakyman asetusnakymaan.
+                 */
+                $scope.toUsers = function () {
+                    $scope.adminView = 'admin/userHandling.tpl.html';
+                };
+
+                /**
+                 * Valittaa palvelulle uudenkayttajan lisays pyynnon.
+                 * Seka function, joka suoritetaan kun vastaus saapuu.
+                 */
+                $scope.createNewUser = function () {
+                    adminService.createUser(base64.encode(JSON.stringify($scope.newUser)),
+                        function (response) {
+                        if (response.data.status === 'OK') {
+                            $scope.newUserBoolean = false;
+                            $scope.newUser = {};
+                        }
+                        success(response);
+                    })
+                };
+
+                /**
+                 * Kiinnittaa kayttajanID:n, jonka salasanaa muokataan.
+                 * @param userID ID, jota muokataan.
+                 */
+                $scope.rpsw = function (userID) {
+                    $scope.resetPsw = userID;
+                };
+
+                /**
+                 * Valittaa palvelulle salasanan vaihto pyynnon.
+                 * @param userID ID, jonka salasanaa muokataan.
+                 * @param newPsw Salasana, joka laitetaan tilalle.
+                 */
+                $scope.doResetPsw = function (userID, newPsw) {
+                    adminService.resetPassword(userID, base64.encode(newPsw), success);
+                    $scope.resetPsw = '';
+                    $scope.editPassword = '';
+                };
+
+                /**
+                 * Valittaa kayttajanpoistamispyynnon.
+                 * @param userID Kayttaja, jota ollaan poistamassa.
+                 */
+                $scope.removeUser = function (userID) {
+                    makeSure(function() {
+                        adminService.delUser(userID, success);
+                    });
+                };
+
+                /**
+                 * Aloittaa uuden kayttajan luomisen.
+                 */
+                $scope.newUserBoolTrue = function () {
+                    $scope.newUserBoolean = true;
+                };
+
+                /**
+                 * Peruuttaa kayttajan luomisen tai salasanan nollaamisen.
+                 */
+                $scope.cancelNewOrReset = function () {
+                    $scope.newUserBoolean = false;
+                    $scope.resetPsw = '';
+                };
+
+                /**
+                 * Valitta palvelimen tilan resetointi pyynnon.
+                 */
+                $scope.resetServer = function () {
+                    makeSure(function() {
+                        adminService.resetDatabase(success);
+                    });
+                };
+
+                /**
+                 * Sulkee ilmoituksen.
+                 * @param index Suljettavan ilmoituksen indeksi.
+                 */
+                $scope.closeAlert = function (index) {
+                    $scope.alerts.splice(index, 1);
+                };
+
+                /**
+                 * Pyytaa kayttajien hakua palvelulta ja lisää ne taulukkoon.
+                 */
+                var getUsers = function () {
+                    $scope.users = [];
+                    adminService.getUsers(function (response) {
+                        angular.forEach(response.data, function (key) {
+                            $scope.users.push(key);
+                        });
+                    });
+                };
+                
+                /** Hakee kayttajat kun kontrolleri ladataan. */
+                getUsers();
+            }]);

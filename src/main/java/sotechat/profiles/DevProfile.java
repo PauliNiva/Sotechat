@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
+
 import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
@@ -11,30 +12,50 @@ import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
+/**
+ * Kehitysprofiili.
+ */
 @Configuration
 @Profile("development")
 public class DevProfile {
 
+    /**
+     * <code>JPA</code>-sailo, joka sailoo <code>person</code>-olioita.
+     */
     @Autowired
-    PersonRepo personRepo;
+    private PersonRepo personRepo;
 
+    /**
+     * <code>JPA</code>-sailo, joka sailoo <code>Conversation</code>-olioita.
+     */
     @Autowired
-    ConversationRepo conversationRepo;
+    private ConversationRepo conversationRepo;
 
+    /**
+     * <code>JPA</code>-sailo, joka sailoo <code>Message</code>-olioita.
+     */
     @Autowired
-    MessageRepo messageRepo;
+    private MessageRepo messageRepo;
 
+    /**
+     * <code>Mapper</code>-olio, jonne talletetaan kirjautuneen kayttajan
+     * <code>username</code> ja <code>userId</code>, jotta kayttaja voidaan
+     * hakea <code>Mapper</code>-oliosta <code>userId</code>:n perusteella.
+     */
     @Autowired
-    Mapper mapper;
+    private Mapper mapper;
 
+    /**
+     * Luo kaksi kayttajaa valmiiksi, joista toisella on rooli "ADMIN" ja
+     * toisella rooli "USER".
+     */
     @PostConstruct
     @Transactional
     public void init() {
         Person admin = new Person("admin");
         admin.setUserName("pauli");
-        admin.setPassword("0000");
+        admin.hashPasswordWithSalt("0000");
         admin.setLoginName("admin");
         admin.setUserId("admin");
         admin.setRole("ROLE_ADMIN");
@@ -43,7 +64,7 @@ public class DevProfile {
 
         Person pro = new Person("666");
         pro.setUserName("Hoitaja");
-        pro.setPassword("salasana");
+        pro.hashPasswordWithSalt("salasana");
         pro.setLoginName("hoitaja");
         pro.setUserId("666");
         pro.setRole("ROLE_USER");
@@ -51,27 +72,4 @@ public class DevProfile {
         mapper.mapProUsernameToUserId(pro.getUserName(), pro.getUserId());
     }
 
-
-
-
-    /* TODO: Saako poistaa?
-        Conversation conversation = new Conversation("007", "6.6.2016");
-        conversation.setCategory("Hammashoito");
-        conversation.addPersonToConversation(admin);
-        conversationRepo.save(conversation);
-
-        admin.addConversationToPerson(conversation);
-        personRepo.save(admin);
-
-        Message message = new Message();
-        message.setChannelId("007");
-        message.setContent("This project sux ballz!");
-        message.setDate("6.6.2016");
-        message.setSender("pauli");
-        message.setConversation(conversation);
-        messageRepo.save(message);
-
-        conversation.addMessageToConversation(message);
-        conversationRepo.save(conversation);
-        */
 }

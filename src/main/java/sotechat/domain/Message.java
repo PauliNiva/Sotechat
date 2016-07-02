@@ -1,128 +1,131 @@
 package sotechat.domain;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
- * Luokka viestien tallentamiseen
+ * Luokka viestien tallentamiseen tietokantaan.
  */
 @Entity
 public class Message extends AbstractPersistable<Long> {
 
     /**
-     * aikaleima muodossa DateTime.toString()
-     * */
+     * Aikaleima.
+     */
     private String date;
 
-    /** viestin sisalto */
+    /**
+     * Viestin sisalto.
+     */
     private String content;
 
-    /** viestin lahettaja */
+    /**
+     * Viestin lahettaja.
+     */
     private String sender;
 
-    /** keskustelu, johon viesti liittyy */
-    @ManyToOne(fetch = FetchType.LAZY)
+    /**
+     * Keskustelu, johon viesti liittyy. Tietokannassa monen suhde yhteen.
+     * Hakutapa on <code>EAGER</code>, eli kaikki keskustelu haetaan heti, kun
+     * jokin sen viesteistä haetaan.
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
     private Conversation conversation;
 
-    /** keskustelun kanavaid johon viesti liittyy */
-    private String channelId;
-
-    /** konstruktori */
+    /**
+     * Konstruktori.
+     */
     public Message() {
     }
 
-    /** Konstruktori asettaa parametreina annetut lahettajan, viestin sisallon
+    /**
+     * Konstruktori asettaa argumentteina annetun lahettajan, viestin sisallon
      * ja aikaleiman.
-     * @param sender lahettajan nimi
-     * @param content viestin sisalto
-     * @param date aikaleima
+     *
+     * @param pSender Lahettajan nimi.
+     * @param pContent Viestin sisalto.
+     * @param pDate Aikaleima.
      */
-    public Message(String sender, String content, String date){
-        this.sender = sender;
-        this.content = content;
-        this.date = date;
+    public Message(final String pSender, final String pContent,
+                   final String pDate) {
+        this.sender = pSender;
+        this.content = pContent;
+        this.date = pDate;
     }
 
     /**
-     * Palauttaa viestin aikaleiman
-     * @return viestin aikaleima
+     * Palauttaa viestin aikaleiman.
+     *
+     * @return Viestin aikaleima.
      */
     public final String getDate() {
         return this.date;
     }
 
     /**
-     * Asettaa viestin aikaleimaksi parametrina annetun ajan
-     * @param pdate viestin aikaleima
+     * Asettaa viestin aikaleimaksi argumenttina annetun ajan.
+     *
+     * @param pDate Viestin aikaleima.
      */
-    public final void setDate(final String pdate) {
-        this.date = pdate;
+    public final void setDate(final String pDate) {
+        this.date = pDate;
     }
 
     /**
-     * Palauttaa viestin sisallon
-     * @return viestin sisalto
+     * Palauttaa viestin sisallon.
+     *
+     * @return Viestin sisalto.
      */
     public final String getContent() {
         return this.content;
     }
 
     /**
-     * Asettaa viestin sisalloksi parametrina annetun tekstin
-     * @param pContent viestin sisalto
+     * Asettaa viestin sisalloksi parametrina annetun tekstin.
+     *
+     * @param pContent Viestin sisalto.
      */
     public final void setContent(final String pContent) {
         this.content = pContent;
     }
 
     /**
-     * Palauttaa viestin lahettajan
-     * @return viestin lahettaja
+     * Palauttaa viestin lahettajan.
+     *
+     * @return Viestin lahettaja.
      */
     public final String getSender() {
         return this.sender;
     }
 
     /**
-     * Asettaa viestin lahettajaksi parametrina annetun kayttajanimen
-     * @param psender viestin lahettaja
+     * Asettaa viestin lahettajaksi argumenttina annetun lahettanjan.
+     *
+     * @param pSender Viestin lahettaja.
      */
-    public final void setSender(final String psender) {
-        this.sender = psender;
+    public final void setSender(final String pSender) {
+        this.sender = pSender;
     }
 
     /**
-     * Palauttaa viestin keskustelun
-     * @return viestiin liitetty Conversation olio
+     * Palauttaa keskustelun johon viesti kuuluu.
+     *
+     * @return Viestiin liitetty <code>Conversation</code>-olio.
      */
     public final Conversation getConversation() {
         return this.conversation;
     }
 
     /**
-     * Asettaa viestin keskusteluksi parametrina annetun keskustelun
-     * @param pConversation viestiin liittyva keskustelu
+     * Asettaa viestin keskusteluksi argumenttina annetun keskustelun.
+     *
+     * @param pConversation Viestiin liittyva keskustelu.
      */
     public final void setConversation(final Conversation pConversation) {
-
         this.conversation = pConversation;
-        this.channelId = pConversation.getChannelId();
     }
 
-    /**
-     * Palauttaa viestiin liittyvan kanavaid:n
-     * @return keskustelun kanavaid
-     */
-    public String getChannelId() {
-        return channelId;
-    }
-
-    /**
-     * Asettaa keskustelun kanavaid:ksi parametrina annetun id:n
-     * @param channelId keskustelun kanavaid
-     */
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
 }

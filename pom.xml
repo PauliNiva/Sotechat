@@ -5,7 +5,7 @@
 
     <groupId>Sotechat</groupId>
     <artifactId>Sotechat</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <packaging>war</packaging>
 
     <name>Sotechat</name>
@@ -286,18 +286,15 @@
             </plugin>
 
             <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.1.0</version>
-                <configuration>
-                    <repoToken>tGCOU6PiHPHfoeZPBBA6QedChzJt2NFQI</repoToken>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.6.201602180812</version>
+                <configuration>
+                    <excludes>
+                        <exclude>sotechat/profiles/ProProfile.class</exclude>
+                        <exclude>sotechat/config/HibernateConfig.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -336,6 +333,7 @@
                         <param>sotechat.LauncherTest</param>
                         <param>sotechat.auth*</param>
                         <param>sotechat.domain*</param>
+                        <param>sotechat.data*</param>
                         <param>sotechat.service*</param>
                         <param>sotechat.wrappers*</param>
                         <param>sotechat.websocketService*</param>
@@ -359,7 +357,7 @@
                     <drivers>
                         <driver>
                             <name>chromedriver</name>
-                            <version>2.21</version>
+                            <version>2.22</version>
                         </driver>
                     </drivers>
                 </configuration>
@@ -384,8 +382,7 @@
                         </context>
                     </additionalContexts>
                     <preloadSources>
-                        <source>${project.basedir}/src/main/webapp/assets/lib/jquery-1.12.3.min.js</source>
-                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.js</source>
+                        <source>${project.basedir}/src/main/webapp/assets/lib/angular.min.js</source>
                         <source>${project.basedir}/src/main/webapp/assets/lib/angular-mocks.js</source>
                     </preloadSources>
                     <jsSrcDir>${project.basedir}</jsSrcDir>

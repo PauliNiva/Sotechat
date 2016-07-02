@@ -1,5 +1,6 @@
-/** Palvelu huolehtii ammattilaiselle näkyvän jonon ylläpitämisestä
- *  Sekä säilömisestä
+/** 
+ * Palvelu huolehtii ammattilaiselle nakyvan jonon yllapitamisesta,
+ * seka sailomisesta.
  */
 angular.module('chatProApp')
     .factory('queueProService', [function () {
@@ -9,8 +10,8 @@ angular.module('chatProApp')
         var length = 0;
 
         /**
-         * Palauttaa jonon ensimmäisen kanavanId:n
-         * Jos jono tyhjä niin palauttaa null
+         * Palauttaa jonon ensimmaisen kanavanId:n.
+         * Jos jono tyhja niin palauttaa null.
          * @returns {*}
          */
         var getFirstChannelID = function () {
@@ -21,40 +22,46 @@ angular.module('chatProApp')
         };
 
         /**
-         * Hakee jonosta haluttua kategoriaa vastaavat alkiot
-         * @param category kategoria joka halutaan palautettavaksi
+         * Hakee jonosta haluttua kategoriaa vastaavat alkiot.
+         * @param category kategoria joka halutaan palautettavaksi.
          * @returns {Array} Alkiot jotka kuuluvat kategoriaan.
-         * Jos kategoria tyhjä niin palautetaan koko jono
+         * Jos kategoria tyhja niin palautetaan koko jono.
          */
         var makeQueueByCategory = function (category) {
             if (category === "") return queue;
             var subQueue = [];
             for (var i = 0; i < queue.length; i++) {
-                if (queue[i].category === category) subQueue.push(queue[i]);
+                if (queue[i].category === category) {
+                    subQueue.push(queue[i]);
+                }
             }
             return subQueue;
         };
 
         /**
-         * Tarkastaa onko annettu kanavaID jonossa
-         * @param channelID KanavaID jonka tilanne tahdotaan tarkastaa
-         * @returns {*} palautetaan sama kanavaID jos löydetty muuten null
+         * Tarkastaa onko annettu kanavaID jonossa.
+         * @param channelID KanavaID jonka tilanne tahdotaan tarkastaa.
+         * @returns {*} palautetaan sama kanavaID jos löydetty muuten null.
          */
         var checkChannelID = function (channelID) {
             for (var i = 0; i < queue.length; i++) {
-                if (queue[i].channelID === channelID) return queue[i].channelID;
+                if (queue[i].channelID === channelID) {
+                    return queue[i].channelID;
+                }
             }
             return null;
         };
 
         /**
-         * Lisätään kategoria taulukkoon, jos se ei jo ennestään sisällä sitä
-         * @param category kategorian nimi joka tahdotaan lisätä
+         * Lisataan kategoria taulukkoon, jos se ei jo ennestaan sisalla sita.
+         * @param category Kategoriannimi joka tahdotaan lisata.
          */
         var addCategory = function (category) {
             var boolean = true;
             for (var i = 0; i < categories.length; i++) {
-                if (categories[i] === category) boolean = false;
+                if (categories[i] === category) {
+                    boolean = false;
+                }
             }
             if (boolean) {
                 categories.push(category);
@@ -62,9 +69,9 @@ angular.module('chatProApp')
         };
 
         /**
-         * Lisää jono taulukkoon annetun jono objectin
-         * kun se on alustettu
-         * @param object lisättävä jono objekti
+         * Lisaa jonotaulukkoon annetun jono objectin,
+         * kun se on alustettu.
+         * @param object Lisattava jono objekti.
          */
         var addToQueue = function (object) {
             var queueObject = [];
@@ -77,14 +84,16 @@ angular.module('chatProApp')
         };
 
         /**
-         * Palauttaa jonon pituuden
+         * Palauttaa jonon pituuden.
          * @returns {number} jonon pituus
          */
         var getLength = function () {
             return length;
         };
 
-        /** Tyhjentää jonon ja kategoriat kokonaan */
+        /** 
+         * Tyhjentaa jonon ja kategoriat kokonaan.
+         */
         var clear = function () {
             queue.length = 0;
             categories.length = 0;

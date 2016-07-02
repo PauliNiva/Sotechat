@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>MapperImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.data</a> &gt; <span class="el_source">MapperImpl.java</span></div><h1>MapperImpl.java</h1><pre class="source lang-java linenums">package sotechat.data;
+import org.springframework.stereotype.Component;
+import sotechat.controller.MessageBroker;
+import sotechat.service.DatabaseService;
+import sotechat.wrappers.MsgToClient;
+
+
+import java.util.*;
+
+/**
+ * Mapper muistaa asioita kanaviin ja ID:hen liittyen. Esimerkiksi:
+ * - Onko jokin username varattu rekisteroityneelle kayttajalle?
+ * - Getteri Channel-olioille parametrilla channelId
+ */
+@Component
+public class MapperImpl implements Mapper {
+
+    /**
+     * Kanava-mappi. Avain channelId, arvo Channel-olio.
+     */
+    private Map&lt;String, Channel&gt; channels;
+
+    /**
+     * Satunnaismerkkijonogeneraattori.
+     */
+    private FastGeneratorForRandomStrings fastGen;
+
+    /**
+     * Muistetaan, mitka generaattorin tuottamat ID:t on jo varattu.
+     */
+    private Set&lt;String&gt; reservedIds;
+
+    /**
+     * Rekisteroityneet kayttajat. Avain username, arvo userId.
+     */
+    private Map&lt;String, String&gt; mapRegisteredUsers;
+
+    /**
+     * Tietokantapalvelut.
+     */
+    private DatabaseService databaseService;
+
+
+    /**
+     * Konstruktori.
+     */
+<span class="fc" id="L47">    public MapperImpl() {</span>
+<span class="fc" id="L48">        this.channels = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L49">        this.fastGen = new FastGeneratorForRandomStrings();</span>
+<span class="fc" id="L50">        this.reservedIds = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L51">        this.mapRegisteredUsers = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * Palauttaa &lt;code&gt;Channel&lt;/code&gt;-olion.
+     *
+     * @param channelId channelId.
+     * @return &lt;code&gt;Channel&lt;/code&gt;-olio tai &lt;code&gt;null&lt;/code&gt; jos ei loydy.
+     */
+    @Override
+    public synchronized Channel getChannel(
+            final String channelId
+    ) {
+<span class="fc" id="L64">        Channel channel = channels.get(channelId);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (channel == null) {</span>
+            /* Kanavaa ei loydy muistista, luodaan se. */
+<span class="fc" id="L67">            channel = new Channel(channelId);</span>
+<span class="fc" id="L68">            channels.put(channelId, channel);</span>
+            /* Haetaan kanavan lokit tietokannasta (tai tyhja lista). */
+
+<span class="fc" id="L71">            List&lt;MsgToClient&gt; logs = databaseService.retrieveMessages(channelId);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">            for (MsgToClient msg : logs) {</span>
+<span class="nc" id="L73">                String username = msg.getUsername();</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                if (isUsernameReserved(username)) {</span>
+                    /* Loydettiin ammattilaisen kirjoittama viesti, joten
+                     * lisataan kirjoittaja historiallisiin kayttajiin. */
+<span class="nc" id="L77">                    String userId = getIdFromRegisteredName(username);</span>
+<span class="nc" id="L78">                    channel.addHistoricUserId(userId);</span>
+                }
+<span class="nc" id="L80">            }</span>
+        }
+<span class="fc" id="L82">        return channel;</span>
+    }
+
+    /**
+     * Luo uuden kanava-olion, kirjaa sen muistiin ja palauttaa sen.
+     *
+     * @return luotu kanava-olio.
+     */
+    @Override
+    public synchronized Channel createChannel() {
+<span class="fc" id="L92">        String channelId = generateNewId();</span>
+<span class="fc" id="L93">        Channel channel = new Channel(channelId);</span>
+<span class="fc" id="L94">        channels.put(channelId, channel);</span>
+<span class="fc" id="L95">        return channel;</span>
+    }
+
+    /**
+     * Poistaa kanavan, joka vastaa parametrina annettua channelId:ta.
+     * Jos palvelin on pitkaan paalla, halutaan vapauttaa vanhojen
+     * kanavien tietoja muistista.
+     * @param channelId channelId
+     */
+    @Override
+    public synchronized void forgetChannel(final String channelId) {
+<span class="fc" id="L106">        channels.remove(channelId);</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * Liittaa ammattilaisen kayttajanimen ja kayttajatunnuksen toisiinsa.
+     *
+     * @param username p.
+     * @param userId p.
+     */
+    @Override
+    public synchronized void mapProUsernameToUserId(
+            final String username,
+            final String userId
+    ) {
+<span class="fc" id="L120">        this.mapRegisteredUsers.put(username, userId);</span>
+<span class="fc" id="L121">    }</span>
+
+    @Override
+    public synchronized void reserveId(
+            final String someId
+    ) {
+<span class="fc" id="L127">        this.reservedIds.add(someId);</span>
+<span class="fc" id="L128">    }</span>
+
+    /**
+     * Unohtaa, että jokin username oli varattu. Käyttäjän poiston yhteydessä.
+     *
+     * @param username &lt;code&gt;username&lt;/code&gt;.
+     */
+    @Override
+    public synchronized void removeMappingForUsername(
+            final String username
+    ) {
+<span class="fc" id="L139">        this.mapRegisteredUsers.remove(username);</span>
+<span class="fc" id="L140">    }</span>
+
+    /**
+     * Tarkistaa onko kayttajanimi varattu.
+     *
+     * @param username kayttajanimi.
+     * @return &lt;code&gt;true&lt;/code&gt; jos kayttajanimi on varattu.
+     * &lt;code&gt;false&lt;/code&gt; muulloin.
+     */
+    @Override
+    public synchronized boolean isUsernameReserved(
+            final String username
+    ) {
+<span class="fc" id="L153">        return mapRegisteredUsers.containsKey(username);</span>
+    }
+
+    /**
+     * Hakee salaisen kayttajaID:n. argumenttina julkinen kayttajanimi.
+     * Kaytetaan vain rekisteroityjen kayttajien tapauksessa.
+     *
+     * @param username Julkinen &lt;code&gt;username&lt;/code&gt;.
+     * @return id Salainen id.
+     */
+    @Override
+    public synchronized String getIdFromRegisteredName(
+            final String username
+    ) {
+        /* Varmistetaan ensin, etta username tunnetaan. */
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (username == null</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">                || username.isEmpty()</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">                || !mapRegisteredUsers.containsKey(username)) {</span>
+<span class="nc" id="L171">            throw new IllegalArgumentException((&quot;Error! Unknown userId for &quot;</span>
+                    + &quot;registered name &quot; + username));
+        }
+<span class="fc" id="L174">        return this.mapRegisteredUsers.get(username);</span>
+    }
+
+    /**
+     * Tuottaa ja varaa uuden yksilollisen ID:n (userId/channelId).
+     *
+     * @return userId.
+     */
+    @Override
+    public synchronized String generateNewId() {
+        String newId;
+        do {
+<span class="fc" id="L186">            newId = getFastRandomString();</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">        } while (reservedIds.contains(newId));</span>
+<span class="fc" id="L188">        reserveId(newId);</span>
+<span class="fc" id="L189">        return newId;</span>
+    }
+
+    /**
+     * Nopea satunnaismerkkijonotuottaja (kaytossa).
+     *
+     *  @return Satunnaismerkkijono.
+     */
+    @Override
+    public String getFastRandomString() {
+<span class="fc" id="L199">        return fastGen.nextString();</span>
+    }
+
+    @Override
+    public void setDatabaseService(DatabaseService databaseService) {
+<span class="fc" id="L204">        this.databaseService = databaseService;</span>
+<span class="fc" id="L205">    }</span>
+
+    /**
+     * Nopea pseudosatunnaismerkkijonotuottaja.
+     * Attribution: http://stackoverflow.com/questions/
+     * 41107/how-to-generate-a-random-alpha-numeric-string.
+     */
+    private class FastGeneratorForRandomStrings {
+
+        /* Kaytetaan nopeaa randomia. */
+<span class="fc" id="L215">        private final Random random = new Random();</span>
+        /* Haluttu pituus satunnaismerkkijonoille. */
+        private static final int LENGTH = 16;
+
+        /* Sisaltaa aakkoston, jonka merkkeja satunnaisjonot voi sisaltaa. */
+        private final char[] symbols;
+        /* Tilapaistaulukko uuden merkkijonon muodostukseen. */
+        private final char[] buf;
+
+        /* Konstruktori alustaa olion (yksi olio riittaa). */
+<span class="fc" id="L225">        FastGeneratorForRandomStrings() {</span>
+            if (LENGTH &lt; 1) {
+                throw new IllegalArgumentException(&quot;length &lt; 1: &quot; + LENGTH);
+            }
+<span class="fc" id="L229">            buf = new char[LENGTH];</span>
+<span class="fc" id="L230">            StringBuilder tmp = new StringBuilder();</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">            for (char ch = '0'; ch &lt;= '9'; ++ch) {</span>
+<span class="fc" id="L232">                tmp.append(ch);</span>
+            }
+<span class="fc bfc" id="L234" title="All 2 branches covered.">            for (char ch = 'a'; ch &lt;= 'z'; ++ch) {</span>
+<span class="fc" id="L235">                tmp.append(ch);</span>
+            }
+<span class="fc" id="L237">            symbols = tmp.toString().toCharArray();</span>
+<span class="fc" id="L238">        }</span>
+
+        /**
+         * Palauttaa satunnaismerkkijonon.
+         *
+         * @return Satunnaismerkkijono.
+         */
+        public String nextString() {
+<span class="fc bfc" id="L246" title="All 2 branches covered.">            for (int idx = 0; idx &lt; buf.length; ++idx) {</span>
+<span class="fc" id="L247">                buf[idx] = symbols[random.nextInt(symbols.length)];</span>
+            }
+<span class="fc" id="L249">            return new String(buf);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

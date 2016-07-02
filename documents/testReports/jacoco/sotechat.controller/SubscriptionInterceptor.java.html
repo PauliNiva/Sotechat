@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SubscriptionInterceptor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.controller</a> &gt; <span class="el_source">SubscriptionInterceptor.java</span></div><h1>SubscriptionInterceptor.java</h1><pre class="source lang-java linenums">package sotechat.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import org.springframework.stereotype.Component;
+
+import sotechat.service.ValidatorService;
+
+
+/**
+ * Sallii/kieltaa polun tilauksen kayttajaoikeuksista riippuen.
+ * Jos Interceptoria ei ole, kuka tahansa voi tilata esimerkiksi
+ * polun /toClient/* ja siten kuunnella salaa kaikkien viesteja.
+ */
+@Component
+public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
+
+    /**
+     * Validator Service suorittaa validointilogiikan.
+     */
+    private ValidatorService validatorService;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pValidatorService validatorService
+     */
+    @Autowired
+    public SubscriptionInterceptor(
+            final ValidatorService pValidatorService
+<span class="fc" id="L35">    ) {</span>
+<span class="fc" id="L36">        validatorService = pValidatorService;</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * Metodin tehtava on toimia portinvartijana tilaus-tapahtumille,
+     * mutta muunkintyyppiset WebSocket-sanomat aktivoivat taman
+     * metodin ja heittamalla poikkeus voidaan estaa sanoman kasittely.
+     *
+     * @param message message
+     * @param channel channel
+     * @return message Jos sallitaan tilaus. Palautusarvo toimii tassa
+     * tapauksessa niin, etta tilaus-viestin kulkeminen sita kasitteleville
+     * metodeille sallitaan. Jos ei sallita, heitetaan poikkeus.
+     */
+    @Override
+    public final Message&lt;?&gt; preSend(
+            final Message&lt;?&gt; message,
+            final MessageChannel channel
+    ) {
+<span class="fc" id="L55">        StompHeaderAccessor acc = StompHeaderAccessor.wrap(message);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (StompCommand.SUBSCRIBE.equals(acc.getCommand())) {</span>
+<span class="fc" id="L57">            String error = validatorService.validateSubscription(acc);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            if (!error.isEmpty()) {</span>
+<span class="fc" id="L59">                String descriptivePrefix = &quot;Subscription hacking attempt? &quot;;</span>
+<span class="fc" id="L60">                throw new IllegalArgumentException(descriptivePrefix + error);</span>
+            }
+        }
+
+        /* Sallitaan sanoman normaali kasittely. */
+<span class="fc" id="L65">        return message;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

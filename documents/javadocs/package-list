@@ -1,12 +1,15 @@
+integrationTests.additionalTests
+integrationTests.userAcceptanceTests
+integrationTests.util
 sotechat
 sotechat.auth
 sotechat.config
-sotechat.connectionEvents
 sotechat.controller
 sotechat.data
 sotechat.domain
-sotechat.domainService
 sotechat.profiles
 sotechat.repo
 sotechat.service
+sotechat.util
+sotechat.websocketService
 sotechat.wrappers

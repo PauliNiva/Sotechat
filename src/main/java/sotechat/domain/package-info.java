@@ -1,3 +1,4 @@
-/** Tama paketti sisaltaa sovelluksen domain-oliot.
- **/
+/**
+ * Tama paketti sisaltaa sovelluksen <code>domain</code>-oliot.
+ */
 package sotechat.domain;

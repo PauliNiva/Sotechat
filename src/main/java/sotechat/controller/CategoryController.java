@@ -2,42 +2,47 @@ package sotechat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import sotechat.data.Session;
-import sotechat.data.SessionRepo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Map;
 
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+
+/**
+ * Kontrolleri asiakkaan ohjaamiseksi oikeaan kategoriaan.
+ */
 @Controller
 public class CategoryController {
 
-    /** Session Repo. */
-    SessionRepo sessionRepo;
+    /**
+     * Sessioiden kasittely.
+     */
+    private SessionRepo sessionRepo;
 
-    /** Konstruktori.
+    /**
+     * Konstruktori.
      *
-     * @param pSessionRepo p
+     * @param pSessionRepo Alustettava sailo.
      */
     @Autowired
-    public CategoryController(
-            final SessionRepo pSessionRepo
-    ) {
+    public CategoryController(final SessionRepo pSessionRepo) {
         this.sessionRepo = pSessionRepo;
     }
 
 
-    /** Kun asiakas tulee paasivulle tulokategorian nayttavan linkin kautta.
-     * esim. www.sotechat.com/from/?source=mielenterveys
-     * @param source polusta haettu kategoriamuuttuja
-     * @param req pyynto
-     * @param professional autentikaatiotiedot
-     * @return ohjataan kayttaja juureen
+    /**
+     * Asiakkaan saapuessa paasivulle tulokategorian nayttavan linkin kautta
+     * liitetaan sessioon tieto mihin kategoriaan asiakas kuuluu.
+     * Esimerkiksi www.sotechat.com/from/?source=mielenterveys linkki.
+     *
+     * @param source Polusta haettu kategoriamuuttuja.
+     * @param req Pyynto.
+     * @param professional Autentikaatiotiedot.
+     * @return Uudelleenohjaus juureen.
      */
     @RequestMapping(value = "/from/", method = RequestMethod.GET)
     public final String rememberCategoryAndForward(
@@ -47,7 +52,7 @@ public class CategoryController {
     ) {
         Session session = sessionRepo.updateSession(req, professional);
         session.set("category", source);
-        /** Pyydetaan clientia tekemaan uudelleenohjaus juureen. */
+        /* Pyydetaan clientia tekemaan uudelleenohjaus juureen. */
         return "redirect:/";
     }
 

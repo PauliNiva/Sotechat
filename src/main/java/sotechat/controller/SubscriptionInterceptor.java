@@ -7,43 +7,47 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.stereotype.Component;
+
 import sotechat.service.ValidatorService;
-import java.security.Principal;
 
 
 /**
- * Sallii/kieltaa subscriptionin kayttajaoikeuksista riippuen.
- * Jos Interceptoria ei ole, kuka tahansa voi subscribaa esimerkiksi
- * kanavalle /toClient/* ja siten kuunnella salaa kaikkien viesteja.
+ * Sallii/kieltaa polun tilauksen kayttajaoikeuksista riippuen.
+ * Jos Interceptoria ei ole, kuka tahansa voi tilata esimerkiksi
+ * polun /toClient/* ja siten kuunnella salaa kaikkien viesteja.
  */
 @Component
 public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
 
-    /** Validator Service suorittaa validointilogiikan. */
+    /**
+     * Validator Service suorittaa validointilogiikan.
+     */
     private ValidatorService validatorService;
 
-    /** Konstruktori.
+    /**
+     * Konstruktori.
+     *
      * @param pValidatorService validatorService
      */
     @Autowired
-    public SubscriptionInterceptor(
-            final ValidatorService pValidatorService
-    ) {
+    public SubscriptionInterceptor(final ValidatorService pValidatorService) {
         validatorService = pValidatorService;
     }
 
-    /** Toimii "portinvartijana" subscribe-tapahtumille.
+    /**
+     * Metodin tehtava on toimia portinvartijana tilaus-tapahtumille,
+     * mutta muunkintyyppiset WebSocket-sanomat aktivoivat taman
+     * metodin ja heittamalla poikkeus voidaan estaa sanoman kasittely.
+     *
      * @param message message
      * @param channel channel
-     * @return message jos sallitaan subscribe. palautusarvo toimii tassa
-     * tapauksessa niin, etta subscribe-viestin kulkeminen sita kasitteleville
+     * @return message Jos sallitaan tilaus. Palautusarvo toimii tassa
+     * tapauksessa niin, etta tilaus-viestin kulkeminen sita kasitteleville
      * metodeille sallitaan. Jos ei sallita, heitetaan poikkeus.
      */
     @Override
-    public final Message<?> preSend(
-            final Message<?> message,
-            final MessageChannel channel
-    ) {
+    public final Message<?> preSend(final Message<?> message,
+                                    final MessageChannel channel) {
         StompHeaderAccessor acc = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(acc.getCommand())) {
             String error = validatorService.validateSubscription(acc);
@@ -53,7 +57,8 @@ public class SubscriptionInterceptor extends ChannelInterceptorAdapter {
             }
         }
 
-        /* Sallitaan subscriptionin normaali kasittely. */
+        /* Sallitaan sanoman normaali kasittely. */
         return message;
     }
+
 }

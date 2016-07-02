@@ -1,3 +1,4 @@
-/** Tama paketti sisaltaa sovelluksen kontrollerit.
- **/
+/**
+ * Paketti sisaltaa sovelluksen kontrollerit.
+ */
 package sotechat.controller;

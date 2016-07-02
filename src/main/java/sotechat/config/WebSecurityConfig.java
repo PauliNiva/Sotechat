@@ -21,18 +21,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import org.springframework.security.config.annotation
         .authentication.configurers.GlobalAuthenticationConfigurerAdapter;
-import sotechat.auth.JpaAuthenticationProvider;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
+import sotechat.auth.JpaAuthenticationProvider;
+
 /**
- * Tama konfiguraatiotiedosto ottaa Spring Securityn kayttoon
- * yhdessa joidenkin pom.xml -maarityksien kanssa.
+ * Ottaa <code>Spring Security</code>:n kayttoon.
  */
 @Configuration
 @EnableWebSecurity
@@ -40,9 +42,8 @@ import java.io.IOException;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
-     * Määrittelee sallitut resurssit.
-     * Csrf suojauksen, sekä sivun jolle
-     * ohjataan uloskirjautumisen jälkeen
+     * Maarittaa sallitut resurssit, CSRF-suojauksen, sekä sivun jolle
+     * ohjataan uloskirjautumisen jalkeen.
      */
     @Override
     @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
@@ -51,26 +52,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic().and().csrf()
+                .httpBasic().and().csrf().ignoringAntMatchers("/toServer/**")
                 .csrfTokenRepository(csrfTokenRepository()).and()
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
+                .headers().frameOptions().sameOrigin().and()
                 .logout().logoutSuccessUrl("/pro");
-
-        // TODO: allaoleva HTTP->HTTPS ohjaus
-        // http.requiresChannel().anyRequest().requiresSecure();
     }
 
     /**
-     * Luo angular yhteensopivan csrf filterin.
-     * @return palauttaa csrf Filterin
+     * Luo Angular-yhteensopivan CSRF-filtterin.
+     * @return Palauttaa CSRF-filterin.
      */
     private Filter csrfHeaderFilter() {
         return new OncePerRequestFilter() {
             @Override
-            protected void doFilterInternal(
-                    final HttpServletRequest request,
-                    final HttpServletResponse response,
-                    final FilterChain filterChain)
+            protected void doFilterInternal(final HttpServletRequest request,
+                                            final HttpServletResponse response,
+                                            final FilterChain filterChain)
                     throws ServletException, IOException {
 
                 CsrfToken csrf = (CsrfToken) request
@@ -91,9 +89,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Luodaan uusi CsrfToken.
-     * Asetetaan sen Header nimeksi Angular yhteensopiva.
-     * @return palauttaa csrfTokenRepositorin
+     * Luo uuden <code>CsrfToken</code>:in.
+     * Asettaa sen <code>Header</code> nimen Angular-yhteensopivaksi.
+     * @return Palauttaa <code>CsrfTokenRepository</code>-olion.
      */
     private CsrfTokenRepository csrfTokenRepository() {
         HttpSessionCsrfTokenRepository repository =
@@ -103,22 +101,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Yhdistää tietokannan Spring security authentikointiin.
+     * Yhdistaa tietokannan <code>Spring Security</code> todentamiseen.
      */
     @Configuration
     protected static class AuthenticationConfiguration
             extends GlobalAuthenticationConfigurerAdapter {
 
         /**
-         * Spring injektoi jpaAuthenticationProviderin tähän luokkaan.
+         * <code>JpaAuthenticationProvider</code>-olio.
          */
         @Autowired
         private JpaAuthenticationProvider jpaAuthenticationProvider;
 
         /**
-         * Käynnistää jpa authentikointi palvelun.
-         * @param auth AuthenticationManagerBuilder
-         * @throws Exception Liittäminen securityyn ei onnistu
+         * Kaynnistaa todentamispalvelun.
+         * @param auth AuthenticationManagerBuilder.
+         * @throws Exception Tietokantaan yhdistamisen epaonnistuessa.
          */
         @Override
         public final void init(final AuthenticationManagerBuilder auth)

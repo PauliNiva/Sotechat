@@ -47,6 +47,8 @@ public class joiningQueueIT {
      */
     @Test
     public void UserJoinsACommonQueue() {
+        proLogin(proWait);
+        handler.getDriver("user").navigate().refresh();
         // User has accessed chat pag
         // Username and a starting message is submitted
         waitAndFillInformation(userWait);
@@ -54,8 +56,8 @@ public class joiningQueueIT {
         // A queueing view is showed to the user
         assertTrue(waitForTextToAppear(userWait, "sinua palvellaan mahdollisimman pian"));
 
-        // User is added to the pool of customers professionals side
-        proLogin(proWait);
+        // User is added to the queue of customers professionals side
+
         assertTrue(waitElementPresent(proWait,By.id("queuerBlock")).isDisplayed());
         waitAndPickFromQueue(proWait);
         waitChatWindowsAppear(userWait);

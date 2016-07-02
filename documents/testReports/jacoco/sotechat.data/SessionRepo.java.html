@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SessionRepo.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.data</a> &gt; <span class="el_source">SessionRepo.java</span></div><h1>SessionRepo.java</h1><pre class="source lang-java linenums">package sotechat.data;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.MapSessionRepository;
+import org.springframework.stereotype.Component;
+import sotechat.controller.MessageBroker;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.util.HashMap;
+
+/**
+ * Hoitaa Session-olioihin liittyvan kasittelyn.
+ * esim. paivittaa session-attribuutteihin nimimerkin.
+ */
+@Component
+public class SessionRepo extends MapSessionRepository {
+
+    /**
+     * Avain sessio-ID, arvo Sessio-olio.
+     * HUOM: Usea sessio-ID voi viitata samaan Session-olioon!
+     */
+    private HashMap&lt;String, Session&gt; sessionsBySessionId;
+
+    /**
+     * Avain userId, arvo Sessio-olio.
+     */
+    private HashMap&lt;String, Session&gt; sessionsByUserId;
+
+    /**
+     * Avain proUsername, arvo Sessio-olio.
+     * Tehty toteuttamaan hoitajan kayttotapaus: logout-&gt;login-&gt;jatka chatteja
+     */
+    private HashMap&lt;String, Session&gt; proUserSessions;
+
+    /**
+     * Lukumaara kirjautuneita ammattilaisia, jotka ovat valmiita
+     * vastaanottamaan uusia asiakkaita. Liittyy chatin sulkemiseen.
+     */
+    private int countOfProsAcceptingNewCustomers;
+
+    /**
+     * Mapper.
+     */
+    private Mapper mapper;
+
+    /**
+     * Konstruktori.
+     *
+     * @param pMapper p.
+     */
+    @Autowired
+    public SessionRepo(
+            final Mapper pMapper
+<span class="fc" id="L55">    ) {</span>
+<span class="fc" id="L56">        this.mapper = pMapper;</span>
+<span class="fc" id="L57">        initialize();</span>
+<span class="fc" id="L58">    }</span>
+
+    /**
+     * Alustaminen, jota kutsutaan seka olion
+     * luonnissa etta sessioiden unohtamisessa.
+     * */
+    private void initialize() {
+<span class="fc" id="L65">        this.sessionsBySessionId = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L66">        this.sessionsByUserId = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L67">        this.proUserSessions = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L68">        this.countOfProsAcceptingNewCustomers = 0;</span>
+<span class="fc" id="L69">    }</span>
+
+    /**
+     * Kaivaa sessionId:lla session-olion.
+     *
+     * @param sessionId SessionId.
+     * @return Session-olio.
+     */
+    public synchronized Session getSessionFromSessionId(
+            final String sessionId
+    ) {
+<span class="fc" id="L80">        return sessionsBySessionId.get(sessionId);</span>
+    }
+
+    /**
+     * Kaivaa session-olion userId:lla.
+     *
+     * @param userId Kayttajan userId
+     * @return SessionReposta userId:lla haettu session.
+     */
+    public synchronized Session getSessionFromUserId(
+            final String userId
+    ) {
+<span class="fc" id="L92">        return sessionsByUserId.get(userId);</span>
+    }
+
+    /**
+     * Kanavalta poistuminen. Kutsutaan tapauksissa:
+     * - Kun keskustelija painaa nappia &quot;Poistu&quot;
+     * - Kun keskustelija on kadonnut eika tule takaisin pian (timeout)
+     * - Kun admin poistaa ammattilaiskayttajan, jolla on aktiivisia kanavia.
+     * @param channelId p.
+     * @param sessionId p.
+     */
+    public synchronized void leaveChannel(
+            final String channelId,
+            final String sessionId
+    ) {
+<span class="fc" id="L107">        Session session = getSessionFromSessionId(sessionId);</span>
+<span class="fc" id="L108">        session.removeChannel(channelId);</span>
+<span class="fc" id="L109">        updateCountOfProsAcceptingNewCustomers();</span>
+<span class="fc" id="L110">        Channel channel = mapper.getChannel(channelId);</span>
+<span class="fc" id="L111">        disableChannel(channel);</span>
+<span class="fc" id="L112">        channel.removeSubscriber(session);</span>
+<span class="fc" id="L113">        channel.removeActiveUserId(session.get(&quot;userId&quot;));</span>
+<span class="fc" id="L114">    }</span>
+
+    /**
+     * Asettaa kanavan epaaktiiviseksi.
+     *
+     * @param channel Kanava, joka asetaetaan.
+     */
+    public void disableChannel(
+            final Channel channel
+    ) {
+<span class="fc" id="L124">        channel.setInactive();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        for (String someUserId : channel.getActiveUserIds()) {</span>
+<span class="fc" id="L126">            Session someSession = getSessionFromUserId(someUserId);</span>
+<span class="fc" id="L127">            String someSessionId = someSession.get(&quot;sessionId&quot;);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">            if (!someSession.isPro()) {</span>
+                /* Jos kukaan lahtee kanavalta, jolla on normikayttajia,
+                 * unohdetaan normikayttajien sessiot. */
+<span class="fc" id="L131">                sessionsByUserId.remove(someUserId);</span>
+<span class="fc" id="L132">                sessionsBySessionId.remove(someSessionId);</span>
+            }
+<span class="fc" id="L134">        }</span>
+<span class="fc" id="L135">    }</span>
+
+
+    /**
+     * Paivittaa tarpeen vaatiessa sessioniin liittyvia tietoja.
+     *      - Paivittaa mappayksia &quot;sessioId liittyy tahan sessio-olioon&quot; yms.
+     *      - Paivittaa sessio-olion attribuutteja
+     *
+     * @param req taalta saadaan Http Session Id.
+     * @param professional taalta saadaan kirjautumistiedot, voi olla null.
+     * @return Session-olio.
+     */
+    public synchronized Session updateSession(
+            final HttpServletRequest req,
+            final Principal professional
+    ) {
+<span class="fc" id="L151">        String sessionId = req.getSession().getId();</span>
+
+<span class="fc" id="L153">        Session session = updateSessionObjectMapping(sessionId, professional);</span>
+<span class="fc" id="L154">        updateSessionAttributes(session, professional);</span>
+<span class="fc" id="L155">        session.set(&quot;sessionId&quot;, sessionId);</span>
+<span class="fc" id="L156">        updateCountOfProsAcceptingNewCustomers();</span>
+
+<span class="fc" id="L158">        return session;</span>
+    }
+
+    /**
+     * Paivittaa tarpeen vaatiessa session-olion attribuutteja.
+     *
+     * @param session session-olio
+     * @param professional kirjautumistiedot, saa olla null
+     */
+    public void updateSessionAttributes(
+            final Session session,
+            final Principal professional
+    ) {
+        /* Kaivetaan username ja id sessio-attribuuteista. */
+<span class="fc" id="L172">        String username = session.get(&quot;username&quot;);</span>
+<span class="fc" id="L173">        String userId = session.get(&quot;userId&quot;);</span>
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (professional != null) {</span>
+            /* Jos client on autentikoitunut ammattilaiseksi */
+<span class="fc" id="L177">            username = professional.getName();</span>
+<span class="fc" id="L178">            userId = mapper.getIdFromRegisteredName(username);</span>
+<span class="fc" id="L179">            session.set(&quot;state&quot;, &quot;pro&quot;);</span>
+<span class="fc" id="L180">            session.set(&quot;username&quot;, username);</span>
+<span class="fc" id="L181">            session.set(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L182">            session.updateChannelsAttribute();</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">        } else if (username.isEmpty()) {</span>
+            /* Uusi kayttaja */
+<span class="fc" id="L185">            username = &quot;Anon&quot;;</span>
+<span class="fc" id="L186">            userId = mapper.generateNewId();</span>
+<span class="fc" id="L187">            session.set(&quot;username&quot;, username);</span>
+<span class="fc" id="L188">            session.set(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L189">            session.set(&quot;state&quot;, &quot;start&quot;);</span>
+<span class="fc" id="L190">            session.set(&quot;category&quot;, &quot;Aihe ei tiedossa&quot;);</span>
+<span class="fc" id="L191">            Channel channel = mapper.createChannel();</span>
+<span class="fc" id="L192">            channel.allowParticipation(session);</span>
+        }
+
+<span class="fc bfc" id="L195" title="All 4 branches covered.">        if (chatClosed() &amp;&amp; session.get(&quot;state&quot;).equals(&quot;start&quot;)) {</span>
+            /* Ei nayteta alkunakymaa asiakkaille, jos chat on suljettu. */
+<span class="fc" id="L197">            session.set(&quot;state&quot;, &quot;closed&quot;);</span>
+<span class="pc bpc" id="L198" title="1 of 4 branches missed.">        } else if (!chatClosed() &amp;&amp; session.get(&quot;state&quot;).equals(&quot;closed&quot;)) {</span>
+            /* Chat oli joskus suljettu, mutta nyt se on avattu. */
+<span class="nc" id="L200">            session.set(&quot;state&quot;, &quot;start&quot;);</span>
+        }
+
+        /* Muistetaan jatkossakin, mihin sessioon tama userId liittyy. */
+<span class="fc" id="L204">        sessionsByUserId.put(userId, session);</span>
+<span class="fc" id="L205">    }</span>
+
+    /**
+     * Paivittaa mappayksia kuten &quot;sessioId liittyy tahan sessio-olioon&quot;.
+     *
+     * @param sessionId sessioId
+     * @param professional autentikaatiotiedot, voi olla null
+     * @return sessio-olio
+     */
+    private Session updateSessionObjectMapping(
+            final String sessionId,
+            final Principal professional
+    ) {
+<span class="fc" id="L218">        Session session = sessionsBySessionId.get(sessionId);</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">        if (session != null) {</span>
+            /* Talle sessioId:lle on jo mapatty Sessio-olio, palautetaan se. */
+<span class="fc" id="L221">            return session;</span>
+        }
+
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        if (professional != null) {</span>
+            /* Onko hoitajalla olemassaoleva vanha sessio? */
+<span class="fc" id="L226">            String proUsername = professional.getName();</span>
+<span class="fc" id="L227">            session = proUserSessions.get(proUsername);</span>
+        }
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        if (session == null) {</span>
+            /* Sessio edelleen tuntematon, luodaan uusi sessio. */
+<span class="fc" id="L231">            session = new Session();</span>
+<span class="fc" id="L232">            session.set(&quot;online&quot;, &quot;true&quot;);</span>
+        }
+
+        /* Muistetaan jatkossakin, mihin sessioon tama sessionId liittyy. */
+<span class="fc" id="L236">        sessionsBySessionId.put(sessionId, session);</span>
+
+        /* Jos kyseessa pro, muistetaan etta proUsername liittyy sessioon. */
+<span class="fc bfc" id="L239" title="All 2 branches covered.">        if (professional != null) {</span>
+<span class="fc" id="L240">            proUserSessions.put(professional.getName(), session);</span>
+        }
+
+<span class="fc" id="L243">        return session;</span>
+    }
+
+    /**
+     * Asettaa ammattilaisen online-statukseksi &quot;true&quot; tai &quot;false&quot;.
+     * Oletettavasti pyynto on validoitu ennen taman metodin kutsua.
+     *
+     * @param req sessioId taalta
+     * @param onlineStatus asettava onlineStatus
+     */
+    public synchronized void setOnlineStatus(
+            final HttpServletRequest req,
+            final String onlineStatus
+    ) {
+<span class="nc" id="L257">        String sessionId = req.getSession().getId();</span>
+<span class="nc" id="L258">        setOnlineStatus(sessionId, onlineStatus);</span>
+<span class="nc" id="L259">    }</span>
+
+    public synchronized void setOnlineStatus(
+            final String sessionId,
+            final String onlineStatus
+    ) {
+<span class="nc" id="L265">        Session session = sessionsBySessionId.get(sessionId);</span>
+<span class="nc" id="L266">        session.set(&quot;online&quot;, onlineStatus);</span>
+<span class="nc" id="L267">        updateCountOfProsAcceptingNewCustomers();</span>
+<span class="nc" id="L268">    }</span>
+
+    /**
+     * Paivittaa muistiin lukumaaran kirjautuneista ammattilaisista,
+     * jotka hyvaksyvat uusia asiakkaita. Jos kirjautuneita ammattilaisia
+     * voi olla yli 1000, paivitys olisi hyva hoitaa tehokkaammin.
+     */
+    private synchronized void updateCountOfProsAcceptingNewCustomers() {
+<span class="fc" id="L276">        countOfProsAcceptingNewCustomers = 0;</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">        for (Session session : proUserSessions.values()) {</span>
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">            if (session.get(&quot;online&quot;).equals(&quot;true&quot;)) {</span>
+<span class="fc" id="L279">                countOfProsAcceptingNewCustomers++;</span>
+            }
+<span class="fc" id="L281">        }</span>
+<span class="fc" id="L282">    }</span>
+
+    /**
+     * Onko chat suljettu?. Tarkoitettu kaytettavaksi siihen liittyen,
+     * hyvaksytaanko uusia asiakkaita enaa jonoon (tai edes aloitussivulle).
+     * Vanhat asiakkaat on tarkoitus kasitella, vaikka chat olisikin &quot;suljettu&quot;.
+     *
+     * @return true jos uusia asiakkaita ei hyvaksyta.
+     */
+    public synchronized boolean chatClosed() {
+<span class="fc bfc" id="L292" title="All 2 branches covered.">        return countOfProsAcceptingNewCustomers == 0;</span>
+    }
+
+    /**
+     * Unohtaa kaiken, mika liittyy kayttajaan annetulla userId:lla.
+     * Tarkoitettu kaytettavaksi timeoutissa seka ammattilaiskayttajan
+     * tilin poistamisen yhteydessa.
+     *
+     * @param userId userId
+     */
+    public void forgetSession(final String userId) {
+<span class="fc" id="L303">        Session session = getSessionFromUserId(userId);</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">        if (session == null) {</span>
+            /* Kayttajaan ei liity sessiota. */
+<span class="fc" id="L306">            return;</span>
+        }
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        for (String channelId : session.getChannels()) {</span>
+<span class="nc" id="L309">            Channel channel = mapper.getChannel(channelId);</span>
+<span class="nc" id="L310">            disableChannel(channel);</span>
+            /* Note: ei haittaa että WS yhteys kanavalle jaa auki, silla
+             * kukaan ei pysty enaa lahettamaan viesteja kanavalle. */
+<span class="nc" id="L313">        }</span>
+<span class="nc" id="L314">        sessionsByUserId.remove(userId);</span>
+<span class="nc" id="L315">        String sessionId = session.get(&quot;sessionId&quot;);</span>
+<span class="nc" id="L316">        sessionsBySessionId.remove(sessionId);</span>
+<span class="nc" id="L317">        proUserSessions.remove(session.get(&quot;username&quot;));</span>
+<span class="nc" id="L318">        updateCountOfProsAcceptingNewCustomers();</span>
+<span class="nc" id="L319">    }</span>
+
+    /**
+     * Testausta helpottamaan metodi sessioiden unohtamiseen.
+     */
+    public void forgetAllSessions() {
+<span class="fc" id="L325">        initialize();</span>
+<span class="fc" id="L326">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -10,16 +10,12 @@ public class MapperTest {
 
     @Before
     public void setUp() {
-        mapper = new Mapper();
+        mapper = new MapperImpl();
     }
 
-    //@Test
-    //TODO: kunnolla
+    @Test
     public void getIdFromRegisteredNameTest() {
         mapper.mapProUsernameToUserId("pauli", "admin");
-        Assert.assertEquals("UNKNOWN_ID", mapper.getIdFromRegisteredName(""));
-        Assert.assertEquals("UNKNOWN_ID", mapper.getIdFromRegisteredName(null));
         Assert.assertEquals("admin", mapper.getIdFromRegisteredName("pauli"));
-        Assert.assertEquals("UNKNOWN_ID", mapper.getIdFromRegisteredName("iluap"));
     }
 }

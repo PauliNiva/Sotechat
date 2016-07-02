@@ -19,32 +19,42 @@ import sotechat.data.Mapper;
 import sotechat.domain.Person;
 import sotechat.repo.PersonRepo;
 
+/**
+ * Luokka <code>JPA</code>-pohjaiseen kayttajan todentamiseen.
+ * Koskee vain ammattilais- ja <code>admin</code>-kayttajia.
+ * Toteuttaa rajapinnan <code>AuthenticationProvider</code>.
+ */
 @Component
 public class JpaAuthenticationProvider implements AuthenticationProvider {
 
     /**
-     * Mapper.
+     * <code>Mapper</code>-olio.
      */
     @Autowired
     private Mapper mapper;
 
     /**
-     * PersonRepo.
+     * Säilö <code>person</code>-olioille.
      */
     @Autowired
     private PersonRepo personRepo;
 
     /**
-     * Konstruktori.
-     * @param a auth
-     * @return TODO
-     * @throws AuthenticationException TODO
+     * Todentaa kayttajan tarkistamalla, etta kirjautuvan kayttajan salasana
+     * vastaa <code>PersonRepo</code>:ssa tallessa olevaa salasanaa.
+     *
+     * @param auth <code>Authentication</code>-olio.
+     * @return Valtuus, jossa argumentteina <code>person</code>-olion
+     * kayttajanimi, salasana ja lista annetuistavaltuuksista.
+     * @throws AuthenticationException Heitettava poikkeus jos todentaminen
+     * epaonnistuu. Heitetaan kayttajan ollessa <code>null</code> tai salasana
+     * ei vastaa tallessa olevaa salasanaa.
      */
     @Override
-    public final Authentication authenticate(Authentication a)
+    public final Authentication authenticate(final Authentication auth)
             throws AuthenticationException {
-        String loginName = a.getPrincipal().toString();
-        String password = a.getCredentials().toString();
+        String loginName = auth.getPrincipal().toString();
+        String password = auth.getCredentials().toString();
         Person person = personRepo.findByLoginName(loginName);
 
         if (person == null) {
@@ -53,7 +63,7 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
             };
         }
         if (!BCrypt.hashpw(password, person.getSalt())
-                .equals(person.getPassword())) {
+                .equals(person.getHashOfPasswordAndSalt())) {
             throw new AuthenticationException(
                     "Unable to authenticate user " + loginName) {
             };
@@ -61,16 +71,19 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
 
         List<GrantedAuthority> grantedAuths = grantAuthority(person);
         mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());
+
         return new UsernamePasswordAuthenticationToken(person.getUserName(),
                 password, grantedAuths);
     }
 
     /**
-     * TODO
-     * @param person person
-     * @return TODO
+     * Antaa kayttajalle valtuudeksi joko roolin "ADMIN" tai roolin "USER".
+     * Rooli "USER" viittaa rekisteroityyn ammattilaiskayttajaan.
+     *
+     * @param person Kirjautuva henkilo.
+     * @return Kayttajan rooli listana.
      */
-    private List<GrantedAuthority> grantAuthority(Person person) {
+    private List<GrantedAuthority> grantAuthority(final Person person) {
         List<GrantedAuthority> grantedAuths = new ArrayList<>();
         if (person.getRole().equals("ROLE_ADMIN")) {
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
@@ -81,12 +94,22 @@ public class JpaAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * TODO
-     * @param type
-     * @return
+     * Palauttaa <code>true</code>, jos <code>AuthenticationProvider</code>
+     * tukee viitattua <code>Authentication</code>-oliota.
+     * <p>
+     * <code>true</code>:n palautus ei takaa, etta
+     * <code>AuthenticationProvider</code> pystyy valtuuttamaan sille esitetyn
+     * <code>Authentication</code>-luokan ilmentyman.
+     * <code>AuthenticationProvider</code> voi edelleen palauttaa arvon
+     * <code>null</code>, vaikka <code>supports</code>-metodi palauttaisi
+     * <code>true</code>. Talloin on kokeiltava toista
+     * <code>AuthenticationProvider</code>:ia.
+     * @param type tyyppi.
+     * @return <code>true</code>, jos viitattu olio on tuettu.
      */
     @Override
-    public final boolean supports(Class<?> type) {
-        return true;
+    public final boolean supports(final Class<?> type) {
+        return type.equals(UsernamePasswordAuthenticationToken.class);
     }
+
 }

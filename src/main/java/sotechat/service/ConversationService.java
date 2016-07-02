@@ -3,122 +3,118 @@ package sotechat.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 import sotechat.domain.Conversation;
 import sotechat.domain.Message;
 import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 
-import java.util.List;
-
 /**
- * Luokka tietokannassa olevien keskustelujen hallinnoimiseen
+ * Luokka tietokannassa olevien keskustelujen hallinnoimiseen.
  * (CRUD -operaatiot)
  */
 @Service
 public class ConversationService {
 
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Message-luokan olioita.
+     */
     @Autowired
     private MessageRepo messageRepo;
 
+    /**
+     * JPA-repositorio, josta voidaan hakea tai jonne voidaan tallettaa
+     * Conversation-luokan olioita.
+     */
     @Autowired
     private ConversationRepo conversationRepo;
 
     /**
      * Lisaa uuden keskustelun tietokantaan, jolle asetetaan aikaleima
      * ja tunnukseksi parametrina annettu kanavaid. Taman jalkeen lisataan
-     * keskusteluun parametrina annettu viesti
-     * @param conv lisättävä keskustelu
+     * keskusteluun parametrina annettu viesti.
+     *
+     * @param conv lisattava keskustelu
+     * @throws Exception Poikkeus, joka heitetaan jos tietokantaan tallettaminen
+     * epaonnistuu.
      */
     @Transactional
-    public void addConversation(Conversation conv)
+    public void addConversation(final Conversation conv)
             throws Exception {
-            conversationRepo.save(conv);
+        conversationRepo.save(conv);
     }
 
     /**
-     * Lisää parametrina annettua kanavaid:tä vastaavaan keskusteluun
+     * Lisaa parametrina annettua kanavaid:ta vastaavaan keskusteluun
      * parametrina annetun Person luokan olion. Henkilo lisataan Keskustelun
      * henkiloihin.
+     *
      * @param person Person luokan oli, joka halutaan lisata keskusteluun
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void addPerson(Person person, String channelId)
+    public void addPerson(final Person person, final String channelId)
             throws Exception {
-                Conversation conv = conversationRepo.findOne(channelId);
-                conv.addPersonToConversation(person);
-                conversationRepo.save(conv);
+        Conversation conv = conversationRepo.findOne(channelId);
+        conv.addPersonToConversation(person);
+        conversationRepo.save(conv);
     }
 
     /**
      * Liittaa parametrina annettulla kanavaid:lla tietokannasta loytyvan
-     * keskustelun kategoriaksi parametrina annetun aihealueen
+     * keskustelun kategoriaksi parametrina annetun aihealueen.
+     *
      * @param category keskustelun aihealue
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void setCategory(String category, String channelId) throws Exception {
-            Conversation conv = conversationRepo.findOne(channelId);
-            conv.setCategory(category);
-            conversationRepo.save(conv);
-    }
-
-    /**
-     * Lisaa parametrina annetun Message -luokan olion parametrina annetun
-     * Conversation -olion listaan, ts liittaa viestin keskusteluun.
-     * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
-     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
-     * kertaan.
-     * @param message Message -luokan olio, jossa on kayttajan viesti
-     * @param conv Conversation -luokan oli, joka edustaa keskustelua, johon
-     *             viesti liittyy
-     * @throws Exception NullPointerException
-     */
-
-    @Transactional
-    public Message addMessage(Message message, Conversation conv)
+    public void setCategory(final String category, final String channelId)
             throws Exception {
-            message.setConversation(conv);
-            Message messageToBeAddedToConversation = messageRepo.save(message);
-            conv.addMessageToConversation(messageToBeAddedToConversation);
-            conversationRepo.save(conv);
-            return messageToBeAddedToConversation;
+        Conversation conv = conversationRepo.findOne(channelId);
+        conv.setCategory(category);
+        conversationRepo.save(conv);
     }
 
     /**
-     * Lisaa parametrina annetun Message olion keskusteluun, joka etsitaan
-     * tietokannasta parametrina annetun kanava id:n perusteella.
+     * Lisaa parametrina annetun Message-luokan olion parametrina annetun
+     * Conversation-olion listaan, ts. liittaa viestin keskusteluun.
      * MessageRepoa tarvitaan, jotta viesti saadaan talletettua tietokantaan
-     * ensin, ja kun viesti lisätään keskusteluun, viestiä ei lisätä kahteen
+     * ensin, ja kun viesti lisataan keskusteluun, viestia ei lisata kahteen
      * kertaan.
-     * @param message Message lisattava viesti
-     * @param channelId kanavaid jonka osoittamaan keskusteluun viesti halutaan
-     *                  lisata
+     *
+     * @param message Message-luokan olio, jossa on kayttajan viesti
+     * @param conv Conversation-luokan oli, joka edustaa keskustelua, johon
+     *             viesti liittyy
+     * @return Palauttaa keskusteluun lisatyn viestin Message-oliona.
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
-    /*
     @Transactional
-    public Message addMessage(Message message, String channelId) {
-        Conversation conv = conversationRepo.findOne(channelId);
+    public Message addMessage(final Message message, final Conversation conv)
+            throws Exception {
         message.setConversation(conv);
         Message messageToBeAddedToConversation = messageRepo.save(message);
-        conv.addMessageToConversation(message);
+        conv.addMessageToConversation(messageToBeAddedToConversation);
         conversationRepo.save(conv);
         return messageToBeAddedToConversation;
     }
-    */
 
     /**
-     * Poistaa keskustelusta viestin ts. poistaa parametrina annetun Message
-     * olion sen muuttujista loytyvan Conversation olion listasta ja paivittaa
-     * muutoksen tietokantaan.
+     * Poistaa keskustelusta viestin.
+     *
      * @param message Viesti joka halutaan poistaa (taytyy etsia ensin
      *                messageServicesta)
      */
     @Transactional
-    public void removeMessage(Message message) {
+    public void removeMessage(final Message message) {
         String channelId = message.getConversation().getChannelId();
         Conversation conv = conversationRepo.findOne(channelId);
         conv.getMessagesOfConversation().remove(message);
@@ -126,29 +122,34 @@ public class ConversationService {
     }
 
     /**
-     * Poistaa keskustelun tietokannasta ts. poistaa parametrina annettua
-     * kanavaid:ta vastaavaa keskustelua edustavan Conversation luokan olion
-     * tietokannasta.
+     * Poistaa keskustelun tietokannasta.
+     *
      * @param channelId keskustelun kanavan id
-     * @throws Exception IllegalArgumentException
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public void removeConversation(String channelId) throws Exception {
+    public void removeConversation(final String channelId) throws Exception {
         conversationRepo.delete(channelId);
     }
 
     /**
-     * Palauttaa parametrina annettua channel id:tä vastaavan keskustelun
+     * Palauttaa parametrina annettua channelid:ta vastaavan keskustelun.
+     *
      * @param channelId haetun keskustelun kanavaid
      * @return Conversation olio, jolla pyydetty kanavaid
+     * @throws Exception Poikkeus, joka heitetaan, jos tietokantaan
+     * tallettaminen epaonnistuu.
      */
     @Transactional
-    public Conversation getConversation(String channelId) throws Exception {
+    public Conversation getConversation(final String channelId)
+            throws Exception {
         return conversationRepo.findOne(channelId);
     }
 
     /**
      * Palauttaa listan kaikista tietokannan keskusteluista.
+     *
      * @return lista Conversation-olioista
      */
     @Transactional

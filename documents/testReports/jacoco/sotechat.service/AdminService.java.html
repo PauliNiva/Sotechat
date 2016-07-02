@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AdminService.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Sotechat</a> &gt; <a href="index.source.html" class="el_package">sotechat.service</a> &gt; <span class="el_source">AdminService.java</span></div><h1>AdminService.java</h1><pre class="source lang-java linenums">package sotechat.service;
+
+import com.google.gson.Gson;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import org.springframework.util.Base64Utils;
+
+import sotechat.controller.MessageBroker;
+import sotechat.data.ChatLogger;
+import sotechat.data.Mapper;
+import sotechat.data.Session;
+import sotechat.data.SessionRepo;
+import sotechat.domain.Person;
+import sotechat.repo.PersonRepo;
+
+import javax.transaction.Transactional;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+<span class="fc" id="L25">public class AdminService {</span>
+
+    @Autowired
+    private PersonRepo personRepo;
+
+    @Autowired
+    private DatabaseService databaseService;
+
+    @Autowired
+    private SessionRepo sessionRepo;
+
+    @Autowired
+    private Mapper mapper;
+
+    @Autowired
+    private ChatLogger chatLogger;
+
+    @Autowired
+    private QueueService queueService;
+
+    @Autowired
+    private ValidatorService validatorService;
+
+    @Autowired
+    private MessageBroker broker;
+
+    /**
+     * Lisaa uuden ammattilaisen.
+     *
+     * @param encodedPersonJson merkkijono muotoa eyJ1c2Vybm...
+     *        decoded personJson: {&quot;username&quot;: mikko ... }
+     *        TODO:
+     *             JSONissa kuuluisi olla lainausmerkit myos mikon kohdalla.
+     *             Nahtavasti toimii siita huolimatta.
+     * @return Virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
+    @Transactional
+    public String addUser(final String encodedPersonJson) {
+        /* Validoidaan pyynto. */
+<span class="fc" id="L64">        String error = validatorService</span>
+<span class="fc" id="L65">                .validateAddUserReq(encodedPersonJson, personRepo);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (!error.isEmpty()) {</span>
+            /* Palautetaan virheilmoitus. */
+<span class="nc" id="L68">            return error;</span>
+        }
+
+        /* Pyynto validoitu, tallennetaan tiedot uudesta personista. */
+<span class="fc" id="L72">        Person person = makePersonFrom(encodedPersonJson);</span>
+<span class="fc" id="L73">        person.setUserId(mapper.generateNewId());</span>
+        try {
+<span class="fc" id="L75">            personRepo.save(person);</span>
+<span class="nc" id="L76">        } catch (Exception databaseException) {</span>
+<span class="nc" id="L77">            return &quot;Tietokantavirhe henkilön tallennusta yrittäessä!&quot;;</span>
+<span class="fc" id="L78">        }</span>
+<span class="fc" id="L79">        mapper.mapProUsernameToUserId(person.getUserName(), person.getUserId());</span>
+
+        /* Palautetaan tyhja String merkiksi onnistuneesta pyynnosta. */
+<span class="fc" id="L82">        return &quot;&quot;;</span>
+    }
+
+    @Transactional
+    public String listAllPersonsAsJsonList() {
+<span class="fc" id="L87">        List&lt;Person&gt; personList = personRepo.findAll();</span>
+<span class="fc" id="L88">        List&lt;Person&gt; deprecatedPersonList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L89">        personList.forEach(p-&gt;deprecatedPersonList</span>
+<span class="fc" id="L90">                .add(extractInfo(p)));</span>
+<span class="fc" id="L91">        Gson gson = new Gson();</span>
+<span class="fc" id="L92">        return gson.toJson(deprecatedPersonList);</span>
+    }
+
+    private Person extractInfo(final Person pPerson) {
+<span class="fc" id="L96">        Person personWithDeprecatedAttributes = new Person();</span>
+<span class="fc" id="L97">        personWithDeprecatedAttributes.setLoginName(pPerson.getLoginName());</span>
+<span class="fc" id="L98">        personWithDeprecatedAttributes.setUserName(pPerson.getUserName());</span>
+<span class="fc" id="L99">        personWithDeprecatedAttributes.setUserId(pPerson.getUserId());</span>
+<span class="fc" id="L100">        return personWithDeprecatedAttributes;</span>
+    }
+
+    /**
+     * Poistaa ammattilaiskayttajan annetulla userId:lla.
+     *
+     * @param userId userId
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
+    @Transactional
+    public String deleteUser(final String userId) {
+        Person personToBeDeleted;
+        try {
+<span class="fc" id="L113">            personToBeDeleted = personRepo.findOne(userId);</span>
+<span class="nc" id="L114">        } catch (Exception e) {</span>
+<span class="nc" id="L115">            return &quot;Tietokantavirhe hakiessa henkilöä!&quot;;</span>
+<span class="fc" id="L116">        }</span>
+
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if (personToBeDeleted == null) {</span>
+<span class="nc" id="L119">            return &quot;Käyttäjää ei löydy.&quot;;</span>
+        }
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (personToBeDeleted.getRole().equals(&quot;ROLE_ADMIN&quot;)) {</span>
+<span class="nc" id="L122">            return &quot;Ylläpitäjää ei voi poistaa.&quot;;</span>
+        }
+<span class="fc" id="L124">        String username = personToBeDeleted.getUserName();</span>
+<span class="fc" id="L125">        mapper.removeMappingForUsername(username);</span>
+        try {
+<span class="fc" id="L127">            personRepo.delete(userId);</span>
+<span class="nc" id="L128">        } catch (Exception databaseException) {</span>
+<span class="nc" id="L129">            return &quot;Tietokantavirhe yrittäessä poistaa käyttäjää!&quot;;</span>
+<span class="fc" id="L130">        }</span>
+<span class="fc" id="L131">        Session session = sessionRepo.getSessionFromUserId(userId);</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if (session != null) {</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            for (String channelId : session.getChannels()) {</span>
+            /* Tiedotetaan poistettavan kayttajan kanaville
+             * kanavien sulkemisesta. */
+<span class="nc" id="L136">                broker.sendClosedChannelNotice(channelId);</span>
+<span class="nc" id="L137">            }</span>
+        }
+<span class="fc" id="L139">        sessionRepo.forgetSession(userId);</span>
+
+<span class="fc" id="L141">        return &quot;&quot;;</span>
+    }
+
+    /**
+     * Vaihtaa salasanan.
+     *
+     * @param userId userId kenen salasana vaihdetaan
+     * @param encodedPassword haluttu uusi salasana encodattuna
+     * @return virheilmoitus Stringina tai tyhja String jos pyynto onnistui.
+     */
+    @Transactional
+    public String changePassword(
+            final String userId,
+            final String encodedPassword
+    ) {
+        try {
+<span class="fc" id="L157">            String decodedPassword = decode(encodedPassword);</span>
+<span class="fc" id="L158">            Person person = personRepo.findOne(userId);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">            if (person == null) {</span>
+<span class="nc" id="L160">                return &quot;Käyttäjää ei löydy.&quot;;</span>
+            }
+<span class="fc" id="L162">            person.hashPasswordWithSalt(decodedPassword);</span>
+<span class="fc" id="L163">            return &quot;&quot;;</span>
+<span class="nc" id="L164">        } catch (Exception exception) {</span>
+<span class="nc" id="L165">            return &quot;Virhe salasanan kääntämisessä selkokieliseen muotoon&quot;</span>
+                    + &quot;tai hakiessa henkilöä tietokannasta!&quot;;
+        }
+
+    }
+
+    /**
+     * Tyhjentaa historian. Tarkoitettu tehtavaksi vain ennen demoamista.
+     * Unohtaa aktiiviset sessiot, tyhjentaa asiakasjonon, unohtaa
+     * keskustelut muistista, unohtaa keskustelut tietokannasta.
+     *
+     * @return virheilmoitus Stringina tai tyhja jos ei virhetta
+     */
+    @Transactional
+    public String clearHistory() {
+<span class="fc" id="L180">        sessionRepo.forgetAllSessions();</span>
+<span class="fc" id="L181">        queueService.clearQueue();</span>
+<span class="fc" id="L182">        chatLogger.removeOldMessagesFromMemory(0);</span>
+<span class="fc" id="L183">        return databaseService.removeAllConversationsFromDatabase();</span>
+    }
+
+
+    /**
+     * Yrittaa luoda Person-olion encoodatusta JSON-stringista.
+     * HUOM: oliota ei tallenneta tietokantaan metodin sisalla.
+     *
+     * @param encodedPersonJson encoodattu person Json Stringina
+     * @return Person-olio tai null jos virheellinen syote.
+     */
+    public static Person makePersonFrom(final String encodedPersonJson) {
+        try {
+<span class="fc" id="L196">            String decodedPersonJson = decode(encodedPersonJson);</span>
+<span class="fc" id="L197">            decodedPersonJson = decodedPersonJson.replaceFirst(&quot;password&quot;, &quot;authenticationHash&quot;);</span>
+<span class="fc" id="L198">            Gson gson = new Gson();</span>
+<span class="fc" id="L199">            Person person = gson.fromJson(decodedPersonJson, Person.class);</span>
+<span class="fc" id="L200">            person.hashPasswordWithSalt(person.getHashOfPasswordAndSalt());</span>
+<span class="fc" id="L201">            person.setRole(&quot;ROLE_USER&quot;);</span>
+<span class="fc" id="L202">            return person;</span>
+<span class="nc" id="L203">        } catch (Exception ex) {</span>
+<span class="nc" id="L204">            return null;</span>
+        }
+    }
+
+    /**
+     * Annettuna encoodattu Stringi, palauttaa selkokielisen Stringin.
+     * HUOM: Kyseessa ylimaarainen suojaus, kaikki liikenne tulisi
+     * silti kuljettaa HTTPS yhteyden sisalla!
+     *
+     * @param encodedData String encoodattua dataa
+     * @return String decoodattua dataa
+     * @throws UnsupportedEncodingException jos muotoilu on vaarin
+     */
+    private static String decode(
+            final String encodedData) throws UnsupportedEncodingException {
+<span class="fc" id="L219">        return new String(Base64Utils.decodeFromString(encodedData), &quot;UTF-8&quot;);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

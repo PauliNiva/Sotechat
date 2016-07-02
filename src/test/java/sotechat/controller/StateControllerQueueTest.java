@@ -16,13 +16,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.support.SimpAnnotationMethodMessageHandler;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.support.AbstractSubscribableChannel;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,13 +36,12 @@ import sotechat.domain.Person;
 import sotechat.repo.ConversationRepo;
 import sotechat.repo.MessageRepo;
 import sotechat.repo.PersonRepo;
+import sotechat.service.DatabaseService;
 import sotechat.service.QueueService;
 import sotechat.util.*;
-import sotechat.wrappers.QueueItem;
 
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,6 +89,9 @@ public class StateControllerQueueTest {
     @Autowired
     private StateController stateController;
 
+    @Autowired
+    private DatabaseService databaseService;
+
     @Before
     public void setUp() throws Exception {
         Mockito.when(personRepo.findOne(any(String.class)))
@@ -100,7 +100,8 @@ public class StateControllerQueueTest {
                 .thenReturn(new Conversation());
         this.accessor = Mockito.mock(SimpMessageHeaderAccessor.class);
         this.stateController = (StateController) context.getBean("stateController");
-        this.mapper = (Mapper) context.getBean("mapper");
+        this.mapper = (Mapper) context.getBean("mapperImpl");
+        mapper.setDatabaseService(databaseService);
         this.queueService = (QueueService) context.getBean("queueService");
 
         this.mapper.mapProUsernameToUserId("hoitaja", "666");
@@ -113,7 +114,7 @@ public class StateControllerQueueTest {
     public void tearDown() throws Exception {
         /* Unohdetaan sessiot, jotta testien valille
          * ei syntyisi riippuvaisuuksia. */
-        sessionRepo.forgetSessions();
+        sessionRepo.forgetAllSessions();
         emptyQueue();
     }
 
@@ -161,12 +162,13 @@ public class StateControllerQueueTest {
         assertEquals(0, this.queueService.getQueueLength());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void professionalCantPopFromEmptyQueue() throws Exception {
         Mockito.when(this.accessor.getUser()).thenReturn(new MockPrincipal("hoitaja"));
 
-        this.stateController
-                .popClientFromQueue("DEV_CHANNEL", this.accessor);
+        JsonObject response = parseStringIntoJsonObject(this.stateController
+                .popClientFromQueue("DEV_CHANNEL", this.accessor));
+        assertEquals("", response.get("channelAssignedTo").getAsString());
     }
 
     @Test

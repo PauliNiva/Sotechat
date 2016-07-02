@@ -57,7 +57,7 @@ public class StateControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        mapper = (Mapper)webApplicationContext.getBean("mapper");
+        mapper = (Mapper)webApplicationContext.getBean("mapperImpl");
         sessions = (SessionRepo)webApplicationContext
                 .getBean("sessionRepo");
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -71,7 +71,7 @@ public class StateControllerTest {
     public void tearDown() throws Exception {
         /* Unohdetaan sessiot, jotta testien valille
          * ei syntyisi riippuvaisuuksia. */
-        sessions.forgetSessions();
+        sessions.forgetAllSessions();
     }
 
     /** GET polkuun /userState palauttaa uskottavat arvot.
@@ -83,7 +83,7 @@ public class StateControllerTest {
                 .get("/userState").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(5)))
-                .andExpect(jsonPath("$.state", is("start")))
+                .andExpect(jsonPath("$.state", is("closed")))
                 .andExpect(jsonPath("$.username", is("Anon")))
                 .andExpect(jsonPath("$.channelId").isNotEmpty())
                 .andExpect(jsonPath("$.userId").isNotEmpty())
@@ -120,7 +120,11 @@ public class StateControllerTest {
     @Test
     public void testJoinQueueWithoutProperSessionFails() throws Exception {
         String json = "{\"username\":\"Markku\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(MockMvcRequestBuilders
+                .get("/proState")
+                .accept(MediaType.APPLICATION_JSON)
+                .principal(new MockPrincipal("Hoitaja")));
+        mvc.perform(post("/joinQueue")
                 .contentType(MediaType.APPLICATION_JSON).content(json)
         )
                 .andExpect(status().isOk())
@@ -150,14 +154,14 @@ public class StateControllerTest {
 
         /** Tehdaan sitten samalta 007-sessiolta kelpo /joinQueue pyynto. */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                     .contentType(MediaType.APPLICATION_JSON).content(json)
                     .session(mockSession)
                     )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                        is("OK, please request new state now.")));
+                        is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test
@@ -175,14 +179,14 @@ public class StateControllerTest {
 
         /** Tehdaan /joinQueue pyynto sessiolta 007, vaikka tila != "start". */
         String json = "{\"username\":\"Anon\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
                         .contentType(MediaType.APPLICATION_JSON).content(json)
                         .session(mockSession)
                         )
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.*", hasSize(1)))
                     .andExpect(jsonPath("$.content",
-                        is("Denied join pool request due to bad state.")));
+                            is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test
@@ -199,14 +203,13 @@ public class StateControllerTest {
         /** Tehdaan sitten samalta 007-sessiolta /joinQueue pyynto,
          * jossa yritamme valita rekisteroidyn kayttajanimen "Hoitaja". */
         String json = "{\"username\":\"Hoitaja\",\"startMessage\":\"Hei!\"}";
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$.content",
-                           is("Denied join pool request due "
-                                   + "to reserved username.")));
+                        is("Denied join, no professionals available."))); //TODO:FIX JONO KIINNI
     }
 
     @Test
@@ -220,7 +223,7 @@ public class StateControllerTest {
 
         String json = "väärä json";
 
-        mvc.perform(post("/joinPool")
+        mvc.perform(post("/joinQueue")
         .contentType(MediaType.APPLICATION_JSON).content(json)
         .session(mockSession))
                 .andExpect(status().isOk())

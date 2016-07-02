@@ -253,29 +253,23 @@ public class DatabaseServiceTest {
         Assert.assertEquals(0, databaseService.getConvInfoListOfUserId("xxd").size());
     }
 
-    @Test
-    @Transactional
-    public void createNewUserTest(){
-        databaseService.createNewUser("yxz345", "hoitaja", "Hoitaja", "hoitaja", "salasana");
-        Assert.assertNotNull(personRepo.findOne("yxz345"));
-        Person person = personRepo.findOne("yxz345");
-        Assert.assertEquals("hoitaja", person.getLoginName());
-        Assert.assertEquals("Hoitaja", person.getUserName());
-        Assert.assertEquals("hoitaja", person.getRole());
-    }
 
     @Test
     @Transactional
-    public void InvalidDataCreatePersonTest(){
-        databaseService.createNewUser("yxz456", null, null, null, null);
-        Assert.assertNull(personRepo.findOne("yxz456"));
-    }
-
-    @Test
-    @Transactional
-    public void InvalidDataCreatePersonTest2(){
-        databaseService.createNewUser(null, "hoitaja", "hoitaja", "hoitaja", "salasana");
-        Assert.assertNull(personRepo.findOne("yxz456"));
+    public void removeAllConversationsFromDatabaseTest(){
+        Assert.assertTrue(conversationRepo.findAll().isEmpty());
+        Assert.assertTrue(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
+        conversationRepo.save(conversation);
+        conversation.addPersonToConversation(personRepo.findOne("xxd"));
+        personRepo.findOne("xxd").addConversationToPerson(conversationRepo.findOne("xyzo"));
+        conversationRepo.save(conversation);
+        Assert.assertFalse(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
+        Assert.assertNotNull(conversationRepo.findOne("xyzo"));
+        Assert.assertEquals(1, conversationRepo.findAll().size());
+        databaseService.removeAllConversationsFromDatabase();
+        Assert.assertNull(conversationRepo.findOne("xyzo"));
+        Assert.assertTrue(personRepo.findOne("xxd").getConversationsOfPerson().isEmpty());
+        Assert.assertTrue(conversationRepo.findAll().isEmpty());
     }
 
 }

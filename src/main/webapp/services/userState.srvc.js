@@ -1,44 +1,52 @@
-/** Palvelu huolehtii käyttäjän tilan ylläpitämiestä
- *  kontrolleri vaihdosten yli
+/**
+ * Palvelu huolehtii kayttajan tilan yllapitamisesta
+ * kontrolleri vaihdosten yli.
  */
 angular.module('chatApp')
     .factory('userStateService', ['$http', function ($http) {
-        /** Esitellään parametrit */
         var channelID;
         var username;
         var userID;
         var userState;
 
-        /** Getterit ja setterit */
+        /**
+         * etterit ja setterit
+         */
         function setChannelID(value) {
             channelID = value;
-        };
+        }
 
         function setUsername(value) {
             username = value;
-        };
+        }
 
         function setUserState(value) {
             userState = value;
-        };
+        }
 
         function setUserID(value) {
             userID = value;
-        };
+        }
 
         function getChannelID() {
             return channelID;
-        };
+        }
 
         function getUsername() {
             return username;
-        };
+        }
 
         function getUserID() {
             return userID;
-        };
+        }
 
-        /** Palauttaa käyttäjän tilaavastaavan templaten osoitteen */
+        function getState() {
+            return userState;
+        }
+
+        /**
+         * Palauttaa käyttäjän tilaavastaavan templaten osoitteen.
+         */
         function getUserState() {
             if (userState === 'queue') {
                 return 'queue/userInQueue.tpl.html'
@@ -46,28 +54,36 @@ angular.module('chatApp')
                 return 'chatWindow/userInChat.tpl.html'
             } else if (userState === 'pro') {
                 return 'staticErrorPages/sameBrowserError.html'
-            }
-            else {
+            } else if (userState === 'closed') {
+                return 'common/chatClosed.tpl.html'
+            } else {
                 return 'queue/userToQueue.tpl.html';
             }
-        };
+        }
         
+        /**
+         * Lahettaa poistumis ilmoituksen serverille.
+         */
         function leaveChat() {
             $http.post("/leave/" + getChannelID(), {});
-        };
+        }
 
-        /** Hakee get-pyynnöllä palvelimelta käyttäjän tiedot */
+        /**
+         * Hakee get-pyynnolla palvelimelta kayttajan tiedot.
+         */
         function getVariablesFormServer() {
             return $http.get("/userState");
-        };
+        }
 
-        /** asettaa vastauksessa tullet parametrit palveluun*/
+        /**
+         * Asettaa vastauksessa tulleet parametrit palveluun.
+         */
         function setAllVariables(response) {
             setUsername(response.data.username);
             setChannelID(response.data.channelId);
             setUserID(response.data.userId);
             setUserState(response.data.state);
-        };
+        }
 
         var queue = {
             getVariablesFormServer: getVariablesFormServer,
@@ -77,7 +93,8 @@ angular.module('chatApp')
             getChannelID: getChannelID,
             getUsername: getUsername,
             getUserID: getUserID,
-            leaveChat: leaveChat
+            leaveChat: leaveChat,
+            getState: getState
         };
 
         return queue;

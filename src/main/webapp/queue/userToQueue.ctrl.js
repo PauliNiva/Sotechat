@@ -1,21 +1,24 @@
-/** Controlleri hallitsee käyttäjän liittämistä jonoon, 
- *  kun käyttäjä on valinnut nimimerkin ja kirjoittanut aloitusviestin
+/**
+ * Kontrolleri hallitsee kayttajan liittamista jonoon,
+ * kun kayttaja on valinnut nimimerkin ja kirjoittanut aloitusviestin.
  */
 angular.module('chatApp')
-    .controller('userToQueueCtrl', ['$http', '$scope', 'userStateService', function ($http, $scope, userStateService) {
-        /** Serverin mappaukset */
-        var JOINPOOLURL = '/joinPool';
+    .controller('userToQueueCtrl', ['$http', '$scope', 'userStateService',
+        function ($http, $scope, userStateService) {
+        var JOINPOOLURL = '/joinQueue';
 
-        /** Kun käyttäjä painaa jonoon liittymispainiketta 
-         *  Suoritetaan post pyyntö serverille ja toimitaan
-         *  sen vastauksen mukaan.
+        /** 
+         * Kun kayttaja painaa jonoon liittymispainiketta 
+         * suoritetaan post pyynto serverille ja toimitaan
+         * sen vastauksen mukaan.
          */
         $scope.joinQueue = function () {
-            /** Onnistunut post pyyntö
-             *  Käyttäjä pyytää tilapäivitystä ja toimii sen mukaan
+            /** 
+             * Onnistunut post-pyynto.
+             * Kayttaja pyytaa tilapaivitysta ja toimii sen mukaan.
              */
             var handleResponse = function (response) {
-                if (response.data.content == "OK, please request new state now.") {
+                if (response.data.content === "OK, please request new state now.") {
                     userStateService.getVariablesFormServer().then(function (response) {
                         userStateService.setAllVariables(response);
                         $scope.updateState();
@@ -25,27 +28,31 @@ angular.module('chatApp')
                 }
 
             };
-                /** Epäonnistunut post pyyntö
-                 *  Alustetaan virheilmoitukset
+                /** 
+                 * Epaonnistunut post-pyynto.
+                 * Alustetaan virheilmoitukset.
                  */
             var errorJoinQueue = function (response) {
                     var err = "Tuntematon virhe";
-                    if (response.data.content == "Denied join pool request for professional.") {
+                    if (response.data.content === "Denied join queue request for professional.") {
                         // Tässä casessa userState vaihtuu "pro":ksi ja kayttajan nakyma
                         // heitetaan staattiselle virhesivulle. Siksi tyhja blokki.
                     } else {
-                        if (response.data.content == "Denied join pool request due to reserved username.") {
+                        if (response.data.content === "Denied join queue request due to reserved username.") {
                             err = "Kayttajanimi on varattu. Kokeile toista nimea.";
-                        } else if (response.data.content == "Denied join pool request. Username already on channel.") {
+                        } else if (response.data.content === "Denied join queue request. Username already on channel.") {
                             err = "Kanavalla on jo kayttaja samalla kayttajanimella. Kokeile toista nimea.";
+                        } else if (response.data.content === "Denied join, no professionals available.") {
+                            err = "Ammattilaisia ei ole juuri nyt paikalla.";
                         }
                         alert(err);
                     }
-            }
+            };
 
-            /** Suoritetaan post pyyntö palvelimelle
-             *  Viesti sisältää halutun käyttäjänimen 
-             *  Sekä aloutusviestin
+            /** 
+             * Suoritetaan post pyynto palvelimelle.
+             * Viesti sisaltaa halutun kayttajanimen,
+             * sekä aloitusviestin.
              */
             $http.post(JOINPOOLURL, {'username': $scope.username, 'startMessage': $scope.startMessage})
                 .then(handleResponse, errorJoinQueue);

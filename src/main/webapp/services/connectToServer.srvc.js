@@ -1,14 +1,16 @@
-/** Palvelu huolehtii websocket yhteyden muodostus pyynnöstä
- *  palvelimeen ja pitää yhteyden elossa 
- *  kontrollerien välillä liikkuessa
+/** 
+ * Palvelu huolehtii websocket-yhteyden muodostuspyynnosta
+ * palvelimeen ja pitaa yhteyden elossa 
+ * kontrollerien valilla liikuessa.
  */
 angular.module('commonMod')
-    .service('connectToServer', ['stompSocket', '$timeout', function (stompSocket, $timeout) {
+    .service('connectToServer', ['stompSocket', '$timeout', '$window',
+        function (stompSocket, $timeout, $window) {
         /** Serverin mappaukset */
         var WEBSOCKETURL = '/toServer';
         /** Yhteyden tila */
         var connectionStatus = false;
-        
+        var reconnectMulti = 1;
         /** Yhteyden muodostamis pyyntö 
          *  Parametrina functio jota kutsutaan 
          *  kun yhteys muodostettu
@@ -16,23 +18,27 @@ angular.module('commonMod')
         function connect(answer) {
             if (!connectionStatus) {
                 stompSocket.init(WEBSOCKETURL);
-                stompSocket.connect(function (frame) {
+                stompSocket.connect(function () {
                     connectionStatus = true;
                     answer();
-                }, function (error) {
-                    connectionStatus = false; //TODO: RECONNECT
-                   // $timeout(function() {
-                   //     connect(answer);
-                   // }, 10000);
+                }, function () {
+                    connectionStatus = false;
+                    reconnectMulti *= 2 ;
+                    $timeout(function() {
+                        connect(function() {
+                            $window.location.reload();
+                        });
+                    }, 10000 * reconnectMulti);
                 });
             } else {
                 answer();
             }
         }
 
-        /** Funtio jolta voidaan pyytää kanavan tilaamista
-         *  Parametrina kavan osoite sekä functio jota kutsutaan
-         *  kun viestejä saapuu kanavalta
+        /** 
+         * Funtio jolta voidaan pyytaa kanavan tilaamista.
+         * Parametrina kavanosoite seka functio jota kutsutaan
+         * kun viesteja saapuu kanavalta.
          */
         function subscribe(destination, answerFunction) {
             return stompSocket.subscribe(destination, function (response) {
