@@ -89,9 +89,27 @@ public class ChatLogger {
     }
 
     /**
-     * Kirjaa palvelimen kaynnistymisen
+     * TODO: Refactoroi.
+     * Kaytannossa allaoleva metodi suoritetaan kerran,
+     * palvelimen kaynnistyessa. Kyseessa on viime
+     * hetken korjaus, jolla saatiin purkattua kasaan
+     * tarvittavat riippuvuudet, jotta asiakaskayttajien ja
+     * ammattilaiskayttajien timeout disconnect toimii
+     * jarkevalla ja intuitiivisella tavalla. Metodi
+     * odottelee, kunnes Mapper ja DatabaseService ovat
+     * alustettu, ja sen jalkeen antaa Mapperille
+     * riippuvuuden DatabaseServiceen. Miksi riippuvuuksia
+     * ei olla asetettu normaalilla tavalla? Jostain syysta
+     * joillain tietokoneilla Spring kuvittelee loytaneensa
+     * kehariippuvuuden ja kieltaytyy kaynnistymasta.
+     * Talla purkalla saadaan Spring kaynnistymaan.
+     * Spring siis luulee, etta DatabaseServicesta on
+     * riippuvuus takaisin Mapperiin, vaikka nain ei ole.
+     *
+     * Lisaksi tama metodi kirjaa palvelimen kaynnistymisen
      * yhteydessa Mapperiin tietokannasta varatut ID:t ja
      * usernamet.
+     *
      */
     public void tryToInitializeDependencies() {
         if (mapper == null || databaseService == null) {
